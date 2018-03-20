@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#exec >>/run/mdev.log
+#exec 2>&1
+#env
+
+sleep 1
+#dev_path/sys${DEVPATH}
+-dev_path=/sys$1
+state=`cat ${dev_path}/state`
+if [ "$state"x != "config"x  ] ; then
+UDC=`ls /sys/class/udc/| awk '{print $1}'`
+echo $UDC > /sys/kernel/config/usb_gadget/g1/UDC
+fi

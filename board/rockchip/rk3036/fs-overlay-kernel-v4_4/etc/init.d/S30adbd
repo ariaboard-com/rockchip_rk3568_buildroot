@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# Start ADB daemon service....
+#
+
+case "$1" in
+  start)
+	echo "Configuring ADB USB gadget driver..."
+	chmod 776 /usr/bin/adb_config
+	UDC=`ls /sys/class/udc/| awk '{print $1}'`
+	mkdir /dev/usb-ffs -m 0770 
+	mkdir /dev/usb-ffs/adb -m 0770 
+	mount -t configfs none /sys/kernel/config
+	mkdir /sys/kernel/config/usb_gadget/g1  -m 0770 
+	sleep 1
+	echo 0x2207 > /sys/kernel/config/usb_gadget/g1/idVendor 
+	echo 0x0006 > /sys/kernel/config/usb_gadget/g1/idProduct
+	mkdir /sys/kernel/config/usb_gadget/g1/strings/0x409   -m 0770 
+	sleep 1
+	echo "0123456789ABCDEF" > /sys/kernel/config/usb_gadget/g1/strings/0x409/serialnumber
+	echo "rockchip"  > /sys/kernel/config/usb_gadget/g1/strings/0x409/manufacturer
+	echo "rk3xxx"  > /sys/kernel/config/usb_gadget/g1/strings/0x409/product
+	mkdir /sys/kernel/config/usb_gadget/g1/functions/ffs.adb
+	mkdir /sys/kernel/config/usb_gadget/g1/configs/b.1  -m 0770 
+	mkdir /sys/kernel/config/usb_gadget/g1/configs/b.1/strings/0x409  -m 0770 
+	#echo 0x1 > /sys/kernel/config/usb_gadget/g1/os_desc/b_vendor_code
+	#echo "MSFT100" > /sys/kernel/config/usb_gadget/g1/os_desc/qw_sign
+	#echo 500 > /sys/kernel/config/usb_gadget/g1/configs/b.1/MaxPower
+	#ln -s /sys/kernel/config/usb_gadget/g1/configs/b.1 /sys/kernel/config/usb_gadget/g1/os_desc/b.1
+	sleep 1
+	ln -s  /sys/kernel/config/usb_gadget/g1/functions/ffs.adb /sys/kernel/config/usb_gadget/g1/configs/b.1
+	echo "adb" > /sys/kernel/config/usb_gadget/g1/configs/b.1/strings/0x409/configuration
+	mount -t functionfs adb /dev/usb-ffs/adb
+	adbd  &
+	sleep 1
+	echo $UDC > /sys/kernel/config/usb_gadget/g1/UDC
+	
+	#echo rockchip > /sys/class/android_usb/android0/iManufacturer
+	#echo rk1108 > /sys/class/android_usb/android0/iProduct 
+
+	#mkdir -p /dev/usb-ffs/adb
+	#mount -t functionfs adb /dev/usb-ffs/adb
+	#echo adb > /sys/class/android_usb/android0/f_ffs/aliases
+
+	#echo 0 > /sys/class/android_usb/android0/enable
+	#echo 2207 > /sys/class/android_usb/android0/idVendor
+	#echo 0006 > /sys/class/android_usb/android0/idProduct
+	#echo adb > /sys/class/android_usb/android0/functions
+	#echo 1 > /sys/class/android_usb/android0/enable
+	#start-stop-daemon --start --oknodo --pidfile /var/run/adbd.pid --startas /usr/sbin/adbd --background
+	;;
+  stop)
+	echo "none" > /config/usb_gadget/g1/UDC
+#	start-stop-daemon --stop --oknodo --pidfile /var/run/adbd.pid --retry 5
+#	echo 0 > /sys/class/android_usb/android0/enable
+#	umount /dev/usb-ffs/adb
+	;;
+  restart|reload)
+	echo adb > /sys/class/android_usb/android0/f_ffs/aliases
+	echo 0 > /sys/class/android_usb/android0/enable
+	echo 2207 > /sys/class/android_usb/android0/idVendor
+	echo 0006 > /sys/class/android_usb/android0/idProduct
+	echo adb > /sys/class/android_usb/android0/functions
+	echo 1 > /sys/class/android_usb/android0/enable
+
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?

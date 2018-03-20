@@ -1,0 +1,4 @@
+config BR2_PACKAGE_ROCKCHIP_UTILS
+    bool "rockchip utils"
+	default y
+

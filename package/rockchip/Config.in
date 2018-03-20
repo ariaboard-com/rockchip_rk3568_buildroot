@@ -1,0 +1,55 @@
+menuconfig BR2_PACKAGE_ROCKCHIP
+	bool "rockchip BSP packages"
+
+if BR2_PACKAGE_ROCKCHIP
+choice
+	default BR2_PACKAGE_RV1108
+	prompt "rockchip chip support"
+
+config BR2_PACKAGE_RV1108
+	bool "rv1108 chip"
+	help
+		Use rockchip's rv1108 chip
+
+config BR2_PACKAGE_RK312X
+	bool "rk312X chip"
+	help
+		Use rockchip's rk312x chip
+
+config BR2_PACKAGE_RK3036_ECHO
+	bool "rk3036G chip"
+	help
+		Use rockchip's rk3036g chip
+
+config BR2_PACKAGE_RK3308
+    bool "rk3308 chip"
+    help
+        Use rockchip's rk3308 chip
+
+endchoice
+
+# BSP packages
+source "package/rockchip/rv1108-firmware/Config.in"
+
+# Shared packages with all chips
+source "package/rockchip/liblog/Config.in"
+source "package/rockchip/alexaClientSDK/Config.in"
+source "package/rockchip/DuerClientSDK/Config.in"
+source "package/rockchip/libcutils/Config.in"
+source "package/rockchip/libion/Config.in"
+source "package/rockchip/mpp/Config.in"
+source "package/rockchip/adbd/Config.in"
+source "package/rockchip/gstreamer1-rockchip/Config.in"
+source "package/rockchip/wakeWordAgent/Config.in"
+source "package/rockchip/pcba/Config.in"
+source "package/rockchip/libiep/Config.in"
+source "package/rockchip/softap/Config.in"
+source "package/rockchip/softapServer/Config.in"
+source "package/rockchip/wifiAutoSetup/Config.in"
+source "package/rockchip/gstreamer1-iep/Config.in"
+source "package/rockchip/gst1-libav-rk/Config.in"
+source "package/rockchip/rkwifibt/Config.in"
+source "package/rockchip/rockchip_utils/Config.in"
+source "package/rockchip/mdev_mount/Config.in"
+source "package/rockchip/alsa_capture/Config.in"
+endif

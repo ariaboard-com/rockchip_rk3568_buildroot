@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# Insmod
+#
+
+auto_mount() {
+	e2fsck -fy /dev/mmcblk2p9
+	resize2fs /dev/mmcblk2p9
+	e2fsck -fy /dev/mmcblk2p8
+	resize2fs /dev/mmcblk2p8
+	mount -t ext4 /dev/mmcblk2p9 data
+	mount -t ext4 /dev/mmcblk2p8 data/cfg
+}
+
+case "$1" in
+  start)
+        auto_mount
+        ;;
+  stop)
+        printf "stop finished\n"
+        ;;
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0

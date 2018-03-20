@@ -1,0 +1,2 @@
+config BR2_PACKAGE_LIBIEP
+	bool "libiep for rockchip"

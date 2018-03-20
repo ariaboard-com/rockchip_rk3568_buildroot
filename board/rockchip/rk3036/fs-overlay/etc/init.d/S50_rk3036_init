@@ -1,0 +1,107 @@
+#!/bin/sh
+#
+# Insmod
+#
+
+auto_mount() {
+	local cmdline="`cat /proc/cmdline`"
+	local data_type="${cmdline##*dataType=}"
+	local data_type="${data_type%% *}"
+	local cfg_type="${cmdline##*cfgType=}"
+	local cfg_type="${cfg_type%% *}"
+
+	case "${cfg_type}" in
+		ext4)
+			;;
+		*)
+			local cfg_type="ext4"
+			;;
+	esac
+
+	case "${data_type}" in
+		squashfs|ext4)
+			;;
+		*)
+			local data_type="squashfs"
+			;;
+	esac
+
+	local flash_type="${cmdline##*root=}"
+	local flash_type="${flash_type%% *}"
+
+	if [ "${flash_type}" == "/dev/rknand_boot" ];then
+		local fdir="/dev/rknand_"
+		if [ "${data_type}" == "ext4" ];then
+			e2fsck -fy ${fdir}data
+			resize2fs ${fdir}data
+		fi
+		if [ "${cfg_type}" == "ext4" ];then
+			e2fsck -fy ${fdir}cfg
+			resize2fs ${fdir}cfg
+		fi
+
+		mount -t ${data_type} ${fdir}data /data
+		mount -t ${cfg_type} ${fdir}cfg /data/cfg
+		return 0
+	fi
+
+	if [ "${flash_type:0:11}" == "/dev/mmcblk" ];then
+        printf "insmod drmboot service...\n"
+        insmod /usr/lib/modules/drmboot.ko
+		local ftmp="${cmdline##*mtdparts=rk29xxnand:}"
+		local ftmp="${ftmp%% *}"
+		local fno=0
+		local fdir=/dev/PartNo
+		mkdir $fdir
+		for i in ${ftmp//,/ }
+		do
+			i=${i##*\(}
+			i=${i%*\)}
+			local fno=$(( fno + 1 ))
+			ln -sf "/dev/mmcblk0p${fno}" ${fdir}/${i}
+		done
+
+		if [ "${data_type}" == "ext4" ];then
+			e2fsck -fy ${fdir}/data
+			resize2fs ${fdir}/data
+		fi
+		if [ "${cfg_type}" == "ext4" ];then
+			e2fsck -fy ${fdir}/cfg
+			resize2fs ${fdir}/cfg
+		fi
+
+		mount -t ${data_type} ${fdir}/data /data
+		mount -t ${cfg_type} ${fdir}/cfg /data/cfg
+		return 0
+	fi
+
+	if [ "${flash_type:0:9}" == "/dev/boot" ];then
+		if [ "${data_type}" == "ext4" ];then
+			e2fsck -fy /dev/data
+			resize2fs /dev/data
+		fi
+		if [ "${cfg_type}" == "ext4" ];then
+			e2fsck -fy /dev/cfg
+			resize2fs /dev/cfg
+		fi
+
+		mount -t ${data_type} /dev/data /data
+		mount -t ${cfg_type} /dev/cfg /data/cfg
+		return 0
+	fi
+
+}
+
+case "$1" in
+  start)
+        auto_mount
+        ;;
+  stop)
+        printf "stop finished\n"
+        ;;
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0

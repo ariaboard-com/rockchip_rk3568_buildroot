@@ -1,0 +1,17 @@
+export HOME=/data/cfg
+export PATH=$PATH:$HOME:$HOME/bin:/data/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/usrlibs
+
+case "$1" in
+  start)
+        source /data/RkLunch.sh
+        ;;
+  stop)
+        printf "stop finished\n"
+        ;;
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0

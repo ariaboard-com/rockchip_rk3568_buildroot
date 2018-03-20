@@ -1,0 +1,3 @@
+#!/bin/sh
+rfkill unblock all
+brcm_patchram_plus1 --bd_addr_rand --enable_hci --no2bytes --use_baudrate_for_download  --tosleep  200000 --baudrate 1500000 --patchram  BTFIRMWARE_PATH BT_TTY_DEV &
