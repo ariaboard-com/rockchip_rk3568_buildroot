@@ -1881,6 +1881,7 @@ F:	package/linux-firmware/
 F:	package/linux-tools/
 F:	package/matchbox*
 F:	package/mesa3d-headers/
+F:	package/mke2img/
 F:	package/nbd/
 F:	package/nut/
 F:	package/nvidia-driver/
