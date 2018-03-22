@@ -1,0 +1,4 @@
+config BR2_PACKAGE_ROCKCHIP_TEST
+	bool  "stress test tools"
+	help
+		function test for Rockchip stress test 
