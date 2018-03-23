@@ -14,6 +14,9 @@ do
 	let i++
 done
 
+# Set croot alias
+alias croot="cd $(pwd)"
+
 function choose_info()
 {
 	echo
@@ -127,19 +130,11 @@ function choose_type()
 				echo
 			fi
 		else
-			get_index $ANSWER
-			ANSWER=$?
-			if [ $ANSWER -gt 0 ]; then
-				index=$((${ANSWER}-1))
-				TARGET_BUILD_CONFIG=`get_build_config ${DEFCONFIG_ARRAY[$index]}`
-				TARGET_DIR_NAME="${DEFCONFIG_ARRAY[$index]}"
-				TARGET_BUILD_TYPE=`get_target_build_type ${DEFCONFIG_ARRAY[$index]}`
-				TARGET_BOARD_TYPE=`get_target_board_type ${DEFCONFIG_ARRAY[$index]}`
-			else
-				echo
-				echo "I didn't understand your response.  Please try again."
-				echo
-			fi
+			echo $ANSWER
+			TARGET_BUILD_CONFIG=`get_build_config $ANSWER`
+			TARGET_DIR_NAME="$ANSWER"
+			TARGET_BUILD_TYPE=`get_target_build_type $ANSWER`
+			TARGET_BOARD_TYPE=`get_target_board_type $ANSWER`
 		fi
 		if [ -n "$1" ]; then
 			break
@@ -170,4 +165,5 @@ function function_stuff()
 	choose_type $@
 	lunch
 }
+
 function_stuff $@
