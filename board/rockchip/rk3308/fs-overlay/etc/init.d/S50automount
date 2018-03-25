@@ -4,12 +4,12 @@
 #
 
 auto_mount() {
-	e2fsck -fy /dev/mmcblk2p9
-	resize2fs /dev/mmcblk2p9
-	e2fsck -fy /dev/mmcblk2p8
-	resize2fs /dev/mmcblk2p8
-	mount -t ext4 /dev/mmcblk2p9 data
-	mount -t ext4 /dev/mmcblk2p8 data/cfg
+	e2fsck -fy /dev/mmcblk0p9
+	resize2fs /dev/mmcblk0p9
+	e2fsck -fy /dev/mmcblk0p8
+	resize2fs /dev/mmcblk0p8
+	mount -t ext2 /dev/mmcblk0p9 data
+	mount -t ext2 /dev/mmcblk0p8 data/cfg
 }
 
 case "$1" in
