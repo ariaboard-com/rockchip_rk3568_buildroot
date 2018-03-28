@@ -1,6 +1,6 @@
 #!/bin/sh
 
-RESULT_DIR=/test_log/cpu
+RESULT_DIR=/data/cfg/rockchip_test/cpu
 RESULT_LOG=${RESULT_DIR}/cpu_hotplut.log
 
 #cpu info check

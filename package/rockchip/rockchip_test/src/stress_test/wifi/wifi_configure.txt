@@ -1,8 +1,0 @@
-ssid=chrysalis_5G
-password=buyaocaimima256
-encrypt=psk
-driver=dhd
-mode=station
-onoff_test=0
-retry=5
-debug=1

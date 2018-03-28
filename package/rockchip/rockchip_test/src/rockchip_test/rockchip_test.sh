@@ -1,8 +1,8 @@
 #!/bin/sh
-### file: test_plan.sh
-### author: yuegui.he@amlogic.com
+### file: rockchip_test.sh
+### author: yhx@rock-chips.com
 ### function: ddr cpu gpio audio usb player ehernet sdio/pcie(wifi) 
-### date: 2017/6/6
+### date: 20180327
 
 moudle_env()
 {
@@ -15,7 +15,7 @@ module_choice()
     echo "*****************************************************"
     echo "***                                               ***"
     echo "***        ********************                   ***"
-    echo "***        *AMLOGIC TEST TOOLS*                   ***"
+    echo "***       *ROCKCHIPS TEST TOOLS*                  ***"
     echo "***        *                  *                   ***"
     echo "***        ********************                   ***"
     echo "***                                               ***"
@@ -24,7 +24,7 @@ module_choice()
     
     echo "*****************************************************"
     echo "ddr test :            1 (qpl & ddr si)"
-    echo "cpu test :            2 (dvfs & autoreboot & cpu hotplug & suspend resume & thermal)"
+    echo "cpu test :            2 (dvfs & cpu hotplug & suspend resume & thermal)"
     echo "nand test:            3"
     echo "gpio test:            4 (pio & irq & pull)"
     echo "audio test:           5"
@@ -35,6 +35,7 @@ module_choice()
     echo "ethernet test:        10"
     echo "IR test:              11"
     echo "QT test:              12"
+	echo "auto reboot test:     13"
     echo "*****************************************************"
 
     echo  "please input your test moudle: "
@@ -48,7 +49,7 @@ ddr_test()
 
 cpu_test()
 {
-    sh /test_plan/cpu/cpu_test.sh
+    sh /rockchip_test/cpu/cpu_test.sh
 }
 
 nand_test()
@@ -106,6 +107,15 @@ qt_test()
 	sh /test_plan/qt/mipi_test.sh
 }
 
+auto_reboot_test()
+{
+	fcnt=/data/config/rockchip_test/reboot_cnt;                 
+	if [ -e "$fcnt" ]; then
+		rm -f $fcnt;                   
+	fi
+	sh /rockchip_test/auto_reboot/auto_reboot.sh
+}
+
 module_test()
 {
     case ${MODULE_CHOICE} in
@@ -144,6 +154,9 @@ module_test()
             ;;
         12)
             qt_test	
+            ;;
+		13)
+            auto_reboot_test	
             ;;
     esac
 }
