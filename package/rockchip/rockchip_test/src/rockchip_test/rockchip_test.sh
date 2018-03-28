@@ -23,7 +23,7 @@ module_choice()
 
     
     echo "*****************************************************"
-    echo "ddr test :            1 (qpl & ddr si)"
+    echo "ddr test :            1 (memtester & stressapptest)"
     echo "cpu test :            2 (dvfs & cpu hotplug & suspend resume & thermal)"
     echo "nand test:            3"
     echo "gpio test:            4 (pio & irq & pull)"
@@ -44,7 +44,7 @@ module_choice()
 
 ddr_test()
 {
-    sh /test_plan/ddr/ddr_test.sh
+    sh /rockchip_test/ddr/ddr_test.sh
 }
 
 cpu_test()
