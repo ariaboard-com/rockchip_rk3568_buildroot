@@ -30,7 +30,7 @@ module_choice()
     echo "audio test:           5"
     echo "usb  test:            6 (insert & read & write)"
     echo "player test:          7 "
-    echo "mult uboot test:      8 (erase & bad data & half data)"
+    echo "suspend_resume test:  8 (suspend & resume)"
     echo "wifi test:            9"
     echo "ethernet test:        10"
     echo "IR test:              11"
@@ -72,9 +72,9 @@ player_test()
     sh /test_plan/player/test.sh
 }
 
-mult_uboot_test()
+suspend_resume_test()
 {
-   sh /test_plan/mult_uboot/mult_reboot_control.sh 
+   sh /rockchip_test/suspend_resume/suspend_resume.sh
 }
 
 wifi_test()
@@ -141,7 +141,7 @@ module_test()
             player_test
             ;;
         8)
-            mult_uboot_test
+            suspend_resume_test
             ;;
         9)
             wifi_test
@@ -161,11 +161,7 @@ module_test()
     esac
 }
 
-# module env
-#module_env
-# moudule choice
 module_choice
-# moudle test
 module_test
 
 
