@@ -10,6 +10,7 @@ auto_mount() {
 	resize2fs /dev/mmcblk0p8
 	mount -t ext2 /dev/mmcblk0p9 data
 	mount -t ext2 /dev/mmcblk0p8 data/cfg
+	mount -t  pstore pstore /sys/fs/pstore
 }
 
 case "$1" in
