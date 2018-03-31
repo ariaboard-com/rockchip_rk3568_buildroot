@@ -3,6 +3,7 @@ source /etc/profile.d/RkEnv.sh
 case "$1" in
   start)
         source /data/RkLunch.sh
+        source /data/cfg/rockchip_test/auto_reboot.sh &
         ;;
   stop)
         printf "stop finished\n"
