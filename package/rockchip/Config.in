@@ -26,6 +26,11 @@ config BR2_PACKAGE_RK3308
     help
         Use rockchip's rk3308 chip
 
+config BR2_PACKAGE_RK3326
+    bool "rk3326 chip"
+    help
+        Use rockchip's rk3326 chip
+
 endchoice
 
 # BSP packages
