@@ -17,8 +17,28 @@ WAKEWORDAGENT_CONF_OPTS = \
 $(eval $(autotools-package))
 endif
 
-
 ifeq ($(BR2_PACKAGE_RK3308),y)
+WAKEWORDAGENT_SITE = $(TOPDIR)/../external/wakeWordAgent
+WAKEWORDAGENT_SITE_METHOD = local
+WAKEWORDAGENT_INSTALL_STAGING = YES
+WAKEWORDAGENT_AUTORECONF = YES
+
+WAKEWORDAGENT_CONF_OPTS = \
+    --exec-prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-dependency-tracking \
+    'CXXFLAGS=-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -Os' \
+    'CPPFLAGS=-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64' \
+    'CFLAGS=-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64  -Os'
+
+$(eval $(autotools-package))
+endif
+
+$(eval $(autotools-package))
+endif
+
+ifeq ($(BR2_PACKAGE_RK3326),y)
 WAKEWORDAGENT_SITE = $(TOPDIR)/../external/wakeWordAgent
 WAKEWORDAGENT_SITE_METHOD = local
 WAKEWORDAGENT_INSTALL_STAGING = YES

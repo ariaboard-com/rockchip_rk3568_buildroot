@@ -7,6 +7,9 @@ ADBD_SITE_METHOD = local
 else ifeq ($(BR2_PACKAGE_RK3308),y)
 ADBD_SITE = $(TOPDIR)/../external/adb
 ADBD_SITE_METHOD = local
+else ifeq ($(BR2_PACKAGE_RK3326),y)
+ADBD_SITE = $(TOPDIR)/../external/adb
+ADBD_SITE_METHOD = local
 else ifeq ($(BR2_PACKAGE_RK312X),y)
 ADBD_SITE = $(TOPDIR)/../external/adb
 ADBD_SITE_METHOD = local
