@@ -35,9 +35,6 @@ WAKEWORDAGENT_CONF_OPTS = \
 $(eval $(autotools-package))
 endif
 
-$(eval $(autotools-package))
-endif
-
 ifeq ($(BR2_PACKAGE_RK3326),y)
 WAKEWORDAGENT_SITE = $(TOPDIR)/../external/wakeWordAgent
 WAKEWORDAGENT_SITE_METHOD = local
