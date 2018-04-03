@@ -1,7 +1,7 @@
 #!/bin/sh
 
 delay=10
-total=3000
+total=30000
 fudev=/dev/sda
 CNT=/data/cfg/rockchip_test/reboot_cnt
 
