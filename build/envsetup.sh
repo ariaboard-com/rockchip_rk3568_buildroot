@@ -131,7 +131,7 @@ function choose_type()
 			fi
 		else
 			echo $ANSWER
-			TARGET_BUILD_CONFIG=`get_build_config $ANSWER`
+			TARGET_BUILD_CONFIG="$ANSWER"
 			TARGET_DIR_NAME="$ANSWER"
 			TARGET_BUILD_TYPE=`get_target_build_type $ANSWER`
 			TARGET_BOARD_TYPE=`get_target_board_type $ANSWER`
