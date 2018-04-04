@@ -75,6 +75,10 @@ function get_build_config() {
 	fi
 }
 
+function get_defconfig_name() {
+	echo $TARGET_DIR_NAME
+}
+
 function get_target_build_type() {
 	TARGET=$1
 	TYPE="$(echo $TARGET | cut -d '_' -f 1)"
