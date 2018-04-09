@@ -24,7 +24,7 @@ module_choice()
     
     echo "*****************************************************"
     echo "ddr test :            1 (memtester & stressapptest)"
-    echo "cpu test :            2 (dvfs & cpu hotplug & suspend resume & thermal)"
+    echo "cpu_dvfs_test:        2 (dvfs stresstest)"
     echo "nand test:            3"
     echo "gpio test:            4 (pio & irq & pull)"
     echo "audio test:           5"
@@ -47,9 +47,10 @@ ddr_test()
     sh /rockchip_test/ddr/ddr_test.sh
 }
 
-cpu_test()
+cpu_dvfs_test()
 {
-    sh /rockchip_test/cpu/cpu_test.sh
+	#value 1 is sleep time
+    sh /rockchip_test/dvfs/stress_test_dvfs.sh 60 &
 }
 
 nand_test()
@@ -123,7 +124,7 @@ module_test()
             ddr_test
             ;;
         2)
-            cpu_test
+            cpu_dvfs_test
             ;;
         3)
             nand_test
