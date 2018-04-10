@@ -49,8 +49,7 @@ ddr_test()
 
 cpu_dvfs_test()
 {
-	#value 1 is sleep time
-    sh /rockchip_test/dvfs/stress_test_dvfs.sh 60 &
+    sh /rockchip_test/dvfs/dvfs_test.sh
 }
 
 nand_test()
