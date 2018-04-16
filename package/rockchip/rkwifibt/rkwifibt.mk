@@ -42,6 +42,9 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/rk_load_bt_firmware
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/rk_load_bt_firmware
     $(INSTALL) -D -m 0755 $(@D)/rk_load_bt_firmware $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/wl $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/dhd $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/rtwpriv $(TARGET_DIR)/usr/bin
 endef
 endif
 
