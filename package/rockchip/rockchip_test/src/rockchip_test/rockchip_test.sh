@@ -79,7 +79,7 @@ suspend_resume_test()
 
 wifi_test()
 {
-    sh /test_plan/wifi/wifi_test.sh
+    sh /rockchip_test/wifi/wifi_test.sh
 }
 
 ethernet_test()
