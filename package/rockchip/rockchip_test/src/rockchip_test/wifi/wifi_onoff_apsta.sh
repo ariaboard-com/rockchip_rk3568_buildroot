@@ -2,7 +2,7 @@ ssid=
 password=
 encrypt=psk
 mode="station"
-config_file="/data/wifi_configure.txt"
+config_file="/data/wifi/wifi_configure.txt"
 router_ip="192.168.168.1"
 router_connted="no"
 ap_ip="192.168.2.1"
@@ -13,7 +13,7 @@ debug="1"
 module_pid_file="/sys/bus/mmc/devices/mmc1:0001/mmc1:0001:1/device"
 init_config=0
 ERROR_FLAG=0
-wifi_results_file=/data/wifi_results.txt
+wifi_results_file=/data/wifi/wifi_results.txt
 wifi_results_ok=
 wifi_results_fail=
 
@@ -199,7 +199,7 @@ mode=station
 onoff_test=1
 retry=5
 debug=1
-"  > /data/wifi_configure.txt
+"  > /data/wifi/wifi_configure.txt
 	fi
 	
 else
@@ -232,7 +232,7 @@ mode=station
 onoff_test=1
 retry=5
 debug=1
-"  > /data/wifi_configure.txt
+"  > /data/wifi/wifi_configure.txt
 	fi
 fi
 echo "user set:
@@ -291,10 +291,10 @@ ping $router_ip -w $ping_period
 
 if [ $? -eq 1 ];then
 	echo "ping fail!! please check"
-	echo "======================kernel log=========================" >> /data/wifi_reboot_fail.txt
-	dmesg >> /data/wifi_reboot_fail.txt
-	echo "======================wpa_supplicant_fail log============" >> /data/wpa_supplicant_fail.log
-	cat /data/wpa_supplicant.log >> /data/wpa_supplicant_fail.log
+	echo "======================kernel log=========================" >> /data/wifi/wifi_reboot_fail.txt
+	dmesg >> /data/wifi/wifi_reboot_fail.txt
+	echo "======================wpa_supplicant_fail log============" >> /data/wifi/wpa_supplicant_fail.log
+	cat /data/wifi/wpa_supplicant.log >> /data/wifi/wpa_supplicant_fail.log
 
 	let wifi_results_fail+=1
 	ERROR_FLAG=1
@@ -302,7 +302,7 @@ else
 
 	echo "ping successfully"
 	router_connted="yes"
-	dmesg > /data/wifi_reboot_ok.txt
+	dmesg > /data/wifi/wifi_reboot_ok.txt
 
 	let wifi_results_ok+=1
 fi
@@ -319,8 +319,7 @@ sleep 3
 echo "starting wpa_supplicant..."
 ifconfig wlan0 0.0.0.0
 
-mkdir /data/wpa_supplicant
-echo "ctrl_interface=/data/wpa_supplicant
+echo "ctrl_interface=/var/run/wpa_supplicant
 ap_scan=1
 
 network={
@@ -328,20 +327,16 @@ network={
 	psk=\"$password\"
 	key_mgmt=WPA-PSK
 }
-" > /data/wpa_supplicant.conf
+" > /data/cfg/wpa_supplicant.conf
 
 if [ $debug -eq 1 ];then
 	echo "ctrl_interface=/var/run/wpa_supplicant"
-	/sbin/start-stop-daemon -S -m -p $PIDFILE1  -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf -d > /data/wpa_supplicant.log &
+	/sbin/start-stop-daemon -S -m -p $PIDFILE1  -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/cfg/wpa_supplicant.conf -ddddddddd > /data/wifi/wpa_supplicant.log &
 else
 	echo "ctrl_interface=/var/run/wpa_supplicant debug0"
 	#/sbin/start-stop-daemon -S -m -p /usr/bin/wpa_supplicant -b -x /var/run/wpa_supplicant.pid -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf
-	/sbin/start-stop-daemon -S -m -p $PIDFILE1 -b -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf
+	/sbin/start-stop-daemon -S -m -p $PIDFILE1 -b -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/cfg/wpa_supplicant.conf
 fi
-
-#check_in_loop 2 check_wpa
-#check_in_loop 2 check_ap_connect
-echo "start wpa_supplicant successfully!!"
 
 sleep 2
 
@@ -349,6 +344,10 @@ sleep 2
 echo "starting wifi dhcp..."
 /sbin/dhcpcd wlan0
 echo "ap connected!!"
+
+check_in_loop 6 check_wpa
+check_in_loop 6 check_ap_connect
+echo "start wpa_supplicant successfully!!"
 }
 
 function start_wifi() {
@@ -418,4 +417,5 @@ fi
 }
 
 wifi_bcm_init
+mkdir /data/wifi/
 main
