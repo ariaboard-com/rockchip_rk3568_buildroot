@@ -38,6 +38,7 @@ source "package/rockchip/rv1108-firmware/Config.in"
 
 # Shared packages with all chips
 source "package/rockchip/liblog/Config.in"
+source "package/rockchip/LocalPlayer/Config.in"
 source "package/rockchip/alexaClientSDK/Config.in"
 source "package/rockchip/DuerClientSDK/Config.in"
 source "package/rockchip/libcutils/Config.in"
