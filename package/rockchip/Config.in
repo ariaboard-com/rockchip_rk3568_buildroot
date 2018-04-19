@@ -59,4 +59,5 @@ source "package/rockchip/rockchip_utils/Config.in"
 source "package/rockchip/mdev_mount/Config.in"
 source "package/rockchip/alsa_capture/Config.in"
 source "package/rockchip/rockchip_test/Config.in"
+source "package/rockchip/rockchip_modules/Config.in"
 endif
