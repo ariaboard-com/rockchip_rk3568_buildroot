@@ -1,16 +1,40 @@
 #!/bin/sh
 #
-# Insmod
+# partitions mount 
+# yhx@rock-chips.com
 #
 
+nand_disk_name="/dev/rknand0"
+
+#partitions number
+if [ ! -f "$nand_disk_name" ]; then
+	data_partition_number=$(fdisk -l |grep -E "data" |awk '{print $1}')
+	cfg_partition_number=$(fdisk -l |grep -E "cfg" |awk '{print $1}')
+	disk_name=$(fdisk -l |grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
+else
+	data_partition_number=$(fdisk -l $nand_disk_name|grep -E "data" |awk '{print $1}')
+	cfg_partition_number=$(fdisk -l $nand_disk_name|grep -E "cfg" |awk '{print $1}')
+	disk_name=$(fdisk -l $nand_disk_name|grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
+fi
+
+data_device=$disk_name"p"$data_partition_number
+cfg_device=$disk_name"p"$cfg_partition_number
+
+mount_data() {
+	e2fsck -fy $data_device
+	resize2fs $data_device
+	mount -t ext2 $data_device data
+}
+
+mount_cfg() {
+	e2fsck -fy $cfg_device
+	resize2fs $cfg_device
+	mount -t ext2 $cfg_device data/cfg
+}
+
 auto_mount() {
-	e2fsck -fy /dev/mmcblk0p9
-	resize2fs /dev/mmcblk0p9
-	e2fsck -fy /dev/mmcblk0p8
-	resize2fs /dev/mmcblk0p8
-	mount -t ext2 /dev/mmcblk0p9 data
-	mount -t ext2 /dev/mmcblk0p8 data/cfg
-	mount -t  pstore pstore /sys/fs/pstore
+	mount_data
+	mount_cfg
 }
 
 case "$1" in
