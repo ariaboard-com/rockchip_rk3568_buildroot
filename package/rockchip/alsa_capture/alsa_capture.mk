@@ -9,19 +9,19 @@ ALSA_CAPTURE_SITE=$(TOPDIR)/../external/alsa_capture/src
 ALSA_CAPTURE_SITE_METHOD=local
 
 define ALSA_CAPTURE_BUILD_CMDS
-	$(MAKE) CC=$(TARGET_CC) CXX=$(TARGET_CXX) -C $(@D)
+    $(TARGET_MAKE_ENV) $(MAKE) CC=$(TARGET_CC) CXX=$(TARGET_CXX) -C $(@D)
 endef
 
 define ALSA_CAPTURE_CLEAN_CMDS
-	$(MAKE) -C $(@D) clean
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) clean
 endef
 
 define ALSA_CAPTURE_INSTALL_TARGET_CMDS
-	$(MAKE) -C $(@D) install
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
 endef
 
 define ALSA_CAPTURE_UNINSTALL_TARGET_CMDS
-        $(MAKE) -C $(@D) uninstall
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) uninstall
 endef
 
 $(eval $(generic-package))
