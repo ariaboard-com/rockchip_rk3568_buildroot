@@ -13,7 +13,9 @@ debug="1"
 module_pid_file="/sys/bus/mmc/devices/mmc1:0001/mmc1:0001:1/device"
 init_config=0
 ERROR_FLAG=0
-wifi_results_file=/data/wifi/wifi_results.txt
+wifi_results_file="/data/wifi/wifi_results.txt"
+wifi_scan_results_file="/data/wifi/wifi_scan_results.txt"
+
 wifi_results_ok=
 wifi_results_fail=
 
@@ -41,6 +43,7 @@ alias check_wpa="wpa_cli ping 2> /dev/null | grep PONG"
 alias check_ap_connect="wpa_cli status 2> /dev/null | grep state=COMPLETED"
 alias check_hostapd="hostapd_cli status 2> /dev/null | grep state=ENABLED"
 alias check_dnsmasq="ps | grep -v grep | grep dnsmasq > /dev/null"
+alias check_scan="iw wlan0 scan | grep SSID > $wifi_scan_results_file"
 
 function end_script() {
 if [ ${ERROR_FLAG} -ne 0 ]
@@ -71,6 +74,9 @@ while [ $cnt -lt $1 ]; do
         check_ap_connect)
         check_ap_connect
         ;;
+		check_scan)
+		check_scan
+        ;;
     esac
     if [ $? -eq 0 ];then
         return
@@ -80,14 +86,10 @@ while [ $cnt -lt $1 ]; do
         continue
     fi
 done
-##return here if no matter###
-if [ "$2" = "check_eth" ];then
-	return
-fi
 
-echo "fail!!"
-ERROR_FLAG=1
-end_script
+echo "check_in_loop fail!!"
+#ERROR_FLAG=1
+#end_script
 }
 
 function load_driver() {
@@ -416,6 +418,64 @@ fi
 
 }
 
+function test_wifi() {
+
+rm $wifi_scan_results_file
+touch $wifi_scan_results_file
+
+echo "ifconfig wlan0 down ..."
+ifconfig wlan0 down
+sleep 2
+echo "ifconfig wlan0 up ..."
+ifconfig wlan0 up
+sleep 2
+
+echo "checking wlan0..."
+check_in_loop 15 check_wlan
+echo "wlan0 shows up"
+
+echo "checking wlan0 scan ..."
+check_in_loop 15 check_scan
+
+wifi_ssid=`cat $wifi_scan_results_file | sed -n "1p"`
+echo "wifi ssid: $wifi_ssid"
+
+if [ -z "$wifi_ssid" ];then
+	echo "wifi failed !!!!!"
+	dmesg >> /data/wifi/wifi_onoff_fail.txt
+
+	let wifi_results_fail+=1
+else
+	echo "wifi successfully"
+	router_connted="yes"
+	dmesg > /data/wifi/wifi_onoff_ok.txt
+
+	let wifi_results_ok+=1
+fi
+
+echo "wifi_ok=$wifi_results_ok
+wifi_fail=$wifi_results_fail
+" > $wifi_results_file
+
+}
+
+function main2() {
+while true; do
+	test_wifi
+	sleep 5
+	cnt=$((cnt + 1))
+	echo "
+	#######################################################
+	##### wifi has been tuned on/off for $cnt times...
+	#####  ok: $wifi_results_ok times
+	#####  fail: $wifi_results_fail times
+	#######################################################
+	"
+done
+}
+
 wifi_bcm_init
-mkdir /data/wifi/
-main
+mkdir /data/wifi/ 2>/dev/null
+touch /data/wifi/wifi_results.txt
+touch /data/wifi/wifi_scan_results.txt
+main2
