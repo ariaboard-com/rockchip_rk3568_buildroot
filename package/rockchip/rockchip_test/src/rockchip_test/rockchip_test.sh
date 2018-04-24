@@ -25,7 +25,7 @@ module_choice()
     echo "ddr test :            1 (memtester & stressapptest)"
     echo "cpu_dvfs_test:        2 (dvfs stresstest)"
     echo "flash stress test:    3"
-    echo "gpio test:            4 (pio & irq & pull)"
+    echo "bluetooth test:       4 (bluetooth on&off test)"
     echo "audio test:           5"
     echo "usb  test:            6 (insert & read & write)"
     echo "player test:          7 "
@@ -80,9 +80,9 @@ ethernet_test()
    sh /test_plan/ethernet/eth_test.sh 
 }
 
-gpio_test()
+bluetooth_test()
 {
-    sh /test_plan/gpio/gpio_test.sh
+    sh /rockchip_test/bluetooth/bt_onoff.sh &
 }
 
 audio_test()
@@ -122,7 +122,7 @@ module_test()
             flash_stress_test
             ;;
         4)
-            gpio_test
+            bluetooth_test
             ;;
         5)
             audio_test
