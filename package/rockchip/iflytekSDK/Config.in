@@ -1,0 +1,2 @@
+config BR2_PACKAGE_IFLYTEKSDK
+	bool "Simple iflytek voice process and cloud SDK"
