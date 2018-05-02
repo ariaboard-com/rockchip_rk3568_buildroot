@@ -23,6 +23,18 @@ CHIP_NAME = AP6212A1
 BT_FIRMWARE = bcm43438a1.hcd
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_AWCM256),y)
+CHIP_VENDOR = BROADCOM
+CHIP_NAME = AW-CM256
+BT_FIRMWARE = bcm43438a1.hcd
+endif
+
+ifeq ($(BR2_PACKAGE_RKWIFIBT_AWNB197),y)
+CHIP_VENDOR = BROADCOM
+CHIP_NAME = AW-NB197
+BT_FIRMWARE = BCM4343A1.hcd
+endif
+
 ifeq ($(CHIP_VENDOR), BROADCOM)
 define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
@@ -42,9 +54,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/rk_load_bt_firmware
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/rk_load_bt_firmware
     $(INSTALL) -D -m 0755 $(@D)/rk_load_bt_firmware $(TARGET_DIR)/usr/bin
-	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/wl $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/dhd $(TARGET_DIR)/usr/bin
-	$(INSTALL) -D -m 0755 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/rtwpriv $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
 endef
 endif
 

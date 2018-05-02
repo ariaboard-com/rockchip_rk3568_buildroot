@@ -10,11 +10,15 @@ config BR2_PACKAGE_RKWIFIBT_AP6255
     bool "AP6255"
 config BR2_PACKAGE_RKWIFIBT_AP6212A1
     bool "AP6212A1"
+config BR2_PACKAGE_RKWIFIBT_AWCM256
+    bool "AW-CM256"
+config BR2_PACKAGE_RKWIFIBT_AWNB197
+    bool "AW-NAB197"
 endchoice
 
 config BR2_PACKAGE_RKWIFIBT_BTUART
 	string "bt uart"
-	default "ttyS1"
+	default "ttyS4"
 	depends on BR2_PACKAGE_RKWIFIBT
 	help
 		tty that bt used
