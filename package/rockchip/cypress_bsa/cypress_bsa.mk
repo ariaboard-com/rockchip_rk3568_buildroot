@@ -26,11 +26,7 @@ define CYPRESS_BSA_INSTALL_TARGET_CMDS
 		$(INSTALL) -D -m 755 $(@D)/$(CYPRESS_BSA_PATH)/$${ff}/build/$(CYPRESS_BSA_BUILD_TYPE)/$${ff} $(TARGET_DIR)/usr/bin/${ff}; \
 	done
 
-	mkdir -p $(TARGET_DIR)/data/bsa
-	mkdir -p $(TARGET_DIR)/data/bsa/config
-	#$(INSTALL) -D -m 755 $(@D)/test_files/av/44k8bpsStereo.wav $(TARGET_DIR)/etc/bsa
-	#$(INSTALL) -D -m 755 $(@D)/test_files/dg/tx_test_file.txt $(TARGET_DIR)/etc/bsa
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/S44bluetooth $(TARGET_DIR)/etc/init.d
+	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/S100bluetooth $(TARGET_DIR)/etc/init.d
 
 endef
 

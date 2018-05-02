@@ -23,6 +23,8 @@ case "$1" in
     echo 1 > /sys/class/rfkill/rfkill0/state
     sleep 1
 
+    mkdir /data/bsa 2>/dev/null
+    mkdir /data/bsa/config 2>/dev/null
     cd /data/bsa/config
     echo "start broadcom bluetooth server bsa_sever"
     start-stop-daemon -S  -m -p $PIDFILE1 -x $DAEMON1 -- -r 13 -all=0 -b /data/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
