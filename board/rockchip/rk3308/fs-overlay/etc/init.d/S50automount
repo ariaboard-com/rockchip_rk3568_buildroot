@@ -7,14 +7,14 @@
 nand_disk_name="/dev/rknand0"
 
 #partitions number
-if [ ! "nand" = $(echo $storagemedia) ]; then
-    data_partition_number=$(fdisk -l $nand_disk_name|grep -E "data" |awk '{print $1}')
-    cfg_partition_number=$(fdisk -l $nand_disk_name|grep -E "cfg" |awk '{print $1}')
-    disk_name=$(fdisk -l $nand_disk_name|grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
-else
+if [ ! -f "$nand_disk_name" ]; then
 	data_partition_number=$(fdisk -l |grep -E "data" |awk '{print $1}')
 	cfg_partition_number=$(fdisk -l |grep -E "cfg" |awk '{print $1}')
 	disk_name=$(fdisk -l |grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
+else
+	data_partition_number=$(fdisk -l $nand_disk_name|grep -E "data" |awk '{print $1}')
+	cfg_partition_number=$(fdisk -l $nand_disk_name|grep -E "cfg" |awk '{print $1}')
+	disk_name=$(fdisk -l $nand_disk_name|grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
 fi
 
 data_device=$disk_name"p"$data_partition_number
