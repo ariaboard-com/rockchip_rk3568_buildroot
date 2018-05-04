@@ -12,7 +12,7 @@ NAME3=app_avk
 DAEMON3=/usr/bin/$NAME3
 PIDFILE3=/var/run/$NAME3.pid
 
-hcd_file="/system/etc/firmware/BCM4345C0.hcd"
+hcd_file="BTFIRMWARE_PATH"
 echo "hcd_file = $hcd_file"
 
 case "$1" in
@@ -27,7 +27,7 @@ case "$1" in
     mkdir /data/bsa/config 2>/dev/null
     cd /data/bsa/config
     echo "start broadcom bluetooth server bsa_sever"
-    start-stop-daemon -S  -m -p $PIDFILE1 -x $DAEMON1 -- -r 13 -all=0 -b /data/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
+    start-stop-daemon -S  -m -p $PIDFILE1 -x $DAEMON1 -- -r 12 -all=0 -b /data/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
     sleep 2
 
     echo "start broadcom bluetooth app_manager"
