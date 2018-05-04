@@ -26,8 +26,8 @@ define CYPRESS_BSA_INSTALL_TARGET_CMDS
 		$(INSTALL) -D -m 755 $(@D)/$(CYPRESS_BSA_PATH)/$${ff}/build/$(CYPRESS_BSA_BUILD_TYPE)/$${ff} $(TARGET_DIR)/usr/bin/${ff}; \
 	done
 
-	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' package/rockchip/cypress_bsa/S86bluetooth
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/S86bluetooth $(TARGET_DIR)/etc/init.d
+	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(TARGET_DIR)/etc/init.d/S86bluetooth
 
 endef
 
