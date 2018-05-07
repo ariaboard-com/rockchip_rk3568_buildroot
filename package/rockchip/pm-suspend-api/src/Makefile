@@ -15,6 +15,8 @@ clean:
 .PHONY: install
 
 install:
+	cp -f dbus_suspend_api.h $(HOST_DIR)/aarch64-rockchip-linux-gnu/sysroot/usr/include/
+	cp -f libsuspend_api.so $(HOST_DIR)/aarch64-rockchip-linux-gnu/sysroot/usr/lib/
 	cp -f libsuspend_api.so $(TARGET_DIR)/usr/lib/
 	cp -f 00rockchip-suspend $(TARGET_DIR)/usr/lib/pm-utils/sleep.d/
 
