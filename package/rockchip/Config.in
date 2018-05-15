@@ -64,4 +64,6 @@ source "package/rockchip/rockchip_modules/Config.in"
 source "package/rockchip/cypress_bsa/Config.in"
 source "package/rockchip/pm-suspend-api/Config.in"
 source "package/rockchip/rtw_simple_config/Config.in"
+source "package/rockchip/recovery/Config.in"
+source "package/rockchip/rkupdate/Config.in"
 endif
