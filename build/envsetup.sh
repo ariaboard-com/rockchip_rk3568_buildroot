@@ -4,7 +4,7 @@ LOCAL_DIR=$(pwd)
 BUILDROOT_DIR=$LOCAL_DIR/buildroot
 BUILD_OUTPUT_DIR=$LOCAL_DIR/buildroot/output
 
-DEFCONFIG_ARRAY=( "rockchip_rk3308_release" "rockchip_rk3308_debug" "rockchip_rk3308_robot_release" "rockchip_rk3308_robot_debug" "rockchip_rk3308_mini_release" "rockchip_rk3326_release" "rockchip_rk3326_debug" "rockchip_rk3308_recovery")
+DEFCONFIG_ARRAY=( "rockchip_rk3308_release" "rockchip_rk3308_debug" "rockchip_rk3308_robot_release" "rockchip_rk3308_robot_debug" "rockchip_rk3308_mini_release" "rockchip_rk3308_pcba" "rockchip_rk3326_release" "rockchip_rk3326_debug" "rockchip_rk3308_recovery")
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 
