@@ -17,13 +17,13 @@ RECOVERY_BUILD_OPTS=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm -I"$(ST
 	--sysroot=$(STAGING_DIR) \
 	-fPIC \
 	-fpermissive \
-	-lz -lpthread -lpng -ldrm -D RecoveryNoUi
+	-lz -lpthread -lpng -ldrm
 
 RECOVERY_MAKE_OPTS = \
         CFLAGS="$(TARGET_CFLAGS) $(RECOVERY_BUILD_OPTS)" \
         PROJECT_DIR="$(@D)"
 
-
+TARGET_MAKE_ENV += RecoveryNoUi=true
 
 define RECOVERY_BUILD_CMDS
 	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) CC="$(TARGET_CC)" $(RECOVERY_MAKE_OPTS)
