@@ -5,19 +5,19 @@ exec 2>&1
 
 echo "run factory_reset_cfg.sh"
 # 1. kill processes accessing the path  &  umount
-fuser -km /data/cfg/
+fuser -km /userdata/
 echo "kill processes accessing the path succeed"
-umount /data/cfg/
+umount /userdata/
 echo "umount succeed"
 
-# 2. copy backup files from data partition
-cp -vr /data/cfg /tmp/
+# 2. copy backup files from userdata partition
+#cp -vr /userdata /tmp/
 
 # 3. format the cfg partion & mount
 mkfs.ext2 /dev/mmcblk0p8
-mount -t ext2 /dev/mmcblk0p8 /data/cfg
+mount -t ext2 /dev/mmcblk0p8 /userdata
 
-# 4. copy backup files to cfg path
-cp -vrf /tmp/cfg/* /data/cfg
+# 4. copy backup files to userdata path
+#cp -vrf /tmp/userdata/* /userdata
 
 echo "factory reset cfg succeed"

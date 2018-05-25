@@ -9,33 +9,35 @@ nand_disk_name="/dev/rknand0"
 #partitions number
 ls $nand_disk_name > /dev/null
 if [ ! $? -eq 0 ]; then
-	data_partition_number=$(fdisk -l |grep -E "data" |awk '{print $1}')
-	cfg_partition_number=$(fdisk -l |grep -E "cfg" |awk '{print $1}')
+    oem_partition_number=$(fdisk -l |grep -E "oem" |awk '{print $1}')
+	userdata_partition_number=$(fdisk -l |grep -E "userdata" |awk '{print $1}')
 	disk_name=$(fdisk -l |grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
 else
-	data_partition_number=$(fdisk -l $nand_disk_name|grep -E "data" |awk '{print $1}')
-	cfg_partition_number=$(fdisk -l $nand_disk_name|grep -E "cfg" |awk '{print $1}')
+	oem_partition_number=$(fdisk -l $nand_disk_name|grep -E "oem" |awk '{print $1}')
+	userdata_partition_number=$(fdisk -l $nand_disk_name|grep -E "userdata" |awk '{print $1}')
 	disk_name=$(fdisk -l $nand_disk_name|grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
 fi
 
-data_device=$disk_name"p"$data_partition_number
-cfg_device=$disk_name"p"$cfg_partition_number
+oem_device=$disk_name"p"$oem_partition_number
+userdata_device=$disk_name"p"$userdata_partition_number
 
-mount_data() {
-	e2fsck -fy $data_device
-	resize2fs $data_device
-	mount -t ext2 $data_device data
+mount_oem() {
+	e2fsck -fy $oem_device
+	resize2fs $oem_device
+	mount -t ext2 $oem_device oem
 }
 
-mount_cfg() {
-	e2fsck -fy $cfg_device
-	resize2fs $cfg_device
-	mount -t ext2 $cfg_device data/cfg
+mount_userdata() {
+	e2fsck -fy $userdata_device
+	resize2fs $userdata_device
+	mount -t ext2 $userdata_device userdata
+    mkdir -p /userdata/cfg
+    mkdir -p /userdata/bin
 }
 
 auto_mount() {
-	mount_data
-	mount_cfg
+	mount_oem
+	mount_userdata
 }
 
 case "$1" in
