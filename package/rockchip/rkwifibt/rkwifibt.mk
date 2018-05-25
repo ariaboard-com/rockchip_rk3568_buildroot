@@ -83,6 +83,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 	sed -i 's/MODULE_PATH/\/usr\/lib\/modules\/bcmdhd.ko/g' $(@D)/S66load_wifi_modules
 	$(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/bt_load_broadcom_firmware
+	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_broadcom_firmware
 	$(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
 	$(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
 endef
