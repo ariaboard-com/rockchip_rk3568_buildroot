@@ -28,6 +28,9 @@ case "$1" in
 
 		;;
 	stop)
+
+		echo 0 > /sys/class/rfkill/rfkill0/state
+
 		;;
 	restart|reload)
 		$0 stop
