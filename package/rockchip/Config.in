@@ -67,4 +67,5 @@ source "package/rockchip/rtw_simple_config/Config.in"
 source "package/rockchip/recovery/Config.in"
 source "package/rockchip/rkupdate/Config.in"
 source "package/rockchip/recoverySystem/Config.in"
+source "package/rockchip/ueventd/Config.in"
 endif
