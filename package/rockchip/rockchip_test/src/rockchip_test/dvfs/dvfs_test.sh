@@ -14,7 +14,6 @@ info_view()
 info_view
 echo "*****************************************************"
 echo "cpu auto freq test:                             1"
-echo "dvfs stress test:                               2"
 echo "*****************************************************"
 
 read -t 30 DVFS_CHOICE
@@ -22,7 +21,7 @@ read -t 30 DVFS_CHOICE
 auto_cpu_freq_test()
 {
 	#value 1 is sleep time
-	sh ${DIR_DVFS}/auto_cpu_freq_test.sh 60 &
+	sh ${DIR_DVFS}/auto_cpu_freq_test.sh 1 &
 }
 
 dvfs_stress_test()
@@ -33,9 +32,6 @@ dvfs_stress_test()
 case ${DVFS_CHOICE} in
 	1)
 		auto_cpu_freq_test
-		;;
-	2)
-		dvfs_stress_test
 		;;
 	*)
 		echo "not fount your input."
