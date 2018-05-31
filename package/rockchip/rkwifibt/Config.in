@@ -3,7 +3,7 @@ menuconfig BR2_PACKAGE_RKWIFIBT
 
 if BR2_PACKAGE_RKWIFIBT
 choice
-	default BR2_PACKAGE_RKWIFIBT_AP6212A1
+	default BR2_PACKAGE_RKWIFIBT_AWCM256
     prompt "wifi chip support"
 
 config BR2_PACKAGE_RKWIFIBT_AP6255
