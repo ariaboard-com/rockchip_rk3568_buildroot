@@ -18,9 +18,14 @@
 ::sysinit:/bin/mount -o remount,rw /
 ::sysinit:/bin/mkdir -p /dev/pts
 ::sysinit:/bin/mkdir -p /dev/shm
+::sysinit:/bin/mkdir -p /mnt
+::sysinit:/bin/mkdir -p /oem
+::sysinit:/bin/mkdir -p /udisk
+::sysinit:/bin/mkdir -p /sdcard
+::sysinit:/bin/mkdir -p /userdata
+::sysinit:/bin/ln -s /userdata /data
 ::sysinit:/bin/mount -a
 ::sysinit:/bin/hostname -F /etc/hostname
-null::sysinit:/sbin/ifconfig lo up
 # now run any rc scripts
 ::respawn:-/bin/sh
 ::sysinit:/etc/init.d/rcS
