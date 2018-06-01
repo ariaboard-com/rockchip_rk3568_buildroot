@@ -26,11 +26,30 @@ config BR2_PACKAGE_RK3308
     help
         Use rockchip's rk3308 chip
 
+config BR2_PACKAGE_RK3128H
+    bool "rk3128H chip"
+    help
+        Use rockchip's rk3128H box chip
+
+config BR2_PACKAGE_RK3399
+    bool "rk3399 chip"
+    help
+        Use rockchip's rk3399 chip
+
+config BR2_PACKAGE_RK3288
+    bool "rk3288 chip"
+    help
+        Use rockchip's rk3288 chip
+
 config BR2_PACKAGE_RK3326
     bool "rk3326 chip"
     help
         Use rockchip's rk3326 chip
 
+config BR2_PACKAGE_PX3SE
+    bool "px3se chip"
+    help
+        Use rockchip's px3se chip
 endchoice
 
 # BSP packages
@@ -46,6 +65,7 @@ source "package/rockchip/libion/Config.in"
 source "package/rockchip/mpp/Config.in"
 source "package/rockchip/adbd/Config.in"
 source "package/rockchip/gstreamer1-rockchip/Config.in"
+source "package/rockchip/gstreamer1-rockchip-extra/Config.in"
 source "package/rockchip/wakeWordAgent/Config.in"
 source "package/rockchip/pcba/Config.in"
 source "package/rockchip/libiep/Config.in"
@@ -58,6 +78,10 @@ source "package/rockchip/rkwifibt/Config.in"
 source "package/rockchip/rockchip_utils/Config.in"
 source "package/rockchip/mdev_mount/Config.in"
 source "package/rockchip/alsa_capture/Config.in"
+source "package/rockchip/mali-rockchip/Config.in"
+source "package/rockchip/libhdmiset/Config.in"
+source "package/rockchip/dialserver/Config.in"
+source "package/rockchip/linux-rga/Config.in"
 source "package/rockchip/iflytekSDK/Config.in"
 source "package/rockchip/rockchip_test/Config.in"
 source "package/rockchip/rockchip_modules/Config.in"
@@ -65,7 +89,22 @@ source "package/rockchip/cypress_bsa/Config.in"
 source "package/rockchip/pm-suspend-api/Config.in"
 source "package/rockchip/rtw_simple_config/Config.in"
 source "package/rockchip/recovery/Config.in"
-source "package/rockchip/rkupdate/Config.in"
-source "package/rockchip/recoverySystem/Config.in"
+source "package/rockchip/update/Config.in"
+source "package/rockchip/modeset/Config.in"
+source "package/rockchip/rkjpeg/Config.in"
+source "package/rockchip/jpegdemo/Config.in"
 source "package/rockchip/ueventd/Config.in"
+source "package/rockchip/rkupdate/Config.in"
+source "package/rockchip/io/Config.in"
+source "package/rockchip/music/Config.in"
+source "package/rockchip/video/Config.in"
+source "package/rockchip/camera/Config.in"
+source "package/rockchip/carmachine/Config.in"
+source "package/rockchip/gallery/Config.in"
+source "package/rockchip/QLauncher/Config.in"
+source "package/rockchip/settings/Config.in"
+source "package/rockchip/powermanager/Config.in"
+source "package/rockchip/audioservice/Config.in"
+source "package/rockchip/securityAuth/Config.in"
+source "package/rockchip/recoverySystem/Config.in"
 endif
