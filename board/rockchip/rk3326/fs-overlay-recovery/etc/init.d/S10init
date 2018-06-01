@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Start rk3326 linux service....
+#
+
+case "$1" in
+	start)
+		# Mount debugfs
+		mount -t debugfs none /sys/kernel/debug
+
+		echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+		
+		# ueventd
+		/usr/bin/ueventd &
+		;;
+	stop)
+		printf "stop finished"
+        ;;
+	*)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0
+
