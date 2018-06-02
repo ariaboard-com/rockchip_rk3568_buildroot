@@ -13,4 +13,9 @@ GMRENDER_RESURRECT_LICENSE = GPL-2.0+
 GMRENDER_RESURRECT_LICENSE_FILES = COPYING
 GMRENDER_RESURRECT_DEPENDENCIES = gstreamer1 libupnp
 
+define GMRENDER_RESURRECT_INSTALL_INIT_SYSV
+$(INSTALL) -D -m 0755 $(TOPDIR)/package/gmrender-resurrect/gmrender_service.sh \
+	$(TARGET_DIR)/sbin
+endef
+
 $(eval $(autotools-package))
