@@ -1,6 +1,5 @@
 config BR2_PACKAGE_CYPRESS_BSA
     bool "broadcom(cypress) bsa server and app"
-    default y
     help
 	broadcom bsa server and app
 if BR2_PACKAGE_CYPRESS_BSA
