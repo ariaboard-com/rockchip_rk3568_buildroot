@@ -2,7 +2,7 @@
 # Author : Nyx Zheng <zyh@rock-chips.com>
 
 #ifeq ($(BR2_PACKAGE_LOCAL_PLAYER),y)
-LOCALPLAYER_SITE = $(TOPDIR)/../external/rkdemos/LocalPlayer
+LOCALPLAYER_SITE = $(TOPDIR)/../external/LocalPlayer
 LOCALPLAYER_SITE_METHOD = local
 LOCALPLAYER_INSTALL_STAGING = YES
 LOCALPLAYER_DEPENDENCIES = gst1-plugins-base gst1-plugins-ugly
