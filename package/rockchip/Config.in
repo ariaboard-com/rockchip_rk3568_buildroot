@@ -107,4 +107,5 @@ source "package/rockchip/powermanager/Config.in"
 source "package/rockchip/audioservice/Config.in"
 source "package/rockchip/securityAuth/Config.in"
 source "package/rockchip/recoverySystem/Config.in"
+source "package/rockchip/led_control_app/Config.in"
 endif

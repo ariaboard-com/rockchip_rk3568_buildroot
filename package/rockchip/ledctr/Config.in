@@ -1,4 +1,0 @@
-config BR2_PACKAGE_LEDCTR
-	bool "Rockchip Led control tool for linux"
-	help
-	  Rockchip Led control tool for linux.
