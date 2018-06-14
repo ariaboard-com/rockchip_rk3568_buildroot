@@ -289,11 +289,6 @@ ping $router_ip -w $ping_period
 
 if [ $? -eq 1 ];then
 	echo "ping fail!! please check"
-	echo "======================kernel log=========================" >> /data/wifi_reboot_fail.txt
-	dmesg >> /data/wifi_reboot_fail.txt
-	echo "======================wpa_supplicant_fail log============" >> /data/wpa_supplicant_fail.log
-	cat /data/wpa_supplicant.log >> /data/wpa_supplicant_fail.log
-
 	let wifi_results_fail+=1
 else
 
@@ -327,10 +322,9 @@ network={
 
 if [ $debug -eq 1 ];then
 	echo "ctrl_interface=/var/run/wpa_supplicant"
-	/sbin/start-stop-daemon -S -m -p $PIDFILE1  -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf -d > /data/wpa_supplicant.log &
+	/sbin/start-stop-daemon -S -m -p $PIDFILE1  -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf &
 else
 	echo "ctrl_interface=/var/run/wpa_supplicant debug0"
-	#/sbin/start-stop-daemon -S -m -p /usr/bin/wpa_supplicant -b -x /var/run/wpa_supplicant.pid -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf
 	/sbin/start-stop-daemon -S -m -p $PIDFILE1 -b -x $DAEMON1 -- -Dnl80211 -iwlan0 -c/data/wpa_supplicant.conf
 fi
 

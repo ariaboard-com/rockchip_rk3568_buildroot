@@ -293,10 +293,11 @@ ping $router_ip -w $ping_period
 
 if [ $? -eq 1 ];then
 	echo "ping fail!! please check"
-	echo "======================kernel log=========================" >> /data/wifi/wifi_reboot_fail.txt
+	echo "======================kernel log=========================" > /data/wifi/wifi_reboot_fail.txt
 	dmesg >> /data/wifi/wifi_reboot_fail.txt
-	echo "======================wpa_supplicant_fail log============" >> /data/wifi/wpa_supplicant_fail.log
-	cat /data/wifi/wpa_supplicant.log >> /data/wifi/wpa_supplicant_fail.log
+	echo "======================wpa_supplicant_fail log============" > /data/wifi/wpa_supplicant_fail.log
+	cat /data/wifi/wpa_supplicant.log > /data/wifi/wpa_supplicant_fail.log
+	rm /data/wifi/wpa_supplicant.log
 
 	let wifi_results_fail+=1
 	ERROR_FLAG=1
