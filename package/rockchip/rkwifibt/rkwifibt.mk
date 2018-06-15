@@ -50,22 +50,28 @@ ifeq ($(CHIP_VENDOR), REALTEK)
 
 ifeq ($(CHIP_NAME), RTL8723DS)
 define RKWIFIBT_BUILD_CMDS
-	$(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
-	$(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=arm64 \
-			CROSS_COMPILE=$(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+    $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
+    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=arm64 \
+            CROSS_COMPILE=$(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 endef
 
 define RKWIFIBT_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
-	$(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules
+    $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
+    $(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules
 
-	mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
-	$(INSTALL) -D -m 0755 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
-	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_rtk_firmware
-	$(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
-	cp $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
+    mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
+    $(INSTALL) -D -m 0755 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
+    sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_rtk_firmware
+    $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    cp $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
 endef
 endif # RTL8723DS
+
+ifeq ($(CHIP_NAME), RTL8189FS)
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
+endef
+endif #RTL8189FS
 
 endif # CHIP_VENDOR
 
@@ -76,17 +82,17 @@ define RKWIFIBT_BUILD_CMDS
 endef
 
 define RKWIFIBT_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/lib/modules
+    mkdir -p $(TARGET_DIR)/usr/lib/modules
     mkdir -p $(TARGET_DIR)/system/etc/firmware
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/* $(TARGET_DIR)/system/etc/firmware
-	$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/bt/* $(TARGET_DIR)/system/etc/firmware
-	$(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/brcm_patchram_plus1
-	sed -i 's/MODULE_PATH/\/usr\/lib\/modules\/bcmdhd.ko/g' $(@D)/S66load_wifi_modules
-	$(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
-	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/bt_load_broadcom_firmware
-	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_broadcom_firmware
-	$(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
-	$(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/bt/* $(TARGET_DIR)/system/etc/firmware
+    $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/brcm_patchram_plus1
+    sed -i 's/MODULE_PATH/\/usr\/lib\/modules\/bcmdhd.ko/g' $(@D)/S66load_wifi_modules
+    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
+    sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/bt_load_broadcom_firmware
+    sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_broadcom_firmware
+    $(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    $(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
 endef
 endif
 
