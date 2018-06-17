@@ -11,6 +11,9 @@ case "$1" in
 		# bluetooth
 		rkbt /etc/bluetooth/broadcom/fw/bcm43438a0.hcd /dev/ttyS1 &
 
+		# power manager
+		/usr/bin/power_manager_service &
+
 		# music
 		/usr/bin/audioservice &
 
