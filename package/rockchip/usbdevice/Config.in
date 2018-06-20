@@ -1,0 +1,4 @@
+config BR2_PACKAGE_USBDEVICE
+	bool "script for USB device configure"
+	help
+	  script for USB device configure.
