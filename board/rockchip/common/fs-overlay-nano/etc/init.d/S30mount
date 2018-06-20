@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# remount all media in fstab again after some mount point created by udev....
+#
+
+case "$1" in
+start)
+	mount -a 2>/dev/null
+	;;
+stop)
+	;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+esac
+
+exit 0
