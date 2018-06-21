@@ -4,32 +4,16 @@
 # yhx@rock-chips.com
 #
 
-nand_disk_name="/dev/rknand0"
-
-#partitions number
-ls $nand_disk_name > /dev/null
-if [ ! $? -eq 0 ]; then
-    oem_partition_number=$(fdisk -l |grep -E "oem" |awk '{print $1}')
-	userdata_partition_number=$(fdisk -l |grep -E "userdata" |awk '{print $1}')
-	disk_name=$(fdisk -l |grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
-else
-	oem_partition_number=$(fdisk -l $nand_disk_name|grep -E "oem" |awk '{print $1}')
-	userdata_partition_number=$(fdisk -l $nand_disk_name|grep -E "userdata" |awk '{print $1}')
-	disk_name=$(fdisk -l $nand_disk_name|grep -E "Disk" |head -1 |awk '{print $2}'|cut -d: -f1)
-fi
-
-oem_device=$disk_name"p"$oem_partition_number
-userdata_device=$disk_name"p"$userdata_partition_number
+oem_device="/dev/block/by-name/oem"
+userdata_device="/dev/block/by-name/userdata"
 
 mount_oem() {
 	e2fsck -fy $oem_device
-	resize2fs $oem_device
 	mount -t ext2 $oem_device oem
 }
 
 mount_userdata() {
 	e2fsck -fy $userdata_device
-	resize2fs $userdata_device
 	mount -t ext2 $userdata_device userdata
     mkdir -p /userdata/cfg
     mkdir -p /userdata/bin
