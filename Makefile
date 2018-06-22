@@ -917,8 +917,15 @@ defconfig: $(BUILD_DIR)/buildroot-config/conf prepare-kconfig
 define percent_defconfig
 # Override the BR2_DEFCONFIG from COMMON_CONFIG_ENV with the new defconfig
 %_defconfig: $(BUILD_DIR)/buildroot-config/conf $(1)/configs/%_defconfig prepare-kconfig
-	@$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
-		$$< --defconfig=$(1)/configs/$$@ $$(CONFIG_CONFIG_IN)
+	if [ "`head -n 1 $(1)/configs/$$@ | cut -c1-8`" = rockchip ] ;\
+	then \
+		$(TOPDIR)/build/mkconfig.sh $$@ ;\
+		$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
+                        $$< --defconfig=$(BASE_DIR)/.rockchipconfig $$(CONFIG_CONFIG_IN) ;\
+	else \
+		$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
+			$$< --defconfig=$(1)/configs/$$@ $$(CONFIG_CONFIG_IN) ;\
+	fi
 endef
 $(eval $(foreach d,$(call reverse,$(TOPDIR) $(BR2_EXTERNAL_DIRS)),$(call percent_defconfig,$(d))$(sep)))
 
