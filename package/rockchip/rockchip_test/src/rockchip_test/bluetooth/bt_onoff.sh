@@ -55,7 +55,7 @@ rm $bt_scan_results_file
 touch $bt_scan_results_file
 
 sleep 1
-/usr/bin/rk_load_bt_firmware
+/usr/bin/bt_pcba_test
 sleep 2
 
 check_in_loop 10 check_hci0
