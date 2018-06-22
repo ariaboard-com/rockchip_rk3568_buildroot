@@ -3,39 +3,52 @@
 # Start linux launcher...
 #
 
+function get_emmcblk() {
+  MMC=/dev/mmcblk2
+  for i in `seq 0 2`; do
+    TYPE=`cat /sys/bus/mmc/devices/mmc${i}*/type 2>/dev/null`
+    if [ "${TYPE}"x == "MMCx" ]; then
+      MMC=$i;
+    fi
+  done
+
+  echo /dev/mmcblk$MMC
+}
+
 case "$1" in
   start)
-		printf "Starting launcher: "
-		px3seBase -i
-		export LC_ALL='zh_CN.utf8'
-		export QT_QPA_PLATFORM=wayland
+    printf "Starting launcher: "
+    px3seBase -i $(get_emmcblk)
+    export LC_ALL='zh_CN.utf8'
+    export QT_QPA_PLATFORM=wayland
 
-		#for kmssink
-		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
+    #for kmssink
+    export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
 
-		#for waylandsink
-		#export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
+    #for waylandsink
+    #export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
 
-		#for QLauncher wayland
-		mkdir -p /tmp/.xdg &&  chmod 0700 /tmp/.xdg
-		export XDG_RUNTIME_DIR=/tmp/.xdg
-		weston --tty=2 --idle-time=0&
-		sleep 1
-		/usr/local/QLauncher/QLauncher &
+    #for QLauncher wayland
+    mkdir -p /tmp/.xdg &&  chmod 0700 /tmp/.xdg
+    export XDG_RUNTIME_DIR=/tmp/.xdg
+    weston --tty=2 --idle-time=0&
+    sleep 1
+    /usr/local/QLauncher/QLauncher &
 
-		#for Carmachine wayland
-		#/usr/bin/Carmachine -platform wayland -plugin EvdevTouch -plugin EvdevKeyboard &
+    #for Carmachine wayland
+    #/usr/bin/Carmachine -platform wayland -plugin EvdevTouch -plugin EvdevKeyboard &
 
-	;;
+    ;;
   stop)
-		killall QLauncher
-		#killall CarMachine
-		killall weston
-		printf "stop finished"
-        ;;
+    killall QLauncher
+    #killall CarMachine
+    killall weston
+    printf "stop finished"
+    ;;
   *)
-        echo "Usage: $0 {start|stop}"
-        exit 1
-        ;;
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
 esac
+
 exit 0
