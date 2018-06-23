@@ -43,7 +43,7 @@ while [ $cnt -lt $1 ]; do
 done
 
 echo "check_in_loop fail!!"
-#ERROR_FLAG=1
+ERROR_FLAG=1
 #end_script
 }
 
@@ -62,22 +62,13 @@ check_in_loop 10 check_hci0
 
 hciconfig hci0 up
 
-check_in_loop 10 check_scan
-
-bt_ssid=`cat $bt_scan_results_file | sed -n "2p"`
-echo "bt ssid: $bt_ssid"
-
-if [ -z "$bt_ssid" ];then
-	echo "bt failed !!!!!"
-	dmesg >> /data/bt/bt_onoff_fail.txt
-
+if [ ${ERROR_FLAG} -ne 0 ];then
 	let bt_results_fail+=1
+	dmesg >> /data/bt/bt_onoff_fail.txt
+	ERROR_FLAG=0
 else
-	echo "bt successfully"
-	router_connted="yes"
-	dmesg > /data/bt/bt_onoff_ok.txt
-
 	let bt_results_ok+=1
+	dmesg > /data/bt/bt_onoff_ok.txt
 fi
 
 echo "bt_ok=$bt_results_ok
