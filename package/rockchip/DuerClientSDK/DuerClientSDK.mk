@@ -11,6 +11,7 @@ DUERCLIENTSDK_DEPENDENCIES = libnghttp2 zlib sqlite libcurl portaudio ffmpeg3 \
 	rapidjson wpa_supplicant
 
 DUERCLIENTSDK_BUILD_CONF = $(DUERCLIENTSDK_BUILDDIR)build/build.conf
+DUERCLIENTSDK_OEM_DIR = $(TOPDIR)/../device/rockchip/rk3308/dueros/duer/resources
 
 # Duer DevKit has its special setting,
 # keep same with $(DUERCLIENTSDK_BUILDDIR)build.sh.
@@ -55,6 +56,13 @@ define DUERCLIENTSDK_CONFIGURE_CMDS
 		-DDUERLINK_V2=$${DUERLINK_V2} \
 	)
 endef
+
+define DUERCLIENTSDK_POST_INSTALL_TARGET_HOOK1
+	install -C $($(PKG)_BUILDDIR)resources/* $(DUERCLIENTSDK_OEM_DIR)
+	install -C $($(PKG)_BUILDDIR)appresources/Rk3308/app_config.json $(DUERCLIENTSDK_OEM_DIR)
+endef
+
+DUERCLIENTSDK_POST_INSTALL_TARGET_HOOKS += DUERCLIENTSDK_POST_INSTALL_TARGET_HOOK1
 
 $(eval $(cmake-package))
 endif
