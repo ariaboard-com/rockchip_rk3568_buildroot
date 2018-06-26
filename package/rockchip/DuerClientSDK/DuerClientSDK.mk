@@ -8,7 +8,7 @@ DUERCLIENTSDK_SITE = $(TOPDIR)/../external/DuerClientSDK
 DUERCLIENTSDK_SITE_METHOD = local
 DUERCLIENTSDK_INSTALL_STAGING = YES
 DUERCLIENTSDK_DEPENDENCIES = libnghttp2 zlib sqlite libcurl portaudio ffmpeg3 \
-	rapidjson
+	rapidjson wpa_supplicant
 
 DUERCLIENTSDK_BUILD_CONF = $(DUERCLIENTSDK_BUILDDIR)build/build.conf
 
