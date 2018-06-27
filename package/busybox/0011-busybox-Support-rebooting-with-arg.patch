@@ -1,0 +1,137 @@
+From d9b6f0b06f40f3fa2dc33334895cc95dbfade7c8 Mon Sep 17 00:00:00 2001
+From: zain wang <wzz@rock-chips.com>
+Date: Wed, 27 Jun 2018 10:33:52 +0800
+Subject: [PATCH] busybox: Support rebooting with arg
+
+In order to match kernel, add reboot command
+with arg.
+
+Signed-off-by: zain wang <wzz@rock-chips.com>
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ init/halt.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
+ init/init.c |  6 ++----
+ 2 files changed, 44 insertions(+), 11 deletions(-)
+
+diff --git a/init/halt.c b/init/halt.c
+index c228c4b..b3cfd00 100644
+--- a/init/halt.c
++++ b/init/halt.c
+@@ -83,6 +83,8 @@
+ 
+ #include "libbb.h"
+ #include "reboot.h"
++#include <linux/reboot.h>
++#include <sys/syscall.h>
+ 
+ #if ENABLE_FEATURE_WTMP
+ #include <sys/utsname.h>
+@@ -109,6 +111,36 @@ static void write_wtmp(void)
+ #define write_wtmp() ((void)0)
+ #endif
+ 
++static volatile int caught_signal = FALSE;
++static void signal_handler(int sig)
++{
++	bb_error_msg("got sig(%d)", sig);
++	caught_signal = TRUE;
++}
++
++static int reboot_with_arg(const char *arg)
++{
++	struct sigaction sa;
++
++	memset(&sa, 0, sizeof(sa));
++	sigemptyset(&sa.sa_mask);
++	sa.sa_flags = 0;
++	sa.sa_handler = signal_handler;
++	sigaction_set(SIGTERM, &sa);
++
++	/* The init will send SIGTERM to us after cleanup */
++	while (!caught_signal)
++		usleep(50000);
++
++	/* Wait 300ms for other processes to exit */
++	usleep(300000);
++	sync();
++
++	bb_error_msg("rebooting with arg(%s)", arg);
++	return syscall(__NR_reboot, LINUX_REBOOT_MAGIC1,
++			LINUX_REBOOT_MAGIC2,
++			LINUX_REBOOT_CMD_RESTART2, arg);
++}
+ 
+ int halt_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
+ int halt_main(int argc UNUSED_PARAM, char **argv)
+@@ -118,7 +150,7 @@ int halt_main(int argc UNUSED_PARAM, char **argv)
+ 		RB_POWER_OFF,
+ 		RB_AUTOBOOT
+ 	};
+-	// add SIGPWR for reboot loader
++	// add SIGPWR for reboot cmd
+ 	static const smallint signals[] = { SIGUSR1, SIGUSR2, SIGTERM, SIGPWR };
+ 
+ 	int delay = 0;
+@@ -163,12 +195,10 @@ int halt_main(int argc UNUSED_PARAM, char **argv)
+ 			/* talk to linuxrc */
+ 			/* bbox init/linuxrc assumed */
+ 			pid_t *pidlist = find_pid_by_name("linuxrc");
+-			//set reboot parameter
+-			if (signals[which] == SIGTERM) {
+-				if (argc > 1 && strstr(argv[1], "loader") != NULL) {
+-					which++;
+-				}
+-			}
++
++			if (signals[which] == SIGTERM && argc > 1 && argv[1][0] != '-')
++				which++;
++
+ 			if (pidlist[0] > 0)
+ 				rc = kill(pidlist[0], signals[which]);
+ 			if (ENABLE_FEATURE_CLEAN_UP)
+@@ -193,6 +223,11 @@ int halt_main(int argc UNUSED_PARAM, char **argv)
+ 						CONFIG_TELINIT_PATH);
+ 			}
+ 		}
++
++		/* Pass reboot arg to kernel */
++		if (signals[which] == SIGPWR && argc > 1 && argv[1][0] != '-')
++			rc = reboot_with_arg(argv[1]);
++
+ 	} else {
+ 		rc = reboot(magic[which]);
+ 	}
+diff --git a/init/init.c b/init/init.c
+index 8d3047b..3bf2fbe 100644
+--- a/init/init.c
++++ b/init/init.c
+@@ -130,7 +130,6 @@
+ 
+ #include "libbb.h"
+ #include <syslog.h>
+-#include <paths.h>
+ #include <sys/resource.h>
+ #ifdef __linux__
+ # include <linux/vt.h>
+@@ -809,7 +808,6 @@ static void run_shutdown_and_kill_processes(void)
+  */
+ 
+ /* The SIGPWR/SIGUSR[12]/SIGTERM handler */
+-#define RB_AUTOBOOT_CMD	0xa1b2c3d4
+ static void halt_reboot_pwoff(int sig) NORETURN;
+ static void halt_reboot_pwoff(int sig)
+ {
+@@ -835,8 +833,8 @@ static void halt_reboot_pwoff(int sig)
+ 		m = "poweroff";
+ 		rb = RB_POWER_OFF;
+ 	} else if (sig == SIGPWR) {
+-		m = "reboot loader";
+-		rb = RB_AUTOBOOT_CMD;
++		/* take charge in halt.c */
++		while(1);
+ 	}
+ 	message(L_CONSOLE, "Requesting system %s", m);
+ 	pause_and_low_level_reboot(rb);
+-- 
+2.7.4
+
