@@ -1,0 +1,29 @@
+From dcac36dda6b1bd09a24789069f1f1e7bac3cb07a Mon Sep 17 00:00:00 2001
+From: WangJianhui <wjh@rock-chips.com>
+Date: Mon, 18 Sep 2017 17:55:26 +0800
+Subject: [PATCH] qt5base: fix QT eglfs display bug
+
+The app occur Segmentation fault when it exit and click screen
+
+Signed-off-by: WangJianhui <wjh@rock-chips.com>
+---
+ src/gui/kernel/qscreen.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/gui/kernel/qscreen.cpp b/src/gui/kernel/qscreen.cpp
+index 96f75f3..3a8c1c1 100644
+--- a/src/gui/kernel/qscreen.cpp
++++ b/src/gui/kernel/qscreen.cpp
+@@ -374,6 +374,9 @@ QSize QScreen::availableSize() const
+ */
+ QRect QScreen::geometry() const
+ {
++    if (!qApp) {
++	return QRect(0, 0, 0, 0);
++    }
+     Q_D(const QScreen);
+     return d->geometry;
+ }
+-- 
+1.9.1
+
