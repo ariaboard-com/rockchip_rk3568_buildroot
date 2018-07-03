@@ -14,7 +14,7 @@ CONFIG=$1
 LINE=$(head -n 1 $CONIFG_DIR/$CONFIG)
 ROCKCHIP=$(echo "$LINE" | cut -c1-8)
 TARGET_DIR=${CONFIG%_defconfig}
-mkdir -p $TOP_DIR/buildroot/out/$TARGET_DIR
+mkdir -p $TOP_DIR/buildroot/output/$TARGET_DIR
 DST_CONFIG=$TOP_DIR/buildroot/output/$TARGET_DIR/.rockchipconfig
 SRC_CONFIG=$TOP_DIR/buildroot/configs/$CONFIG
 echo "dst:$DST_CONFIG"
