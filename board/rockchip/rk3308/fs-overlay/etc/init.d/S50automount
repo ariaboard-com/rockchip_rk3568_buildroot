@@ -9,12 +9,14 @@ userdata_device="/dev/block/by-name/userdata"
 
 mount_oem() {
 	e2fsck -fy $oem_device
+    resize2fs $oem_device
 	mount -t ext2 $oem_device oem
 }
 
 mount_userdata() {
 	e2fsck -fy $userdata_device
-	mount -t ext2 $userdata_device userdata
+    resize2fs $userdata_device
+    mount -t ext2 $userdata_device userdata
     mkdir -p /userdata/cfg
     mkdir -p /userdata/bin
 }
