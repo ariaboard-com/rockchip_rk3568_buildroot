@@ -1,2 +1,4 @@
 config BR2_PACKAGE_IFLYTEKSDK
-	bool "Simple iflytek voice process and cloud SDK"
+    select BR2_PACKAGE_CJSON
+    bool "Simple iflytek voice process and cloud SDK"
+
