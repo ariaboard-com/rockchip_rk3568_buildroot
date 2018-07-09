@@ -1,0 +1,2 @@
+ACTION=="add",GOTO="farsight",KERNEL=="mmcblk[0]p[0-9]",RUN+="/etc/mount-sdcard.sh %k",LABEL="farsight"
+ACTION=="add",GOTO="farsight",KERNEL=="sd[a-z][0-9]",RUN+="/etc/mount-udisk.sh %k",LABEL="farsight"

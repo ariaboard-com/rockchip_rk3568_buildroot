@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Start linux launcher...
+#
+
+case "$1" in
+  start)
+		printf "Starting launcher: "
+		export LC_ALL='zh_CN.utf8'
+		export QT_QPA_PLATFORM=wayland
+
+		#for kmssink
+		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
+
+		#for waylandsink
+		#export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
+
+		#for QLauncher wayland
+		mkdir -p /tmp/.xdg &&  chmod 0700 /tmp/.xdg
+		export XDG_RUNTIME_DIR=/tmp/.xdg
+		weston --tty=2 --idle-time=0&
+		sleep 1
+		/usr/local/QLauncher/QLauncher &
+
+		#for Carmachine wayland
+		#/usr/bin/Carmachine -platform wayland -plugin EvdevTouch -plugin EvdevKeyboard &
+
+	;;
+  stop)
+		killall QLauncher
+		#killall CarMachine
+		killall weston
+		printf "stop finished"
+        ;;
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0
