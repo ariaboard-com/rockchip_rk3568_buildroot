@@ -115,4 +115,7 @@ source "package/rockchip/recoverySystem/Config.in"
 source "package/rockchip/led_control_app/Config.in"
 source "package/rockchip/cae_vad/Config.in"
 source "package/rockchip/usbdevice/Config.in"
+source "package/rockchip/cpp_common/Config.in"
+source "package/rockchip/catkin/Config.in"
+source "package/rockchip/console-bridge/Config.in"
 endif
