@@ -1,0 +1,4 @@
+config BR2_PACKAGE_CATKIN
+	bool "catkin for ROS"
+	help
+	  Willow Garage low-level build system macros and infrastructure
