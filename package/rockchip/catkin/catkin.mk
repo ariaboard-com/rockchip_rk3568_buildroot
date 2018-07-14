@@ -3,6 +3,8 @@ CATKIN_SITE = https://github.com/ros/catkin/archive
 CATKIN_SOURCE = $(CATKIN_VERSION).tar.gz
 CATKIN_INSTALL_STAGING = YES
 
+HOST_CATKIN_DEPENDENCIES += host-python-catkin_pkg
+
 HOST_CATKIN_CONF_OPTS += -DCMAKE_PREFIX_PATH=$(HOST_DIR)/opt/ros/kinetic -DCMAKE_INSTALL_PREFIX=$(HOST_DIR)/opt/ros/kinetic
 define CATKIN_CONFIGURE_CMDS
         (mkdir -p $($(PKG)_BUILDDIR) && \
@@ -25,5 +27,14 @@ define CATKIN_CONFIGURE_CMDS
         )
 endef
 
+# The toolchain file limited package search path(CMAKE_FIND_ROOT_PATH)
+# to the staging dir.
+define HOST_CATKIN_SYMLINK_STAGING
+	$(INSTALL) -d $(STAGING_DIR)/opt/ros/kinetic/share
+	ln -sf $(HOST_DIR)/opt/ros/kinetic/share/catkin $(STAGING_DIR)/opt/ros/kinetic/share
+endef
+
+HOST_CATKIN_POST_INSTALL_HOOKS += HOST_CATKIN_SYMLINK_STAGING
 
 $(eval $(cmake-package))
+$(eval $(host-cmake-package))
