@@ -1,0 +1,2 @@
+ACTION=="remove",GOTO="farsight",SUBSYSTEM=="block" GOTO="farsight",KERNEL=="mmcblk[0]p[0-9]",RUN+="/etc/umount-sdcard.sh %k",LABEL="farsight"
+ACTION=="remove",GOTO="farsight",SUBSYSTEM=="block" GOTO="farsight",KERNEL=="sd[a-z][0-9]",RUN+="/etc/umount-udisk.sh %k",LABEL="farsight"
