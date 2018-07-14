@@ -4,7 +4,7 @@ LOCAL_DIR=$(pwd)
 BUILDROOT_DIR=$LOCAL_DIR/buildroot
 BUILD_OUTPUT_DIR=$LOCAL_DIR/buildroot/output
 
-DEFCONFIG_ARRAY=( "rockchip_rk3308_release" "rockchip_rk3308_32_release" "rockchip_rk3308_32_debug" "rockchip_rk3308_robot_release" "rockchip_rk3308_mini_release" "rockchip_rk3308_pcba" "rockchip_rk3308_recovery" "rockchip_rk3326" "rockchip_rk3326_nano" "rockchip_rk3326_tiny" "rockchip_rk3326_mini" "rockchip_rk3326_medium" "rockchip_rk3326_nano_recovery" "rockchip_rk3326_medium_pcba" "rockchip_rk3399" "rockchip_rk3399_recovery" "rockchip_rk3288" "rockchip_rk3288_recovery" "rockchip_px30" "rockchip_px30_recovery" "rockchip_px3se" "rockchip_px3se_recovery" "rockchip_rk3328" "rockchip_rk3328_recovery")
+DEFCONFIG_ARRAY=( "rockchip_rk3308_release" "rockchip_rk3308_32_release" "rockchip_rk3308_32_debug" "rockchip_rk3308_robot_release" "rockchip_rk3308_mini_release" "rockchip_rk3308_pcba" "rockchip_rk3308_recovery" "rockchip_rk3326" "rockchip_rk3326_recovery" "rockchip_rk3399" "rockchip_rk3399_recovery" "rockchip_rk3288" "rockchip_rk3288_recovery" "rockchip_px30" "rockchip_px30_recovery" "rockchip_px3se" "rockchip_px3se_recovery" "rockchip_rk3328" "rockchip_rk3328_recovery")
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 
@@ -22,14 +22,6 @@ function choose_info()
 	echo
 	echo "You're building on Linux"
 	echo "Lunch menu...pick a combo:"
-	echo "rockchip_ChipName_nano_defconfig:          no app, QT, video, GPU, audo, bt/wifi. only busybox"
-	echo "rockchip_ChipName_tiny_defconfig:          no app, QT, video, GPU, have audo, bt/wifi, busybox."
-	echo "rockchip_ChipName_mini_defconfig:          no app, QT, video, have GPU, audo, bt/wifi, busybox."
-	echo "rockchip_ChipName_small_defconfig:         no app, QT, GPU, have video, audo, bt/wifi, busybox."
-	echo "rockchip_ChipName_medium_defconfig:        no app, QT, have video GPU, audo, bt/wifi, busybox."
-	echo "rockchip_ChipName_defconfig:               have app, QT, have video GPU, audo, bt/wifi, busybox."
-	echo "rockchip_ChipName_nano_recovery_defconfig: add recovery tool base on rockchip_ChipName_nano_defconfig"
-	echo "rockchip_ChipName_medium_pcba_defconfig:   add pcba test tool base on rockchip_ChipName_medium_pcba_defconfig"
 	echo ""
 	i=0
 	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
