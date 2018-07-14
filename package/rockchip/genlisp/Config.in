@@ -1,0 +1,7 @@
+config BR2_PACKAGE_GENLISP
+	bool "genlisp for ROS"
+	select BR2_PACKAGE_HOST_CATKIN
+	select BR2_PACKAGE_GENMSG
+	select BR2_PACKAGE_GENCPP
+	help
+		Lisp message generation for ROS
