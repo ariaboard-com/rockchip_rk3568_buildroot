@@ -129,4 +129,5 @@ source "package/rockchip/genpy/Config.in"
 source "package/rockchip/genmsg/Config.in"
 source "package/rockchip/message-generation/Config.in"
 source "package/rockchip/python-catkin_pkg/Config.in.host"
+source "package/rockchip/minigui/Config.in"
 endif
