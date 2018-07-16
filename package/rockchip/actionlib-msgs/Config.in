@@ -1,0 +1,10 @@
+config BR2_PACKAGE_ACTIONLIB_MSGS
+	bool "actionlib-msgs for ros"
+	select BR2_PACKAGE_HOST_CATKIN
+	select BR2_PACKAGE_CPP_COMMON
+	select BR2_PACKAGE_ROSCPP_SERIALIZATION
+	select BR2_PACKAGE_MESSAGE_GENERATION
+	select BR2_PACKAGE_MESSAGE_RUNTIME
+	select BR2_PACKAGE_STD_MSGS
+	help
+		actionlib_msgs defines the common messages to interact with an action server and an action client. For full documentation of the actionlib API see the actionlib package.
