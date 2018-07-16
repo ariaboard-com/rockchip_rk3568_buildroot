@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MESSAGE_RUNTIME
+	bool "message generation for ROS"
+	select BR2_PACKAGE_HOST_CATKIN
+	select BR2_PACKAGE_GENCPP
+	select BR2_PACKAGE_CPP_COMMON
+	select BR2_PACKAGE_ROSCPP_SERIALIZATION
+	help
+		Package modeling the run-time dependencies for language bindings of messages.
