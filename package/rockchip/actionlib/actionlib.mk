@@ -1,6 +1,6 @@
 ACTIONLIB_VERSION = 1.11.14
 ACTIONLIB_SOURCE = $(ACTIONLIB_VERSION).tar.gz
-ACTIONLIB_SITE = https://gmthub.com/ros/actionlib/archive
+ACTIONLIB_SITE = https://github.com/ros/actionlib/archive
 ACTIONLIB_INSTALL_STAGING = YES
 
 ACTIONLIB_DEPENDENCIES = \
