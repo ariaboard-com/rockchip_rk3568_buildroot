@@ -1,0 +1,11 @@
+config BR2_PACKAGE_GEOMETRY_MSGS
+	bool "geometry_msgs for ros"
+	select BR2_PACKAGE_HOST_CATKIN
+	select BR2_PACKAGE_MESSAGE_GENERATION
+	select BR2_PACKAGE_STD_MSGS
+	help
+		geometry_msgs provides messages for common
+		geometric primitives such as points, vectors,
+		and poses. These primitives are designed to
+		provide a common data type and facilitate
+		interoperability throughout the system.
