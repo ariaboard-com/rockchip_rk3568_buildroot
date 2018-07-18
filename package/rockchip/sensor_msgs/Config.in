@@ -1,0 +1,9 @@
+config BR2_PACKAGE_SENSOR_MSGS
+	bool "sensor msgs for ros"
+	select BR2_PACKAGE_HOST_CATKIN
+	select BR2_PACKAGE_GEOMETRY_MSGS
+	select BR2_PACKAGE_MESSAGE_GENERATION
+	select BR2_PACKAGE_STD_MSGS
+	help
+		This package defines messages for commonly used sensors,
+		including cameras and scanning laser rangefinders.
