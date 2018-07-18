@@ -142,5 +142,5 @@ source "package/rockchip/roscpp/Config.in"
 source "package/rockchip/rostest/Config.in"
 source "package/rockchip/actionlib/Config.in"
 source "package/rockchip/std-msgs/Config.in"
-
+source "package/rockchip/kernel_modules/Config.in"
 endif
