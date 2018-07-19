@@ -77,8 +77,8 @@ LIBCURL_CONF_OPTS += --without-libssh2
 endif
 
 # Configure curl to support http2
-ifeq ($(BR2_PACKAGE_LIBNGHTTP2),y)
-LIBCURL_DEPENDENCIES += libnghttp2
+ifeq ($(BR2_PACKAGE_NGHTTP2),y)
+LIBCURL_DEPENDENCIES += nghttp2
 LIBCURL_CONF_OPTS += --with-nghttp2=$(STAGING_DIR)/usr
 endif
 
