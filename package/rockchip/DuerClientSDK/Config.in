@@ -1,5 +1,4 @@
 config BR2_PACKAGE_DUERCLIENTSDK
 	bool "duer client sdk"
-	select BR2_PACKAGE_SQLITE
-	select BR2_PACKAGE_RAPIDJSON
-
+	help
+	  DuerOS client sdk
