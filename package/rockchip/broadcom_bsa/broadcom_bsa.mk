@@ -7,7 +7,12 @@ BROADCOM_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 		   app_hl app_hs app_tm app_tm \
 		   app_hd app_hh
 
+ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+BROADCOM_BSA_BUILD_TYPE = arm
+endif
+ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 BROADCOM_BSA_BUILD_TYPE = arm64
+endif
 
 ifeq ($(BR2_PACKAGE_BROADCOM_BSA_AP6255),y)
 	BTFIRMWARE = BCM4345C0.hcd

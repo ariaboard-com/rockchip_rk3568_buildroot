@@ -7,7 +7,12 @@ CYPRESS_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 				 app_hl app_hs app_tm app_tm app_socket \
 				 app_hd app_hh app_ble_wifi_introducer
 
+ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+CYPRESS_BSA_BUILD_TYPE = arm
+endif
+ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 CYPRESS_BSA_BUILD_TYPE = arm64
+endif
 
 ifeq ($(BR2_PACKAGE_CYPRESS_BSA_AWCM256),y)
 	BTFIRMWARE = BCM4345C0.hcd
