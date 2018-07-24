@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Do some initialzation for Rockchip Linux SDK....
+#
+
+case "$1" in
+start)
+	echo "Welcome to Rockchip Linux SDK"
+	#alsa conf
+	CARD=rk817
+	ALSA_CARD_NAME=rockchip_rk817-
+	sed -i "4a${ALSA_CARD_NAME} cards.${CARD}" /usr/share/alsa/cards/aliases.conf
+	;;
+stop)
+	;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+esac
+
+exit 0
