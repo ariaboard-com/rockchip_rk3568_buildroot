@@ -917,23 +917,22 @@ defconfig: $(BUILD_DIR)/buildroot-config/conf prepare-kconfig
 define percent_defconfig
 # Override the BR2_DEFCONFIG from COMMON_CONFIG_ENV with the new defconfig
 %_defconfig: $(BUILD_DIR)/buildroot-config/conf $(1)/configs/%_defconfig prepare-kconfig
-	if [ "`head -n 1 $(1)/configs/$$@ | cut -c1-8`" = rockchip ] ;\
-	then \
-		$(TOPDIR)/build/mkconfig.sh $$@ ;\
-		$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
-                        $$< --defconfig=$(BASE_DIR)/.rockchipconfig $$(CONFIG_CONFIG_IN) ;\
-	else \
-		$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
-			$$< --defconfig=$(1)/configs/$$@ $$(CONFIG_CONFIG_IN) ;\
-	fi
+	$(TOPDIR)/build/defconfig_hook.py -m $(1)/configs/$$@ $(BASE_DIR)/.rockchipconfig
+	$$(COMMON_CONFIG_ENV) BR2_DEFCONFIG=$(1)/configs/$$@ \
+		$$< --defconfig=$(BASE_DIR)/.rockchipconfig $$(CONFIG_CONFIG_IN)
 endef
 $(eval $(foreach d,$(call reverse,$(TOPDIR) $(BR2_EXTERNAL_DIRS)),$(call percent_defconfig,$(d))$(sep)))
 
+CFG_ := $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig)
 savedefconfig: $(BUILD_DIR)/buildroot-config/conf prepare-kconfig
-	@$(COMMON_CONFIG_ENV) $< \
-		--savedefconfig=$(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig) \
-		$(CONFIG_CONFIG_IN)
-	@$(SED) '/BR2_DEFCONFIG=/d' $(if $(DEFCONFIG),$(DEFCONFIG),$(CONFIG_DIR)/defconfig)
+	grep "#include" $(CFG_) > $(CFG_).split || true
+
+	@$(COMMON_CONFIG_ENV) $< --savedefconfig=$(CFG_) $(CONFIG_CONFIG_IN)
+	@$(SED) '/BR2_DEFCONFIG=/d' $(CFG_)
+
+	cat $(CFG_) >> $(CFG_).split
+	$(TOPDIR)/build/defconfig_hook.py -s $(CFG_).split $(CFG_)
+	rm $(CFG_).split
 
 .PHONY: defconfig savedefconfig
 
