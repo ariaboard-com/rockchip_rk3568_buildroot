@@ -22,10 +22,14 @@ ifeq ($(BR2_PACKAGE_CYPRESS_BSA_AWNB197),y)
 	BTFIRMWARE = BCM4343A1.hcd
 endif
 
+ifeq ($(BR2_PACKAGE_DUERCLIENTSDK),y)
+        CYPRESS_BSA_DUERCLIENTSDK = $(BR2_PACKAGE_DUERCLIENTSDK)
+endif
+
 define CYPRESS_BSA_BUILD_CMDS
 	$(MAKE) -C $(@D)/$(CYPRESS_BSA_PATH)/$(CYPRESS_BSA_LIBBSA)/build CPU=$(CYPRESS_BSA_BUILD_TYPE) ARMGCC=$(TARGET_CC)
 	for ff in $(CYPRESS_BSA_APP); do \
-		$(MAKE) -C $(@D)/$(CYPRESS_BSA_PATH)/$$ff/build CPU=$(CYPRESS_BSA_BUILD_TYPE) ARMGCC=$(TARGET_CC) BSASHAREDLIB=TRUE; \
+		$(MAKE) -C $(@D)/$(CYPRESS_BSA_PATH)/$$ff/build CPU=$(CYPRESS_BSA_BUILD_TYPE) ARMGCC=$(TARGET_CC) BSASHAREDLIB=TRUE DUERCLIENTSDK=$(CYPRESS_BSA_DUERCLIENTSDK); \
 	done
 
 endef
@@ -44,8 +48,10 @@ define CYPRESS_BSA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_bt_sink.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
+        $(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_ble_wifi_introducer.sh $(TARGET_DIR)/usr/bin/
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
+        sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 
 endef
 
