@@ -8,6 +8,9 @@ case "$1" in
 		# Mount debugfs
 		mount -t debugfs none /sys/kernel/debug
 
+		# Power on wifi/bt if exist
+		echo 1 >  /sys/class/rfkill/rfkill0/state || true
+
 		# bluetooth
 		rkbt  /etc/bluetooth/BCM4335C0.hcd /dev/ttyS0 &
 
