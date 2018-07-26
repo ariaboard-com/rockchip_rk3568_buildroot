@@ -46,6 +46,13 @@ CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8189FS
 endif
 
+ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+RKWIFIBT_BIN_DIR = $(@D)/bin/arm
+endif
+ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
+RKWIFIBT_BIN_DIR = $(@D)/bin/arm64
+endif
+
 ifeq ($(CHIP_VENDOR), REALTEK)
 
 ifeq ($(CHIP_NAME), RTL8723DS)
@@ -58,7 +65,7 @@ endef
 define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
-    $(INSTALL) -D -m 0755 $(@D)/bin/rtwpriv $(TARGET_DIR)/usr/bin/rtwpriv
+    $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/rtwpriv $(TARGET_DIR)/usr/bin/rtwpriv
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
     $(INSTALL) -D -m 0755 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
@@ -94,7 +101,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/bt_load_broadcom_firmware
     sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_broadcom_firmware
     $(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
-    $(INSTALL) -D -m 0755 $(@D)/bin/* $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/* $(TARGET_DIR)/usr/bin/
 endef
 endif
 
