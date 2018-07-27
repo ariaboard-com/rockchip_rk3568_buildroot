@@ -4,7 +4,7 @@ BROADCOM_BSA_SITE_METHOD = local
 BROADCOM_BSA_PATH = 3rdparty/embedded/bsa_examples/linux
 BROADCOM_BSA_LIBBSA = libbsa
 BROADCOM_BSA_APP = app_manager app_av app_avk app_ble app_dg \
-		   app_hl app_hs app_tm app_tm \
+		   app_hl app_hs app_tm app_tm app_socket \
 		   app_hd app_hh
 
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
