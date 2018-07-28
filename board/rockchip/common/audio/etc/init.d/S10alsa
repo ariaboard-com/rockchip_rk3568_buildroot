@@ -1,11 +1,10 @@
 #!/bin/sh
 #
-# Do some initialzation for Rockchip Linux SDK....
+# Do some initialzation for alsa....
 #
 
 case "$1" in
 start)
-	echo "Welcome to Rockchip Linux SDK"
 	#alsa conf
 	CARD=rk817
 	ALSA_CARD_NAME=rockchip_rk817-
