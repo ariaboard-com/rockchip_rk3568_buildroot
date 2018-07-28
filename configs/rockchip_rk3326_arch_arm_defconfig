@@ -1,3 +1,0 @@
-BR2_arm=y
-BR2_cortex_a35=y
-BR2_ARM_FPU_VFPV4=y
