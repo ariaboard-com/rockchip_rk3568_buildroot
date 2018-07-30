@@ -179,6 +179,7 @@ static void vendor_storage_write_cmd_parse(char *cmd)
 	tmp = cnt;
 	for (i = 0; i < tmp; i++) {
 		if (cmd[i] == space) {
+			memset(vendor_id, 0, sizeof(vendor_id));
 			memcpy(vendor_id, cmd, i + 1);
 			cmd += i;
 			cnt -= i;
@@ -200,6 +201,7 @@ static void vendor_storage_write_cmd_parse(char *cmd)
 		if (cmd[i] == space)
 			goto form_error;
 
+	memset(vendor_num, 0, sizeof(vendor_num));
 	memcpy(vendor_num, cmd, cnt);
 
 #ifdef VENDOR_STORAGE_DEBUG
