@@ -1,0 +1,3 @@
+# Rules for USBmount -*- conf -*-
+
+KERNEL=="sda", SUBSYSTEM=="block", ACTION=="add", RUN+="/bin/ln -s /media/usb0 /udisk"

@@ -1,0 +1,4 @@
+config BR2_PACKAGE_USBHOST
+	bool "script for USB host configure"
+	help
+	  script for USB host configure.
