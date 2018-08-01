@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PART_NAME=$1
+FS_TYPE=`mount | grep $PART_NAME | cut -d ' ' -f 5`
+GPT_SIZE=`udevadm info -a -n /dev/block/by-name/$PART_NAME  | grep ATTR{size} | cut -d '"' -f 2`
+GPT_SIZE=`expr $GPT_SIZE / 2`
+REAL_SIZE=`df -k | grep $PART_NAME | sed -n 2p | awk '{print $1}'`
+#echo "FS_TYPE:$FS_TYPE, GPT_SIZE:$GPT_SIZE, REAL_SIZE:$REAL_SIZE"
+
+PERCENT=`expr $GPT_SIZE - $REAL_SIZE`
+PERCENT=`expr $PERCENT \* 10000`
+PERCENT=`expr $PERCENT / $GPT_SIZE`
+#echo "percent: $PERCENT"
+if [[ "$PERCENT" -gt "500" ]];then
+	if [[ $FS_TYPE == ext2 || $FS_TYPE == ext3 || $FS_TYPE == ext4 ]];then
+		echo "$PART_NAME is $FS_TYPE and there are more then 5% of capacity can be extended. so resize it"
+		e2fsck -fy /dev/block/by-name/$PART_NAME
+		resize2fs /dev/block/by-name/$PART_NAME
+	fi
+
+	if [ $FS_TYPE = vfat ];then
+		echo "$PART_NAME is $FS_TYPE, there are more then 5% of capacity can be extended. so format it"
+		MOUNT_POINT=`mount | grep userdata | cut -d ' ' -f 3`
+		umount $MOUNT_POINT
+		mkdosfs /dev/block/by-name/$PART_NAME
+		mount -a 2>/dev/null
+	fi
+fi

@@ -1,0 +1,4 @@
+config BR2_PACKAGE_PARTINIT
+	bool "script for partition init"
+	help
+	  script for partition init.

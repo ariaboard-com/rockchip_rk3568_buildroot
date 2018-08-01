@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# check if we need to resize or format oem and userdata partition....
+#
+
+case "$1" in
+start)
+	partinit oem
+	partinit userdata
+	;;
+stop)
+	;;
+*)
+	echo "Usage: $0 {start|stop}"
+	exit 1
+esac
+
+exit 0
