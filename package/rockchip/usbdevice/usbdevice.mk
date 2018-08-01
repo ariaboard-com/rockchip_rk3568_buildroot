@@ -12,7 +12,7 @@ USBDEVICE_LICENSE_FILES = NOTICE
 
 define USBDEVICE_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/S50usbdevice $(TARGET_DIR)/etc/init.d/
-	$(INSTALL) -m 0644 -D $(@D)/usbdevice.rules $(TARGET_DIR)/etc/udev/rules.d/
+	$(INSTALL) -m 0644 -D $(@D)/61-usbdevice.rules $(TARGET_DIR)/lib/udev/rules.d/
 	$(INSTALL) -m 0755 -D $(@D)/usbdevice $(TARGET_DIR)/usr/bin/
 
 endef
