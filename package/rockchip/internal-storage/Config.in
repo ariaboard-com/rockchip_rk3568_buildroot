@@ -1,0 +1,4 @@
+config BR2_PACKAGE_INTERNAL_STORAGE
+	bool "rockchip internal-storage"
+	help
+	  udev rule for rockchip internal storage.
