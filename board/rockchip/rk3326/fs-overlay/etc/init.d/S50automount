@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# partitions mount 
+# yhx@rock-chips.com
+#
+
+oem_device="/dev/block/by-name/oem"
+userdata_device="/dev/block/by-name/userdata"
+
+mount_oem() {
+	e2fsck -fy $oem_device
+	resize2fs $oem_device
+	mount -t ext2 $oem_device oem
+}
+
+mount_userdata() {
+	e2fsck -fy $userdata_device
+	resize2fs $userdata_device
+	mount -t vfat $userdata_device userdata
+# 	mkdir -p /userdata/cfg
+#	mkdir -p /userdata/bin
+}
+
+auto_mount() {
+	mount_oem
+	mount_userdata
+}
+
+case "$1" in
+  start)
+        auto_mount
+        ;;
+  stop)
+        printf "stop finished\n"
+        ;;
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+        ;;
+esac
+exit 0
