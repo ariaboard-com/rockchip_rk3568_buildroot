@@ -5,7 +5,7 @@ BROADCOM_BSA_PATH = 3rdparty/embedded/bsa_examples/linux
 BROADCOM_BSA_LIBBSA = libbsa
 BROADCOM_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 		   app_hl app_hs app_tm app_tm app_socket \
-		   app_hd app_hh
+		   app_hd app_hh app_ble_wifi_introducer
 
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 BROADCOM_BSA_BUILD_TYPE = arm
@@ -22,9 +22,13 @@ ifeq ($(BR2_PACKAGE_BROADCOM_BSA_AP6212A1),y)
 	BTFIRMWARE = bcm43438a1.hcd
 endif
 
+ifeq ($(BR2_PACKAGE_DUERCLIENTSDK),y)
+        BROADCOM_BSA_DUERCLIENTSDK = $(BR2_PACKAGE_DUERCLIENTSDK)
+endif
+
 define BROADCOM_BSA_BUILD_CMDS
 	for ff in $(BROADCOM_BSA_APP); do \
-		$(MAKE) -C $(@D)/$(BROADCOM_BSA_PATH)/$$ff/build CPU=$(BROADCOM_BSA_BUILD_TYPE) ARMGCC=$(TARGET_CC) BSASHAREDLIB=TRUE; \
+		$(MAKE) -C $(@D)/$(BROADCOM_BSA_PATH)/$$ff/build CPU=$(BROADCOM_BSA_BUILD_TYPE) ARMGCC=$(TARGET_CC) BSASHAREDLIB=TRUE DUERCLIENTSDK=$(BROADCOM_BSA_DUERCLIENTSDK); \
 	done
 endef
 
@@ -42,8 +46,10 @@ define BROADCOM_BSA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_sink.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_ble_wifi_introducer.sh $(TARGET_DIR)/usr/bin/
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
+	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 
 endef
 
