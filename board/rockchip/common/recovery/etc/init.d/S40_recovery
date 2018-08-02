@@ -5,6 +5,7 @@
 
 case "$1" in
   start)
+	  	touch /dev/.coldboot_done
 		/usr/bin/recovery &
 
 	;;
