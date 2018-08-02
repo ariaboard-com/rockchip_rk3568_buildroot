@@ -56,15 +56,27 @@ endif
 ifeq ($(CHIP_VENDOR), REALTEK)
 
 ifeq ($(CHIP_NAME), RTL8723DS)
+
+ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 define RKWIFIBT_BUILD_CMDS
     $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
     $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=arm64 \
             CROSS_COMPILE=$(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+         
 endef
+endif
+
+ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+define RKWIFIBT_BUILD_CMDS
+    $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)  
+    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=arm \
+            CROSS_COMPILE=$(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-       
+endef
+endif
 
 define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
-    $(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
+    $(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko    
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/rtwpriv $(TARGET_DIR)/usr/bin/rtwpriv
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
@@ -74,6 +86,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     cp $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
 endef
+
 endif # RTL8723DS
 
 ifeq ($(CHIP_NAME), RTL8189FS)
