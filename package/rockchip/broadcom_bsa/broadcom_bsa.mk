@@ -7,6 +7,10 @@ BROADCOM_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 		   app_hl app_hs app_tm app_tm app_socket \
 		   app_hd app_hh app_ble_wifi_introducer
 
+ifeq ($(BR2_PACKAGE_BROADCOM_BSA)$(BR2_PACKAGE_CYPRESS_BSA),yy)
+$(error "You can only choose one type of BSA module (Broadcom or Cypress).")
+endif
+
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 BROADCOM_BSA_BUILD_TYPE = arm
 endif
