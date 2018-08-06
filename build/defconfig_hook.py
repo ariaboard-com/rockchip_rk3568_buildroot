@@ -32,7 +32,7 @@ def load_base(base_cfgs, cfg):
     base_cfgs[cfg] = set()
 
     for line in open(cfg):
-        n = re.match('#include\s*"(\w+\.\w+)"$', line)
+        n = re.match('\s*#include\s*"(\w+\.\w+)"\s*$', line)
         if n:
             name = n.group(1)
             path = os.path.dirname(os.path.realpath(cfg))
