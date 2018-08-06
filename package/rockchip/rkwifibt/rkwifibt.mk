@@ -78,7 +78,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko    
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/rtwpriv $(TARGET_DIR)/usr/bin/rtwpriv
-    $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)bluetooth-player $(TARGET_DIR)/usr/bin/bluetooth-player
+    $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/bluetooth-player $(TARGET_DIR)/usr/bin/bluetooth-player
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
     $(INSTALL) -D -m 0755 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
