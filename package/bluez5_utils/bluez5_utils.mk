@@ -12,10 +12,19 @@ BLUEZ5_UTILS_DEPENDENCIES = dbus libglib2
 BLUEZ5_UTILS_LICENSE = GPLv2+, LGPLv2.1+
 BLUEZ5_UTILS_LICENSE_FILES = COPYING COPYING.LIB
 
+BLUEZ5_UTILS_CONF_ENV = \
+	LIBS=-lpthread
+
 BLUEZ5_UTILS_CONF_OPTS = 	\
 	--enable-tools 		\
 	--enable-library 	\
-	--disable-cups
+	--disable-cups		\
+	--enable-deprecated
+
+ifeq ($(BR2_PACKAGE_DUERCLIENTSDK),y)
+        BLUEZ5_UTILS_MAKE_OPTS = \
+		CFLAGS+=" -DDUEROS=$(BR2_PACKAGE_DUERCLIENTSDK)"
+endif
 
 ifeq ($(BR2_PACKAGE_BLUEZ5_UTILS_OBEX),y)
 BLUEZ5_UTILS_CONF_OPTS += --enable-obex
@@ -96,5 +105,14 @@ define BLUEZ5_UTILS_INSTALL_INIT_SYSTEMD
 	ln -fs ../../../../usr/lib/systemd/system/bluetooth.service \
 		$(TARGET_DIR)/etc/systemd/system/dbus-org.bluez.service
 endef
+
+define BLUEZ5_UTILS_POST_INSTALL_TARGET_HOOK1
+	install -C $($(PKG)_BUILDDIR)tools/gatt-service $(TARGET_DIR)/usr/bin
+        install -C $($(PKG)_BUILDDIR)tools/hciconfig $(TARGET_DIR)/usr/bin
+        install -C $($(PKG)_BUILDDIR)tools/hcitool $(TARGET_DIR)/usr/bin
+        install -C package/bluez5_utils/bluez5_utils_wifi_config.sh $(TARGET_DIR)/usr/bin/
+endef
+
+BLUEZ5_UTILS_POST_INSTALL_TARGET_HOOKS += BLUEZ5_UTILS_POST_INSTALL_TARGET_HOOK1
 
 $(eval $(autotools-package))
