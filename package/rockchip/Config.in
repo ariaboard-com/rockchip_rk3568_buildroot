@@ -55,6 +55,11 @@ config BR2_PACKAGE_PX3SE
     bool "px3se chip"
     help
         Use rockchip's px3se chip
+
+config BR2_PACKAGE_RK1808
+    bool "rk1808 chip"
+    help
+        Use rockchip's rk1808 chip
 endchoice
 
 # BSP packages
