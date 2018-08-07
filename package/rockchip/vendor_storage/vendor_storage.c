@@ -108,7 +108,11 @@ static int vendor_storage_write(int cmd, char *num)
 
 	req->tag = VENDOR_REQ_TAG;
 	req->id = cmd;
-	req->len = strlen(num);
+
+	if (cmd != VENDOR_SN_ID && cmd != VENDOR_IMEI_ID)
+		req->len = 6;
+	else
+		req->len = strlen(num);
 	memcpy(req->data, num, req->len);
 
 	ret = ioctl(sys_fd, VENDOR_WRITE_IO, req);
@@ -162,6 +166,7 @@ static void vendor_storage_write_cmd_parse(char *cmd)
 	int i, cnt, tmp, id = 0xff;
 	unsigned char vendor_id[20];
 	unsigned char vendor_num[20];
+	unsigned char vendor_hex[10];
 
 	cnt = strlen(cmd);
 
@@ -240,8 +245,10 @@ static void vendor_storage_write_cmd_parse(char *cmd)
 		break;
 	}
 
+	memset(vendor_hex, 0, sizeof(vendor_hex));
 	if (id != VENDOR_SN_ID && id != VENDOR_IMEI_ID) {
-		for (i = 0; i < (strlen(vendor_num) - 1); i++) {
+		tmp = strlen(vendor_num);
+		for (i = 0; i < tmp; i++) {
 			if (vendor_num[i] < '0' ||
 			    (vendor_num[i] > '9' && vendor_num[i] < 'A') ||
 			    (vendor_num[i] > 'F' && vendor_num[i] < 'a') ||
@@ -250,11 +257,28 @@ static void vendor_storage_write_cmd_parse(char *cmd)
 				       vendor_id_table[id + 1]);
 				goto error;
 			}
+
+			/* string to hex */
+			if (vendor_num[i] >= '0' && vendor_num[i] <= '9')
+				vendor_num[i] -= '0';
+			else if (vendor_num[i] >= 'a' && vendor_num[i] <= 'f')
+				vendor_num[i] -= 'a' - 10;
+			else
+				vendor_num[i] -= 'A' - 10;
+
+			if (i & 1)
+				vendor_hex[(i - 1) >> 1] = (vendor_num[i - 1] << 4) | vendor_num[i];
 		}
 	}
 
-	if (vendor_storage_write(id, vendor_num))
-		goto error;
+	if (id == VENDOR_SN_ID || id == VENDOR_IMEI_ID) {
+		if (vendor_storage_write(id, vendor_num))
+			goto error;
+	} else {
+		if (vendor_storage_write(id, vendor_hex))
+			goto error;
+	}
+
 
 	printf("vendor write successful!\n");
 	return;
