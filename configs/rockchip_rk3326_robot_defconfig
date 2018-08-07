@@ -1,0 +1,6 @@
+#include "rk3326_arm64.config"
+#include "base.config"
+#include "gpu.config"
+#include "audio.config"
+#include "wifi.config"
+#include "debug.config"
