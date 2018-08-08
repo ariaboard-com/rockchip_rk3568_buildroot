@@ -48,9 +48,11 @@ define BROADCOM_BSA_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/etc/bsa_file
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
+	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_hfp.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_sink.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_ble_wifi_introducer.sh $(TARGET_DIR)/usr/bin/
+	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_hfp.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
