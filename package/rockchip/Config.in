@@ -60,7 +60,25 @@ config BR2_PACKAGE_RK1808
     bool "rk1808 chip"
     help
         Use rockchip's rk1808 chip
+
+config BR2_PACKAGE_RK3328
+    bool "rk3328 chip"
+    help
+        Use rockchip's rk3328 chip
+
+config BR2_PACKAGE_RK3229
+    bool "rk3229 chip"
+    help
+        Use rockchip's rk3229 chip
+
+config BR2_PACKAGE_RK3036
+    bool "rk3036 chip"
+    help
+        Use rockchip's rk3036 chip
+
 endchoice
+
+
 
 # BSP packages
 source "package/rockchip/rv1108-firmware/Config.in"
