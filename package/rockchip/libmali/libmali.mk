@@ -59,7 +59,7 @@ ifeq ($(BR2_PACKAGE_PX3SE),y)
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
 	$(INSTALL) -D -m 755 $(@D)/lib/arm-linux-gnueabihf/libmali-utgard-400-r7p0-r3p0-wayland.so $(TARGET_DIR)/usr/lib/
-	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_px3se $(TARGET_DIR)/usr/lib/etc/init.d/S10libmali
+	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_px3se $(TARGET_DIR)/etc/init.d/S10libmali
 	$(INSTALL) -D -m 755 $(@D)/overlay/px3seBase $(TARGET_DIR)/usr/sbin/
 	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-utgard-400-r7p0-r3p0-wayland.so libmali.so && $(LIBMALI_LINK_SO) && cd -
 endef
@@ -70,7 +70,7 @@ define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
 	$(INSTALL) -D -m 755 $(@D)/lib/arm-linux-gnueabihf/libmali-midgard-t76x-r14p0-r0p0-wayland.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 755 $(@D)/lib/arm-linux-gnueabihf/libmali-midgard-t76x-r14p0-r1p0-wayland.so $(TARGET_DIR)/usr/lib/
-	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_rk3288 $(TARGET_DIR)/usr/lib/etc/init.d/S10libmali
+	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_rk3288 $(TARGET_DIR)/etc/init.d/S10libmali
 	cd $(TARGET_DIR)/usr/lib/ && $(LIBMALI_LINK_SO) && cd -
 endef
 endif
