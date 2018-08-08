@@ -1,9 +1,3 @@
-#!/bin/sh
-
-LOCAL_DIR=$(pwd)
-BUILDROOT_DIR=$LOCAL_DIR/buildroot
-BUILD_OUTPUT_DIR=$LOCAL_DIR/buildroot/output
-
 DEFCONFIG_ARRAY=("rockchip_rk3308_release" "rockchip_rk3308_32_release" "rockchip_rk3308_32_debug" \
     "rockchip_rk3308_32_dueros" "rockchip_rk3308_64_dueros" \
     "rockchip_rk3308_robot_release" "rockchip_rk3308_mini_release" "rockchip_rk3308_32_mini_release" \
@@ -24,9 +18,6 @@ while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
 do
 	let i++
 done
-
-# Set croot alias
-alias croot="cd $(pwd)"
 
 function choose_info()
 {
@@ -163,7 +154,6 @@ function lunch()
 {
 	mkdir -p $TARGET_OUTPUT_DIR
 	if [ -n "$TARGET_BUILD_CONFIG" ]; then
-		cd buildroot
 		echo "==========================================="
 		echo
 		echo "#TARGET_BOARD=${TARGET_BOARD_TYPE}"
@@ -172,9 +162,8 @@ function lunch()
 		echo "#CONFIG=${TARGET_BUILD_CONFIG}_defconfig"
 		echo
 		echo "==========================================="
-		make O="$TARGET_OUTPUT_DIR" "$TARGET_BUILD_CONFIG"_defconfig
+		make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" "$TARGET_BUILD_CONFIG"_defconfig
 	fi
-	cd $LOCAL_DIR
 }
 function function_stuff()
 {
@@ -182,4 +171,18 @@ function function_stuff()
 	lunch
 }
 
-function_stuff $@
+if [ -n "${BASH_SOURCE}" ];then
+	SCRIPT_DIR=$(realpath $(dirname ${PWD}/${BASH_SOURCE}))
+	BUILDROOT_DIR=$(dirname ${SCRIPT_DIR})
+	BUILDROOT_OUTPUT_DIR=${BUILDROOT_DIR}/output
+	TOP_DIR=$(dirname ${BUILDROOT_DIR})
+
+	echo Top of tree: ${TOP_DIR}
+
+	# Set croot alias
+	alias croot="cd ${TOP_DIR}"
+
+	function_stuff $@
+else
+	echo Only support bash, please run \"bash PATH_TO_THIS_SCRIPT\" instead.
+fi
