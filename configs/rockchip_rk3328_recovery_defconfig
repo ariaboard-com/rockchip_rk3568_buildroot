@@ -1,0 +1,3 @@
+#include "rk3328_arm64.config"
+#include "base.config"
+#include "recovery.config"

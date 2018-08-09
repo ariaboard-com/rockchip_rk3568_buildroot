@@ -1,0 +1,3 @@
+#include "rk3036_arm.config"
+#include "base.config"
+#include "recovery.config"
