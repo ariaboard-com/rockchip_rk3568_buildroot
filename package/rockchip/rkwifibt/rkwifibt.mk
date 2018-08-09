@@ -46,11 +46,17 @@ CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8189FS
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_COMPATIBLE),y)
+CHIP_VENDOR = ROCKCHIP
+endif
+
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 RKWIFIBT_BIN_DIR = $(@D)/bin/arm
+TARGET_ARCH = arm
 endif
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 RKWIFIBT_BIN_DIR = $(@D)/bin/arm64
+TARGET_ARCH = arm64
 endif
 
 ifeq ($(CHIP_VENDOR), REALTEK)
@@ -123,5 +129,23 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/* $(TARGET_DIR)/usr/bin/
 endef
 endif
+
+ifeq ($(CHIP_VENDOR), ROCKCHIP)
+define RKWIFIBT_BUILD_CMDS
+    $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
+    mkdir -p $(TARGET_DIR)/system/lib/modules/
+    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+endef
+
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    mkdir -p $(TARGET_DIR)/system/etc/firmware
+    $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/all/* $(TARGET_DIR)/system/etc/firmware
+    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
+    $(INSTALL) -D -m 0755 $(@D)/src/rk_wifi_init $(TARGET_DIR)/usr/bin/rk_wifi_init
+endef
+endif
+
 
 $(eval $(generic-package))
