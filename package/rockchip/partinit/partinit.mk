@@ -10,7 +10,7 @@ PARTINIT_SITE_METHOD = local
 
 define PARTINIT_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/partinit $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -m 0755 -D $(@D)/S10part $(TARGET_DIR)/etc/init.d/
+	$(INSTALL) -m 0755 -D $(@D)/S40part $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
