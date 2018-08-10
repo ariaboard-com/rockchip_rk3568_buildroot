@@ -25,17 +25,18 @@ case "$1" in
     echo "start broadcom bluetooth wifi introducer"
     app_ble_wifi_introducer > /data/bsa/app_ble_wifi_introducer.log &
     sleep 1
+    echo "|----- bluetooth ble wifi config ------|"
 
         ;;
     stop)
-        echo -n "Stopping broadcom bsa bluetooth server & app"
+        echo "Stopping broadcom bsa bluetooth server & app"
         killall app_ble_wifi_introducer
         sleep 1
         killall app_manager
         sleep 1
         killall bsa_server
         sleep 2
-        echo 0 > /sys/class/rfkill/rfkill0/state
+        echo "|-----ble wifi config is close-----|"
 
         ;;
     *)
