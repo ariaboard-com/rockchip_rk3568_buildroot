@@ -87,6 +87,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_start $(TARGET_DIR)/usr/bin/bt_realtek_start
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_start $(TARGET_DIR)/usr/bin/bt_realtek_hfp_start
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_hanup $(TARGET_DIR)/usr/bin/bt_realtek_hfp_hanup
+    $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_accept $(TARGET_DIR)/usr/bin/bt_realtek_hfp_accept
     cp $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
 endef
