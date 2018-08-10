@@ -172,7 +172,8 @@ function function_stuff()
 }
 
 if [ -n "${BASH_SOURCE}" ];then
-	SCRIPT_DIR=$(realpath $(dirname ${PWD}/${BASH_SOURCE}))
+	SCRIPT_PATH=$(realpath ${PWD}/${BASH_SOURCE})
+	SCRIPT_DIR=$(dirname ${SCRIPT_PATH})
 	BUILDROOT_DIR=$(dirname ${SCRIPT_DIR})
 	BUILDROOT_OUTPUT_DIR=${BUILDROOT_DIR}/output
 	TOP_DIR=$(dirname ${BUILDROOT_DIR})
