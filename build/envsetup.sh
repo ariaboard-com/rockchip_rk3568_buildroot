@@ -147,7 +147,7 @@ function choose_type()
 			break
 		fi
 	done
-	export TARGET_OUTPUT_DIR="$BUILD_OUTPUT_DIR/$TARGET_DIR_NAME"
+	export TARGET_OUTPUT_DIR="$BUILDROOT_OUTPUT_DIR/$TARGET_DIR_NAME"
 }
 
 function lunch()
