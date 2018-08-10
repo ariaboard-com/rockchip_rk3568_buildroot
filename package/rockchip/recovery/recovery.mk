@@ -15,7 +15,7 @@ PROJECT_DIR="$(@D)"
 RECOVERY_BUILD_OPTS=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm \
 	--sysroot=$(STAGING_DIR) \
 	-fPIC \
-	-lz -lpthread -lpng -ldrm
+	-lpthread
 
 ifeq ($(BR2_PACKAGE_RK3308),y)
 TARGET_MAKE_ENV += RecoveryNoUi=true
