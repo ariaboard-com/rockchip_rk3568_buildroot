@@ -12,13 +12,17 @@ RECOVERY_LICENSE = Apache V2.0
 RECOVERY_LICENSE_FILES = NOTICE
 CC="$(TARGET_CC)"
 PROJECT_DIR="$(@D)"
-RECOVERY_BUILD_OPTS=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm \
+RECOVERY_BUILD_OPTS+=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm \
 	--sysroot=$(STAGING_DIR) \
 	-fPIC \
 	-lpthread
 
 ifeq ($(BR2_PACKAGE_RK3308),y)
 TARGET_MAKE_ENV += RecoveryNoUi=true
+endif
+
+ifneq ($(BR2_PACKAGE_RK3308),y)
+RECOVERY_BUILD_OPTS +=-lz -lpng -ldrm
 endif
 
 RECOVERY_MAKE_OPTS = \
