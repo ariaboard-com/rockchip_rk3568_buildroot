@@ -9,7 +9,8 @@ DEFCONFIG_ARRAY=("rockchip_rk3308_release" "rockchip_rk3308_32_release" "rockchi
     "rockchip_rk3288" "rockchip_rk3288_recovery" \
     "rockchip_px30" "rockchip_px30_recovery" \
     "rockchip_px3se" "rockchip_px3se_recovery" \
-    "rockchip_rk3328" "rockchip_rk3328_recovery")
+    "rockchip_rk3328" "rockchip_rk3328_recovery" \
+    "rockchip_rk1808" "rockchip_rk1808_recovery")
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 
