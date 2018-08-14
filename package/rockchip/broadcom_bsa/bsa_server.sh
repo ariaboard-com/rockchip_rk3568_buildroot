@@ -17,32 +17,14 @@ case "$1" in
     killall bsa_server
     bsa_server -r 12 -b /data/bsa/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
     sleep 2
-
-    echo "start broadcom bluetooth app_manager"
-    app_manager -s > /data/bsa/app_mananger.log &
-
-    echo "start broadcom bluetooth app_avk"
-    app_avk -s > /data/bsa/app_avk.log &
-    sleep 1
-
-
-    echo "#########act as a bluetooth music player#########"
-    app_socket avk 2
-    sleep 2
-    echo "|----- bluetooth music player ------|"
+    echo "|----- bluetooth bsa server is open ------|"
 
         ;;
     stop)
-        echo "Stopping broadcom bsa bluetooth server & app"
-        killall app_socket
-        sleep 1
-        killall app_avk
-        sleep 1
-        killall app_manager
-        sleep 1
+        echo "Stopping broadcom bsa bluetooth server"
         killall bsa_server
         sleep 2
-        echo "|-----bluetooth music player is close-----|"
+        echo "|-----bluetooth bsa server is close-----|"
 
         ;;
     *)
