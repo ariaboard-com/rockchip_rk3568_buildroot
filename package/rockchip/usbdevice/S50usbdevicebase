@@ -10,7 +10,7 @@ start)
 	mount -t configfs none /sys/kernel/config
 	mkdir /sys/kernel/config/usb_gadget/rockchip  -m 0770
 	echo 0x2207 > /sys/kernel/config/usb_gadget/rockchip/idVendor
-	echo 0x0006 > /sys/kernel/config/usb_gadget/rockchip/idProduct
+	# ADD_IDPRODUCT
 	mkdir /sys/kernel/config/usb_gadget/rockchip/strings/0x409   -m 0770
 	echo "0123456789ABCDEF" > /sys/kernel/config/usb_gadget/rockchip/strings/0x409/serialnumber
 	echo "rockchip"  > /sys/kernel/config/usb_gadget/rockchip/strings/0x409/manufacturer
@@ -19,20 +19,14 @@ start)
 	mkdir /sys/kernel/config/usb_gadget/rockchip/configs/b.1/strings/0x409  -m 0770
 	echo 500 > /sys/kernel/config/usb_gadget/rockchip/configs/b.1/MaxPower
 
-	mkdir /sys/kernel/config/usb_gadget/rockchip/functions/mass_storage.0
-	echo /dev/disk/by-partlabel/userdata > /sys/kernel/config/usb_gadget/rockchip/functions/mass_storage.0/lun.0/file
-	ln -s  /sys/kernel/config/usb_gadget/rockchip/functions/mass_storage.0 /sys/kernel/config/usb_gadget/rockchip/configs/b.1/f1
+	# INIT_FUNCTIONS
 
-	mkdir /sys/kernel/config/usb_gadget/rockchip/functions/ffs.adb
-	ln -s  /sys/kernel/config/usb_gadget/rockchip/functions/ffs.adb /sys/kernel/config/usb_gadget/rockchip/configs/b.1/f2
-	echo "ums_adb" > /sys/kernel/config/usb_gadget/rockchip/configs/b.1/strings/0x409/configuration
-	mount -t functionfs adb /dev/usb-ffs/adb
+	# INIT_CONFIG
 
-	export service_adb_tcp_port=5555
-	adbd &
-	sleep 1
+	# START_APP_BEFORE_UDC
 	UDC=`ls /sys/class/udc/| awk '{print $1}'`
 	echo $UDC > /sys/kernel/config/usb_gadget/rockchip/UDC
+	# START_APP_AFTER_UDC
 
 	;;
 stop)

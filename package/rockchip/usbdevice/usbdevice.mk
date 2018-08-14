@@ -11,6 +11,8 @@ USBDEVICE_LICENSE = Apache V2.0
 USBDEVICE_LICENSE_FILES = NOTICE
 
 define USBDEVICE_INSTALL_TARGET_CMDS
+	cp $(@D)/S50usbdevicebase $(@D)/S50usbdevice
+	$(@D)/geninitfile.sh $(@D)
 	$(INSTALL) -m 0755 -D $(@D)/S50usbdevice $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -m 0644 -D $(@D)/61-usbdevice.rules $(TARGET_DIR)/lib/udev/rules.d/
 	$(INSTALL) -m 0755 -D $(@D)/usbdevice $(TARGET_DIR)/usr/bin/
