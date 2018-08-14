@@ -172,4 +172,5 @@ source "package/rockchip/sdmount/Config.in"
 source "package/rockchip/internal-storage/Config.in"
 source "package/rockchip/partinit/Config.in"
 source "package/rockchip/glmarktest/Config.in"
+source "package/rockchip/mtp/Config.in"
 endif
