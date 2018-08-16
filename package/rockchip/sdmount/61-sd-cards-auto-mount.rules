@@ -13,7 +13,7 @@ ACTION=="add", ENV{ID_FS_TYPE}=="vfat", RUN+="/bin/mount -t vfat -o %E{mount_opt
 
 ACTION=="add", ENV{mount_options_ntfs}="rw,uid=1000,gid=1000,dmask=022,fmask=133,noatime"
 
-ACTION=="add", ENV{ID_FS_TYPE}=="ntfs", RUN+="/bin/mount -t ntfs-3g -o %E{mount_options_ntfs} /dev/%k '/mnt/sdcard'"
+ACTION=="add", ENV{ID_FS_TYPE}=="ntfs", RUN+="/bin/mount -t ntfs -o %E{mount_options_ntfs} /dev/%k '/mnt/sdcard'"
 
 ACTION=="add", ENV{mount_options_ext2}="users,exec,noatime"
 
