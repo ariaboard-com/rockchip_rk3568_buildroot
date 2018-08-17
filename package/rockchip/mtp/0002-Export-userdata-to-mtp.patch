@@ -1,7 +1,7 @@
 From add0864b7e65ad253e9485df25eb6a6a0a81b835 Mon Sep 17 00:00:00 2001
 From: "zain.wang" <wzz@rock-chips.com>
 Date: Thu, 9 Aug 2018 11:43:12 +0800
-Subject: [PATCH 2/2] Export userdata to mtp
+Subject: [PATCH 2/3] Export userdata to mtp
 
 Signed-off-by: zain.wang <wzz@rock-chips.com>
 ---
