@@ -178,7 +178,7 @@ if [ -n "${BASH_SOURCE}" ];then
 	BUILDROOT_DIR=$(dirname ${SCRIPT_DIR})
 	BUILDROOT_OUTPUT_DIR=${BUILDROOT_DIR}/output
 	TOP_DIR=$(dirname ${BUILDROOT_DIR})
-
+	source ${TOP_DIR}/device/rockchip/.BoardConfig.mk
 	echo Top of tree: ${TOP_DIR}
 
 	# Set croot alias
