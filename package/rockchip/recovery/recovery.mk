@@ -18,11 +18,10 @@ RECOVERY_BUILD_OPTS+=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm \
 	-lpthread
 
 ifeq ($(BR2_PACKAGE_RK3308),y)
-TARGET_MAKE_ENV += RecoveryNoUi=true
-endif
-
-ifneq ($(BR2_PACKAGE_RK3308),y)
-RECOVERY_BUILD_OPTS +=-lz -lpng -ldrm
+	TARGET_MAKE_ENV += RecoveryNoUi=true
+else
+	RECOVERY_BUILD_OPTS += -lz -lpng -ldrm
+	RECOVERY_DEPENDENCIES += libzlib libpng libdrm
 endif
 
 RECOVERY_MAKE_OPTS = \
