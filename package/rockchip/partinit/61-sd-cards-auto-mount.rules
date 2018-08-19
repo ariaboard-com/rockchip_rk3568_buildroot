@@ -5,8 +5,6 @@ ATTRS{type}!="SD", GOTO="sd_cards_auto_mount_end"
 
 IMPORT{program}="/sbin/blkid -o udev -p %N"
 
-ACTION=="add", RUN+="/bin/mkdir -p '/mnt/sdcard'", RUN+="/bin/ln -s /mnt/sdcard /sdcard"
-
 ACTION=="add", ENV{mount_options_vfat}="rw,uid=1000,gid=1000,dmask=022,fmask=133,noatime"
 
 ACTION=="add", ENV{ID_FS_TYPE}=="vfat", RUN+="/bin/mount -t vfat -o %E{mount_options_vfat} /dev/%k '/mnt/sdcard'"
@@ -27,6 +25,6 @@ ACTION=="add", ENV{mount_options_ext4}="users,exec,noatime"
 
 ACTION=="add", ENV{ID_FS_TYPE}=="ext4", RUN+="/bin/mount -t ext4 -o %E{mount_options_ext4} /dev/%k '/mnt/sdcard'"
 
-ACTION=="remove", RUN+="/bin/umount '/mnt/sdcard'", RUN+="/bin/rm -rf '/mnt/sdcard' '/sdcard'"
+ACTION=="remove", RUN+="/bin/umount '/mnt/sdcard'"
 
 LABEL="sd_cards_auto_mount_end"

@@ -1,4 +1,0 @@
-config BR2_PACKAGE_SDMOUNT
-	bool "script for sd card mount configure"
-	help
-	  script for sd card mount configure.
