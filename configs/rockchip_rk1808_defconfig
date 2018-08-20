@@ -1,3 +1,5 @@
 #include "rk1808_arm64.config"
 #include "base.config"
 #include "debug.config"
+BR2_PACKAGE_MINIGUI=y
+BR2_PACKAGE_LIBDRM=y
