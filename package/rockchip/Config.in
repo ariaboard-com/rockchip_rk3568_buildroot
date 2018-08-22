@@ -172,4 +172,5 @@ source "package/rockchip/partinit/Config.in"
 source "package/rockchip/glmarktest/Config.in"
 source "package/rockchip/tensorflow/Config.in"
 source "package/rockchip/mtp/Config.in"
+source "package/rockchip/alsa-config/Config.in"
 endif
