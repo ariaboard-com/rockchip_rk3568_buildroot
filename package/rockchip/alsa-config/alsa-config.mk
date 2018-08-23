@@ -10,10 +10,8 @@ ALSA_CONFIG_SITE_METHOD = local
 
 ALSA_CONFIG_LICENSE = Apache V2.0
 ALSA_CONFIG_LICENSE_FILES = NOTICE
-PROJECT_DIR="$(@D)"
 
-define ALSA_CONFIG_INSTALL_TARGET_CMDS
-        $(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
-endef
+ALSA_CONFIG_AUTORECONF = YES
+ALSA_CONFIG_CONF_OPTS = --prefix=/usr/share/alsa/
 
-$(eval $(generic-package))
+$(eval $(autotools-package))
