@@ -30,9 +30,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "update_recv/update_recv.h"
+
 #define LOG_FILE_LEN 512
 #if 0
-#define RECOVERY_PATH "/tmp/recovery"                                         
+#define RECOVERY_PATH "/tmp/recovery"
 #define LOG_FILE_PATH "/tmp/recovery/log"
 #define COMMAND_FILE_PATH "/tmp/recovery/command"
 #else
@@ -103,10 +105,10 @@ static void bootCommand(char *arg){
 	FILE *log_file;
 	FILE *misc_file;
 	char blank[LOG_FILE_LEN];
-	
+
 	if(!arg) return;
 	printf("command: %s\n", arg);
-	mkdir(RECOVERY_PATH,0775); 
+	mkdir(RECOVERY_PATH,0775);
 	if((command_file = fopen(COMMAND_FILE_PATH,"wb")) == NULL){
  		printf("Open command file error.\n");
 		return;
@@ -121,7 +123,7 @@ static void bootCommand(char *arg){
 		printf("Open misc file error.\n");
 		return;
 	}
- 
+
 	printf("update: write command to command file: ");
  	fwrite(arg, strlen(arg), 1, command_file);
  	fwrite("\n", 1, 1, command_file);
@@ -171,7 +173,7 @@ static void installPackage(char *update_file){
 	char *str_update_package = "--update_package=";
 	int str_update_package_len = strlen(str_update_package);
 	int str_update_file_len = strlen(update_file);
-	
+
 	memset(arg, 0, 512);
 	strcpy(arg, str_update_package);
 	strcpy(arg + str_update_package_len, update_file);
@@ -203,9 +205,9 @@ void rebootWipeUserData(){
 }
 
 int rebootUpdate(char *path){
-	
+
 	if(path){
-		printf("find %s\n", path);                                 
+		printf("find %s\n", path);
         	installPackage(path);
 	}
 
@@ -220,30 +222,43 @@ int rebootUpdate(char *path){
 		installPackage(SD_UPDATE_FILE);
 		return 0;
 	}
-	
+
 	printf("find %s\n", DATA_UPDATE_FILE);
 	installPackage(DATA_UPDATE_FILE);
 	return 0;
 }
 
 int main(int argc, char** argv){
-
+    char* partition_name = "recovery";
 	printf("update: Rockchip Update Tool\n");
+
 	if(argc == 1) {
 		rebootWipeUserData();
 	} else if(argc == 2){
 		if(!strcmp(argv[1], "ota") || !strcmp(argv[1], "update"))
 			rebootUpdate(0);
 		else if(!strcmp(argv[1], "factory") || !strcmp(argv[1], "reset"))
-			rebootWipeUserData(); 
+			rebootWipeUserData();
 		else  return -1;
-			
+
 		return 0;
-			
+
 	} else if(argc == 3){
 		if(!strcmp(argv[1], "ota") || !strcmp(argv[1], "update"))
-			if(argv[2])
+			if(argv[2]) {
+                int ret;
+                ret = WriteFwData(argv[2], partition_name);
+                if (ret < 0) {
+                    printf(" Update partition %s fail \n", partition_name);
+                    return -1;
+                } else {
+                    if (!CheckFwData(argv[2], partition_name)){
+                        printf(" Check partition %s fail \n", partition_name);
+                        return -1;
+                    }
+                }
 				return rebootUpdate(argv[2]);
+			}
 	}
 
 	return -1;
