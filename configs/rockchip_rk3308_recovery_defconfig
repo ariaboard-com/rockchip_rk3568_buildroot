@@ -1,5 +1,3 @@
 #include "rk3308_arm.config"
 #include "base.config"
 #include "recovery.config"
-BR2_PACKAGE_EQ_DRC_PROCESS=y
-BR2_PACKAGE_ALSA_LADSPA=y
