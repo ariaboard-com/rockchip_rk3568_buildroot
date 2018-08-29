@@ -26,7 +26,7 @@ endef
 
 define EQ_DRC_PROCESS_INSTALL_TARGET_CMDS
         $(INSTALL) -D -m 755 $(@D)/eq_drc_process $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -D -m 755 $(@D)/S98_EQ_init $(TARGET_DIR)/etc/init.d/
+	$(INSTALL) -D -m 755 $(@D)/S97_EQ_init $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
