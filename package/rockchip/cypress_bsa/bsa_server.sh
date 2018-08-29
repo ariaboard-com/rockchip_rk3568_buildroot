@@ -24,6 +24,7 @@ case "$1" in
         echo "Stopping broadcom bsa bluetooth server"
         killall bsa_server
         sleep 2
+        echo 0 > /sys/class/rfkill/rfkill0/state
         echo "|-----bluetooth bsa server is close-----|"
 
         ;;
