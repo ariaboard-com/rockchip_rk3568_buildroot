@@ -19,14 +19,13 @@ case "$1" in
 
     echo "start broadcom bluetooth wifi introducer"
     app_ble_wifi_introducer &
-    sleep 1
     echo "|----- bluetooth ble wifi config ------|"
 
         ;;
     stop)
         echo "Stopping broadcom bsa bluetooth app"
         killall app_ble_wifi_introducer
-        sleep 1
+        check_not_exist.sh app_ble_wifi_introducer
         echo "|-----ble wifi config is close-----|"
 
         ;;

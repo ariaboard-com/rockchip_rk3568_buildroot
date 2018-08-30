@@ -19,14 +19,13 @@ case "$1" in
 
     echo "start broadcom bluetooth app_avk"
     app_avk -s &
-    sleep 1
     echo "|----- bluetooth music player ------|"
 
         ;;
     stop)
         echo "Stopping broadcom bsa bluetooth app"
         killall app_avk
-        sleep 1
+        check_not_exist.sh app_avk
         echo "|-----bluetooth music player is close-----|"
 
         ;;
