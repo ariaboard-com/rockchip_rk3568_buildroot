@@ -12,6 +12,7 @@ PERCENT=`expr $PERCENT \* 10000`
 PERCENT=`expr $PERCENT / $GPT_SIZE`
 MOUNT_POINT=`mount | grep $PART_NAME | cut -d ' ' -f 3`
 #echo "percent: $PERCENT"
+
 if [[ "$PERCENT" -gt "500" ]];then
 	if [[ $FS_TYPE == ext2 || $FS_TYPE == ext3 || $FS_TYPE == ext4 ]];then
 		echo "$PART_NAME is $FS_TYPE and there are more then 5% of capacity can be extended. so resize it"
@@ -27,4 +28,11 @@ if [[ "$PERCENT" -gt "500" ]];then
 		mkdosfs /dev/block/by-name/$PART_NAME
 		mount -a 2>/dev/null
 	fi
+#should check ext2/ext3/ext4 filesystem every boot time
+elif [[ $FS_TYPE == ext2 || $FS_TYPE == ext3 || $FS_TYPE == ext4 ]];then
+	echo "e2fsck /dev/block/by-name/$PART_NAME"
+	umount $MOUNT_POINT
+	e2fsck -fy /dev/block/by-name/$PART_NAME
+	mount -a 2>/dev/null
 fi
+
