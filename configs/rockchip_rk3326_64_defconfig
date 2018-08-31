@@ -12,3 +12,4 @@
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"
+BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y

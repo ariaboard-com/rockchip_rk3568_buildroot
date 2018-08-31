@@ -4,3 +4,4 @@
 #include "audio.config"
 #include "wifi.config"
 #include "debug.config"
+BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y
