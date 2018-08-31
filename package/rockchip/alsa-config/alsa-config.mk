@@ -12,6 +12,6 @@ ALSA_CONFIG_LICENSE = Apache V2.0
 ALSA_CONFIG_LICENSE_FILES = NOTICE
 
 ALSA_CONFIG_AUTORECONF = YES
-ALSA_CONFIG_CONF_OPTS = --prefix=/usr/share/alsa/
+ALSA_CONFIG_CONF_OPTS = --prefix=$(TARGET_DIR)
 
 $(eval $(autotools-package))
