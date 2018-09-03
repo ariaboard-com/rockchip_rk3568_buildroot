@@ -27,7 +27,7 @@ module_choice()
     echo "flash stress test:    3"
     echo "bluetooth test:       4 (bluetooth on&off test)"
     echo "audio test:           5"
-    echo "usb  test:            6 (insert & read & write)"
+    echo "recovery test:        6 (default wipe all)"
     echo "player test:          7 "
     echo "suspend_resume test:  8 (suspend & resume)"
     echo "wifi test:            9"
@@ -56,10 +56,11 @@ flash_stress_test()
    bash /rockchip_test/flash_test/flash_stress_test.sh 5 20000&
 }
 
-usb_test()
+recovery_test()
 {
-    sh /test_plan/usb/usb_test.sh
+    sh /rockchip_test/recovery_test/auto_reboot.sh
 }
+
 player_test()
 {
     sh /test_plan/player/test.sh
@@ -87,7 +88,7 @@ bluetooth_test()
 
 audio_test()
 {
-    sh /test_plan/audio/audio_test.sh
+    sh /rockchip_test/audio/audio_functions_test.sh
 }
 
 ir_test()
@@ -128,7 +129,7 @@ module_test()
             audio_test
             ;;
         6)
-            usb_test
+            recovery_test
             ;;
         7)
             player_test

@@ -4,6 +4,11 @@ case "$1" in
   start)
         aplay /usr/lib/silence.wav
         source /oem/RkLunch.sh
+		#recovery test
+		if [ -e "/oem/rockchip_test/auto_reboot.sh" ]; then
+			mkdir /data/cfg/rockchip_test
+			cp /oem/rockchip_test/auto_reboot.sh /data/cfg/rockchip_test
+		fi
         source /data/cfg/rockchip_test/auto_reboot.sh &
         ;;
   stop)
