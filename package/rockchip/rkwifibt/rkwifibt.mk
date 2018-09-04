@@ -11,6 +11,11 @@ RKWIFIBT_SITE = $(TOPDIR)/../external/rkwifibt
 RKWIFIBT_MODULES_PATH = $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan
 BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6181),y)
+CHIP_VENDOR = BROADCOM
+CHIP_NAME = AP6181
+endif
+
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6255),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6255
@@ -119,7 +124,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/lib/modules
     mkdir -p $(TARGET_DIR)/system/etc/firmware
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/wifi/* $(TARGET_DIR)/system/etc/firmware
-    $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/bt/* $(TARGET_DIR)/system/etc/firmware
+    -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(CHIP_NAME)/bt/* $(TARGET_DIR)/system/etc/firmware
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/brcm_patchram_plus1
     sed -i 's/MODULE_PATH/\/usr\/lib\/modules\/bcmdhd.ko/g' $(@D)/S66load_wifi_modules
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
