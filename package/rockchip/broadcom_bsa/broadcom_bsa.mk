@@ -55,8 +55,8 @@ define BROADCOM_BSA_INSTALL_TARGET_CMDS
 	done
 
 	mkdir -p $(TARGET_DIR)/etc/bsa_file
-	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
-	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/broadcom_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/broadcom_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_bt_hfp.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/$(BROADCOM_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
