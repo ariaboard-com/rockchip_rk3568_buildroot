@@ -102,6 +102,7 @@ endif
 
 else
 SDL2_CONF_OPTS += --disable-video-x11 --without-x
+SDL2_CONF_ENV += CFLAGS=" -DMESA_EGL_NO_X11_HEADERS "
 endif
 
 ifeq ($(BR2_PACKAGE_SDL2_OPENGL),y)
