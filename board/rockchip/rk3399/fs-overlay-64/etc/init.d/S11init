@@ -10,7 +10,6 @@ start)
 	rkbt  /etc/bluetooth/bcm4354a1.hcd /dev/ttyS0 &
 	;;
 stop)
-	killall rkbt
 	printf "stop finished"
 	;;
 *)
