@@ -16,7 +16,7 @@ PROJECT_DIR="$(@D)"
 RKUPDATE_BUILD_OPTS=-I"$(STAGING_DIR)/usr/include/" -I$(PROJECT_DIR) \
 	--sysroot=$(STAGING_DIR) \
 	-fPIC \
-	-lpthread -luuid -lcutils
+	-lpthread -luuid
 
 #RKUPDATE_BUILD_OPTS=-I"$(STAGING_DIR)/usr/include/" -I$(PROJECT_DIR) \
 	--sysroot=$(STAGING_DIR) \
