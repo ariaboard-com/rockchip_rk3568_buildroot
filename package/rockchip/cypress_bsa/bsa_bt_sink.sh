@@ -7,9 +7,9 @@ case "$1" in
     start)
 
     echo 0 > /sys/class/rfkill/rfkill0/state
-    sleep 3
+    sleep 1
     echo 1 > /sys/class/rfkill/rfkill0/state
-    sleep 3
+    sleep 1
 
     mkdir -p /data/bsa/config
     cd /data/bsa/config
@@ -23,8 +23,7 @@ case "$1" in
 
     echo "start broadcom bluetooth app_avk"
     app_avk -s > /data/bsa/app_avk.log &
-    sleep 1
-
+    sleep 3
 
     echo "#########act as a bluetooth music player#########"
     app_socket avk 2
