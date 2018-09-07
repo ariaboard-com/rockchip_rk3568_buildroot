@@ -32,4 +32,10 @@ ifneq ($(BR2_PACKAGE_NTFS_3G_NTFSPROGS),y)
 NTFS_3G_CONF_OPTS += --disable-ntfsprogs
 endif
 
+# Create symlink to mount.ntfs
+define NTFS_3G_INSTALL_SYMLINK
+	ln -sf mount.ntfs-3g $(TARGET_DIR)/sbin/mount.ntfs
+endef
+NTFS_3G_POST_INSTALL_TARGET_HOOKS += NTFS_3G_INSTALL_SYMLINK
+
 $(eval $(autotools-package))
