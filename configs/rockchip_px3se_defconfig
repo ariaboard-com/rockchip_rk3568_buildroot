@@ -1,5 +1,6 @@
 #include "px3se_arm.config"
 #include "base.config"
+#include "base_extra.config"
 #include "gpu.config"
 #include "video_mpp.config"
 #include "video_gst.config"

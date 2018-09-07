@@ -1,5 +1,6 @@
 #include "rk3308_arm64.config"
 #include "base.config"
+#include "base_extra.config"
 #include "audio.config"
 #include "wifi.config"
 #include "debug.config"
