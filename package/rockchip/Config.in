@@ -61,6 +61,11 @@ config BR2_PACKAGE_RK1808
     help
         Use rockchip's rk1808 chip
 
+config BR2_PACKAGE_RK3399PRO_NPU
+    bool "rk3399pro npu chip"
+    help
+        Use rockchip's rk3399pro npu chip
+
 config BR2_PACKAGE_RK3328
     bool "rk3328 chip"
     help
