@@ -138,34 +138,7 @@ endef
 $(eval $(generic-package))
 
 # DEFINITION OF LIBRETRO PLATFORM
-LIBRETRO_PLATFORM =
-ifeq ($(BR2_ARM_CPU_ARMV6),y)
-        LIBRETRO_PLATFORM += armv6
-endif
-
-ifeq ($(BR2_cortex_a7),y)
-        LIBRETRO_PLATFORM += armv7
-endif
-
-ifeq ($(BR2_cortex_a8),y)
-        LIBRETRO_PLATFORM += armv8 cortexa8
-endif
-
-ifeq ($(BR2_x86_i586),y)
-        LIBRETRO_PLATFORM = unix
-endif
-
-ifeq ($(BR2_x86_64),y)
-        LIBRETRO_PLATFORM = unix
-endif
-
-ifeq ($(BR2_cortex_a15),y)
-        LIBRETRO_PLATFORM += armv7
-endif
-
-ifeq ($(BR2_aarch64),y)
-        LIBRETRO_PLATFORM += unix
-endif
+LIBRETRO_PLATFORM = unix
 
 #ifeq ($(BR2_GCC_TARGET_FLOAT_ABI),"hard")
 #        LIBRETRO_PLATFORM += hardfloat
@@ -179,9 +152,3 @@ endif
 # Will be equal to rpi1, rpi2, rpi3 if we are on rpi.
 # Will be equal to LIBRETRO_PLATFORM otherwise
 LIBRETRO_BOARD=$(LIBRETRO_PLATFORM)
-ifeq ($(RECALBOX_SYSTEM_VERSION)),rpi2)
-	LIBRETRO_BOARD=$(RECALBOX_SYSTEM_VERSION)
-endif
-ifeq ($(RECALBOX_SYSTEM_VERSION)),rpi3)
-	LIBRETRO_BOARD=$(RECALBOX_SYSTEM_VERSION)
-endif
