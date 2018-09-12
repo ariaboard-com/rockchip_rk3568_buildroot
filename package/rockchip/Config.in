@@ -89,6 +89,7 @@ endchoice
 source "package/rockchip/rv1108-firmware/Config.in"
 
 # Shared packages with all chips
+source "package/rockchip/ros/Config.in"
 source "package/rockchip/liblog/Config.in"
 source "package/rockchip/LocalPlayer/Config.in"
 source "package/rockchip/alexaClientSDK/Config.in"
