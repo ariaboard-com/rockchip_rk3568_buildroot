@@ -15,14 +15,17 @@ case "$1" in
     cd /data/bsa/config
     echo "start broadcom bluetooth server bsa_sever"
     killall bsa_server
-    bsa_server -r 12 -b /data/bsa/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
+    #bsa_server -r 12 -b /data/bsa/btsnoop.log -p $hcd_file -d /dev/ttyS4 > /data/bsa/bsa_log &
+     bsa_server -r 12 -p $hcd_file -d /dev/ttyS4 -all=0 &
     sleep 2
 
     echo "start broadcom bluetooth app_manager"
-    app_manager -s > /data/bsa/app_mananger.log &
-
+    #app_manager -s > /data/bsa/app_mananger.log &
+    app_manager -s &
+    
     echo "start broadcom bluetooth app_avk"
-    app_avk -s > /data/bsa/app_avk.log &
+    #app_avk -s > /data/bsa/app_avk.log &
+    app_avk -s &
     sleep 3
 
     echo "#########act as a bluetooth music player#########"
