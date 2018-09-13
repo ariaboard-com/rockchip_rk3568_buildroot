@@ -31,6 +31,11 @@ config BR2_PACKAGE_RK3128H
     help
         Use rockchip's rk3128H box chip
 
+config BR2_PACKAGE_RK3128
+    bool "rk3128 chip"
+    help
+        Use rockchip's rk3128 chip
+
 config BR2_PACKAGE_RK3399
     bool "rk3399 chip"
     help
