@@ -1,4 +1,5 @@
 #include "rk3288_arm.config"
+#include "base.config"
 #include "base_extra.config"
 #include "gpu.config"
 #include "video_mpp.config"
