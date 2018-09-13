@@ -2063,6 +2063,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-nxengine/Config.in"
 	source "package/libretro-o2em/Config.in"
 	source "package/libretro-paralleln64/Config.in"
+	source "package/libretro-pcsx/Config.in"
 endmenu
 
 endmenu
