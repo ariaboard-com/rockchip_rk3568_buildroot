@@ -2021,4 +2021,8 @@ menu "Text editors and viewers"
 	source "package/vim/Config.in"
 endmenu
 
+menu "Libretro cores and retroarch"
+	source "package/retroarch/Config.in"
+endmenu
+
 endmenu
