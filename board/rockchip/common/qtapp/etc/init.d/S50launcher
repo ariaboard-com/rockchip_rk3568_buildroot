@@ -18,6 +18,9 @@ case "$1" in
 		#for kmssink
 		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
 
+		#for rkisp plugin
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/gstreamer-1.0
+
 		#for waylandsink
 		#export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
 
