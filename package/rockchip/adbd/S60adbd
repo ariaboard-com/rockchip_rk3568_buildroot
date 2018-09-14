@@ -15,7 +15,7 @@ case "$1" in
 	mkdir /sys/kernel/config/usb_gadget/g1  -m 0770
 	sleep 1
 	echo 0x2207 > /sys/kernel/config/usb_gadget/g1/idVendor
-	echo 0x0011 > /sys/kernel/config/usb_gadget/g1/idProduct
+	echo 0x0006 > /sys/kernel/config/usb_gadget/g1/idProduct
 	mkdir /sys/kernel/config/usb_gadget/g1/strings/0x409   -m 0770
 	sleep 1
 	echo "0123456789ABCDEF" > /sys/kernel/config/usb_gadget/g1/strings/0x409/serialnumber

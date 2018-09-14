@@ -10,7 +10,7 @@ start)
 	mount -t configfs none /sys/kernel/config
 	mkdir /sys/kernel/config/usb_gadget/rockchip  -m 0770
 	echo 0x2207 > /sys/kernel/config/usb_gadget/rockchip/idVendor
-	echo 0x0011 > /sys/kernel/config/usb_gadget/rockchip/idProduct
+	echo 0x0006 > /sys/kernel/config/usb_gadget/rockchip/idProduct
 	mkdir /sys/kernel/config/usb_gadget/rockchip/strings/0x409   -m 0770
 	echo "0123456789ABCDEF" > /sys/kernel/config/usb_gadget/rockchip/strings/0x409/serialnumber
 	echo "rockchip"  > /sys/kernel/config/usb_gadget/rockchip/strings/0x409/manufacturer
