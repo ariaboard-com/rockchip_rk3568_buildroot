@@ -34,7 +34,8 @@ module_choice()
     echo "ethernet test:        10"
     echo "IR test:              11"
     echo "QT test:              12"
-	echo "auto reboot test:     13"
+    echo "auto reboot test:     13"
+    echo "ddr freq scaling test 14"
     echo "*****************************************************"
 
     echo  "please input your test moudle: "
@@ -103,11 +104,16 @@ qt_test()
 
 auto_reboot_test()
 {
-	fcnt=/data/config/rockchip_test/reboot_cnt;                 
+	fcnt=/data/config/rockchip_test/reboot_cnt;
 	if [ -e "$fcnt" ]; then
-		rm -f $fcnt;                   
+		rm -f $fcnt;
 	fi
 	sh /rockchip_test/auto_reboot/auto_reboot.sh
+}
+
+ddr_freq_scaling_test()
+{
+	bash /rockchip_test/ddr/ddr_freq_scaling.sh
 }
 
 module_test()
@@ -147,11 +153,14 @@ module_test()
             ir_test
             ;;
         12)
-            qt_test	
+            qt_test
             ;;
-		13)
-            auto_reboot_test	
+	13)
+            auto_reboot_test
             ;;
+	14)
+	   ddr_freq_scaling_test
+	    ;;
     esac
 }
 
