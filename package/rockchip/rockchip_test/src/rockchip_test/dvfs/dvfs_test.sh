@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR_DVFS=/rockchip_test/dvfs
 
@@ -13,25 +13,29 @@ info_view()
 
 info_view
 echo "*****************************************************"
-echo "cpu auto freq test:                             1"
+echo "cpu freq stress test:                               1"
+echo "cpu freq test:(with out stress test)                2"
 echo "*****************************************************"
 
 read -t 30 DVFS_CHOICE
 
-auto_cpu_freq_test()
+cpu_freq_stress_test()
 {
-	#value 1 is sleep time
-	sh ${DIR_DVFS}/auto_cpu_freq_test.sh 1 &
+	#test 24 hours, every cpu frequency stay 10 seconds
+	bash ${DIR_DVFS}/cpu_freq_stress_test.sh 86400 10 &
 }
 
-dvfs_stress_test()
+cpu_freq_test()
 {
-	sh ${DIR_DVFS}/dvfs_stress_test.sh &
+	sh ${DIR_DVFS}/auto_cpu_freq_test.sh 1 &
 }
 
 case ${DVFS_CHOICE} in
 	1)
-		auto_cpu_freq_test
+		cpu_freq_stress_test
+		;;
+	2)
+		cpu_freq_test
 		;;
 	*)
 		echo "not fount your input."
