@@ -2051,6 +2051,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-hatari/Config.in"
 	source "package/libretro-lutro/Config.in"
 	source "package/libretro-mame/Config.in"
+	source "package/libretro-mame2000/Config.in"
 endmenu
 
 endmenu
