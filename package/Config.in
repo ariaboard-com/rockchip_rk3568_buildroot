@@ -2038,6 +2038,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-cap32/Config.in"
 	source "package/libretro-dosbox/Config.in"
 	source "package/libretro-fbalpha/Config.in"
+	source "package/libretro-fbalpha2012/Config.in"
 endmenu
 
 endmenu
