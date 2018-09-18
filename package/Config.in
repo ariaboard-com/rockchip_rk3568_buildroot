@@ -2050,6 +2050,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-gw/Config.in"
 	source "package/libretro-hatari/Config.in"
 	source "package/libretro-lutro/Config.in"
+	source "package/libretro-mame/Config.in"
 endmenu
 
 endmenu
