@@ -2058,6 +2058,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-mame2016/Config.in"
 	source "package/libretro-meteor/Config.in"
 	source "package/libretro-mgba/Config.in"
+	source "package/libretro-mupen64plus/Config.in"
 endmenu
 
 endmenu
