@@ -2065,6 +2065,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-paralleln64/Config.in"
 	source "package/libretro-pcsx/Config.in"
 	source "package/libretro-picodrive/Config.in"
+	source "package/libretro-ppsspp/Config.in"
 endmenu
 
 endmenu
