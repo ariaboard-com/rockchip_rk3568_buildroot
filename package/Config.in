@@ -2030,6 +2030,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-beetlepcefast/Config.in"
 	source "package/libretro-beetlepcfx/Config.in"
 	source "package/libretro-beetlepsx/Config.in"
+	source "package/libretro-beetlesaturn/Config.in"
 endmenu
 
 endmenu
