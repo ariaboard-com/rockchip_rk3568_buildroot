@@ -2077,6 +2077,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-stella/Config.in"
 	source "package/libretro-tgbdual/Config.in"
 	source "package/libretro-uae/Config.in"
+	source "package/libretro-vbam/Config.in"
 endmenu
 
 endmenu
