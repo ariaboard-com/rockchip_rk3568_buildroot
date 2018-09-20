@@ -32,6 +32,14 @@ ifneq ($(BR2_PACKAGE_NTFS_3G_NTFSPROGS),y)
 NTFS_3G_CONF_OPTS += --disable-ntfsprogs
 endif
 
+ifeq ($(BR2_PACKAGE_NTFS_3G_EXTRAS),y)
+NTFS_3G_CONF_OPTS += --enable-extras
+endif
+
+ifeq ($(BR2_PACKAGE_NTFS_3G_QUARANTINED),y)
+NTFS_3G_CONF_OPTS += --enable-quarantined
+endif
+
 # Create symlink to mount.ntfs
 define NTFS_3G_INSTALL_SYMLINK
 	ln -sf mount.ntfs-3g $(TARGET_DIR)/sbin/mount.ntfs

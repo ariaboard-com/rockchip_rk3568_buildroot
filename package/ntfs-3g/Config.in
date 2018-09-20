@@ -29,6 +29,16 @@ config BR2_PACKAGE_NTFS_3G_NTFSPROGS
 	help
 	  Install NTFS utilities.
 
+config BR2_PACKAGE_NTFS_3G_EXTRAS
+	bool "ntfsprogs"
+	help
+	  Install NTFS extra utilities.
+
+config BR2_PACKAGE_NTFS_3G_QUARANTINED
+	bool "ntfsprogs"
+	help
+	  Install NTFS quarantined utilities.
+
 endif
 
 comment "ntfs-3g needs a toolchain w/ wchar, threads, dynamic library"
