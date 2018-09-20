@@ -1,12 +1,13 @@
 CATKIN_VERSION = 0.7.14
+CATKIN_ROS_DIR = /opt/ros/kinetic
+ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
+CATKIN_VERSION = 0.6.19
+CATKIN_ROS_DIR = /opt/ros/indigo
+endif
+
 CATKIN_SITE = https://github.com/ros/catkin/archive
 CATKIN_SOURCE = $(CATKIN_VERSION).tar.gz
 CATKIN_INSTALL_STAGING = YES
-
-CATKIN_ROS_DIR = /opt/ros/kinetic
-ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
-CATKIN_ROS_DIR = /opt/ros/indigo
-endif
 
 HOST_CATKIN_DEPENDENCIES += host-python-catkin_pkg host-python-em host-python-empy
 

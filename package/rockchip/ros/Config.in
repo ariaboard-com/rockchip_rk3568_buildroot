@@ -33,8 +33,6 @@ source "package/rockchip/ros/geometry/Config.in"
 source "package/rockchip/ros/catkin/Config.in.host"
 source "package/rockchip/ros/catkin/Config.in"
 source "package/rockchip/ros/pluginlib/Config.in"
-source "package/rockchip/ros/std-msgs/Config.in"
-source "package/rockchip/ros/message-generation/Config.in"
 source "package/rockchip/ros/message-runtime/Config.in"
 source "package/rockchip/ros/console-bridge/Config.in"
 source "package/rockchip/ros/gencpp/Config.in"
@@ -46,5 +44,17 @@ source "package/rockchip/ros/class-loader/Config.in"
 source "package/rockchip/ros/cmake_modules/Config.in"
 source "package/rockchip/ros/rospack/Config.in"
 source "package/rockchip/ros/orocos_kinematics_dynamics/Config.in"
+
+if BR2_PACKAGE_ROS_KINETIC
+source "package/rockchip/ros/std-msgs/Config_kinetic.in"
+source "package/rockchip/ros/message-generation/Config_kinetic.in"
+source "package/rockchip/ros/geneus/Config.in"
+source "package/rockchip/ros/gennodejs/Config.in"
+endif
+
+if BR2_PACKAGE_ROS_INDIGO
+source "package/rockchip/ros/std-msgs/Config_indigo.in"
+source "package/rockchip/ros/message-generation/Config_indigo.in"
+endif
 
 endif
