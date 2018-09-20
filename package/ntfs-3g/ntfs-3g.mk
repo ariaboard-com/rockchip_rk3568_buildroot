@@ -46,4 +46,16 @@ define NTFS_3G_INSTALL_SYMLINK
 endef
 NTFS_3G_POST_INSTALL_TARGET_HOOKS += NTFS_3G_INSTALL_SYMLINK
 
+# Create wrapper for fsck helper
+define NTFS_3G_INSTALL_WRAPPER
+	FSCK_NTFS=$(TARGET_DIR)/sbin/fsck.ntfs; \
+	if [ -f $(TARGET_DIR)/usr/bin/ntfsfix ];then \
+		echo "#!/bin/sh" > $(TARGET_DIR)/sbin/fsck.ntfs; \
+		echo 'ntfsfix $$(echo $$@ |xargs -n 1|grep "^[^-]")' \
+			>> $(TARGET_DIR)/sbin/fsck.ntfs; \
+		chmod 755 $(TARGET_DIR)/sbin/fsck.ntfs; \
+	fi
+endef
+NTFS_3G_POST_INSTALL_TARGET_HOOKS += NTFS_3G_INSTALL_WRAPPER
+
 $(eval $(autotools-package))
