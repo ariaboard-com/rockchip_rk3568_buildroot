@@ -13,3 +13,4 @@ PYTHON_PYYAML_LICENSE_FILES = LICENSE
 PYTHON_PYYAML_DEPENDENCIES = libyaml
 
 $(eval $(python-package))
+$(eval $(host-python-package))
