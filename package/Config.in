@@ -2044,6 +2044,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-fmsx/Config.in"
 	source "package/libretro-fuse/Config.in"
 	source "package/libretro-gambatte/Config.in"
+	source "package/libretro-gearboy/Config.in"
 endmenu
 
 endmenu
