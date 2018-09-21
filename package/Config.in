@@ -2073,6 +2073,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-snes9x/Config.in"
 	source "package/libretro-snes9x2002/Config.in"
 	source "package/libretro-snes9x2005/Config.in"
+	source "package/libretro-snes9x2010/Config.in"
 endmenu
 
 endmenu
