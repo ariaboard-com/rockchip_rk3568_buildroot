@@ -2072,6 +2072,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-scummvm/Config.in"
 	source "package/libretro-snes9x/Config.in"
 	source "package/libretro-snes9x2002/Config.in"
+	source "package/libretro-snes9x2005/Config.in"
 endmenu
 
 endmenu
