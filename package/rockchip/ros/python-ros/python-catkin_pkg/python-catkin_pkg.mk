@@ -4,3 +4,4 @@ PYTHON_CATKIN_PKG_SITE = https://files.pythonhosted.org/packages/fa/e9/6977c1cd0
 PYTHON_CATKIN_PKG_SETUP_TYPE = setuptools
 
 $(eval $(host-python-package))
+$(eval $(python-package))
