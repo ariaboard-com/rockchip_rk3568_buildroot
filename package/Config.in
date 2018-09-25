@@ -2054,6 +2054,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-mame2000/Config.in"
 	source "package/libretro-mame2003/Config.in"
 	source "package/libretro-mame2010/Config.in"
+	source "package/libretro-mame2014/Config.in"
 endmenu
 
 endmenu
