@@ -2034,6 +2034,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-beetlesupergrafx/Config.in"
 	source "package/libretro-beetlevb/Config.in"
 	source "package/libretro-beetlewswan/Config.in"
+	source "package/libretro-bluemsx/Config.in"
 endmenu
 
 endmenu
