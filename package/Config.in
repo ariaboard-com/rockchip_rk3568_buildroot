@@ -2068,6 +2068,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-ppsspp/Config.in"
 	source "package/libretro-prboom/Config.in"
 	source "package/libretro-prosystem/Config.in"
+	source "package/libretro-quicknes/Config.in"
 endmenu
 
 endmenu
