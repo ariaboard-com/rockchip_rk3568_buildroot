@@ -2042,6 +2042,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-fceumm/Config.in"
 	source "package/libretro-fceunext/Config.in"
 	source "package/libretro-fmsx/Config.in"
+	source "package/libretro-fuse/Config.in"
 endmenu
 
 endmenu
