@@ -2026,6 +2026,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-4do/Config.in"
 	source "package/libretro-81/Config.in"
 	source "package/libretro-beetlelynx/Config.in"
+	source "package/libretro-beetlengp/Config.in"
 endmenu
 
 endmenu
