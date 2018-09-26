@@ -2043,6 +2043,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-fceunext/Config.in"
 	source "package/libretro-fmsx/Config.in"
 	source "package/libretro-fuse/Config.in"
+	source "package/libretro-gambatte/Config.in"
 endmenu
 
 endmenu
