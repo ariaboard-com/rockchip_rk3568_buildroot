@@ -165,8 +165,17 @@ function lunch()
 		echo
 		echo "==========================================="
 		make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" "$TARGET_BUILD_CONFIG"_defconfig
+		TARGET_BOARD_CONFIG_FILE=BoardConfig.mk
+		if [ $TARGET_BUILD_TYPE = 32 ]; then
+			TARGET_BOARD_CONFIG_FILE=BoardConfig_32bit.mk
+		fi
+		cd device/rockchip && ln -snf $TARGET_BOARD_TYPE/$TARGET_BOARD_CONFIG_FILE .BoardConfig.mk && \
+		sed --follow-symlinks -i "s/\(RK_CFG_BUILDROOT=\).*/\1$TARGET_BUILD_CONFIG/g" .BoardConfig.mk
+		cd $TOP_DIR
+		source ${TOP_DIR}/device/rockchip/.BoardConfig.mk
 	fi
 }
+
 function function_stuff()
 {
 	choose_type $@
