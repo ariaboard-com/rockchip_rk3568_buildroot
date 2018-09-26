@@ -2060,6 +2060,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-mgba/Config.in"
 	source "package/libretro-mupen64plus/Config.in"
 	source "package/libretro-nestopia/Config.in"
+	source "package/libretro-nxengine/Config.in"
 endmenu
 
 endmenu
