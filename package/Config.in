@@ -2047,6 +2047,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-gearboy/Config.in"
 	source "package/libretro-genesisplusgx/Config.in"
 	source "package/libretro-gpsp/Config.in"
+	source "package/libretro-gw/Config.in"
 endmenu
 
 endmenu
