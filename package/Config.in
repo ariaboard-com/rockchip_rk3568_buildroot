@@ -2031,6 +2031,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-beetlepcfx/Config.in"
 	source "package/libretro-beetlepsx/Config.in"
 	source "package/libretro-beetlesaturn/Config.in"
+	source "package/libretro-beetlesupergrafx/Config.in"
 endmenu
 
 endmenu
