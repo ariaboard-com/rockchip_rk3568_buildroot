@@ -2048,6 +2048,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-genesisplusgx/Config.in"
 	source "package/libretro-gpsp/Config.in"
 	source "package/libretro-gw/Config.in"
+	source "package/libretro-hatari/Config.in"
 endmenu
 
 endmenu
