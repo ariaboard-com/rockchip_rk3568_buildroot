@@ -2040,6 +2040,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-fbalpha/Config.in"
 	source "package/libretro-fbalpha2012/Config.in"
 	source "package/libretro-fceumm/Config.in"
+	source "package/libretro-fceunext/Config.in"
 endmenu
 
 endmenu
