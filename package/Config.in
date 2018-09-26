@@ -2033,6 +2033,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-beetlesaturn/Config.in"
 	source "package/libretro-beetlesupergrafx/Config.in"
 	source "package/libretro-beetlevb/Config.in"
+	source "package/libretro-beetlewswan/Config.in"
 endmenu
 
 endmenu
