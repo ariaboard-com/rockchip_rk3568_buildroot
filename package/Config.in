@@ -2079,6 +2079,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-uae/Config.in"
 	source "package/libretro-vbam/Config.in"
 	source "package/libretro-vbanext/Config.in"
+	source "package/libretro-vecx/Config.in"
 endmenu
 
 endmenu
