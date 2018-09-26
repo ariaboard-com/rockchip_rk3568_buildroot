@@ -2080,6 +2080,7 @@ menu "Libretro cores and retroarch"
 	source "package/libretro-vbam/Config.in"
 	source "package/libretro-vbanext/Config.in"
 	source "package/libretro-vecx/Config.in"
+	source "package/libretro-virtualjaguar/Config.in"
 endmenu
 
 endmenu
