@@ -61,8 +61,10 @@ define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	mkdir -p $(RKafDir)
 	mkdir -p $(RKaeDir)
 	mkdir -p $(RKawbDir)
+	mkdir -p $(TARGET_DIR)/etc/iqfiles
 	$(INSTALL) -D -m 755 $(TOPDIR)/package/rockchip/camera_engine_rkisp/set_pipeline.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 $(TOPDIR)/package/rockchip/camera_engine_rkisp/S50set_pipeline $(TARGET_DIR)/etc/init.d/
+	$(INSTALL) -D -m 755 $(@D)/iqfiles/*.xml $(TARGET_DIR)/etc/iqfiles/
 	$(INSTALL) -D -m 755 $(@D)/build/lib/librkisp.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 755 $(@D)/plugins/3a/rkiq/af/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_af.so $(RKafDir)/
 	$(INSTALL) -D -m 755 $(@D)/plugins/3a/rkiq/aec/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_ae.so $(RKaeDir)/
