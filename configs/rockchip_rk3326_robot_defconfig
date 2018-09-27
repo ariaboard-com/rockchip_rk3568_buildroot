@@ -1,8 +1,0 @@
-#include "rk3326_arm64.config"
-#include "base.config"
-#include "base_extra.config"
-#include "gpu.config"
-#include "audio.config"
-#include "wifi.config"
-#include "debug.config"
-BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y
