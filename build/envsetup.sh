@@ -1,17 +1,36 @@
-DEFCONFIG_ARRAY=("rockchip_rk3308_release" "rockchip_rk3308_32_release" "rockchip_rk3308_32_debug" \
-    "rockchip_rk3308_32_dueros" "rockchip_rk3308_64_dueros" \
-    "rockchip_rk3308_robot_release" "rockchip_rk3308_mini_release" "rockchip_rk3308_32_mini_release" \
-    "rockchip_rk3308_pcba" "rockchip_rk3308_recovery" \
-    "rockchip_rk3326_32" "rockchip_rk3326_64" "rockchip_rk3326_recovery" \
-    "rockchip_rk3326_rebot_release" \
-    "rockchip_rk3326_nano" "rockchip_rk3326_audio" \
-    "rockchip_rk3399" "rockchip_rk3399_recovery" \
-    "rockchip_rk3288" "rockchip_rk3288_recovery" \
-    "rockchip_px30_32" "rockchip_px30_64" "rockchip_px30_recovery" \
-    "rockchip_px3se" "rockchip_px3se_recovery" \
-    "rockchip_rk3328" "rockchip_rk3328_recovery" \
-    "rockchip_rk1808" "rockchip_rk1808_recovery" \
-    "rockchip_rk3399pro_npu")
+DEFCONFIG_ARRAY=(
+"rockchip_rk3308_release" \
+"rockchip_rk3308_32_release" \
+"rockchip_rk3308_32_debug" \
+"rockchip_rk3308_32_dueros" \
+"rockchip_rk3308_64_dueros" \
+"rockchip_rk3308_mini_release" \
+"rockchip_rk3308_32_mini_release" \
+"rockchip_rk3308_robot32" \
+"rockchip_rk3308_robot64" \
+"rockchip_rk3308_pcba" \
+"rockchip_rk3308_recovery" \
+"rockchip_rk3326_32" \
+"rockchip_rk3326_64" \
+"rockchip_rk3326_recovery" \
+"rockchip_rk3326_robot32" \
+"rockchip_rk3326_robot64" \
+"rockchip_rk3399" \
+"rockchip_rk3399_recovery" \
+"rockchip_rk3288" \
+"rockchip_rk3288_recovery" \
+"rockchip_px30_32" \
+"rockchip_px30_64" \
+"rockchip_px30_robot32" \
+"rockchip_px30_robot64" \
+"rockchip_px30_recovery" \
+"rockchip_px3se" \
+"rockchip_px3se_recovery" \
+"rockchip_rk3328" \
+"rockchip_rk3328_recovery" \
+"rockchip_rk1808" \
+"rockchip_rk1808_recovery" \
+"rockchip_rk3399pro_npu")
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 
