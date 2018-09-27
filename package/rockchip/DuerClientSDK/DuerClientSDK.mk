@@ -70,13 +70,13 @@ define DUERCLIENTSDK_CONFIGURE_CMDS
 	)
 endef
 
-$(eval $(shell sed -n '/MIC_NUM=/p' $(TOPDIR)/../device/rockchip/rk3308/BoardConfig.mk))
+$(eval $(shell sed -n '/MIC_NUM=/p' $(TOPDIR)/../device/rockchip/.BoardConfig.mk))
 ifeq ($(MIC_NUM),)
 $(error missing set MIC_NUM in BoardConfig.mk?)
 endif
 
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
-DUERCLIENTSDK_OEM_BINARIES_DIR = $(DUERCLIENTSDK_OEM_DIR)/arm32
+DUERCLIENTSDK_OEM_BINARIES_DIR = $(DUERCLIENTSDK_OEM_DIR)/spil/arm32
 DUERCLIENTSDK_BUILD_CONF = $(DUERCLIENTSDK_BUILDDIR)build/build32.conf
 DUERCLIENTSDK_EXTRA_RESOURCES_DIR = $(DUERCLIENTSDK_BUILDDIR)resources32
 DUERCLIENTSDK_THIRD_HEADER_PATH = $(DUERCLIENTSDK_BUILDDIR)third/include32
@@ -85,7 +85,7 @@ DUERCLIENTSDK_SDK_LIB_PATH = $(DUERCLIENTSDK_BUILDDIR)sdk/lib32
 DUERCLIENTSDK_LIBDIR = lib32
 endif
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
-DUERCLIENTSDK_OEM_BINARIES_DIR = $(DUERCLIENTSDK_OEM_DIR)/arm64
+DUERCLIENTSDK_OEM_BINARIES_DIR = $(DUERCLIENTSDK_OEM_DIR)/spil/arm64
 DUERCLIENTSDK_BUILD_CONF = $(DUERCLIENTSDK_BUILDDIR)build/build64.conf
 DUERCLIENTSDK_EXTRA_RESOURCES_DIR = $(DUERCLIENTSDK_BUILDDIR)resources64
 DUERCLIENTSDK_THIRD_HEADER_PATH = $(DUERCLIENTSDK_BUILDDIR)third/include64
@@ -97,7 +97,7 @@ endif
 define DUERCLIENTSDK_PRE_BUILD_HOOK1
 	install -C $(DUERCLIENTSDK_OEM_BINARIES_DIR)/baidu_spil_rk3308_$(call qstrip,$(MIC_NUM))mic/libbd_alsa_audio_client.so \
 	$(DUERCLIENTSDK_SDK_LIB_PATH)
-	cd $(DUERCLIENTSDK_INSTALL_DIR); rm -f lib; mkdir $(DUERCLIENTSDK_LIBDIR); \
+	cd $(DUERCLIENTSDK_INSTALL_DIR); rm -rf lib; mkdir $(DUERCLIENTSDK_LIBDIR); \
 	ln -snf $(DUERCLIENTSDK_LIBDIR) lib
 endef
 
@@ -108,7 +108,9 @@ define DUERCLIENTSDK_POST_INSTALL_TARGET_HOOK1
 	mkdir -p $(DUERCLIENTSDK_OEM_RESOURCE_DIR)
 	install -C $($(PKG)_BUILDDIR)resources/* $(DUERCLIENTSDK_OEM_RESOURCE_DIR)
 	install -C $(DUERCLIENTSDK_EXTRA_RESOURCES_DIR)/* $(DUERCLIENTSDK_OEM_RESOURCE_DIR)
-	install -C $(DUERCLIENTSDK_BUILDDIR)sdk/log.config $(DUERCLIENTSDK_INSTALL_DIR)/log.config.bak
+	install -C $(DUERCLIENTSDK_BUILDDIR)sdk/log.config $(DUERCLIENTSDK_INSTALL_DIR)/log.config
+	install -C $(DUERCLIENTSDK_BUILDDIR)sdk/duerlinklog.config $(DUERCLIENTSDK_INSTALL_DIR)/duerlinklog.config
+	cd $(DUERCLIENTSDK_INSTALL_DIR)/lib; rm -f libbd_alsa_audio_client.so; ln -sf ../../baidu_spil_rk3308/libbd_alsa_audio_client.so .
 	$(call strip_files_under,$(DUERCLIENTSDK_INSTALL_DIR))
 endef
 
