@@ -35,9 +35,10 @@ LIBMAD_CONF_OPTS = \
 	--$(if $(BR2_PACKAGE_LIBMAD_STRICT_ISO),enable,disable)-strict-iso
 
 define LIBMAD_BUILD_CMDS
-        $(TARGET_MAKE_ENV) $(LIBMAD_MAKE_ENV) $(MAKE) $(LIBMAD_MAKE_OPTS) -C $(@D)
-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) -lmad $(@D)/minimad.c -o $(TARGET_DIR)/usr/bin/minimad
-
+	$(TARGET_MAKE_ENV) $(LIBMAD_MAKE_ENV) $(MAKE) $(LIBMAD_MAKE_OPTS) -C $(@D)
+	cd $(@D) && \
+		$(TARGET_MAKE_ENV) $(LIBMAD_MAKE_ENV) $(MAKE) $(LIBMAD_MAKE_OPTS) minimad && \
+		$(INSTALL) -C .libs/minimad $(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(autotools-package))
