@@ -20,6 +20,7 @@ config BR2_PACKAGE_ROS_INDIGO
 
 endchoice
 source "package/rockchip/ros/geometry2/Config.in"
+source "package/rockchip/ros/vision-opencv/Config.in"
 
 source "package/rockchip/ros/dynamic-reconfigure/Config.in"
 source "package/rockchip/ros/actionlib/Config.in"
@@ -50,11 +51,13 @@ source "package/rockchip/ros/std-msgs/Config_kinetic.in"
 source "package/rockchip/ros/message-generation/Config_kinetic.in"
 source "package/rockchip/ros/geneus/Config.in"
 source "package/rockchip/ros/gennodejs/Config.in"
+
 endif
 
 if BR2_PACKAGE_ROS_INDIGO
 source "package/rockchip/ros/std-msgs/Config_indigo.in"
 source "package/rockchip/ros/message-generation/Config_indigo.in"
+
 endif
 
 endif
