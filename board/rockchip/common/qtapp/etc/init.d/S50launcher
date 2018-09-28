@@ -15,6 +15,9 @@ case "$1" in
                 # music
                 /usr/bin/audioservice &
 
+		# bt
+		/usr/libexec/bluetooth/bluetoothd --compat &
+
 		#for kmssink
 		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
 
