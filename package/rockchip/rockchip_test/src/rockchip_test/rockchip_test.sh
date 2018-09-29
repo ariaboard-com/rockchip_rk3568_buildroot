@@ -59,7 +59,7 @@ flash_stress_test()
 
 recovery_test()
 {
-    sh /rockchip_test/recovery_test/auto_recovery.sh
+    sh /rockchip_test/recovery_test/auto_reboot.sh
 }
 
 player_test()

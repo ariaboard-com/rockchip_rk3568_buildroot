@@ -4,6 +4,7 @@ config BR2_PACKAGE_ROCKCHIP_TEST
 	select BR2_PACKAGE_DHRYSTONE
 	select BR2_PACKAGE_MEMTESTER
 	select BR2_PACKAGE_FIO
+	select BR2_PACKAGE_MEMTESTER
 	select BR2_PACKAGE_BASH
 	help
 		function test for Rockchip stress test 
