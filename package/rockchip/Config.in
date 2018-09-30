@@ -166,4 +166,5 @@ source "package/rockchip/rknpu/Config.in"
 source "package/rockchip/mtp/Config.in"
 source "package/rockchip/alsa-config/Config.in"
 source "package/rockchip/libcapsimage/Config.in"
+source "package/rockchip/rkscript/Config.in"
 endif
