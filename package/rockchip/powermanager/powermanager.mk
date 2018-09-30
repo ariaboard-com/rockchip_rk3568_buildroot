@@ -29,6 +29,7 @@ define POWERMANAGER_INSTALL_TARGET_CMDS
 	cp $(BUILD_DIR)/powermanager-$(POWERMANAGER_VERSION)/thermal_sensor_config.xml $(TARGET_DIR)/etc/ && \
 	cp $(BUILD_DIR)/powermanager-$(POWERMANAGER_VERSION)/thermal_throttle_config.xml $(TARGET_DIR)/etc/ && \
         $(INSTALL) -D -m 755 $(@D)/power_manager_service $(TARGET_DIR)/usr/bin/
+        $(INSTALL) -D -m 0755 $(@D)/S45PM_init $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
