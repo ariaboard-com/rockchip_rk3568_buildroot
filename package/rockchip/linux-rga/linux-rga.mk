@@ -19,8 +19,11 @@ define LINUX_RGA_BUILD_CMDS
 		$(LINUX_RGA_MAKE_OPTS)
 endef
 
+# it's better to implement by 'make install'
 define LINUX_RGA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 644 $(@D)/lib/librga.so $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -d $(STAGING_DIR)/usr/include/rga
+	$(INSTALL) -C $(@D)/*.h $(STAGING_DIR)/usr/include/rga
 endef
 
 $(eval $(generic-package))
