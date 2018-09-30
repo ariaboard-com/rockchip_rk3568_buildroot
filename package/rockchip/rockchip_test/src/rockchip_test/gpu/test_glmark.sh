@@ -22,15 +22,13 @@ elif [[  "$1" == "rk3399"  ]]; then
 	echo performance > /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor # set big cpu
 	echo "set the cpu/ddr/gpu for performance"
 
-elif [[  "$1" == "px30"  ]]; then
-elif [[  "$1" == "rk3326"  ]]; then
+elif [[  "$1" == "px30" || "$1" == "rk3326"  ]]; then
 	echo performance > /sys/class/devfreq/dmc/governor # set ddr
 	echo performance > /sys/class/devfreq/ff400000.gpu/governor # set gpu
 	echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor # set lit cpu
 	echo "set the cpu/ddr/gpu for performance"
 
-elif [[  "$1" == "rk1808"  ]]; then
-elif [[  "$1" == "rk3308"  ]]; then
+elif [[  "$1" == "rk1808" || "$1" == "rk3308"  ]]; then
 	echo "the chips didn't support gpu"
 
 elif [[  "$1" == "px3se"  ]]; then
@@ -70,3 +68,5 @@ set_performance ${CHIPNAME}
 
 export XDG_RUNTIME_DIR=/tmp/.xdg
 glmark2-es2-wayland --fullscreen
+
+echo "the governor is performance for now, please restart it........"
