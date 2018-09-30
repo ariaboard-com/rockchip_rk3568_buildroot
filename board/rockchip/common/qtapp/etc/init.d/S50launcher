@@ -9,9 +9,6 @@ case "$1" in
 		export LC_ALL='zh_CN.utf8'
 		export QT_QPA_PLATFORM=wayland
 
-		# power manager
-                /usr/bin/power_manager_service &
-
                 # music
                 /usr/bin/audioservice &
 
