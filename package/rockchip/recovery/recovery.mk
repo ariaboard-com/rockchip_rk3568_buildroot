@@ -45,7 +45,7 @@ ifeq ($(BR2_PACKAGE_RECOVERY),y)
 define RECOVERY_IMAGE_PACK
 	mkdir -p $(TARGET_DIR)/res/images
 	cp $(BUILD_DIR)/recovery-$(RECOVERY_VERSION)/res/images/* $(TARGET_DIR)/res/images/
-	$(HOST_DIR)/usr/bin/mkbootfs $(TARGET_DIR) | $(HOST_DIR)/usr/bin/minigzip > $(BINARIES_DIR)/ramdisk-recovery.img
+	$(HOST_DIR)/bin/mkbootfs $(TARGET_DIR) | $(HOST_DIR)/bin/minigzip > $(BINARIES_DIR)/ramdisk-recovery.img
 	$(RECOVERY_MKBOOTIMG) --kernel $(RECOVERY_MK_KERNEL_IMAGE) --ramdisk $(BINARIES_DIR)/ramdisk-recovery.img --second $(RECOVERY_RESOURCEIMG) --os_version $(RECOVERY_OS_VERSION) --os_patch_level $(RECOVERY_OS_PATCH_LEVEL) --cmdline $(RECOVERY_CMDLINNE) --output $(BINARIES_DIR)/recovery.img
 	$(RECOVERY_MK_KERNEL_IMAGE) $(BINARIES_DIR)/ramdisk-recovery.img $(BINARIES_DIR)/recovery.img
 endef
