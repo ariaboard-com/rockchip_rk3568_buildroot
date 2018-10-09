@@ -16,6 +16,10 @@ resize_e2fs()
 
 	echo Resizing $DEV...
 	e2fsck -fy $DEV
+
+	# Force using online resize, see:
+	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
+	mount $DEV $MOUNT_POINT
 	resize2fs $DEV
 
 	# Use last mount dir to specify first boot
