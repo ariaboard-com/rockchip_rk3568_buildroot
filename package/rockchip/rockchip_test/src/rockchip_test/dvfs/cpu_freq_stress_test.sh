@@ -3,7 +3,7 @@
 usage()
 {
 echo "Usage: cpu_freq_test.sh [test_second] [every_freq_stay_second]"
-echo "example: cpu_freq_test.sh  3600 10"
+echo "example: cpu_freq_test.sh  3600 30"
 echo "means cpu_freq_test.sh will run 1 hour and every cpu frequency stay 10s"
 }
 
@@ -22,8 +22,7 @@ fi
 #caculate how many cpu core
 cpu_cnt=`cat /proc/cpuinfo | grep processor | sort | uniq | wc -l`
 
-#run stressapptest base on cpu core
-stressapptest -s $1 -i $cpu_cnt -C $cpu_cnt -W --stop_on_errors -M 128&
+stressapptest -s $1 --pause_delay 10 --pause_duration 1 -W --stop_on_errors -M 128&
 
 cd /sys/devices/system/cpu/cpu0/cpufreq
 unset FREQS
