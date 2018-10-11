@@ -8,9 +8,15 @@ MINIGUI_LICENSE = GPLv3
 MINIGUI_AUTORECONF = YES
 MINIGUI_DEPENDENCIES = jpeg libpng
 
-##    --host=arm-linux  
-##    --target=arm-linux 
+ifeq ($(BR2_PACKAGE_MINIGUI_ENABLE_RGA),y)
+MINIGUI_DEPENDENCIES += linux-rga
+MINIGUI_CONF_ENV = CFLAGS+=" -DENABLE_RGA=1"
+endif
+
+##    --host=arm-linux
+##    --target=arm-linux
 MINIGUI_CONF_OPTS = \
+    --with-sysroot=$(STAGING_DIR) \
     --build=i386-linux \
     --with-osname=linux \
     --with-targetname=drmcon \
