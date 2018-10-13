@@ -1,0 +1,133 @@
+From a160b8f346ed5ce59a1c3741e6f1203979ddcd68 Mon Sep 17 00:00:00 2001
+From: Hertz Wang <wangh@rock-chips.com>
+Date: Sat, 13 Oct 2018 17:28:06 +0800
+Subject: [PATCH 1/1] copy or translate data by rga
+
+Signed-off-by: Hertz Wang <wangh@rock-chips.com>
+---
+ v4l2grab.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 83 insertions(+), 11 deletions(-)
+
+diff --git a/v4l2grab.c b/v4l2grab.c
+index 8165c53..6484b13 100644
+--- a/v4l2grab.c
++++ b/v4l2grab.c
+@@ -90,6 +90,9 @@ typedef enum {
+ struct buffer {
+         void *                  start;
+         size_t                  length;
++#ifdef IO_MMAP
++        int                     fd;
++#endif
+ };
+ 
+ static io_method        io              = IO_METHOD_MMAP;
+@@ -237,6 +240,8 @@ static void imageProcess(const void* p, struct timeval timestamp)
+ 	free(dst);
+ }
+ 
++#include <rga/RgaApi.h>
++
+ /**
+ 	read single frame
+ */
+@@ -246,6 +251,9 @@ static int frameRead(void)
+ #ifdef IO_USERPTR
+ 	unsigned int i;
+ #endif
++#ifdef IO_MMAP
++	void *buffer_ptr = NULL;
++#endif
+ 
+ 	switch (io) {
+ #ifdef IO_READ
+@@ -297,7 +305,53 @@ static int frameRead(void)
+ 
+ 			assert(buf.index < n_buffers);
+ 
+-			imageProcess(buffers[buf.index].start,buf.timestamp);
++			buffer_ptr = buffers[buf.index].start;
++			{
++				// test rga read buffer from v4l2
++				bo_t bo;
++				rga_info_t src;
++				rga_info_t dst;
++				int dst_fd;
++				int ret;
++
++				ret = c_RkRgaGetAllocBuffer(&bo, width, height, 32);
++				if (ret)
++					errno_exit("rga alloc buffer failed");
++				ret = c_RkRgaGetMmap(&bo);
++				if (ret)
++					errno_exit("rga get mmap failed");
++				ret = c_RkRgaGetBufferFd(&bo, &dst_fd);
++				if (ret)
++					errno_exit("rga get buffer fd failed");
++
++				memset(&src, 0, sizeof(rga_info_t));
++				// TOFIX: result to wrong image if use the exported fd from usb camera
++				src.fd = -1; // buffers[buf.index].fd;
++				src.virAddr = buffers[buf.index].start;
++				src.mmuFlag = 1;
++				rga_set_rect(&src.rect, 0, 0, width, height, width, height, RK_FORMAT_YCbCr_420_P);
++
++				memset(&dst, 0, sizeof(rga_info_t));
++				dst.fd = dst_fd;
++				dst.mmuFlag = 1;
++				rga_set_rect(&dst.rect, 0, 0, width, height, width, height, RK_FORMAT_YCbCr_420_P);
++
++				ret = c_RkRgaBlit(&src, &dst, NULL);
++				if (ret)
++					errno_exit("rga copy blit failed");
++				buffer_ptr = bo.ptr;
++			}
++
++			{
++				// dump yuv data
++				int fd = open("/tmp/dump.yuv", O_RDWR | O_CREAT);
++				if (fd < 0)
++					errno_exit("create /tmp/dump.yuv failed");
++				write(fd, buffer_ptr, width * height * 3 / 2);
++				close(fd);
++			}
++
++			imageProcess(buffer_ptr, buf.timestamp);
+ 
+ 			if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
+ 				errno_exit("VIDIOC_QBUF");
+@@ -543,6 +597,22 @@ static void readInit(unsigned int buffer_size)
+ #endif
+ 
+ #ifdef IO_MMAP
++static void buffer_export(int v4lfd, enum v4l2_buf_type bt, int index, int *dmafd)
++{
++	struct v4l2_exportbuffer expbuf;
++
++	memset(&expbuf, 0, sizeof(expbuf));
++	expbuf.type = bt;
++	expbuf.index = index;
++	if (ioctl(v4lfd, VIDIOC_EXPBUF, &expbuf) == -1) {
++		perror("VIDIOC_EXPBUF");
++		*dmafd = -1;
++		return;
++	}
++
++	*dmafd = expbuf.fd;
++}
++
+ static void mmapInit(void)
+ {
+ 	struct v4l2_requestbuffers req;
+@@ -591,6 +661,8 @@ static void mmapInit(void)
+ 
+ 		if (MAP_FAILED == buffers[n_buffers].start)
+ 			errno_exit("mmap");
++
++		buffer_export(fd, buf.type, buf.index, &buffers[n_buffers].fd);
+ 	}
+ }
+ #endif
+-- 
+2.7.4
+
