@@ -10,8 +10,11 @@ V4L2GRAB_LICENSE = GPL-2.0+
 V4L2GRAB_LICENSE_FILES = LICENSE.md
 # Fetched from github, no pre-generated configure script provided
 V4L2GRAB_AUTORECONF = YES
-V4L2GRAB_DEPENDENCIES = jpeg libv4l linux-rga
+V4L2GRAB_DEPENDENCIES = jpeg libv4l
 
-V4L2GRAB_CONF_ENV = LDFLAGS+=" -lrga"
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+V4L2GRAB_DEPENDENCIES += linux-rga
+V4L2GRAB_CONF_ENV = LDFLAGS+=" -lrga" CFLAGS+=" -DENABLE_RGA"
+endif
 
 $(eval $(autotools-package))
