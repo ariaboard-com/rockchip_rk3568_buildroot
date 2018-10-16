@@ -161,8 +161,8 @@ mountall()
 
 is_recovery()
 {
-	mountpoint -xq /
-	[ $? -eq 0 ]
+	# Recovery's rootfs is ramfs
+	mountpoint -d /|grep -wq 0:1
 }
 
 case "$1" in
