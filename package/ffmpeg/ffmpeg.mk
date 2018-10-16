@@ -262,6 +262,11 @@ else
 FFMPEG_CONF_OPTS += --disable-mmal --disable-omx --disable-omx-rpi
 endif
 
+ifeq ($(BR2_PACKAGE_DRM_HELPER_DISPLAY),y)
+FFMPEG_CONF_OPTS += --extra-cflags=-DLIBDRM_DISPLAY=1
+FFMPEG_CONF_OPTS += --extra-libs=-ldrm_display
+endif
+
 # To avoid a circular dependency only use opencv if opencv itself does
 # not depend on ffmpeg.
 ifeq ($(BR2_PACKAGE_OPENCV_LIB_IMGPROC)x$(BR2_PACKAGE_OPENCV_WITH_FFMPEG),yx)
