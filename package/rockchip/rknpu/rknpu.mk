@@ -21,6 +21,8 @@ define RKNPU_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0644 $(@D)/drivers/*.so $(TARGET_DIR)/usr/lib/
     $(INSTALL) -D -m 0644 $(@D)/drivers/cl_*.h $(TARGET_DIR)/usr/lib/
     $(INSTALL) -D -m 0755 $(@D)/S99NPU_init $(TARGET_DIR)/etc/init.d/
+    $(INSTALL) -D -m 0644 $(@D)/rknn/*.so $(TARGET_DIR)/usr/lib/
+    $(INSTALL) -D -m 0644 $(@D)/rknn/*.so $(STAGING_DIR)/usr/lib/
 
     if [ -e "$(@D)/test" ]; then \
 	cp -r $(@D)/test $(TARGET_DIR)/usr/share/npu; \
