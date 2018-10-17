@@ -7,23 +7,27 @@ resize_e2fs()
 {
 	DEV=$1
 	MOUNT_POINT=$2
-	LAST_MOUNT_DIR=$(dumpe2fs -h $DEV 2>/dev/null | grep "Last mounted" | grep -o "[^ ]*$")
+	PART_NAME=$3
+	LABEL=$(dumpe2fs -h $DEV | grep "volume name:" | grep -o "[^ ]*$")
 
 	[ $? -eq 0 ] || return
 
 	# Not first boot, likely already resized
-	[ $LAST_MOUNT_DIR == $MOUNT_POINT ] && return
+	[ $LABEL == $PART_NAME ] && return
 
 	echo Resizing $DEV...
-	e2fsck -fy $DEV
+
+	mountpoint -q $MOUNT_POINT || e2fsck -fy $DEV
 
 	# Force using online resize, see:
 	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
-	mount $DEV $MOUNT_POINT
+	TEMP=$(mktemp -d)
+	mount $DEV $TEMP
 	resize2fs $DEV
+	umount $TEMP
 
-	# Use last mount dir to specify first boot
-	tune2fs $DEV -M $MOUNT_POINT
+	# Use volume name to specify first boot
+	tune2fs $DEV -L $PART_NAME
 }
 
 resize_fatresize()
@@ -53,7 +57,7 @@ resize_fatresize()
 resize_fat()
 {
 	DEV=$1
-	MAX_SIZE=$3
+	MAX_SIZE=$4
 	FAT_INFO=$(fsck.fat -vy $DEV 2>/dev/null |grep -iE "data|files" |grep -o "[0-9]\+ ")
 
 	[ $? -eq 0 ] || return
@@ -80,7 +84,7 @@ resize_fat()
 resize_ntfs()
 {
 	DEV=$1
-	MAX_SIZE=$3
+	MAX_SIZE=$4
 	SIZE=$(ntfsresize -if $DEV 2>/dev/null|grep -o "volume size: [0-9]\+" |grep -o "[0-9]\+")
 
 	[ $? -eq 0 ] || return
@@ -107,22 +111,30 @@ do_resize()
 	MOUNT_POINT=$2
 	FSTYPE=$3
 
+	# Find real dev for root dev
+	if [ "$MOUNT_POINT" == '/' ];then
+		DEV=$(mountpoint -n /|cut -d ' ' -f 1)
+	fi
+
 	# Unknown device
 	[ -b "$DEV" ] || return
 
-	MAX_SIZE=$(fdisk -l $DEV |grep -o ", [0-9]\+ bytes" |grep -o "[0-9]\+ ")
+	DEV=$(realpath $DEV)
+	SYS_PATH=/sys/class/block/${DEV##*/}
+	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
+	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
 
 	case $FSTYPE in
 		ext*)
-			resize_e2fs $DEV $MOUNT_POINT $MAX_SIZE
+			resize_e2fs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
 		vfat)
-			resize_fat $DEV $MOUNT_POINT $MAX_SIZE
+			resize_fat $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
 		ntfs)
-			resize_ntfs $DEV $MOUNT_POINT $MAX_SIZE
+			resize_ntfs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
 	esac
