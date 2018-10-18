@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "${BASH_SOURCE}" ];then
+	echo Not in bash, switch to it...
+	bash -c $0
+fi
+
 DEFCONFIG_ARRAY=(
 "rockchip_rk3308_release" \
 "rockchip_rk3308_32_release" \
@@ -215,9 +220,7 @@ function function_stuff()
 	lunch
 }
 
-if [ -z "${BASH_SOURCE}" ];then
-	echo Only support bash, please run \"bash PATH_TO_THIS_SCRIPT\" instead.
-elif [ "${BASH_SOURCE}" == "$0" ];then
+if [ "${BASH_SOURCE}" == "$0" ];then
 	echo This script is executed directly...
 	bash -c "source ${BASH_SOURCE}; bash"
 else
