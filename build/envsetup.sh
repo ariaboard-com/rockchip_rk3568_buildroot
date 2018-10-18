@@ -1,3 +1,5 @@
+#!/bin/bash
+
 DEFCONFIG_ARRAY=(
 "rockchip_rk3308_release" \
 "rockchip_rk3308_32_release" \
@@ -213,7 +215,12 @@ function function_stuff()
 	lunch
 }
 
-if [ -n "${BASH_SOURCE}" ];then
+if [ -z "${BASH_SOURCE}" ];then
+	echo Only support bash, please run \"bash PATH_TO_THIS_SCRIPT\" instead.
+elif [ "${BASH_SOURCE}" == "$0" ];then
+	echo This script is executed directly...
+	bash -c "source ${BASH_SOURCE}; bash"
+else
 	SCRIPT_PATH=$(realpath ${BASH_SOURCE})
 	SCRIPT_DIR=$(dirname ${SCRIPT_PATH})
 	BUILDROOT_DIR=$(dirname ${SCRIPT_DIR})
@@ -226,6 +233,4 @@ if [ -n "${BASH_SOURCE}" ];then
 	alias croot="cd ${TOP_DIR}"
 
 	function_stuff $@
-else
-	echo Only support bash, please run \"bash PATH_TO_THIS_SCRIPT\" instead.
 fi
