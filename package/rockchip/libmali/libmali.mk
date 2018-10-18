@@ -89,8 +89,8 @@ endif
 ifeq ($(BR2_PACKAGE_RK3128),y)
 define LIBMALI_INSTALL_TARGET_CMDS
         rm -f $(LIBMALI_RM_SO)
-        $(INSTALL) -D -m 755 $(@D)/lib/arm-linux-gnueabihf/libmali-utgard-400-r7p0-r1p1-wayland-1.so $(TARGET_DIR)/usr/lib/
-        cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-utgard-400-r7p0-r1p1-wayland-1.so libmali.so && $(LIBMALI_LINK_SO) && cd -
+        $(INSTALL) -D -m 755 $(@D)/lib/arm-linux-gnueabihf/libmali-utgard-400-r7p0-r1p1-wayland.so $(TARGET_DIR)/usr/lib/
+        cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-utgard-400-r7p0-r1p1-wayland.so libmali.so && $(LIBMALI_LINK_SO) && cd -
 endef
 endif
 
