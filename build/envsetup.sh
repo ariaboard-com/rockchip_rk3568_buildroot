@@ -187,7 +187,7 @@ function lunch()
 		if [ $index ]; then
 			if [ $index -ge 0 ]; then
 				# first check the board dir
-				if [ ! -d device/rockchip/$TARGET_BOARD_TYPE ]; then
+				if [ ! -d ${TOP_DIR}/device/rockchip/$TARGET_BOARD_TYPE ]; then
 					# the above shell code seems cut the fixed number 2 3 4 by '_' to get target build info,
 					# obey the fixed name rule when create new target build.
 					echo "<debug> device/rockchip/${TARGET_BOARD_TYPE} is not exist, check the board dirname obey the rule rockchip_[boardtype]_[64/32][_][debug/release/recovery]"
@@ -198,10 +198,10 @@ function lunch()
 				if [ $TARGET_BUILD_TYPE = 32 ]; then
 					TARGET_BOARD_CONFIG_FILE=BoardConfig_32bit.mk
 				fi
-				cd device/rockchip && ln -snf $TARGET_BOARD_TYPE/$TARGET_BOARD_CONFIG_FILE .BoardConfig.mk && \
-				sed --follow-symlinks -i "s/\(RK_CFG_BUILDROOT=\)..*/\1$TARGET_BUILD_CONFIG/g" .BoardConfig.mk
-				cd $TOP_DIR
-				source ${TOP_DIR}/device/rockchip/.BoardConfig.mk
+				BOARD_CONFIG=${TOP_DIR}/device/rockchip/.BoardConfig.mk
+				ln -snf $TARGET_BOARD_TYPE/$TARGET_BOARD_CONFIG_FILE $BOARD_CONFIG
+				sed --follow-symlinks -i "s/\(RK_CFG_BUILDROOT=\)..*/\1$TARGET_BUILD_CONFIG/g" $BOARD_CONFIG
+				source $BOARD_CONFIG
 			fi
 		fi
 	fi
