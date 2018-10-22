@@ -13,7 +13,7 @@ resize_e2fs()
 	[ $? -eq 0 ] || return
 
 	# Not first boot, likely already resized
-	[ $LABEL == $PART_NAME ] && return
+	[ "$LABEL" == "$PART_NAME" ] && return
 
 	echo Resizing $DEV...
 
