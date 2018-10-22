@@ -6,6 +6,7 @@
 #include "video_gst.config"
 #include "audio.config"
 #include "camera.config"
+#include "camera_gst.config"
 #include "test.config"
 #include "debug.config"
 #include "benchmark.config"
