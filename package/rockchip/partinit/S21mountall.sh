@@ -159,6 +159,15 @@ checkall()
 	# FORCE_FSCK="-f"
 
 	echo "Will now check all file systems of types $MOUNTALL_USER_FSTYPES"
+
+	SKIP_FSCK="/var/.skip_fsck"
+	if [ -f $SKIP_FSCK ];then
+		echo "Skipped, remove $SKIP_FSCK to enable it again"
+		return
+	else
+		echo "Create $SKIP_FSCK to skip it"
+	fi
+
 	fsck -ARy $FORCE_FSCK -t $MOUNTALL_USER_FSTYPES
 
 	# The fsck might not work for vfat/ntfs...
