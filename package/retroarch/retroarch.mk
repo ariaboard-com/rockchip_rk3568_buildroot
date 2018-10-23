@@ -13,14 +13,14 @@ RETROARCH_CONF_OPTS += --disable-oss
 RETROARCH_CONF_OPTS += --disable-python
 RETROARCH_CONF_OPTS += --disable-pulse
 RETROARCH_CONF_OPTS += --disable-cheevos
-RETROARCH_CONF_OPTS += --enable-zlib
-
-ifeq ($(BR2_PACKAGE_LIBXML2),y)
-	RETROARCH_CONF_OPTS += --enable-libxml2
-	RETROARCH_DEPENDENCIES += libxml2
-else
-	RETROARCH_CONF_OPTS += --disable-libxml2
-endif
+RETROARCH_CONF_OPTS += --disable-zlib
+RETROARCH_CONF_OPTS += --disable-rgui
+RETROARCH_CONF_OPTS += --disable-networking
+RETROARCH_CONF_OPTS += --disable-freetype
+RETROARCH_CONF_OPTS += --disable-7zip
+RETROARCH_CONF_OPTS += --disable-builtinflac
+RETROARCH_CONF_OPTS += --disable-ssl
+RETROARCH_CONF_OPTS += --disable-libxml2
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
 	RETROARCH_CONF_OPTS += --enable-x11
