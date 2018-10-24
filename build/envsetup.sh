@@ -194,7 +194,12 @@ function lunch()
 	echo
 	echo "==========================================="
 
-	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" "$TARGET_BUILD_CONFIG"_defconfig
+	TARGET="$TARGET_BUILD_CONFIG"_defconfig
+	if [ -f ${TARGET_OUTPUT_DIR}/.config ];then
+		read -p "Found old config, override it? (y/n):" YES
+		[ "$YES" != y ] && TARGET=oldconfig
+	fi
+	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" $TARGET
 
 	if [ -z "$index" ]; then
 		return
