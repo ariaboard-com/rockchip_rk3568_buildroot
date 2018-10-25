@@ -37,7 +37,15 @@ else
 	RETROARCH_CONF_OPTS += --disable-sdl
 endif
 
-ifeq ($(BR2_PACKAGE_SDL2),y)
+ifeq ($(BR2_PACKAGE_WAYLAND),y)
+	RETROARCH_CONF_OPTS += --enable-wayland
+	RETROARCH_DEPENDENCIES += wayland
+else
+	RETROARCH_CONF_OPTS += --disable-wayland
+endif
+
+# Prefer using wayland than sdl2
+ifeq ($(BR2_PACKAGE_SDL2):$(BR2_PACKAGE_WAYLAND),y:)
 	RETROARCH_CONF_OPTS += --enable-sdl2
 	RETROARCH_DEPENDENCIES += sdl2
 else
