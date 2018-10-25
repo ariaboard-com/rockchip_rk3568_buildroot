@@ -3,7 +3,7 @@
 # FBALPHA
 #
 ################################################################################
-LIBRETRO_FBALPHA_VERSION = 6f85b5d19085f91c8f3df5c53dd235c037782fee
+LIBRETRO_FBALPHA_VERSION = d013e285571a9ec7e3e0482ef4bc184de1a0c919
 LIBRETRO_FBALPHA_SITE = $(call github,libretro,fbalpha,$(LIBRETRO_FBALPHA_VERSION))
 
 define LIBRETRO_FBALPHA_BUILD_CMDS
