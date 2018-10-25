@@ -165,4 +165,6 @@ source "package/rockchip/mtp/Config.in"
 source "package/rockchip/alsa-config/Config.in"
 source "package/rockchip/libcapsimage/Config.in"
 source "package/rockchip/rkscript/Config.in"
+source "package/rockchip/deviceio/Config.in"
+source "package/rockchip/ble_wificonfig/Config.in"
 endif
