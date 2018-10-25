@@ -21,6 +21,7 @@ RETROARCH_CONF_OPTS += --disable-7zip
 RETROARCH_CONF_OPTS += --disable-builtinflac
 RETROARCH_CONF_OPTS += --disable-ssl
 RETROARCH_CONF_OPTS += --disable-libxml2
+RETROARCH_CONF_OPTS += --disable-hid --disable-libusb
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
 	RETROARCH_CONF_OPTS += --enable-x11
