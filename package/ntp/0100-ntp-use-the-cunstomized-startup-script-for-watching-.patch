@@ -1,0 +1,86 @@
+From 9ffd0975f389033ac17c48442151e57b3f1a758c Mon Sep 17 00:00:00 2001
+From: Xing Zheng <zhengxing@rock-chips.com>
+Date: Fri, 26 Oct 2018 11:25:00 +0800
+Subject: [PATCH] ntp: use the cunstomized startup script for watching ntpd
+
+Change-Id: I29843cf66b88ac970de3fe561f5dd9de48e45c6e
+Signed-off-by: Xing Zheng <zhengxing@rock-chips.com>
+---
+ package/ntp/S49ntp        | 11 +++++++----
+ package/ntp/ntp.mk        |  1 +
+ package/ntp/watch_ntpd.sh | 20 ++++++++++++++++++++
+ 3 files changed, 28 insertions(+), 4 deletions(-)
+ create mode 100755 package/ntp/watch_ntpd.sh
+
+diff --git a/package/ntp/S49ntp b/package/ntp/S49ntp
+index b4047fc..314b06b 100755
+--- a/package/ntp/S49ntp
++++ b/package/ntp/S49ntp
+@@ -1,7 +1,8 @@
+ #! /bin/sh
+ 
+-NAME=ntpd
+-DAEMON=/usr/sbin/$NAME
++NTPD_NAME=ntpd
++NAME=watch_ntpd.sh
++DAEMON=/usr/bin/$NAME
+ 
+ # Gracefully exit if the package has been removed.
+ test -x $DAEMON || exit 0
+@@ -15,11 +16,13 @@ fi
+ case "$1" in
+   start)
+     printf "Starting $NAME: "
+-    start-stop-daemon -S -q -x $DAEMON -- -g
++    start-stop-daemon -S -q -x $DAEMON &
+     [ $? = 0 ] && echo "OK" || echo "FAIL"
+     ;;
+   stop)
+-    printf "Stopping $NAME: "
++    printf "Stopping $NTPD_NAME and $NAME: "
++    start-stop-daemon -K -q -n $NTPD_NAME
++    sleep 1
+     start-stop-daemon -K -q -n $NAME
+     [ $? = 0 ] && echo "OK" || echo "FAIL"
+     ;;
+diff --git a/package/ntp/ntp.mk b/package/ntp/ntp.mk
+index cc36326..bb4cdb2 100644
+--- a/package/ntp/ntp.mk
++++ b/package/ntp/ntp.mk
+@@ -92,6 +92,7 @@ define NTP_INSTALL_TARGET_CMDS
+ 	$(if $(BR2_PACKAGE_NTP_NTPD), install -m 755 $(@D)/ntpd/ntpd $(TARGET_DIR)/usr/sbin/ntpd)
+ 	test -z "$(NTP_INSTALL_FILES_y)" || install -m 755 $(addprefix $(@D)/,$(NTP_INSTALL_FILES_y)) $(TARGET_DIR)/usr/bin/
+ 	$(INSTALL) -m 644 package/ntp/ntpd.etc.conf $(TARGET_DIR)/etc/ntp.conf
++	$(INSTALL) -m 755 package/ntp/watch_ntpd.sh $(TARGET_DIR)/usr/bin/
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_NTP_NTPD),y)
+diff --git a/package/ntp/watch_ntpd.sh b/package/ntp/watch_ntpd.sh
+new file mode 100755
+index 0000000..fab4f5a
+--- /dev/null
++++ b/package/ntp/watch_ntpd.sh
+@@ -0,0 +1,20 @@
++#!/bin/sh
++
++NTPD_NAME=ntpd
++let WATCH_SECONDS=24*60*60  # Check ntpd in one day in background
++
++while [ true ]
++do
++	COUNT=`ps -ef | grep -ws $NTPD_NAME | grep -v "grep" | wc -l`
++	if [ $COUNT == 0 ]
++	then
++		echo "run ntpd once and watch it every $WATCH_SECONDS seconds"
++
++		# If network works, ntpd will find a suitable ntp server, adjust time, and quit.
++		ntpd -gq &
++	else
++		echo "$NTPD_NAME has been run and check it in $WATCH_SECONDS seconds"
++	fi
++
++        sleep $WATCH_SECONDS
++done
+-- 
+2.7.4
+
