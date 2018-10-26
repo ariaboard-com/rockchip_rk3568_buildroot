@@ -1,8 +1,7 @@
 #! /bin/sh
 
-NTPD_NAME=ntpd
-NAME=watch_ntpd.sh
-DAEMON=/usr/bin/$NAME
+NAME=ntpd
+DAEMON=/usr/sbin/$NAME
 
 # Gracefully exit if the package has been removed.
 test -x $DAEMON || exit 0
@@ -16,13 +15,11 @@ fi
 case "$1" in
   start)
     printf "Starting $NAME: "
-    start-stop-daemon -S -q -x $DAEMON &
+    start-stop-daemon -S -q -x $DAEMON -- -g
     [ $? = 0 ] && echo "OK" || echo "FAIL"
     ;;
   stop)
-    printf "Stopping $NTPD_NAME and $NAME: "
-    start-stop-daemon -K -q -n $NTPD_NAME
-    sleep 1
+    printf "Stopping $NAME: "
     start-stop-daemon -K -q -n $NAME
     [ $? = 0 ] && echo "OK" || echo "FAIL"
     ;;
