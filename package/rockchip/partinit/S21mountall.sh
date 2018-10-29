@@ -26,6 +26,13 @@ resize_e2fs()
 	resize2fs $DEV
 	umount $TEMP
 
+	# The online resize is unavailable when kernel disabled ext4.
+	# So let's do an extra offline resize to cover this case.
+	# Note: It'd be a noop if the previous online resize succeeded.
+	#       And this offline resize may not work if the device is
+        #       nearly full.
+	resize2fs $DEV
+
 	# Use volume name to specify first boot
 	tune2fs $DEV -L $PART_NAME
 }
