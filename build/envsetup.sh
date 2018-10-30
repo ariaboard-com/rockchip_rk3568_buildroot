@@ -194,12 +194,15 @@ function lunch()
 	echo
 	echo "==========================================="
 
-	TARGET="$TARGET_BUILD_CONFIG"_defconfig
-	if [ -f ${TARGET_OUTPUT_DIR}/.config ];then
+	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" \
+		"$TARGET_BUILD_CONFIG"_defconfig
+
+	OLD_CONF=${TARGET_OUTPUT_DIR}/.config.old
+	CONF=${TARGET_OUTPUT_DIR}/.config
+	if diff ${OLD_CONF} ${CONF} 2>/dev/null|grep -qE "is not set$|=y$";then
 		read -p "Found old config, override it? (y/n):" YES
-		[ "$YES" != y ] && TARGET=oldconfig
+		[ "$YES" != y ] && cp ${OLD_CONF} ${CONF}
 	fi
-	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" $TARGET
 
 	if [ -z "$index" ]; then
 		return
