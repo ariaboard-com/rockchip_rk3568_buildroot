@@ -151,7 +151,7 @@ do_resize()
 
 resizeall()
 {
-	echo "Will now resize all file systems of types $MOUNTALL_USER_FSTYPES"
+	echo "Will now resize all file systems"
 	while read LINE;do
 		do_resize $LINE
 	done < /etc/fstab
@@ -165,7 +165,12 @@ checkall()
 	# Uncomment below to enable force fsck
 	# FORCE_FSCK="-f"
 
-	echo "Will now check all file systems of types $MOUNTALL_USER_FSTYPES"
+	if [ "$1" ];then
+		FSCKTYPES_OPT="-t $1"
+		echo "Will now check all file systems of types $1"
+	else
+		echo "Will now check all file systems"
+	fi
 
 	SKIP_FSCK="/var/.skip_fsck"
 	if [ -f $SKIP_FSCK ];then
@@ -175,7 +180,7 @@ checkall()
 		echo "Create $SKIP_FSCK to skip it"
 	fi
 
-	fsck -ARy $FORCE_FSCK -t $MOUNTALL_USER_FSTYPES
+	fsck -ARy $FORCE_FSCK $FSCKTYPES_OPT
 
 	# The fsck might not work for vfat/ntfs...
 	# But no worry, we've done that in resize_fat/resize_ntfs ;)
@@ -183,8 +188,13 @@ checkall()
 
 mountall()
 {
-	echo "Will now mount all file systems of types $MOUNTALL_FSTYPES"
-	mount -a -t $MOUNTALL_FSTYPES
+	if [ "$1" ];then
+		MOUNTTYPES_OPT="-t $1"
+		echo "Will now mount all file systems of types $1"
+	else
+		echo "Will now mount all file systems"
+	fi
+	mount -a $MOUNTTYPES_OPT
 }
 
 is_recovery()
@@ -199,17 +209,14 @@ case "$1" in
 	CHECK_LOG=/tmp/checkfs.log
 	MOUNT_LOG=/tmp/mountfs.log
 
-	MOUNTALL_BASE_FSTYPES="proc,devpts,tmpfs,sysfs"
-	MOUNTALL_USER_FSTYPES="ext2,ext3,ext4,vfat,ntfs"
-	MOUNTALL_FSTYPES="${MOUNTALL_USER_FSTYPES},${MOUNTALL_BASE_FSTYPES}"
+	SYS_BASE_FSTYPES="proc,devpts,tmpfs,sysfs"
 
 	# Mount /tmp firstly to save logs
 	mountpoint -q /tmp || mount -t tmpfs tmpfs /tmp
 
 	if is_recovery;then
 		# Only mount basic file systems for recovery
-		MOUNTALL_FSTYPES=$MOUNTALL_BASE_FSTYPES
-		mountall 2>&1 | tee $MOUNT_LOG
+		mountall $SYS_BASE_FSTYPES 2>&1 | tee $MOUNT_LOG
 		echo Log saved to $MOUNT_LOG
 	else
 		resizeall 2>&1 | tee $RESIZE_LOG
