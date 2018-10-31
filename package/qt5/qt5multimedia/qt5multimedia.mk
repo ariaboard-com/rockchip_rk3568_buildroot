@@ -34,6 +34,10 @@ ifeq ($(BR2_PACKAGE_ALSA_LIB),y)
 QT5MULTIMEDIA_DEPENDENCIES += alsa-lib
 endif
 
+ifeq ($(BR2_PACKAGE_QT5WAYLAND),y)
+QT5MULTIMEDIA_QMAKEFLAGS += QMAKE_CXXFLAGS+=-DENABLE_WAYLAND_PLATFORM
+endif
+
 # The mesa's EGL/eglplatform.h header includes X11 headers unless the flag
 # MESA_EGL_NO_X11_HEADERS is defined. Tell to not include X11 headers if
 # the libxcb is not selected.

@@ -1,0 +1,30 @@
+From 2cd9029c511934ec516ecfc20773262c9e071a4a Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 14 May 2018 09:38:11 +0800
+Subject: [PATCH 3/4] compositor-drm: Create gl-render with alpha support
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 5d8ea46..30e7cb7 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -1794,10 +1794,10 @@ drm_backend_create_gl_renderer(struct drm_backend *b)
+ 	if (format[1])
+ 		n_formats = 3;
+ 	if (gl_renderer->display_create(b->compositor,
+-					EGL_PLATFORM_GBM_KHR,
++					EGL_PLATFORM_WAYLAND_KHR,
+ 					(void *)b->gbm,
+ 					NULL,
+-					gl_renderer->opaque_attribs,
++					gl_renderer->alpha_attribs,
+ 					format,
+ 					n_formats) < 0) {
+ 		return -1;
+-- 
+2.11.0
+
