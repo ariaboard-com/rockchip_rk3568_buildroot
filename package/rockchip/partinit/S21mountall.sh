@@ -17,6 +17,7 @@ resize_e2fs()
 
 	echo Resizing $DEV...
 
+	# Do an initial fsck as resize2fs required.
 	mountpoint -q $MOUNT_POINT || e2fsck -fy $DEV
 
 	# Force using online resize, see:
@@ -24,14 +25,24 @@ resize_e2fs()
 	TEMP=$(mktemp -d)
 	mount $DEV $TEMP
 	resize2fs $DEV
-	umount $TEMP
 
 	# The online resize is unavailable when kernel disabled ext4.
-	# So let's do an extra offline resize to cover this case.
-	# Note: It'd be a noop if the previous online resize succeeded.
-	#       And this offline resize may not work if the device is
-        #       nearly full.
-	resize2fs $DEV
+	# So let's fallback to format it.
+	if [ $? -ne 0 -a $MOUNT_POINT != "/" ];then
+		echo "Unable to resize $DEV, formatting it..."
+
+		# Backup original data
+		tar cvf /tmp/${PART_NAME}.tar $TEMP
+		umount $TEMP
+
+		mkfs.ext2 $DEV
+
+		# Restore backup data
+		mount $DEV $TEMP
+		tar xvf /tmp/${PART_NAME}.tar -C /
+	fi
+
+	umount $TEMP
 
 	# Use volume name to specify first boot
 	tune2fs $DEV -L $PART_NAME
