@@ -123,10 +123,11 @@ do_resize()
 		DEV=$(mountpoint -n /|cut -d ' ' -f 1)
 	fi
 
+	DEV=$(realpath $DEV 2>/dev/null)
+
 	# Unknown device
 	[ -b "$DEV" ] || return
 
-	DEV=$(realpath $DEV)
 	SYS_PATH=/sys/class/block/${DEV##*/}
 	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
 	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
