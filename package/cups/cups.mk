@@ -31,6 +31,10 @@ CUPS_DEPENDENCIES = \
 	host-pkgconf \
 	$(if $(BR2_PACKAGE_ZLIB),zlib)
 
+define CUPS_USERS
+	- - lpadmin -1 * - - - Printers admin group.
+endef
+
 ifeq ($(BR2_PACKAGE_SYSTEMD),y)
 CUPS_CONF_OPTS += --with-systemd=/usr/lib/systemd/system \
 	--enable-systemd
