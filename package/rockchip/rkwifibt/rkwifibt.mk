@@ -104,6 +104,7 @@ endef
 define RKWIFIBT_ENABLE_BT
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/bluetooth-player $(TARGET_DIR)/usr/bin/bluetooth-player
+    $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/bluetooth-reconnect $(TARGET_DIR)/usr/bin/bluetooth-reconnect
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/rtlbtmp $(TARGET_DIR)/usr/bin/rtlbtmp
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
