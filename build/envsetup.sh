@@ -37,7 +37,7 @@ DEFCONFIG_ARRAY=(
 "rockchip_rk3328_recovery" \
 "rockchip_rk1808" \
 "rockchip_rk1808_recovery" \
-"rockchip_rk3399pro_npu")
+"rockchip_rk3399pro-npu")
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 
