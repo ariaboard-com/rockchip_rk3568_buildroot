@@ -110,22 +110,17 @@ function get_defconfig_name() {
 	echo $TARGET_DIR_NAME
 }
 
+# Checking the file "buildroot/configs/*_defconfig"
+# If it contian of "_32_","_32","32_", and return build_type is 32 bit
+# Else return 64 bit
 function get_target_build_type() {
 	TARGET=$1
-	TYPE="$(echo $TARGET | cut -d '_' -f 1)"
 
-	LENGTH="$(echo $TARGET | awk -F '_' '{print NF}')"
-	if [ $LENGTH -le 2 ]; then
+	TARGET=${TARGET}_defconfig
+	if [ "${TARGET#*_32_}" == "${TARGET}"  -a "${TARGET#*32_}" == "${TARGET}" -a "${TARGET#*_32}" == "${TARGET}" ]; then
 		echo "64"
 	else
-		RESULT="$(echo $TARGET | cut -d '_' -f 3)"
-		if [ $RESULT = "32" ]; then
-			echo "32"
-		elif [ $RESULT = "64" ]; then
-			echo "64"
-		else
-			echo "64"
-		fi
+		echo "32"
 	fi
 }
 
