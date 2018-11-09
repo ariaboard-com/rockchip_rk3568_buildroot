@@ -92,6 +92,7 @@ define NTP_INSTALL_TARGET_CMDS
 	$(if $(BR2_PACKAGE_NTP_NTPD), install -m 755 $(@D)/ntpd/ntpd $(TARGET_DIR)/usr/sbin/ntpd)
 	test -z "$(NTP_INSTALL_FILES_y)" || install -m 755 $(addprefix $(@D)/,$(NTP_INSTALL_FILES_y)) $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -m 644 package/ntp/ntpd.etc.conf $(TARGET_DIR)/etc/ntp.conf
+	$(INSTALL) -m 755 package/ntp/watch_ntpd.sh $(TARGET_DIR)/usr/bin/
 endef
 
 ifeq ($(BR2_PACKAGE_NTP_NTPD),y)
