@@ -52,6 +52,7 @@ source "package/rockchip/ros/message-generation/Config_kinetic.in"
 source "package/rockchip/ros/geneus/Config.in"
 source "package/rockchip/ros/gennodejs/Config.in"
 source "package/rockchip/ros/bond-core/Config.in"
+source "package/rockchip/ros/nodelet-core/Config.in"
 
 endif
 

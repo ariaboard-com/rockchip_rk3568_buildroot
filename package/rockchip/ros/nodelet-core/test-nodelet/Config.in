@@ -1,0 +1,9 @@
+config BR2_PACKAGE_TEST_NODELET
+	bool "test nodelet"
+	select BR2_PACKAGE_NODELET
+	depends on BR2_PACKAGE_PLUGINLIB
+	select BR2_PACKAGE_ROSTEST
+	depends on BR2_PACKAGE_BOOST
+	select BR2_PACKAGE_BOOST_THREAD
+	help
+		test nodelet
