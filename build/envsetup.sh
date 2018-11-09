@@ -215,6 +215,13 @@ function lunch()
 	if [ $TARGET_BUILD_TYPE = 32 ]; then
 		TARGET_BOARD_CONFIG_FILE=BoardConfig_32bit.mk
 	fi
+
+	# Check if had configure file device/rockchip/$TARGET_BOARD_TYPE/*.mk
+	# And Set New TARGET_BOARD_CONFIG_FILE
+	if [ -f "${TOP_DIR}/device/rockchip/$TARGET_BOARD_TYPE/${TARGET_BUILD_CONFIG#rockchip_}_${TARGET_BOARD_CONFIG_FILE}" ]; then
+		TARGET_BOARD_CONFIG_FILE=${TARGET_BUILD_CONFIG#rockchip_}_${TARGET_BOARD_CONFIG_FILE}
+		echo "Set NEW TARGET_BOARD_CONFIG_FILE = device/rockchip/$TARGET_BOARD_TYPE/${TARGET_BOARD_CONFIG_FILE}"
+	fi
 	BOARD_CONFIG=${TOP_DIR}/device/rockchip/.BoardConfig.mk
 	ln -snf $TARGET_BOARD_TYPE/$TARGET_BOARD_CONFIG_FILE $BOARD_CONFIG
 	sed --follow-symlinks -i "s/\(RK_CFG_BUILDROOT=\)..*/\1$TARGET_BUILD_CONFIG/g" $BOARD_CONFIG
