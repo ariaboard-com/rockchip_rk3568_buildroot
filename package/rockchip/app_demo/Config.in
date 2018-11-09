@@ -1,0 +1,17 @@
+menuconfig BR2_PACKAGE_APP_DEMO
+	bool "rk demos"
+
+if BR2_PACKAGE_APP_DEMO
+
+config BR2_PACKAGE_APP_DEMO_IMAGE_PROCESS
+	bool "rk image process demo"
+	select BR2_PACKAGE_GFLAGS
+	select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_LINUX_RGA
+	select BR2_PACKAGE_SDL2
+	select BR2_PACKAGE_SDL2_KMSDRM
+	select BR2_PACKAGE_SDL2_OPENGLES
+	select BR2_PACKAGE_SDL2_TTF
+
+endif
+

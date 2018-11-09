@@ -1,0 +1,13 @@
+APP_DEMO_SITE = $(TOPDIR)/../app/demo
+APP_DEMO_SITE_METHOD = local
+APP_DEMO_INSTALL_STAGING = NO
+
+ifeq ($(BR2_PACKAGE_APP_DEMO_IMAGE_PROCESS),y)
+APP_DEMO_DEPENDENCIES += gflags libdrm linux-rga sdl2 sdl2_ttf
+endif
+
+APP_DEMO_CONF_OPTS += "-DDOT_GIT_PARENT_DIR=$($(PKG)_SITE)" \
+	"-DMODULE_RK_IMAGE_PROCESS_DEMO=$(if $(BR2_PACKAGE_APP_DEMO_IMAGE_PROCESS),ON,OFF)" \
+	$(if $(BR2_PACKAGE_APP_DEMO_IMAGE_PROCESS),"-DSDL_GLES2FUNCS_H=$(SDL2_BUILDDIR)src/render/opengles2/SDL_gles2funcs.h")
+
+$(eval $(cmake-package))
