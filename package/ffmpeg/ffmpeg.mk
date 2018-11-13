@@ -19,7 +19,7 @@ endif
 FFMPEG_CONF_OPTS = \
 	--prefix=/usr \
 	--enable-avfilter \
-	--disable-version3 \
+	--enable-version3 \
 	--enable-logging \
 	--enable-optimizations \
 	--disable-extra-warnings \
@@ -252,6 +252,24 @@ FFMPEG_CONF_OPTS += --enable-vdpau
 FFMPEG_DEPENDENCIES += libvdpau
 else
 FFMPEG_CONF_OPTS += --disable-vdpau
+endif
+
+ifeq ($(BR2_PACKAGE_MPP),y)
+FFMPEG_DEPENDENCIES += mpp libdrm
+FFMPEG_CONF_OPTS += --enable-rkmpp --enable-libdrm
+# --disable-v4l2-m2m seems no effect, disable each v4l2m2m
+FFMPEG_CONF_OPTS += \
+	--disable-decoder=h264_v4l2m2m \
+	--disable-decoder=vp8_v4l2m2m \
+	--disable-decoder=mpeg2_v4l2m2m \
+	--disable-decoder=mpeg4_v4l2m2m
+FFMPEG_CONF_OPTS += \
+	--disable-encoder=h264_v4l2m2m \
+	--disable-encoder=vp8_v4l2m2m \
+	--disable-encoder=mpeg2_v4l2m2m \
+	--disable-encoder=mpeg4_v4l2m2m
+else
+FFMPEG_CONF_OPTS += --disable-rkmpp
 endif
 
 ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
