@@ -24,7 +24,10 @@ CUPS_CONF_OPTS = \
 	--without-java \
 	--without-php \
 	--disable-gssapi \
-	--libdir=/usr/lib
+	--libdir=/usr/lib \
+	--with-cups-user=lp \
+	--with-cups-group=lp \
+	--with-system-groups="lpadmin sys system root"
 CUPS_CONFIG_SCRIPTS = cups-config
 CUPS_DEPENDENCIES = \
 	host-autoconf \
@@ -32,6 +35,7 @@ CUPS_DEPENDENCIES = \
 	$(if $(BR2_PACKAGE_ZLIB),zlib)
 
 define CUPS_USERS
+	lp -1 lp -1 * /var/spool/lpd /bin/false - lp
 	- - lpadmin -1 * - - - Printers admin group.
 endef
 
