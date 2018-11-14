@@ -37,7 +37,6 @@ GHOSTSCRIPT_CONF_ENV = \
 
 GHOSTSCRIPT_CONF_OPTS = \
 	--disable-compile-inits \
-	--disable-cups \
 	--enable-fontconfig \
 	--with-fontpath=$(GHOSTSCRIPT_FONTS_TARGET_DIR) \
 	--enable-freetype \
@@ -45,6 +44,14 @@ GHOSTSCRIPT_CONF_OPTS = \
 	--without-jbig2dec \
 	--without-libpaper \
 	--with-system-libtiff
+
+ifeq ($(BR2_PACKAGE_CUPS),y)
+GHOSTSCRIPT_DEPENDENCIES += cups
+GHOSTSCRIPT_CONF_OPTS += --with-local-cups \
+	CUPSCONFIG=$(STAGING_DIR)/usr/bin/cups-config
+else
+GHOSTSCRIPT_CONF_OPTS += --disable-cups
+endif
 
 ifeq ($(BR2_PACKAGE_LIBIDN),y)
 GHOSTSCRIPT_DEPENDENCIES += libidn
