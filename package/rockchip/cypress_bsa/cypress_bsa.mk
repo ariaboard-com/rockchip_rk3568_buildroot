@@ -46,15 +46,15 @@ endef
 define CYPRESS_BSA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/server/$(CYPRESS_BSA_BUILD_TYPE)/bsa_server \
 		$(TARGET_DIR)/usr/bin/bsa_server
-	$(INSTALL) -D -m 755 $(@D)/$(CYPRESS_BSA_PATH)/$(CYPRESS_BSA_LIBBSA)/build/$(CYPRESS_BSA_BUILD_TYPE)/sharedlib/libbsa.so \
+	$(INSTALL) -D -m 644 $(@D)/$(CYPRESS_BSA_PATH)/$(CYPRESS_BSA_LIBBSA)/build/$(CYPRESS_BSA_BUILD_TYPE)/sharedlib/libbsa.so \
 		$(TARGET_DIR)/usr/lib/libbsa.so
 	for ff in $(CYPRESS_BSA_APP); do \
 		$(INSTALL) -D -m 755 $(@D)/$(CYPRESS_BSA_PATH)/$${ff}/build/$(CYPRESS_BSA_BUILD_TYPE)/$${ff} $(TARGET_DIR)/usr/bin/${ff}; \
 	done
 
 	mkdir -p $(TARGET_DIR)/etc/bsa_file
-	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
-	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
+	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
+	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/$(CYPRESS_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/

@@ -12,7 +12,7 @@ $(foreach firmware,$(RV1108_FIRMWARE_FILES), \
 		$(TARGET_DIR)/lib/firmware/
 )
 $(foreach lib,$(RV1108_FIRMWARE_LIBS), \
-	$(INSTALL) -D -m 0755 $(lib) \
+	$(INSTALL) -D -m 0644 $(lib) \
 		$(TARGET_DIR)/usr/lib/
 )
 $(foreach init,$(RV1108_FIRMWARE_INITSCRIPT), \

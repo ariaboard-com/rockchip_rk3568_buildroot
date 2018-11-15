@@ -27,8 +27,8 @@ define CAMERA_ENGINE_CIFISP_BUILD_CMDS
 endef
 
 define CAMERA_ENGINE_CIFISP_INSTALL_TARGET_CMDS
-	$(INSTALL) -D -m  755 $(@D)/build/lib/libcam_ia.so $(TARGET_DIR)/usr/lib/
-	$(INSTALL) -D -m  755 $(@D)/build/lib/libcam_engine_cifisp.so $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -D -m  644 $(@D)/build/lib/libcam_ia.so $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -D -m  644 $(@D)/build/lib/libcam_engine_cifisp.so $(TARGET_DIR)/usr/lib/
 endef
 
 $(eval $(autotools-package))

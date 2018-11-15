@@ -13,13 +13,13 @@ ALSA_LADSPA_LICENSE_FILES = NOTICE
 
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 define ALSA_LADSPA_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 755 $(@D)/Equalizer.so $(TARGET_DIR)/usr/lib/Equalizer.so
+    $(INSTALL) -D -m 644 $(@D)/Equalizer.so $(TARGET_DIR)/usr/lib/Equalizer.so
 endef
 endif
 
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 define ALSA_LADSPA_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 755 $(@D)/Equalizer_32.so $(TARGET_DIR)/usr/lib/Equalizer.so
+    $(INSTALL) -D -m 644 $(@D)/Equalizer_32.so $(TARGET_DIR)/usr/lib/Equalizer.so
 endef
 endif
 

@@ -26,10 +26,10 @@ endef
 
 define CAE_VAD_INSTALL_TARGET_CMDS
         $(INSTALL) -D -m 755 $(@D)/cae_vad $(TARGET_DIR)/usr/bin/
-        $(INSTALL) -D -m 755 $(@D)/libcae.so $(TARGET_DIR)/usr/lib/
-        $(INSTALL) -D -m 755 $(@D)/libIvw60.so $(TARGET_DIR)/usr/lib/
-        $(INSTALL) -D -m 755 $(@D)/wozai.wav $(TARGET_DIR)/usr/lib/
-        $(INSTALL) -D -m 755 $(@D)/ivw_resource.jet $(TARGET_DIR)/etc/
+        $(INSTALL) -D -m 644 $(@D)/libcae.so $(TARGET_DIR)/usr/lib/
+        $(INSTALL) -D -m 644 $(@D)/libIvw60.so $(TARGET_DIR)/usr/lib/
+        $(INSTALL) -D -m 644 $(@D)/wozai.wav $(TARGET_DIR)/usr/lib/
+        $(INSTALL) -D -m 644 $(@D)/ivw_resource.jet $(TARGET_DIR)/etc/
 endef
 
 $(eval $(generic-package))
