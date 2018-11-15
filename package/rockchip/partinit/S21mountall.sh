@@ -222,7 +222,7 @@ case "$1" in
 	CHECK_LOG=/tmp/checkfs.log
 	MOUNT_LOG=/tmp/mountfs.log
 
-	SYS_BASE_FSTYPES="proc,devpts,tmpfs,sysfs"
+	SYS_BASE_FSTYPES="proc,devpts,tmpfs,sysfs,debugfs,pstore"
 
 	# Mount /tmp firstly to save logs
 	mountpoint -q /tmp || mount -t tmpfs tmpfs /tmp
