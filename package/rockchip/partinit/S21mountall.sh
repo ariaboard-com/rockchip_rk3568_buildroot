@@ -189,7 +189,8 @@ checkall()
 		echo "Skipped, remove $SKIP_FSCK to enable it again"
 		return
 	else
-		echo "Create $SKIP_FSCK to skip it"
+		echo "Create $SKIP_FSCK to skip the check"
+		echo "This might take awhile if it didn't shutdown properly!"
 	fi
 
 	fsck -ARy $FORCE_FSCK $FSCKTYPES_OPT
