@@ -144,11 +144,11 @@ do_resize()
 	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
 
 	case $FSTYPE in
-		ext*)
+		ext[234])
 			resize_e2fs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
-		vfat)
+		msdos|fat|vfat)
 			resize_fat $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
