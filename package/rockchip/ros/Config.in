@@ -55,6 +55,7 @@ source "package/rockchip/ros/bond-core/Config.in"
 source "package/rockchip/ros/nodelet-core/Config.in"
 source "package/rockchip/ros/image-common/Config.in"
 source "package/rockchip/ros/libuvc/Config.in"
+source "package/rockchip/ros/libuvc-ros/Config.in"
 
 endif
 
