@@ -1,0 +1,38 @@
+From f28f9fdaacee2abbd9dd264291c680c76a71d528 Mon Sep 17 00:00:00 2001
+From: Nickey Yang <nickey.yang@rock-chips.com>
+Date: Wed, 21 Nov 2018 10:09:54 +0800
+Subject: [PATCH] libweston-desktop: remove compare between geometry and
+ next.size
+
+Work around "xdg_surface buffer does not match the configured state"
+
+Signed-off-by: Nickey Yang <nickey.yang@rock-chips.com>
+---
+ libweston-desktop/xdg-shell-v6.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libweston-desktop/xdg-shell-v6.c b/libweston-desktop/xdg-shell-v6.c
+index 10274e0..23c1060 100644
+--- a/libweston-desktop/xdg-shell-v6.c
++++ b/libweston-desktop/xdg-shell-v6.c
+@@ -643,7 +643,7 @@ weston_desktop_xdg_toplevel_committed(struct weston_desktop_xdg_toplevel *toplev
+ 	}
+ 	if (!wsurface->buffer_ref.buffer)
+ 		return;
+-
++	/*
+ 	struct weston_geometry geometry =
+ 		weston_desktop_surface_get_geometry(toplevel->base.desktop_surface);
+ 
+@@ -660,7 +660,7 @@ weston_desktop_xdg_toplevel_committed(struct weston_desktop_xdg_toplevel *toplev
+ 				       "xdg_surface buffer does not match the configured state");
+ 		return;
+ 	}
+-
++	*/
+ 	toplevel->current.state = toplevel->next.state;
+ 	toplevel->current.min_size = toplevel->next.min_size;
+ 	toplevel->current.max_size = toplevel->next.max_size;
+-- 
+2.17.1
+
