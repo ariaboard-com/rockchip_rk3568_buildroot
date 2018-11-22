@@ -3,27 +3,41 @@
 # Uncomment below to see more logs
 # set -x
 
+check_tool()
+{
+	TOOL=$1
+	CONFIG=$2
+
+	type $TOOL >/dev/null && return 0
+
+	[ -n "$CONFIG" ] && echo "You may need to enable $CONFIG"
+	return 1
+}
+
 resize_e2fs()
 {
 	DEV=$1
 	MOUNT_POINT=$2
 	PART_NAME=$3
+
+	check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return
 	LABEL=$(dumpe2fs -h $DEV | grep "volume name:" | grep -o "[^ ]*$")
+	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
 
-	[ $? -eq 0 ] || return
-
-	# Not first boot, likely already resized
-	[ "$LABEL" == "$PART_NAME" ] && return
+	# Use volume label to mark resized
+	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
 
 	echo Resizing $DEV...
+	check_tool e2fsck BR2_PACKAGE_E2FSPROGS_FSCK || return
+	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
 
 	# Do an initial fsck as resize2fs required.
-	mountpoint -q $MOUNT_POINT || e2fsck -fy $DEV
+	mountpoint -q $MOUNT_POINT || { e2fsck -fy $DEV || return; }
 
 	# Force using online resize, see:
 	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
 	TEMP=$(mktemp -d)
-	mount $DEV $TEMP
+	mount $DEV $TEMP || return
 	resize2fs $DEV
 
 	# The online resize is unavailable when kernel disabled ext4.
@@ -32,19 +46,19 @@ resize_e2fs()
 		echo "Unable to resize $DEV, formatting it..."
 
 		# Backup original data
-		tar cvf /tmp/${PART_NAME}.tar $TEMP
+		tar cvf /tmp/${PART_NAME}.tar $TEMP >/dev/null
 		umount $TEMP
 
-		mkfs.ext2 $DEV
+		mkfs.ext2 $DEV || return
 
 		# Restore backup data
 		mount $DEV $TEMP
-		tar xvf /tmp/${PART_NAME}.tar -C /
+		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
 	fi
 
 	umount $TEMP
 
-	# Use volume name to specify first boot
+	# Use volume label to mark resized
 	tune2fs $DEV -L $PART_NAME
 }
 
@@ -54,10 +68,10 @@ resize_fatresize()
 	SIZE=$2
 	MAX_SIZE=$3
 
-	fatresize -h >/dev/null 2>&1 || echo "No fatresize" && return
+	check_tool fatresize BR2_PACKAGE_FATRESIZE || return 1
 
 	# Somehow fatresize only works for 256M+ fat
-	[ ! $SIZE -gt $((256 * 1024 * 1024)) ] && return
+	[ ! $SIZE -gt $((256 * 1024 * 1024)) ] && return 1
 
 	echo Resizing $DEV...
 
@@ -68,53 +82,75 @@ resize_fatresize()
 		MAX_SIZE=$(($MAX_SIZE - 512 * 1024))
 
 		# Try to resize with fatresize, not always work
-		fatresize -s $MAX_SIZE $DEV && return
+		fatresize -s $MAX_SIZE $DEV && return 0
 	done
+
+	return 1
 }
 
 resize_fat()
 {
 	DEV=$1
+	PART_NAME=$3
 	MAX_SIZE=$4
-	FAT_INFO=$(fsck.fat -vy $DEV 2>/dev/null |grep -iE "data|files" |grep -o "[0-9]\+ ")
 
-	[ $? -eq 0 ] || return
+	check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABEL || return
+	LABEL=$(fatlabel $DEV)
+	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
 
-	DATA_START=$(echo $FAT_INFO|cut -d ' ' -f 1)
-	DATA_SIZE=$(echo $FAT_INFO|cut -d ' ' -f 3)
-	SIZE=$(($DATA_START + $DATA_SIZE))
-	FILES=$(echo $FAT_INFO|cut -d ' ' -f 4)
+	# Use volume label to mark resized
+	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
 
-	# Avoid resizing when it's large enough (delta less than 4M)
-	[ $SIZE -gt $(($MAX_SIZE - 4 * 1024 * 1024)) ] && return
+	# Prefer to format it when possible
+	TEMP=$(mktemp -d)
+	mount $DEV $TEMP || return
 
-	# Format it when it's empty
-	if [ $FILES -eq 0 ];then
-		echo Formatting $DEV...
-		mkfs.fat $DEV
-		return
+	SIZE=$(df $TEMP|tail -1|awk '{ print $2 }')
+	USED_SIZE=$(df $TEMP|tail -1|awk '{ print $3 }')
+	TEMP_SIZE=$(df /tmp/|tail -1|awk '{ print $4 }')
+	if [ $USED_SIZE -lt $TEMP_SIZE ]; then
+		echo "Formatting it..."
+
+		# Backup original data
+		tar cvf /tmp/${PART_NAME}.tar $TEMP >/dev/null
+		umount $TEMP
+
+		mkfs.fat $DEV && FORMATTED=true
+
+		# Restore backup data
+		mount $DEV $TEMP
+		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
 	fi
 
+	umount $TEMP
+
 	# Try fatresize (might not work though)
-	resize_fatresize $DEV $SIZE $MAX_SIZE
+	if [ -z "$FORMATTED" ]; then
+		resize_fatresize $DEV $SIZE $MAX_SIZE && FORMATTED=true
+	fi
+
+	# Use volume label to mark resized
+	[ -n "$FORMATTED" ] && fatlabel $DEV $PART_NAME
 }
 
 resize_ntfs()
 {
 	DEV=$1
+	PART_NAME=$3
 	MAX_SIZE=$4
-	SIZE=$(ntfsresize -if $DEV 2>/dev/null|grep -o "volume size: [0-9]\+" |grep -o "[0-9]\+")
 
-	[ $? -eq 0 ] || return
+	check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
+	LABEL=$(ntfslabel $DEV)
+	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
 
-	# Always attempt to fix it, since fsck might not work for ntfs
-	ntfsfix $DEV
-
-	# Avoid resizing when it's large enough (delta less than 4M)
-	[ $SIZE -gt $(($MAX_SIZE - 4 * 1024 * 1024)) ] && return
+	# Use volume label to mark resized
+	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
 
 	echo Resizing $DEV...
-	echo y | ntfsresize -f $DEV
+	echo y | ntfsresize -f $DEV || return
+
+	# Use volume label to mark resized
+	ntfslabel $DEV $PART_NAME
 }
 
 do_resize()
@@ -145,14 +181,17 @@ do_resize()
 
 	case $FSTYPE in
 		ext[234])
+			check_tool fsck.ext4 BR2_PACKAGE_E2FSPROGS_FSCK
 			resize_e2fs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
 		msdos|fat|vfat)
+			check_tool fsck.fat BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT
 			resize_fat $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
 		ntfs)
+			check_tool fsck.ntfs BR2_PACKAGE_NTFS_3G_NTFSPROGS
 			resize_ntfs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
 			return
 			;;
@@ -194,9 +233,6 @@ checkall()
 	fi
 
 	fsck -ARy $FORCE_FSCK $FSCKTYPES_OPT
-
-	# The fsck might not work for vfat/ntfs...
-	# But no worry, we've done that in resize_fat/resize_ntfs ;)
 }
 
 mountall()
