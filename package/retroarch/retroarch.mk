@@ -97,6 +97,8 @@ endef
 $(eval $(autotools-package))
 
 # DEFINITION OF LIBRETRO PLATFORM
+LIBRETRO_PLATFORM += buildroot
+
 ifeq ($(BR2_PACKAGE_HAS_LIBEGL),y)
 	LIBRETRO_PLATFORM += gles
 endif
