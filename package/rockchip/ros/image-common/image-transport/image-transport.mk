@@ -12,6 +12,9 @@ define IMAGE_TRANSPORT_FIX_TINYXML2_DEPENDENCIES
 	$(SED) 's#target_link_libraries(list_transports#target_link_libraries(list_transports -ltinyxml2#' \
 		$(@D)/image_transport/CMakeLists.txt
 endef
+
+ifeq ($(BR2_PACKAGE_ROS_KINETIC),y)
 IMAGE_TRANSPORT_POST_PATCH_HOOKS += IMAGE_TRANSPORT_FIX_TINYXML2_DEPENDENCIES
+endif
 
 $(eval $(catkin-package))

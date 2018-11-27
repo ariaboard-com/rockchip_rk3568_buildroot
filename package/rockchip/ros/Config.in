@@ -45,6 +45,7 @@ source "package/rockchip/ros/class-loader/Config.in"
 source "package/rockchip/ros/cmake_modules/Config.in"
 source "package/rockchip/ros/rospack/Config.in"
 source "package/rockchip/ros/orocos_kinematics_dynamics/Config.in"
+source "package/rockchip/ros/image-common/Config.in"
 
 if BR2_PACKAGE_ROS_KINETIC
 source "package/rockchip/ros/std-msgs/Config_kinetic.in"
@@ -53,7 +54,6 @@ source "package/rockchip/ros/geneus/Config.in"
 source "package/rockchip/ros/gennodejs/Config.in"
 source "package/rockchip/ros/bond-core/Config.in"
 source "package/rockchip/ros/nodelet-core/Config.in"
-source "package/rockchip/ros/image-common/Config.in"
 source "package/rockchip/ros/libuvc/Config.in"
 source "package/rockchip/ros/libuvc-ros/Config.in"
 
