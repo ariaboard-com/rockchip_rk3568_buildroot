@@ -5,3 +5,14 @@ config BR2_PACKAGE_RETROARCH
 	  Cross-platform, sophisticated frontend for the libretro API.
 
 	  http://www.libretro.com
+
+if BR2_PACKAGE_RETROARCH
+
+config BR2_PACKAGE_RETROARCH_HID
+	bool "retroarch hid"
+	default y
+	select BR2_PACKAGE_LIBUSB
+	help
+	  Support hid inputs.
+
+endif
