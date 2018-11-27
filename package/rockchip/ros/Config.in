@@ -62,6 +62,7 @@ endif
 if BR2_PACKAGE_ROS_INDIGO
 source "package/rockchip/ros/std-msgs/Config_indigo.in"
 source "package/rockchip/ros/message-generation/Config_indigo.in"
+source "package/rockchip/ros/laser-geometry/Config.in"
 
 endif
 
