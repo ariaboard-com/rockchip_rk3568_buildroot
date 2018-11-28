@@ -11,3 +11,9 @@ config BR2_PACKAGE_USBMOUNT
 
 comment "usbmount requires udev to be enabled"
 	depends on !BR2_PACKAGE_HAS_UDEV
+
+config BR2_PACKAGE_USBMOUNT_SYNC
+	bool "usbmount with sync option"
+	depends on BR2_PACKAGE_USBMOUNT
+	help
+		mount usb storage with "sync" option
