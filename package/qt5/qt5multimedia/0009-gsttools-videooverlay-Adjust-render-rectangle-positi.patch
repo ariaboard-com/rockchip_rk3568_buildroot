@@ -1,0 +1,71 @@
+From 3d8008c19000228f77cd565a200a330189c96c50 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Fri, 30 Nov 2018 19:54:10 +0800
+Subject: [PATCH] gsttools: videooverlay: Adjust render rectangle position
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/gsttools/qgstreamervideooverlay.cpp | 40 +++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
+index 2eefa26..88081f6 100644
+--- a/src/gsttools/qgstreamervideooverlay.cpp
++++ b/src/gsttools/qgstreamervideooverlay.cpp
+@@ -274,6 +274,40 @@ static QWindow *findWindow(WId id) {
+     return NULL;
+ }
+ 
++// See qt5wayland->qwaylandwindow.cpp
++static QPoint getDisplayPosition(QWindow *window)
++{
++    QPoint pos;
++
++    if (!window)
++        return pos;
++
++    bool decoration = false;
++    switch (window->type()) {
++        case Qt::Window:
++        case Qt::Widget:
++        case Qt::Dialog:
++        case Qt::Tool:
++        case Qt::Drawer:
++            decoration = true;
++            break;
++        default:
++            break;
++    }
++    if (window->flags() & Qt::FramelessWindowHint ||
++        window->windowState() == Qt::WindowFullScreen ||
++        window->flags() & Qt::BypassWindowManagerHint ||
++        window->parent())
++        decoration = false;
++
++    if (decoration) {
++        QMargins m = window->frameMargins();
++        return QPoint(m.left(), m.top());
++    }
++
++    return pos;
++}
++
+ bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message)
+ {
+     GstMessage* gm = message.rawMessage();
+@@ -317,8 +351,10 @@ bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message
+             handle = native->nativeResourceForWindow("surface", window);
+ 
+         gst_video_overlay_set_window_handle(overlay, (WId) handle);
+-        gst_video_overlay_set_render_rectangle(overlay, m_rect.x(), m_rect.y(),
+-            m_rect.width(), m_rect.height());
++
++        QPoint pos = getDisplayPosition(window);
++        gst_video_overlay_set_render_rectangle(overlay, pos.x() + m_rect.x(),
++            pos.y() + m_rect.y(), m_rect.width(), m_rect.height());
+         return true;
+     }
+ #endif
+-- 
+2.11.0
+

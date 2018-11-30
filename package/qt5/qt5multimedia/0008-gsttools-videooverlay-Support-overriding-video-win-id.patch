@@ -1,0 +1,29 @@
+From 191f75543981df341dab37b4350094f98d84cd34 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Fri, 30 Nov 2018 17:54:38 +0800
+Subject: [PATCH] gsttools: videooverlay: Support overriding video win id
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/gsttools/qgstreamervideooverlay.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
+index 2c192c2..2eefa26 100644
+--- a/src/gsttools/qgstreamervideooverlay.cpp
++++ b/src/gsttools/qgstreamervideooverlay.cpp
+@@ -308,6 +308,11 @@ bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message
+         QWindow *window = findWindow(m_windowId);
+         void *handle = NULL;
+ 
++        QVideoWindowAbstractInterface *intf =
++            dynamic_cast<QVideoWindowAbstractInterface *>(window);
++        if (intf)
++            window = findWindow(intf->videoWinId());
++
+         if (native && window)
+             handle = native->nativeResourceForWindow("surface", window);
+ 
+-- 
+2.11.0
+

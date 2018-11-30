@@ -1,0 +1,60 @@
+From ac23beb73b0a3237c887d27f57be64382e289ad7 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 27 Nov 2018 16:03:31 +0800
+Subject: [PATCH 1/2] gsttools: Set overlay rectangle when updating widget's
+ geometry
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/gsttools/qgstreamervideowidget.cpp | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
+index 792df42..41b4995 100644
+--- a/src/gsttools/qgstreamervideowidget.cpp
++++ b/src/gsttools/qgstreamervideowidget.cpp
+@@ -48,8 +48,9 @@ QT_BEGIN_NAMESPACE
+ class QGstreamerVideoWidget : public QWidget
+ {
+ public:
+-    QGstreamerVideoWidget(QWidget *parent = 0)
++    QGstreamerVideoWidget(QGstreamerVideoOverlay *overlay, QWidget *parent = 0)
+         :QWidget(parent)
++	,m_videoOverlay(overlay)
+     {
+         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+         QPalette palette;
+@@ -83,6 +84,12 @@ public:
+         painter.fillRect(rect(), palette().background());
+     }
+ 
++    void updateGeometry()
++    {
++	    QWidget::updateGeometry();
++	    m_videoOverlay->setRenderRectangle(geometry());
++    }
++
+ protected:
+     void paintEvent(QPaintEvent *) override
+     {
+@@ -90,6 +97,8 @@ protected:
+     }
+ 
+     QSize m_nativeSize;
++
++    QGstreamerVideoOverlay *m_videoOverlay;
+ };
+ 
+ QGstreamerVideoWidgetControl::QGstreamerVideoWidgetControl(QObject *parent, const QByteArray &elementName)
+@@ -124,7 +133,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
+     if (m_widget)
+         return;
+ 
+-    m_widget = new QGstreamerVideoWidget;
++    m_widget = new QGstreamerVideoWidget(&m_videoOverlay);
+ 
+     m_widget->installEventFilter(this);
+     m_videoOverlay.setWindowHandle(m_windowId = m_widget->winId());
+-- 
+2.11.0
+

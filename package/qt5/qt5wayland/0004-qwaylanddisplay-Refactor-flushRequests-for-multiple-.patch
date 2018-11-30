@@ -1,0 +1,59 @@
+From 95181674b55a1b9b181916994e922136b94514e2 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 28 Nov 2018 17:04:59 +0800
+Subject: [PATCH] qwaylanddisplay: Refactor flushRequests() for multiple
+ readers
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/client/qwaylanddisplay.cpp | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index 86cfe1a..bf55ed9 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -74,6 +74,7 @@
+ #include <QtCore/QDebug>
+ 
+ #include <errno.h>
++#include <poll.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+@@ -183,16 +184,26 @@ void QWaylandDisplay::checkError() const
+ 
+ void QWaylandDisplay::flushRequests()
+ {
+-    if (wl_display_prepare_read(mDisplay) == 0) {
+-        wl_display_read_events(mDisplay);
+-    }
++    struct pollfd fd = {0};
++    int ret;
+ 
+-    if (wl_display_dispatch_pending(mDisplay) < 0) {
+-        checkError();
+-        exitWithError();
++    fd.fd = wl_display_get_fd(mDisplay);
++    fd.events = POLLIN | POLLERR | POLLHUP;
++
++    while (wl_display_prepare_read(mDisplay) != 0) {
++        if (wl_display_dispatch_pending(mDisplay) < 0) {
++            checkError();
++            exitWithError();
++        }
+     }
+ 
+     wl_display_flush(mDisplay);
++
++    ret = poll(&fd, 1, 0);
++    if (ret > 0 && fd.revents & POLLIN)
++        wl_display_read_events(mDisplay);
++    else
++        wl_display_cancel_read(mDisplay);
+ }
+ 
+ 
+-- 
+2.11.0
+
