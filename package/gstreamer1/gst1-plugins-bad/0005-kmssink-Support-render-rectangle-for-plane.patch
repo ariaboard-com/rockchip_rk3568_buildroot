@@ -1,7 +1,7 @@
 From aeee29ac7d4e1b5b0cdc4ef6f08b7c2bff8081ca Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 20 Nov 2018 17:33:22 +0800
-Subject: [PATCH] kmssink: Fix plane render rectangle
+Subject: [PATCH] kmssink: Support render rectangle for plane
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -33,7 +33,7 @@ index 0c6f186..9068d85 100755
 +
 +    if (!self->render_rect.x && !self->render_rect.y &&
 +        self->render_rect.w == self->hdisplay &&
-+	self->render_rect.h == self->vdisplay)
++        self->render_rect.h == self->vdisplay)
 +      goto sync_frame;
    }
  
