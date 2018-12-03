@@ -13,8 +13,8 @@ case "$1" in
   MEDIA_MAX=3
   for i in $(seq 0 $MEDIA_MAX); do
     MEDIA_DEV=/dev/media$i
-    BAYER=`media-ctl -d $MEDIA_DEV --get-v4l2 '"rockchip-sy-mipi-dphy":0' |sed "s/^.*fmt:*\([^ ]*\).*/\1/" |cut -f 1 -d '/'`
-    RES=`media-ctl -d $MEDIA_DEV --get-v4l2 '"rockchip-sy-mipi-dphy":0' |sed "s/^.*fmt:*\([^ ]*\).*/\1/" |cut -f 2 -d '/'`
+    BAYER=`media-ctl -d $MEDIA_DEV --get-v4l2 '"rockchip-mipi-dphy-rx":0' |sed "s/^.*fmt:*\([^ ]*\).*/\1/" |cut -f 1 -d '/'`
+    RES=`media-ctl -d $MEDIA_DEV --get-v4l2 '"rockchip-mipi-dphy-rx":0' |sed "s/^.*fmt:*\([^ ]*\).*/\1/" |cut -f 2 -d '/'`
     NAME=`media-ctl -p -d $MEDIA_DEV |grep ENABLED |grep -v -E "rock|rkisp"|grep -o "\".*\""|tr -d \"`
     MP_NODE=`media-ctl -e "rkisp1_mainpath" -d $MEDIA_DEV`
     SP_NODE=`media-ctl -e "rkisp1_selfpath" -d $MEDIA_DEV`
@@ -25,7 +25,7 @@ case "$1" in
       set_pipeline.sh --sensorbayer $BAYER --sensorname "$NAME"  --sensorres $RES --medianode $i --mpnode $MP_NODE --mpfmt NV12 --mpres 640x480 --spnode $SP_NODE --spfmt NV12 --spres 640x480
       if [[ $SENSOR ]]
       then
-          cp /etc/iqfiles/$SENSOR*.xml /etc/cam_iq.xml
+          ln -fs /etc/iqfiles/$SENSOR*.xml /etc/cam_iq.xml
       fi
     fi
   done
