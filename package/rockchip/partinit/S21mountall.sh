@@ -22,17 +22,22 @@ resize_e2fs()
 
 	check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return
 	LABEL=$(dumpe2fs -h $DEV | grep "volume name:" | grep -o "[^ ]*$")
-	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
+	[ $? -eq 0 ] || { echo "Wrong fs type!"; return; }
 
 	# Use volume label to mark resized
 	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
 
-	echo Resizing $DEV...
 	check_tool e2fsck BR2_PACKAGE_E2FSPROGS_FSCK || return
 	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
 
 	# Do an initial fsck as resize2fs required.
-	mountpoint -q $MOUNT_POINT || { e2fsck -fy $DEV || return; }
+	if ! mountpoint -q $MOUNT_POINT;then
+		if ! e2fsck -fy $DEV;then
+			echo "Error detected"
+			e2fsck -y $DEV
+		fi
+		[ $? -eq 0 ] || { echo "Fatal error(cannot recover)!"; return; }
+	fi
 
 	# Force using online resize, see:
 	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
@@ -73,8 +78,6 @@ resize_fatresize()
 	# Somehow fatresize only works for 256M+ fat
 	[ ! $SIZE -gt $((256 * 1024 * 1024)) ] && return 1
 
-	echo Resizing $DEV...
-
 	MIN_SIZE=$(($MAX_SIZE - 16 * 1024 * 1024))
 	[ $MIN_SIZE -lt $SIZE ] && MIN_SIZE=$SIZE
 	while [ $MAX_SIZE -gt $MIN_SIZE ];do
@@ -96,7 +99,7 @@ resize_fat()
 
 	check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABEL || return
 	LABEL=$(fatlabel $DEV)
-	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
+	[ $? -eq 0 ] || { echo "Wrong fs type"; return; }
 
 	# Use volume label to mark resized
 	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
@@ -130,7 +133,11 @@ resize_fat()
 	fi
 
 	# Use volume label to mark resized
-	[ -n "$FORMATTED" ] && fatlabel $DEV $PART_NAME
+	if [ -n "$FORMATTED" ]; then
+	       fatlabel $DEV $PART_NAME
+       else
+	       echo "Resize failed"
+       fi
 }
 
 resize_ntfs()
@@ -141,13 +148,12 @@ resize_ntfs()
 
 	check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
 	LABEL=$(ntfslabel $DEV)
-	[ $? -eq 0 ] || { echo "Wrong fs type for $DEV"; return; }
+	[ $? -eq 0 ] || { echo "Wrong fs type"; return; }
 
 	# Use volume label to mark resized
 	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
 
-	echo Resizing $DEV...
-	echo y | ntfsresize -f $DEV || return
+	echo y | ntfsresize -f $DEV || { echo "Resize failed"; return; }
 
 	# Use volume label to mark resized
 	ntfslabel $DEV $PART_NAME
@@ -178,6 +184,8 @@ do_resize()
 	SYS_PATH=/sys/class/block/${DEV##*/}
 	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
 	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
+
+	echo Resizing $DEV $MOUNT_POINT $FSTYPE...
 
 	case $FSTYPE in
 		ext[234])
