@@ -1,0 +1,75 @@
+From b0a749dcb312b3da124b5c19e090ca325e497b2c Mon Sep 17 00:00:00 2001
+From: Michael Tretter <m.tretter@pengutronix.de>
+Date: Wed, 17 Jan 2018 17:54:31 +0100
+Subject: [PATCH] linux-dmabuf: send deprecated format events
+
+Although the format event is deprecated, some clients, especially the
+GStreamer waylandsink, only support zwp_linux_dmabuf_v1 version 1 and
+require the deprecated format event.
+
+Send format events instead of the modifier event, if the client binds on
+a protocol version before version 3, skipping formats that only support
+non-linear modifiers.
+
+Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+Reviewed-by: Daniel Stone <daniels@collabora.com>
+---
+ libweston/linux-dmabuf.c | 19 ++++++++++++-------
+ libweston/linux-dmabuf.h |  3 +++
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/libweston/linux-dmabuf.c b/libweston/linux-dmabuf.c
+index 59705845..148c61fb 100644
+--- a/libweston/linux-dmabuf.c
++++ b/libweston/linux-dmabuf.c
+@@ -488,8 +488,6 @@ bind_linux_dmabuf(struct wl_client *client,
+ 	wl_resource_set_implementation(resource, &linux_dmabuf_implementation,
+ 				       compositor, NULL);
+ 
+-	if (version < ZWP_LINUX_DMABUF_V1_MODIFIER_SINCE_VERSION)
+-		return;
+ 	/*
+ 	 * Use EGL_EXT_image_dma_buf_import_modifiers to query and advertise
+ 	 * format/modifier codes.
+@@ -510,11 +508,18 @@ bind_linux_dmabuf(struct wl_client *client,
+ 			modifiers = &modifier_invalid;
+ 		}
+ 		for (j = 0; j < num_modifiers; j++) {
+-			uint32_t modifier_lo = modifiers[j] & 0xFFFFFFFF;
+-			uint32_t modifier_hi = modifiers[j] >> 32;
+-			zwp_linux_dmabuf_v1_send_modifier(resource, formats[i],
+-							  modifier_hi,
+-							  modifier_lo);
++			if (version >= ZWP_LINUX_DMABUF_V1_MODIFIER_SINCE_VERSION) {
++				uint32_t modifier_lo = modifiers[j] & 0xFFFFFFFF;
++				uint32_t modifier_hi = modifiers[j] >> 32;
++				zwp_linux_dmabuf_v1_send_modifier(resource,
++								  formats[i],
++								  modifier_hi,
++								  modifier_lo);
++			} else if (modifiers[j] == DRM_FORMAT_MOD_LINEAR ||
++				   modifiers == &modifier_invalid) {
++				zwp_linux_dmabuf_v1_send_format(resource,
++								formats[i]);
++			}
+ 		}
+ 		if (modifiers != &modifier_invalid)
+ 			free(modifiers);
+diff --git a/libweston/linux-dmabuf.h b/libweston/linux-dmabuf.h
+index f4ab52cb..dbeda660 100644
+--- a/libweston/linux-dmabuf.h
++++ b/libweston/linux-dmabuf.h
+@@ -32,6 +32,9 @@
+ #ifndef DRM_FORMAT_MOD_INVALID
+ #define DRM_FORMAT_MOD_INVALID ((1ULL<<56) - 1)
+ #endif
++#ifndef DRM_FORMAT_MOD_LINEAR
++#define DRM_FORMAT_MOD_LINEAR 0
++#endif
+ 
+ struct linux_dmabuf_buffer;
+ typedef void (*dmabuf_user_data_destroy_func)(
+-- 
+2.11.0
+
