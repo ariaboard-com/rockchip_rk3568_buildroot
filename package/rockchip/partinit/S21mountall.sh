@@ -59,6 +59,7 @@ resize_e2fs()
 		# Restore backup data
 		mount $DEV $TEMP
 		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
+		rm /tmp/${PART_NAME}.tar
 	fi
 
 	umount $TEMP
@@ -123,6 +124,7 @@ resize_fat()
 		# Restore backup data
 		mount $DEV $TEMP
 		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
+		rm /tmp/${PART_NAME}.tar
 	fi
 
 	umount $TEMP
