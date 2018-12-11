@@ -1,0 +1,3 @@
+config BR2_PACKAGE_DUI
+	bool "build dui application"
+	select BR2_PACKAGE_DEVICEIO
