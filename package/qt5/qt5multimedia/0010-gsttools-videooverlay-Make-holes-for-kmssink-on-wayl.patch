@@ -1,16 +1,15 @@
-From 24bfc998b265653b4647c3123dbb41a3f0dc0e64 Mon Sep 17 00:00:00 2001
+From bf9e685242073b1b69f45d645731155494c0d779 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Mon, 10 Dec 2018 19:52:55 +0800
-Subject: [PATCH] gsttools: videooverlay: Make holes for lower overlay layers
- on wayland
+Date: Tue, 11 Dec 2018 10:40:55 +0800
+Subject: [PATCH] gsttools: videooverlay: Make holes for kmssink on wayland
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp | 32 ++++++++++++++++++++++++++++----
- 1 file changed, 28 insertions(+), 4 deletions(-)
+ src/gsttools/qgstreamervideooverlay.cpp | 35 +++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 88081f6..febc11f 100644
+index 88081f6..fd0f93a 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -51,6 +51,10 @@
@@ -48,7 +47,7 @@ index 88081f6..febc11f 100644
  #define GST_WAYLAND_DISPLAY_HANDLE_CONTEXT_TYPE "GstWaylandDisplayHandleContextType"
      if (gm && (GST_MESSAGE_TYPE(gm) == GST_MESSAGE_NEED_CONTEXT)) {
          const gchar *type = NULL;
-@@ -340,24 +348,40 @@ bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message
+@@ -340,24 +348,43 @@ bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message
          QPlatformNativeInterface *native =
              QGuiApplication::platformNativeInterface();
          QWindow *window = findWindow(m_windowId);
@@ -78,7 +77,10 @@ index 88081f6..febc11f 100644
 +        if (!surface || !compositor)
 +            return true;
 +
-+        // HACK: Let wayland server to make a hole
++        // HACK: Let wayland server to make a hole for kmssink
++        if (!strstr(GST_ELEMENT_NAME(m_videoSink), "kmssink"))
++                return true;
++
 +        struct wl_region *region = wl_compositor_create_region(compositor);
 +        wl_region_add(region, pos.x() + m_rect.x(), pos.y() + m_rect.y(),
 +                m_rect.width(), m_rect.height());
