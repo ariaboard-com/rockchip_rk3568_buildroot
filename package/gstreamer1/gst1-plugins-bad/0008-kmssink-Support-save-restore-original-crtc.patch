@@ -1,4 +1,4 @@
-From 71f0cdb9ac82c6f647bf94167fb185f8c4f976bc Mon Sep 17 00:00:00 2001
+From 31bb77fe4fc86b734670cfa8b3b7fe4218030078 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 10 Dec 2018 20:57:25 +0800
 Subject: [PATCH] kmssink: Support save/restore original crtc
@@ -7,15 +7,27 @@ Port from weston's compositor-drm.c
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- sys/kms/gstkmssink.c | 20 ++++++++++++++++++++
- sys/kms/gstkmssink.h |  2 ++
- 2 files changed, 22 insertions(+)
+ sys/kms/gstkmssink.c | 25 ++++++++++++++++++++-----
+ sys/kms/gstkmssink.h |  7 +++++++
+ 2 files changed, 27 insertions(+), 5 deletions(-)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 7eb54ab..3152e1f 100755
+index 7eb54ab..159b42c 100755
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
-@@ -409,6 +409,20 @@ get_drm_caps (GstKMSSink * self)
+@@ -46,11 +46,6 @@
+ #include <gst/video/videooverlay.h>
+ #include <gst/allocators/gstdmabuf.h>
+ 
+-#include <drm.h>
+-#include <xf86drm.h>
+-#include <xf86drmMode.h>
+-#include <drm_fourcc.h>
+-
+ #include <fcntl.h>
+ #include <string.h>
+ 
+@@ -409,6 +404,20 @@ get_drm_caps (GstKMSSink * self)
    return TRUE;
  }
  
@@ -36,7 +48,7 @@ index 7eb54ab..3152e1f 100755
  static gboolean
  configure_mode_setting (GstKMSSink * self, GstVideoInfo * vinfo)
  {
-@@ -455,6 +469,9 @@ configure_mode_setting (GstKMSSink * self, GstVideoInfo * vinfo)
+@@ -455,6 +464,9 @@ configure_mode_setting (GstKMSSink * self, GstVideoInfo * vinfo)
    if (!mode)
      goto mode_failed;
  
@@ -46,7 +58,7 @@ index 7eb54ab..3152e1f 100755
    err = drmModeSetCrtc (self->fd, self->crtc_id, fb_id, 0, 0,
        (uint32_t *) & self->conn_id, 1, mode);
    if (err)
-@@ -500,6 +517,7 @@ mode_failed:
+@@ -500,6 +512,7 @@ mode_failed:
    }
  modesetting_failed:
    {
@@ -54,7 +66,7 @@ index 7eb54ab..3152e1f 100755
      GST_ERROR_OBJECT (self, "Failed to set mode: %s", strerror (errno));
      goto bail;
    }
-@@ -704,6 +722,7 @@ bail:
+@@ -704,6 +717,7 @@ bail:
      drmModeFreeResources (res);
  
    if (!ret && self->fd >= 0) {
@@ -62,7 +74,7 @@ index 7eb54ab..3152e1f 100755
      drmClose (self->fd);
      self->fd = -1;
    }
-@@ -797,6 +816,7 @@ gst_kms_sink_stop (GstBaseSink * bsink)
+@@ -797,6 +811,7 @@ gst_kms_sink_stop (GstBaseSink * bsink)
    gst_poll_fd_init (&self->pollfd);
  
    if (self->fd >= 0) {
@@ -71,10 +83,22 @@ index 7eb54ab..3152e1f 100755
      self->fd = -1;
    }
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
-index 92d51aa..71eb50b 100755
+index 92d51aa..4458cf9 100755
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
-@@ -88,6 +88,8 @@ struct _GstKMSSink {
+@@ -28,6 +28,11 @@
+ 
+ #include <gst/video/gstvideosink.h>
+ 
++#include <drm.h>
++#include <xf86drm.h>
++#include <xf86drmMode.h>
++#include <drm_fourcc.h>
++
+ G_BEGIN_DECLS
+ 
+ #define GST_TYPE_KMS_SINK \
+@@ -88,6 +93,8 @@ struct _GstKMSSink {
    /* reconfigure info if driver doesn't scale */
    GstVideoRectangle pending_rect;
    gboolean reconfigure;
