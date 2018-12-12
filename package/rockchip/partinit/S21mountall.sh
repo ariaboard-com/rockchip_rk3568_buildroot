@@ -54,7 +54,7 @@ resize_e2fs()
 		tar cvf /tmp/${PART_NAME}.tar $TEMP >/dev/null
 		umount $TEMP
 
-		mkfs.ext2 $DEV || return
+		mkfs.ext2 $DEV
 
 		# Restore backup data
 		mount $DEV $TEMP
@@ -71,7 +71,7 @@ resize_e2fs()
 resize_fatresize()
 {
 	DEV=$1
-	SIZE=$2
+	SIZE=$(($2 * 1024))
 	MAX_SIZE=$3
 
 	check_tool fatresize BR2_PACKAGE_FATRESIZE || return 1
@@ -80,13 +80,13 @@ resize_fatresize()
 	[ ! $SIZE -gt $((256 * 1024 * 1024)) ] && return 1
 
 	MIN_SIZE=$(($MAX_SIZE - 16 * 1024 * 1024))
-	[ $MIN_SIZE -lt $SIZE ] && MIN_SIZE=$SIZE
+	[ $MIN_SIZE -lt $SIZE ] && return 0 # Large enough!
 	while [ $MAX_SIZE -gt $MIN_SIZE ];do
 		# Somehow fatresize cannot resize to max size
 		MAX_SIZE=$(($MAX_SIZE - 512 * 1024))
 
 		# Try to resize with fatresize, not always work
-		fatresize -s $MAX_SIZE $DEV && return 0
+		fatresize -s ${MAX_SIZE} $DEV && return 0
 	done
 
 	return 1
@@ -136,10 +136,10 @@ resize_fat()
 
 	# Use volume label to mark resized
 	if [ -n "$FORMATTED" ]; then
-	       fatlabel $DEV $PART_NAME
-       else
-	       echo "Resize failed"
-       fi
+		fatlabel $DEV $PART_NAME
+	else
+		echo "Resize failed"
+	fi
 }
 
 resize_ntfs()
