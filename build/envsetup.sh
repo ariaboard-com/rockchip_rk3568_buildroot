@@ -40,6 +40,7 @@ DEFCONFIG_ARRAY=(
 "rockchip_rk3399pro-npu" \
 "rockchip_rk3308_b_release" \
 "rockchip_rk3308_b_32_release" \
+"rockchip_rk3308_gk_32_release" \
 )
 
 DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
