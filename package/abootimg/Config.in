@@ -1,0 +1,6 @@
+config BR2_PACKAGE_ABOOTIMG
+	bool "abootimg"
+	help
+	  abootimg - manipulate Android Boot Images.
+
+	  https://github.com/ggrandou/abootimg
