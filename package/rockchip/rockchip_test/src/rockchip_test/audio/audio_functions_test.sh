@@ -6,6 +6,7 @@ echo "*        RK3308 Platform Audio Functions Test       *"
 echo "*****************************************************"
 echo "*  Loop playback:                              [0]  *"
 echo "*  Loop capture:                               [1]  *"
+echo "*  Test loopback:                              [2]  *"
 echo "*  Exit audio test:                            [q]  *"
 echo "*****************************************************"
 
@@ -79,6 +80,9 @@ case $TEST_CASE in
 	;;
 	"1")
 		loop_capture
+	;;
+	"2")
+		source ./test_loopback.sh
 	;;
 	"q")
 		echo "Exit audio test"
