@@ -36,10 +36,16 @@ module_choice()
     echo "QT test:              12"
     echo "auto reboot test:     13"
     echo "ddr freq scaling test 14"
+    echo "npu stress test       15"
     echo "*****************************************************"
 
     echo  "please input your test moudle: "
     read -t 30  MODULE_CHOICE
+}
+
+npu_stress_test()
+{
+    sh /rockchip_test/npu/npu_stress_test.sh
 }
 
 ddr_test()
@@ -161,6 +167,9 @@ module_test()
 	14)
 	   ddr_freq_scaling_test
 	    ;;
+	15)
+	   npu_stress_test
+	   ;;
     esac
 }
 
