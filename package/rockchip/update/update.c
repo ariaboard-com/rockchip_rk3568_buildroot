@@ -250,7 +250,8 @@ int main(int argc, char** argv){
                 ret = WriteFwData(argv[2], partition_name);
                 if (ret < 0) {
                     printf(" Update partition %s fail \n", partition_name);
-                    return -1;
+                    //means no find recovery partition in update.img
+                    //return -1;
                 } else {
                     if (!CheckFwData(argv[2], partition_name)){
                         printf(" Check partition %s fail \n", partition_name);
