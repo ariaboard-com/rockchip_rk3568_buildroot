@@ -1,19 +1,26 @@
-From ac23beb73b0a3237c887d27f57be64382e289ad7 Mon Sep 17 00:00:00 2001
+From 1461acd2407a0ef5316f770b5f6ef2f82f4fd962 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Nov 2018 16:03:31 +0800
-Subject: [PATCH 1/2] gsttools: Set overlay rectangle when updating widget's
- geometry
+Subject: [PATCH 2/7] gsttools: videowidget: Set overlay rectangle when resized
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideowidget.cpp | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ src/gsttools/qgstreamervideowidget.cpp | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
-index 792df42..41b4995 100644
+index 792df42..476b5e6 100644
 --- a/src/gsttools/qgstreamervideowidget.cpp
 +++ b/src/gsttools/qgstreamervideowidget.cpp
-@@ -48,8 +48,9 @@ QT_BEGIN_NAMESPACE
+@@ -41,6 +41,7 @@
+ 
+ #include <QtCore/qcoreevent.h>
+ #include <QtCore/qdebug.h>
++#include <QtGui/qevent.h>
+ #include <QtGui/qpainter.h>
+ 
+ QT_BEGIN_NAMESPACE
+@@ -48,8 +49,9 @@ QT_BEGIN_NAMESPACE
  class QGstreamerVideoWidget : public QWidget
  {
  public:
@@ -24,29 +31,21 @@ index 792df42..41b4995 100644
      {
          setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
          QPalette palette;
-@@ -83,6 +84,12 @@ public:
-         painter.fillRect(rect(), palette().background());
+@@ -89,7 +91,13 @@ protected:
+         paint_helper();
      }
  
-+    void updateGeometry()
-+    {
-+	    QWidget::updateGeometry();
-+	    m_videoOverlay->setRenderRectangle(geometry());
++    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE {
++	    m_videoOverlay->setRenderRectangle(QRect(QPoint(), event->size()));
 +    }
 +
- protected:
-     void paintEvent(QPaintEvent *) override
-     {
-@@ -90,6 +97,8 @@ protected:
-     }
- 
      QSize m_nativeSize;
 +
 +    QGstreamerVideoOverlay *m_videoOverlay;
  };
  
  QGstreamerVideoWidgetControl::QGstreamerVideoWidgetControl(QObject *parent, const QByteArray &elementName)
-@@ -124,7 +133,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
+@@ -124,7 +132,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
      if (m_widget)
          return;
  
