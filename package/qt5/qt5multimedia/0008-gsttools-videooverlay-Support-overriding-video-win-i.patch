@@ -1,4 +1,4 @@
-From ef501fdb0f32e487ff77070417481eadb0bcbc07 Mon Sep 17 00:00:00 2001
+From 220a7c3b3b4148239b6f79d2f94687827c206f52 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:54:38 +0800
 Subject: [PATCH 4/7] gsttools: videooverlay: Support overriding video win id

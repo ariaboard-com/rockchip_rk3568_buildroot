@@ -1,4 +1,4 @@
-From 67401625bbb7bea58f45027475515a458fc169b4 Mon Sep 17 00:00:00 2001
+From ff0bf69cb73015810913e2164c7a25b149f7ccbe Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
 Subject: [PATCH 3/7] gsttools: videooverlay: Support waylandsink in the right
@@ -6,12 +6,12 @@ Subject: [PATCH 3/7] gsttools: videooverlay: Support waylandsink in the right
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp            | 162 +++++++++++++++++----
+ src/gsttools/qgstreamervideooverlay.cpp            | 168 +++++++++++++++++----
  .../gsttools_headers/qgstreamervideooverlay_p.h    |   2 +
- 2 files changed, 136 insertions(+), 28 deletions(-)
+ 2 files changed, 142 insertions(+), 28 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 6ad70fd..dfcca22 100644
+index 6ad70fd..9d395a9 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -40,7 +40,11 @@
@@ -37,7 +37,7 @@ index 6ad70fd..dfcca22 100644
  QT_BEGIN_NAMESPACE
  
  struct ElementMap
-@@ -194,27 +202,106 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
+@@ -194,27 +202,112 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
          setWindowHandle_helper(id);
  }
  
@@ -105,11 +105,6 @@ index 6ad70fd..dfcca22 100644
 +    GstVideoOverlay *overlay;
 +    wl_surface *surface = NULL;
 +    wl_compositor *compositor = NULL;
-+#endif
-+
-+#if !GST_CHECK_VERSION(1,0,0)
-+    qWarning("Only support gstreamer-1.0\n");
-+    goto out;
  #endif
  
 -        // Properties need to be reset when changing the winId.
@@ -118,6 +113,11 @@ index 6ad70fd..dfcca22 100644
 -        setContrast(m_contrast);
 -        setHue(m_hue);
 -        setSaturation(m_saturation);
++#if !GST_CHECK_VERSION(1,0,0)
++    qWarning("Only support gstreamer-1.0\n");
++    goto out;
++#endif
++
 +    if (!m_videoSink || !GST_IS_VIDEO_OVERLAY(m_videoSink))
 +        goto out;
 +
@@ -133,13 +133,19 @@ index 6ad70fd..dfcca22 100644
 +        compositor = (wl_compositor*) native->nativeResourceForWindow("compositor", window);
      }
 +
-+    if (surface && compositor) {
++    // It's wayland platform, using wl_surface as window handle.
++    if (compositor) {
++        if (!surface) {
++            // There's no surface for overlay now.
++            gst_video_overlay_set_window_handle(overlay, 0);
++            goto out;
++        }
++
 +        gst_video_overlay_set_window_handle(overlay, (WId) surface);
 +
 +        QPoint pos = getDisplayPosition(window);
 +        gst_video_overlay_set_render_rectangle(overlay, pos.x() + m_rect.x(),
 +                pos.y() + m_rect.y(), m_rect.width(), m_rect.height());
-+
 +        goto out;
 +    }
 +#endif // ENABLE_WAYLAND_PLATFORM
@@ -160,7 +166,7 @@ index 6ad70fd..dfcca22 100644
  }
  
  void QGstreamerVideoOverlay::expose()
-@@ -246,24 +333,43 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
+@@ -246,24 +339,43 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
          h = rect.height();
      }
  

@@ -1,21 +1,22 @@
-From eee7196176fcc6f24040ab0f2f9898beac796171 Mon Sep 17 00:00:00 2001
+From 03e4570dd3dfd17265eafe7aa815898b0152ff3c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 11 Dec 2018 10:40:55 +0800
 Subject: [PATCH 5/7] gsttools: videooverlay: Make holes for kmssink on wayland
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ src/gsttools/qgstreamervideooverlay.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 4d8fb44..1c126e1 100644
+index 1fefd7b..9fab7fc 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
-@@ -294,6 +294,17 @@ void QGstreamerVideoOverlay::setWindowHandle_helper(WId id)
+@@ -300,6 +300,18 @@ void QGstreamerVideoOverlay::setWindowHandle_helper(WId id)
+         QPoint pos = getDisplayPosition(window);
          gst_video_overlay_set_render_rectangle(overlay, pos.x() + m_rect.x(),
                  pos.y() + m_rect.y(), m_rect.width(), m_rect.height());
- 
++
 +        // HACK: Let wayland server to make a hole for kmssink
 +        if (!strstr(GST_ELEMENT_NAME(m_videoSink), "kmssink"))
 +            goto out;
