@@ -51,14 +51,15 @@ resize_e2fs()
 		echo "Unable to resize $DEV, formatting it..."
 
 		# Backup original data
-		tar cvf /tmp/${PART_NAME}.tar $TEMP >/dev/null
+		tar cf /tmp/${PART_NAME}.tar $TEMP
 		umount $TEMP
 
-		mkfs.ext2 $DEV
+		mke2fs $DEV
+		tune2fs -c 2 -i 0 $DEV
 
 		# Restore backup data
 		mount $DEV $TEMP
-		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
+		tar xf /tmp/${PART_NAME}.tar -C /
 		rm /tmp/${PART_NAME}.tar
 	fi
 
@@ -116,14 +117,14 @@ resize_fat()
 		echo "Formatting it..."
 
 		# Backup original data
-		tar cvf /tmp/${PART_NAME}.tar $TEMP >/dev/null
+		tar cf /tmp/${PART_NAME}.tar $TEMP
 		umount $TEMP
 
-		mkfs.fat $DEV && FORMATTED=true
+		mkfs.vfat -F 32 $DEV && FORMATTED=true
 
 		# Restore backup data
 		mount $DEV $TEMP
-		tar xvf /tmp/${PART_NAME}.tar -C / >/dev/null
+		tar xf /tmp/${PART_NAME}.tar -C /
 		rm /tmp/${PART_NAME}.tar
 	fi
 
