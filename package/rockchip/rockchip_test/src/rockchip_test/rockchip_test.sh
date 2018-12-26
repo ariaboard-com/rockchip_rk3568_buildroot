@@ -37,6 +37,7 @@ module_choice()
     echo "auto reboot test:     13"
     echo "ddr freq scaling test 14"
     echo "npu stress test       15"
+    echo "camera test           16 (use rkisp_demo)"
     echo "*****************************************************"
 
     echo  "please input your test moudle: "
@@ -122,6 +123,11 @@ ddr_freq_scaling_test()
 	bash /rockchip_test/ddr/ddr_freq_scaling.sh
 }
 
+camera_test()
+{
+    sh /rockchip_test/camera/test_camera.sh 10000
+}
+
 module_test()
 {
     case ${MODULE_CHOICE} in
@@ -170,6 +176,9 @@ module_test()
 	15)
 	   npu_stress_test
 	   ;;
+    16)
+       camera_test
+       ;;
     esac
 }
 
