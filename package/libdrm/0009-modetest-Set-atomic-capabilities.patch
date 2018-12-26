@@ -1,0 +1,27 @@
+From 57ae9e86dce0f97fcc62df6a41c004eddf7eae64 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 26 Dec 2018 20:55:21 +0800
+Subject: [PATCH] modetest: Set atomic capabilities
+
+Set atomic capabilities, to enable get/set atomic property.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ tests/modetest/modetest.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/modetest/modetest.c b/tests/modetest/modetest.c
+index c1338ab..6171dc1 100644
+--- a/tests/modetest/modetest.c
++++ b/tests/modetest/modetest.c
+@@ -627,6 +627,7 @@ static struct resources *get_resources(struct device *dev)
+ 		return NULL;
+ 
+ 	drmSetClientCap(dev->fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
++	drmSetClientCap(dev->fd, DRM_CLIENT_CAP_ATOMIC, 1);
+ 
+ 	res->res = drmModeGetResources(dev->fd);
+ 	if (!res->res) {
+-- 
+2.11.0
+
