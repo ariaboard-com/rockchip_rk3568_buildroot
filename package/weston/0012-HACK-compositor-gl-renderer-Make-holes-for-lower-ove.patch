@@ -1,4 +1,4 @@
-From 0bbed120906f711ee115811d7c12c3e985aae869 Mon Sep 17 00:00:00 2001
+From 1490e6a8f1587c14aec9603134f4e5980f48aa6f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 10 Dec 2018 19:19:53 +0800
 Subject: [PATCH] HACK: compositor/gl-renderer: Make holes for lower overlay
@@ -6,13 +6,13 @@ Subject: [PATCH] HACK: compositor/gl-renderer: Make holes for lower overlay
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/compositor.c  | 29 +++++++++++++++++++++
+ libweston/compositor.c  | 30 +++++++++++++++++++++
  libweston/compositor.h  |  3 +++
  libweston/gl-renderer.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+)
+ 3 files changed, 102 insertions(+)
 
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index fc45338..99ab23e 100644
+index 8701f1a..141c424 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -475,6 +475,7 @@ weston_surface_create(struct weston_compositor *compositor)
@@ -31,7 +31,7 @@ index fc45338..99ab23e 100644
  
  	wl_list_for_each_safe(cb, next, &surface->frame_callback_list, link)
  		wl_resource_destroy(cb->resource);
-@@ -2782,6 +2784,33 @@ surface_set_opaque_region(struct wl_client *client,
+@@ -2782,6 +2784,34 @@ surface_set_opaque_region(struct wl_client *client,
  
  	if (region_resource) {
  		region = wl_resource_get_user_data(region_resource);
@@ -58,7 +58,8 @@ index fc45338..99ab23e 100644
 +			pixman_region32_fini(&hole);
 +
 +			// Trigger repaint to apply the hole
-+			weston_output_damage(surface->output);
++			if (surface->output)
++				weston_output_damage(surface->output);
 +			return;
 +		}
 +
