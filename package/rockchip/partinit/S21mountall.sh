@@ -175,7 +175,7 @@ do_resize()
 	FSTYPE=$3
 
 	# Find real dev for root dev
-	if [ "$MOUNT_POINT" == '/' ];then
+	if [ "$MOUNT_POINT" = '/' ];then
 		DEV=$(mountpoint -n /|cut -d ' ' -f 1)
 	fi
 
