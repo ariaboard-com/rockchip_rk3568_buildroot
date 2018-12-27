@@ -4,6 +4,7 @@
 #include "gpu.config"
 #include "video_mpp.config"
 #include "video_gst.config"
+#include "video_gst_rtsp.config"
 #include "audio.config"
 #include "camera.config"
 #include "camera_gst.config"
