@@ -9,9 +9,11 @@ then
 	exit
 fi
 #num is test times
-num=0;
+TEST_NUM=0;
+#cam link num
+CAM_NUM=0;
 #media node max
-MEDIA_MAX=10
+MEDIA_MAX=10;
 #cif path node name
 CIF_PATH="stream_cif"
 #isp path node name
@@ -20,34 +22,56 @@ for i in $(seq 0 $MEDIA_MAX); do
 	MEDIA_DEV=/dev/media$i
 	ISP_NODE=$(media-ctl -d $MEDIA_DEV -e $ISP_PATH)
 	CIF_NODE=$(media-ctl -d $MEDIA_DEV -e $CIF_PATH)
+	Link=$(media-ctl -d $MEDIA_DEV -p | grep "0 link")
+
 	if echo $ISP_NODE | grep -q "^/dev/video"
 	then
-		eval VIDEO_NODE$i=$ISP_NODE;
-		echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
+		CAM_NUM=$(($CAM_NUM + 1));
+		if echo $Link | grep -q "0 link"
+		then
+			CAM_NUM=$(($CAM_NUM - 1));
+			eval VIDEO_NODE$i="";
+			echo "     Check /dev/media$i didn't link anycamera($(eval echo \$VIDEO_NODE$i)) "
+		else
+			eval VIDEO_NODE$i=$ISP_NODE;
+			echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
+		fi
 	elif echo $CIF_NODE | grep -q "^/dev/video"
 	then
-		eval VIDEO_NODE$i=$CIF_NODE;
-		echo "     Check /dev/media$i is CIF-camera($(eval echo \$VIDEO_NODE$i))"
+		CAM_NUM=$(($CAM_NUM + 1));
+		if echo $Link | grep -q "0 link"
+		then
+			CAM_NUM=$(($CAM_NUM - 1));
+			eval VIDEO_NODE$i="";
+			echo "     Check /dev/media$i didn't link anycamera($(eval echo \$VIDEO_NODE$i)) "
+		else
+			eval VIDEO_NODE$i=$CIF_NODE;
+			echo "     Check /dev/media$i is CIF-camera($(eval echo \$VIDEO_NODE$i))"
+		fi
 	else
-		CAM_NUM=$i;
+		VID_NUM=$i;
 		echo ""
-		echo "     Test camera(Num=$i) $1 times"
-		echo "======================================================="		
+		echo "     Test camera(Cam_num=$CAM_NUM) $1 times"
+		echo "======================================================="
 		break;
 	fi
 done
-CAM_NUM=$(($CAM_NUM -1));
-for i in $(seq 0 $CAM_NUM); do
-	while [ $num -lt $1 ]
-	do
-		num=$(($num +1));
+VID_NUM=$(($VID_NUM -1));
+
+while [ $TEST_NUM -lt $1 ]
+do
+	#init test 
+	i=0;
+	for i in $(seq 0 $CAM_NUM); do
 		VIDEO_DEV=$(eval echo \$VIDEO_NODE$i);
-		rkisp_demo --device=$VIDEO_DEV --output=/tmp/video$i.yuv --count=100;
-		echo "======================================================="
-		echo " camera $(eval echo \$VIDEO_NODE$i) No.($num) out /tmp/video$i.yuv is ok!";
-		echo "======================================================="
-		sleep 1;
+		if echo $VIDEO_DEV | grep -q "^/dev/video"
+		then
+			rkisp_demo --device=$VIDEO_DEV --output=/tmp/video$i.yuv --count=100;
+			echo "======================================================="
+			echo " camera $(eval echo \$VIDEO_NODE$i) No.($TEST_NUM) out /tmp/video$i.yuv is ok!";
+			echo "======================================================="
+			sleep 1;
+		fi
 	done;
-	#init times for next test 
-	num=0;
+	TEST_NUM=$(($TEST_NUM +1));
 done;
