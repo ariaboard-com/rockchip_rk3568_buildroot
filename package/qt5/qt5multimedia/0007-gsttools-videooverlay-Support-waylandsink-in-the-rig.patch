@@ -1,4 +1,4 @@
-From ff0bf69cb73015810913e2164c7a25b149f7ccbe Mon Sep 17 00:00:00 2001
+From 3b55b6129516c4fedbcd5c7e4f1569074650d31f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
 Subject: [PATCH 3/7] gsttools: videooverlay: Support waylandsink in the right
@@ -11,7 +11,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 142 insertions(+), 28 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 6ad70fd..9d395a9 100644
+index 6ad70fd..bd99abd 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -40,7 +40,11 @@
@@ -101,11 +101,11 @@ index 6ad70fd..9d395a9 100644
 +#ifdef ENABLE_WAYLAND_PLATFORM
 +    QPlatformNativeInterface *native =
 +            QGuiApplication::platformNativeInterface();
-+    QWindow *window;
-+    GstVideoOverlay *overlay;
 +    wl_surface *surface = NULL;
 +    wl_compositor *compositor = NULL;
  #endif
++    QWindow *window;
++    GstVideoOverlay *overlay;
  
 -        // Properties need to be reset when changing the winId.
 -        setAspectRatioMode(m_aspectRatioMode);
