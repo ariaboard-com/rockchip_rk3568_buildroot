@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,7 @@
 #endif
 #define SD_UPDATE_FILE "/sdcard/update.img"
 #define DATA_UPDATE_FILE "/userdata/update.img"
-#define MISC_FILE_PATH "/misc"
+#define MISC_FILE_PATH "/dev/block/by-name/misc"
 #define MISC_MSG_OFFSET 16 * 1024
 
 /* Bootloader Message (2-KiB)
@@ -76,22 +76,22 @@
  * issue.
  */
 struct android_bootloader_message {
-    char command[32];
-    char status[32];
-    char recovery[768];
+	char command[32];
+	char status[32];
+	char recovery[768];
 
-    /* The 'recovery' field used to be 1024 bytes.  It has only ever
-     * been used to store the recovery command line, so 768 bytes
-     * should be plenty.  We carve off the last 256 bytes to store the
-     * stage string (for multistage packages) and possible future
-     * expansion. */
-    char stage[32];
+	/* The 'recovery' field used to be 1024 bytes.	It has only ever
+	 * been used to store the recovery command line, so 768 bytes
+	 * should be plenty.  We carve off the last 256 bytes to store the
+	 * stage string (for multistage packages) and possible future
+	 * expansion. */
+	char stage[32];
 
-    /* The 'reserved' field used to be 224 bytes when it was initially
-     * carved off from the 1024-byte recovery field. Bump it up to
-     * 1184-byte so that the entire bootloader_message struct rounds up
-     * to 2048-byte. */
-    char reserved[1184];
+	/* The 'reserved' field used to be 224 bytes when it was initially
+	 * carved off from the 1024-byte recovery field. Bump it up to
+	 * 1184-byte so that the entire bootloader_message struct rounds up
+	 * to 2048-byte. */
+	char reserved[1184];
 };
 
 
@@ -110,12 +110,12 @@ static void bootCommand(char *arg){
 	printf("command: %s\n", arg);
 	mkdir(RECOVERY_PATH,0775);
 	if((command_file = fopen(COMMAND_FILE_PATH,"wb")) == NULL){
- 		printf("Open command file error.\n");
+		printf("Open command file error.\n");
 		return;
- 	}
+	}
 
- 	if((log_file = fopen(LOG_FILE_PATH,"wb")) == NULL){
- 		printf("Open log file error.\n");
+	if((log_file = fopen(LOG_FILE_PATH,"wb")) == NULL){
+		printf("Open log file error.\n");
 		return;
 	}
 
@@ -125,10 +125,10 @@ static void bootCommand(char *arg){
 	}
 
 	printf("update: write command to command file: ");
- 	fwrite(arg, strlen(arg), 1, command_file);
- 	fwrite("\n", 1, 1, command_file);
- 	fclose(command_file);
- 	printf("done\n");
+	fwrite(arg, strlen(arg), 1, command_file);
+	fwrite("\n", 1, 1, command_file);
+	fclose(command_file);
+	printf("done\n");
 
 	printf("update: write command to misc file: ");
 	fseek(misc_file, MISC_MSG_OFFSET, SEEK_SET);
@@ -146,12 +146,12 @@ static void bootCommand(char *arg){
 	fclose(misc_file);
 	printf("done\n");
 
- 	memset(blank, 0, LOG_FILE_LEN);
- 	fwrite(blank, LOG_FILE_LEN, 1, log_file);
- 	fclose(log_file);
+	memset(blank, 0, LOG_FILE_LEN);
+	fwrite(blank, LOG_FILE_LEN, 1, log_file);
+	fclose(log_file);
 	printf("update: reboot!\n");
 	//reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
-	//       LINUX_REBOOT_CMD_RESTART2, "recovery");
+	//		 LINUX_REBOOT_CMD_RESTART2, "recovery");
 	sync();
 	reboot(RB_AUTOBOOT);
 	return;
@@ -178,7 +178,7 @@ static void installPackage(char *update_file){
 	strcpy(arg, str_update_package);
 	strcpy(arg + str_update_package_len, update_file);
 	arg[str_update_package_len + str_update_file_len] = 0;
-        bootCommand(arg);
+		bootCommand(arg);
 }
 
 static void sdUpdate(){
@@ -201,14 +201,14 @@ static void dataUpdate(){
  */
 void rebootWipeUserData(){
 	printf("update: --wipe_all\n");
-        bootCommand("--wipe_all");
+		bootCommand("--wipe_all");
 }
 
 int rebootUpdate(char *path){
 
 	if(path){
 		printf("find %s\n", path);
-        	installPackage(path);
+			installPackage(path);
 	}
 
 	if(access(DATA_UPDATE_FILE,F_OK) == -1){
@@ -229,7 +229,7 @@ int rebootUpdate(char *path){
 }
 
 int main(int argc, char** argv){
-    char* partition_name = "recovery";
+	char* partition_name = "recovery";
 	printf("update: Rockchip Update Tool\n");
 
 	if(argc == 1) {
@@ -244,22 +244,23 @@ int main(int argc, char** argv){
 		return 0;
 
 	} else if(argc == 3){
-		if(!strcmp(argv[1], "ota") || !strcmp(argv[1], "update"))
+		if(!strcmp(argv[1], "ota") || !strcmp(argv[1], "update")) {
 			if(argv[2]) {
-                int ret;
-                ret = WriteFwData(argv[2], partition_name);
-                if (ret < 0) {
-                    printf(" Update partition %s fail \n", partition_name);
-                    //means no find recovery partition in update.img
-                    //return -1;
-                } else {
-                    if (!CheckFwData(argv[2], partition_name)){
-                        printf(" Check partition %s fail \n", partition_name);
-                        return -1;
-                    }
-                }
+				int ret;
+				ret = WriteFwData(argv[2], partition_name);
+				if (ret < 0) {
+					printf(" Update partition %s fail \n", partition_name);
+					//means no find recovery partition in update.img
+					//return -1;
+				} else {
+					if (!CheckFwData(argv[2], partition_name)){
+						printf(" Check partition %s fail \n", partition_name);
+						return -1;
+					}
+				}
 				return rebootUpdate(argv[2]);
 			}
+		}
 	}
 
 	return -1;
