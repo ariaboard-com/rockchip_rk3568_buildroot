@@ -59,3 +59,4 @@ endef
 NTFS_3G_POST_INSTALL_TARGET_HOOKS += NTFS_3G_INSTALL_WRAPPER
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))
