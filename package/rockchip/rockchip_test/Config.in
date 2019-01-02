@@ -5,5 +5,6 @@ config BR2_PACKAGE_ROCKCHIP_TEST
 	select BR2_PACKAGE_MEMTESTER
 	select BR2_PACKAGE_MEMTESTER
 	select BR2_PACKAGE_BASH
+	select BR2_PACKAGE_IPERF
 	help
-		function test for Rockchip stress test 
+		function test for Rockchip stress test
