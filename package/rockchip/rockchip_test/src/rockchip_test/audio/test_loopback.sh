@@ -1,5 +1,8 @@
 #!/bin/sh
 
+device_1=$1
+device_2=$2
+
 prepare_adc_gains()
 {
 	adc_mic_gain=$1
@@ -25,7 +28,8 @@ test_loopback()
 	PATH_CAPTURE=/mnt/sdcard/cap_files
 	# PATH_CAPTURE=/media/usb0/cap_files
 	# PATH_CAPTURE=/tmp/cap_files
-	device="hw:0,0"
+	play_device="default"
+	capt_device="default"
 	fs=16000
 	capt_bits="S16_LE"
 	capt_ch=2
@@ -38,6 +42,15 @@ test_loopback()
 	play_stop_doze=1
 	play_bits=16
 	play_ch=2
+
+	if [ -n "$1" ]; then
+		play_device=$1
+	fi
+
+	if [ -n "$2" ]; then
+		capt_device=$2
+	fi
+
 	# play_gain_tbl="-30 -25 -20 -15 -10 -5 0 5 10 15 20 25 30"
 	play_gain_tbl="-30"
 	set -- $play_gain_tbl
@@ -48,14 +61,14 @@ test_loopback()
 
 	mkdir -p $PATH_CAPTURE
 
-	echo "capt_count: $capt_count, play_count: $play_count, test $test_hours hours on PATH_CAPTURE: $PATH_CAPTURE"
+	echo "play_device: $play_device, capt_device: $capt_device, capt_count: $capt_count, play_count: $play_count, test $test_hours hours on PATH_CAPTURE: $PATH_CAPTURE"
 
 	echo "******** Test loopback start ********"
 
 	for capt_cnt in `seq 1 $capt_count`; do
 		capt_gain=0
 		# playback -> capture -> playback
-		sox -b $play_bits -r $fs -c $play_ch -n -t alsa $device synth $play_seconds sine 1000 gain -30 &  # do playback
+		sox -b $play_bits -r $fs -c $play_ch -n -t alsa $play_device synth $play_seconds sine 1000 gain -30 &  # do playback
 		# start doze
 		sleep $play_start_doze
 
@@ -72,8 +85,8 @@ test_loopback()
 
 		# echo "capt_cnt: $capt_cnt"
 		# echo "play_count: $play_count, play_seconds: $play_seconds"
-		echo "arecord -D $device -r $fs -f $capt_bits -c $capt_ch -d $capt_seconds $PATH_CAPTURE/$DUMP_FILE"
-		arecord -D $device -r $fs -f $capt_bits -c $capt_ch -d $capt_seconds $PATH_CAPTURE/$DUMP_FILE &  # do capture
+		echo "arecord -D $capt_device -r $fs -f $capt_bits -c $capt_ch -d $capt_seconds $PATH_CAPTURE/$DUMP_FILE"
+		arecord -D $capt_device -r $fs -f $capt_bits -c $capt_ch -d $capt_seconds $PATH_CAPTURE/$DUMP_FILE &  # do capture
 
 		# wait the first playback stop
 		sleep $play_seconds
@@ -85,13 +98,13 @@ test_loopback()
 			let play_gain_index+=1
 
 			# echo "play_gain_index: $play_gain_index, play_gain_num: $play_gain_num"
-			echo "sox -b $play_bits -r $fs -c $play_ch -n -t alsa $device synth $play_seconds sine 1000 gain $play_gain"
+			echo "sox -b $play_bits -r $fs -c $play_ch -n -t alsa $play_device synth $play_seconds sine 1000 gain $play_gain"
 			if [ $play_gain_index -ge $play_gain_num ]; then
 				set -- $play_gain_tbl
 				play_gain_index=0
 			fi
 			# echo "play_cnt: $play_cnt"
-			sox -b $play_bits -r $fs -c $play_ch -n -t alsa $device synth $play_seconds sine 1000 gain $play_gain # do playback
+			sox -b $play_bits -r $fs -c $play_ch -n -t alsa $play_device synth $play_seconds sine 1000 gain $play_gain # do playback
 			# stop doze
 			sleep $play_stop_doze
 		done;
@@ -102,4 +115,4 @@ test_loopback()
 
 echo "******** Test loopback v0.1.0 ********"
 
-test_loopback
+test_loopback $device_1 $device_2

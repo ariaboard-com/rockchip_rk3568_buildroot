@@ -1,5 +1,8 @@
 #!/bin/sh
 
+device_1=$1
+device_2=$2
+
 echo ""
 echo "*****************************************************"
 echo "*        RK3308 Platform Audio Functions Test       *"
@@ -27,6 +30,11 @@ loop_playback()
 	ch=2
 	seconds=2
 	gain=-30
+	play_device="default"
+
+	if [ -n "$1" ]; then
+		play_device=$1
+	fi
 
 	while [ $ch -ge 1 ]
 	do
@@ -34,9 +42,8 @@ loop_playback()
         do
 			for bits in $bits_tbl
 			do
-					# sox -b 16 -r 48000 -c 2 -n -t alsa hw:0,0 synth 2 sine 440 gain -18
-					echo "ch="$ch", rate="$fs", bit=$bits, $seconds s, gain=$gain"
-					sox -b $bits -r $fs -c $ch -n -t alsa hw:0,0 synth $seconds sine 440 gain $gain
+					echo "play_device=$play_device, ch="$ch", rate="$fs", bit=$bits, $seconds sec, gain=$gain"
+					sox -b $bits -r $fs -c $ch -n -t alsa $play_device synth $seconds sine 440 gain $gain
 			done
 		done
 	done
@@ -53,6 +60,11 @@ loop_capture()
 	bits_tbl="S16_LE S24_LE S32_LE"
 	ch_tbl="2 4 6 8"
 	seconds=3
+	capt_device="default"
+
+	if [ -n "$1" ]; then
+		capt_device=$1
+	fi
 
 	echo "******** Loop capture start ********"
 
@@ -63,8 +75,8 @@ loop_capture()
 			for ch in $ch_tbl
 			do
 				DUMP_FILE=$(printf 'cap_fs%d_format_%s_ch%d.wav' $fs $bits $ch)
-				echo "DUMP is $DUMP_FILE $seconds s"
-				arecord -D hw:0,0 -r $fs -f $bits -c $ch -d $seconds $PATH_CAPTURE/$DUMP_FILE
+				echo "capt_device: $capt_device capture $DUMP_FILE $seconds sec"
+				arecord -D $capt_device -r $fs -f $bits -c $ch -d $seconds $PATH_CAPTURE/$DUMP_FILE
 			done
 		done
 	done
@@ -76,13 +88,13 @@ loop_capture()
 
 case $TEST_CASE in
 	"0")
-		loop_playback
+		loop_playback $device_1
 	;;
 	"1")
-		loop_capture
+		loop_capture $device_1
 	;;
 	"2")
-		source ./test_loopback.sh
+		source ./test_loopback.sh $device_1 $device_2
 	;;
 	"q")
 		echo "Exit audio test"
