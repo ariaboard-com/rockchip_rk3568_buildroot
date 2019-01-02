@@ -48,7 +48,7 @@ DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
 i=0
 while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
 do
-	let i++
+	let ++i
 done
 
 function choose_info()
@@ -65,7 +65,7 @@ function choose_info()
 		else
 			echo "$((${i}+1)). ${DEFCONFIG_ARRAY[$i]}_release"
 		fi
-		let i++
+		let ++i
 	done
 	echo
 }
@@ -79,10 +79,10 @@ function get_index() {
 	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
 	do
 		if [ $1 = "${DEFCONFIG_ARRAY[$i]}_release" ]; then
-			let i++
+			let ++i
 			return ${i}
 		fi
-		let i++
+		let ++i
 	done
 	return 0
 }
