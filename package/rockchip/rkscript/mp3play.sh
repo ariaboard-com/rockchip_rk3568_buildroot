@@ -13,4 +13,4 @@ then
 	audiofile=/oem/piano2-CoolEdit.mp3
 fi
 
-minimad <$audiofile | aplay -Dhw:0,0 -t raw -f S16_LE -c 2 -r $samplerate
+minimad <$audiofile | aplay -t raw -f S16_LE -c 2 -r $samplerate
