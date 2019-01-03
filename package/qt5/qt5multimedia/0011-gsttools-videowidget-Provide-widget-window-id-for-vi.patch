@@ -1,4 +1,4 @@
-From c140746f767e9b5b5b3d25b7febd52f800d5d4e5 Mon Sep 17 00:00:00 2001
+From e951a4f329a22bd6024b9dda10476b78b0f2345d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 24 Dec 2018 15:40:56 +0800
 Subject: [PATCH 7/7] gsttools: videowidget: Provide widget window id for video
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
-index 2e85973..9baf431 100644
+index 2e85973..8029716 100644
 --- a/src/gsttools/qgstreamervideowidget.cpp
 +++ b/src/gsttools/qgstreamervideowidget.cpp
 @@ -43,10 +43,11 @@
@@ -64,7 +64,7 @@ index 2e85973..9baf431 100644
      if (m_widget && object == m_widget) {
          if (e->type() == QEvent::ParentChange || e->type() == QEvent::Show || e->type() == QEvent::WinIdChange) {
 -            WId newWId = m_widget->winId();
-+            WId newWId = m_widget->videoWinId();
++            WId newWId = m_widget->winId() ? m_widget->videoWinId() : 0;
              if (newWId != m_windowId)
                  m_videoOverlay.setWindowHandle(m_windowId = newWId);
          }
