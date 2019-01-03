@@ -1,4 +1,4 @@
-From 6d6d596a0e063e1dc2496369f454ca7bcfc0db0d Mon Sep 17 00:00:00 2001
+From 8938182d04147324c590494a1d7d0420226b3732 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 15 Dec 2018 12:20:01 +0800
 Subject: [PATCH] modetest: Speed up dumping info
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 22 insertions(+), 6 deletions(-)
 
 diff --git a/tests/modetest/modetest.c b/tests/modetest/modetest.c
-index 62d9332..c1338ab 100644
+index 62d9332..bb8b9f4 100644
 --- a/tests/modetest/modetest.c
 +++ b/tests/modetest/modetest.c
 @@ -54,6 +54,7 @@
@@ -125,7 +125,7 @@ index 62d9332..c1338ab 100644
 -	dev.fd = util_open(device, module);
 +	if (dump_only && !device)
 +		dev.fd = open("/dev/dri/card0", O_RDWR);
-+	if (dev.fd < 0)
++	else
 +		dev.fd = util_open(device, module);
  	if (dev.fd < 0)
  		return -1;
