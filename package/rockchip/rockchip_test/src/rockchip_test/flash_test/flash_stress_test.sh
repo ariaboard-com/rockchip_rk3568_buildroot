@@ -78,7 +78,7 @@ then
             else  
                 rand=$(random ${file_size[$i-1]} ${file_size[$i]})  
             fi  
-            dd if=/dev/zero of=$file_path/test.$i.$rand.bin bs=$rand count=1000  
+            dd if=/dev/random of=$file_path/test.$i.$rand.bin bs=$rand count=1000
         done  
         echo ===========  
     done  
