@@ -1,12 +1,12 @@
 #!/bin/bash
 
-DIR_DVFS=/rockchip_test/dvfs
+DIR_DVFS=/rockchip_test/cpu
 
 info_view()
 {
     echo "*****************************************************"
     echo "***                                               ***"
-    echo "***            DVFS TEST                          ***"
+    echo "***            CPU TEST                           ***"
     echo "***                                               ***"
     echo "*****************************************************"
 }
@@ -17,7 +17,7 @@ echo "cpu freq stress test:                               1"
 echo "cpu freq test:(with out stress test)                2"
 echo "*****************************************************"
 
-read -t 30 DVFS_CHOICE
+read -t 30 CPUFREQ_CHOICE
 
 cpu_freq_stress_test()
 {
@@ -30,7 +30,7 @@ cpu_freq_test()
 	sh ${DIR_DVFS}/auto_cpu_freq_test.sh 1 &
 }
 
-case ${DVFS_CHOICE} in
+case ${CPUFREQ_CHOICE} in
 	1)
 		cpu_freq_stress_test
 		;;
