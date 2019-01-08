@@ -1,4 +1,4 @@
-From 3c5bde0baa8eac9b710be6b354ef55080e1e8e5c Mon Sep 17 00:00:00 2001
+From 824f341baa2e3b5c540c199670ffe54b90d3c333 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 20 Nov 2018 14:51:36 +0800
 Subject: [PATCH] playbin3: Fix qt videoplayer cannot change video state
@@ -7,23 +7,23 @@ Change-Id: I765bbe0caebe333855bd16fdd0843e0257491246
 Signed-off-by: shine.liu <shine.liu@rock-chips.com>
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- gst/playback/gstplaybin3.c | 249 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 247 insertions(+), 2 deletions(-)
+ gst/playback/gstplaybin3.c | 251 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 247 insertions(+), 4 deletions(-)
 
 diff --git a/gst/playback/gstplaybin3.c b/gst/playback/gstplaybin3.c
-index 027766b..279e217 100644
+index 027766b..ed47120 100644
 --- a/gst/playback/gstplaybin3.c
 +++ b/gst/playback/gstplaybin3.c
 @@ -515,6 +515,16 @@ struct _GstPlayBin3Class
  
    /* get the last video sample and convert it to the given caps */
    GstSample *(*convert_sample) (GstPlayBin3 * playbin, GstCaps * caps);
-+  
++
 +  /* notify app that number of audio/video/text streams changed */
 +  void (*video_changed) (GstPlayBin3 * playbin);
 +  void (*audio_changed) (GstPlayBin3 * playbin);
 +  void (*text_changed) (GstPlayBin3 * playbin);
-+  
++
 +  /* get audio/video/text tags for a stream */
 +  GstTagList *(*get_video_tags) (GstPlayBin3 * playbin, gint stream);
 +  GstTagList *(*get_audio_tags) (GstPlayBin3 * playbin, gint stream);
@@ -67,7 +67,7 @@ index 027766b..279e217 100644
 +    gint stream);
 +static GstTagList *gst_play_bin3_get_text_tags (GstPlayBin3 * playbin,
 +    gint stream);
-+	
++
  static GstSample *gst_play_bin3_convert_sample (GstPlayBin3 * playbin,
      GstCaps * caps);
  
@@ -104,63 +104,60 @@ index 027766b..279e217 100644
 +          g_param_spec_int ("current-text", "Current Text",
 +              "Currently playing text stream (-1 = auto)",
 +              -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-+ 
++
    g_object_class_install_property (gobject_klass, PROP_SUBTITLE_ENCODING,
        g_param_spec_string ("subtitle-encoding", "subtitle encoding",
            "Encoding to assume if input subtitles are not in UTF-8 encoding. "
-@@ -1015,7 +1074,42 @@ gst_play_bin3_class_init (GstPlayBin3Class * klass)
-       g_signal_new ("element-setup", G_TYPE_FROM_CLASS (klass),
+@@ -1016,6 +1075,41 @@ gst_play_bin3_class_init (GstPlayBin3Class * klass)
        G_SIGNAL_RUN_LAST, 0, NULL, NULL,
        g_cclosure_marshal_generic, G_TYPE_NONE, 1, GST_TYPE_ELEMENT);
-+	  
+ 
 +  gst_play_bin3_signals[SIGNAL_VIDEO_CHANGED] =
 +      g_signal_new ("video-changed", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, video_changed), NULL, NULL,
 +      g_cclosure_marshal_generic, G_TYPE_NONE, 0, G_TYPE_NONE);
-+	  
++
 +  gst_play_bin3_signals[SIGNAL_AUDIO_CHANGED] =
 +      g_signal_new ("audio-changed", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, audio_changed), NULL, NULL,
 +      g_cclosure_marshal_generic, G_TYPE_NONE, 0, G_TYPE_NONE);
-+	  
++
 +  gst_play_bin3_signals[SIGNAL_TEXT_CHANGED] =
 +      g_signal_new ("text-changed", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, text_changed), NULL, NULL,
 +      g_cclosure_marshal_generic, G_TYPE_NONE, 0, G_TYPE_NONE);
- 
++
 +  gst_play_bin3_signals[SIGNAL_GET_VIDEO_TAGS] =
 +      g_signal_new ("get-video-tags", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, get_video_tags), NULL, NULL,
 +      g_cclosure_marshal_generic, GST_TYPE_TAG_LIST, 1, G_TYPE_INT);
-+	  
++
 +  gst_play_bin3_signals[SIGNAL_GET_AUDIO_TAGS] =
 +      g_signal_new ("get-audio-tags", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, get_audio_tags), NULL, NULL,
 +      g_cclosure_marshal_generic, GST_TYPE_TAG_LIST, 1, G_TYPE_INT);
-+	  
++
 +  gst_play_bin3_signals[SIGNAL_GET_TEXT_TAGS] =
 +      g_signal_new ("get-text-tags", G_TYPE_FROM_CLASS (klass),
 +      G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
 +      G_STRUCT_OFFSET (GstPlayBin3Class, get_text_tags), NULL, NULL,
-+      g_cclosure_marshal_generic, GST_TYPE_TAG_LIST, 1, G_TYPE_INT);	  
++      g_cclosure_marshal_generic, GST_TYPE_TAG_LIST, 1, G_TYPE_INT);
    /**
     * GstPlayBin3::convert-sample
     * @playbin: a #GstPlayBin3
-@@ -1036,7 +1130,11 @@ gst_play_bin3_class_init (GstPlayBin3Class * klass)
-       G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+@@ -1037,6 +1131,10 @@ gst_play_bin3_class_init (GstPlayBin3Class * klass)
        G_STRUCT_OFFSET (GstPlayBin3Class, convert_sample), NULL, NULL,
        g_cclosure_marshal_generic, GST_TYPE_SAMPLE, 1, GST_TYPE_CAPS);
--
-+	  
+ 
 +  klass->get_video_tags = gst_play_bin3_get_video_tags;
 +  klass->get_audio_tags = gst_play_bin3_get_audio_tags;
-+  klass->get_text_tags = gst_play_bin3_get_text_tags;	  
-+	  
++  klass->get_text_tags = gst_play_bin3_get_text_tags;
++
    klass->convert_sample = gst_play_bin3_convert_sample;
  
    gst_element_class_set_static_metadata (gstelement_klass,
@@ -305,7 +302,18 @@ index 027766b..279e217 100644
      case PROP_SUBTITLE_ENCODING:
        GST_PLAY_BIN3_LOCK (playbin);
        g_value_take_string (value,
-@@ -3006,6 +3224,8 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
+@@ -2515,9 +2733,7 @@ gst_play_bin3_handle_message (GstBin * bin, GstMessage * msg)
+       if (target_group)
+         gst_object_replace ((GstObject **) & target_group->collection,
+             (GstObject *) collection);
+-      /* FIXME: Only do the following if it's the current group? */
+-      if (target_group == playbin->curr_group)
+-        update_combiner_info (playbin, target_group->collection);
++      update_combiner_info (playbin, target_group->collection);
+       if (pstate)
+         playbin->do_stream_selections = FALSE;
+       do_stream_selection (playbin, target_group);
+@@ -3006,6 +3222,8 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
    gchar *pad_name;
    GstPlayBin3 *playbin = group->playbin;
  
@@ -314,7 +322,7 @@ index 027766b..279e217 100644
    GST_PLAY_BIN3_SHUTDOWN_LOCK (playbin, shutdown);
  
    pad_name = gst_object_get_name (GST_OBJECT (pad));
-@@ -3034,7 +3254,8 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
+@@ -3034,7 +3252,8 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
  
    combine = &playbin->combiner[pb_stream_type];
  
@@ -324,7 +332,7 @@ index 027766b..279e217 100644
  
    control_source_pad (group, pad, combine->stream_type);
  
-@@ -3049,6 +3270,30 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
+@@ -3049,6 +3268,30 @@ pad_added_cb (GstElement * uridecodebin, GstPad * pad, GstSourceGroup * group)
  
    GST_PLAY_BIN3_SHUTDOWN_UNLOCK (playbin);
  
@@ -350,8 +358,8 @@ index 027766b..279e217 100644
 +    if (signal >= 0) {
 +      g_signal_emit (G_OBJECT (playbin), gst_play_bin3_signals[signal], 0, NULL);
 +    }
-+  } 
-+  
++  }
++
    return;
  
    /* ERRORS */
