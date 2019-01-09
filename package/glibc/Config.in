@@ -6,4 +6,13 @@ config BR2_PACKAGE_GLIBC
 	select BR2_PACKAGE_LINUX_HEADERS
 	select BR2_TOOLCHAIN_HAS_SSP
 
+if BR2_PACKAGE_GLIBC
+
+config BR2_PACKAGE_GLIBC_2_22
+	bool "glibc 2.22"
+	# No support for pthread barriers on < v9 ISA
+	depends on !BR2_sparc
+
+endif
+
 endif

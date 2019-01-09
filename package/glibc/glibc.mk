@@ -8,6 +8,12 @@ ifeq ($(BR2_arc),y)
 GLIBC_VERSION =  arc-2017.09-release
 GLIBC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,glibc,$(GLIBC_VERSION))
 else
+ifeq ($(BR2_PACKAGE_GLIBC_2_22),y)
+GLIBC_VERSION = 2.22
+GLIBC_SITE = $(BR2_GNU_MIRROR)/libc
+GLIBC_SOURCE = glibc-$(GLIBC_VERSION).tar.xz
+GLIBC_SRC_SUBDIR = .
+else
 # Generate version string using:
 #   git describe --match 'glibc-*' --abbrev=40 origin/release/MAJOR.MINOR/master
 GLIBC_VERSION = glibc-2.26-146-gd300041c533a3d837c9f37a099bcc95466860e98
@@ -18,6 +24,7 @@ GLIBC_VERSION = glibc-2.26-146-gd300041c533a3d837c9f37a099bcc95466860e98
 # *NEVER* decide on a version string by looking at the mirror.
 # Then check that the mirror has been synced already (happens once a day.)
 GLIBC_SITE = $(call github,bminor,glibc,$(GLIBC_VERSION))
+endif
 endif
 
 GLIBC_SRC_SUBDIR = .
