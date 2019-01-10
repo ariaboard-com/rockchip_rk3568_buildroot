@@ -1,4 +1,5 @@
 config BR2_PACKAGE_UPDATEENGINE
 	bool "Rockchip updateEngine for linux"
+	select BR2_PACKAGE_LIBCURL
 	help
 	  Rockchip updateEngine for linux.

@@ -24,12 +24,19 @@ UPDATEENGINE_MAKE_OPTS = \
         CFLAGS="$(TARGET_CFLAGS) $(UPDATEENGINE_BUILD_OPTS)" \
         PROJECT_DIR="$(@D)"
 
+define UPDATEENGINE_INSTALL_STAGING_CMDS
+    $(INSTALL) -D -m 0755 $(@D)/libupdateengine.so $(STAGING_DIR)/usr/lib/
+    mkdir -p $(STAGING_DIR)/usr/include/libupdateengine/
+    $(INSTALL) -D -m 0644 $(@D)/update.h $(STAGING_DIR)/usr/include/libupdateengine/
+endef
+
 define UPDATEENGINE_BUILD_CMDS
     $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) CXX="$(TARGET_CXX)" $(UPDATEENGINE_MAKE_OPTS)
 endef
 
 define UPDATEENGINE_INSTALL_TARGET_CMDS
-        $(INSTALL) -D -m 755 $(@D)/update_engine $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 755 $(@D)/libupdateengine.so $(TARGET_DIR)/usr/lib/
+    $(INSTALL) -D -m 755 $(@D)/rkboot_control $(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(generic-package))
