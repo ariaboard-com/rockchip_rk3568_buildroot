@@ -5,88 +5,6 @@ if [ -z "${BASH_SOURCE}" ];then
 	bash -c $0
 fi
 
-DEFCONFIG_ARRAY=(
-"rockchip_rk3308_release" \
-"rockchip_rk3308_32_release" \
-"rockchip_rk3308_32_debug" \
-"rockchip_rk3308_32_dueros" \
-"rockchip_rk3308_64_dueros" \
-"rockchip_rk3308_mini_release" \
-"rockchip_rk3308_32_mini_release" \
-"rockchip_rk3308_robot32" \
-"rockchip_rk3308_robot64" \
-"rockchip_rk3308_pcba" \
-"rockchip_rk3308_recovery" \
-"rockchip_rk3326_32" \
-"rockchip_rk3326_64" \
-"rockchip_rk3326_recovery" \
-"rockchip_rk3326_robot32" \
-"rockchip_rk3326_robot64" \
-"rockchip_rk3399" \
-"rockchip_rk3399_recovery" \
-"rockchip_rk3288" \
-"rockchip_rk3288_recovery" \
-"rockchip_px30_32" \
-"rockchip_px30_64" \
-"rockchip_px30_robot32" \
-"rockchip_px30_robot64" \
-"rockchip_px30_recovery" \
-"rockchip_px3se" \
-"rockchip_px3se_recovery" \
-"rockchip_rk3328" \
-"rockchip_rk3328_recovery" \
-"rockchip_rk1808" \
-"rockchip_rk1808_recovery" \
-"rockchip_rk3399pro-npu" \
-"rockchip_rk3308_b_release" \
-"rockchip_rk3308_b_32_release" \
-"rockchip_rk3308_gk_32_release" \
-)
-
-DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
-
-i=0
-while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-do
-	let ++i
-done
-
-function choose_info()
-{
-	echo
-	echo "You're building on Linux"
-	echo "Lunch menu...pick a combo:"
-	echo ""
-	i=0
-	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-	do
-		if [ $i -lt 100 ]; then
-			echo "$((${i}+1)). ${DEFCONFIG_ARRAY[$i]}"
-		else
-			echo "$((${i}+1)). ${DEFCONFIG_ARRAY[$i]}_release"
-		fi
-		let ++i
-	done
-	echo
-}
-
-function get_index() {
-	if [ $# -eq 0 ]; then
-		return 0
-	fi
-
-	i=0
-	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-	do
-		if [ $1 = "${DEFCONFIG_ARRAY[$i]}_release" ]; then
-			let ++i
-			return ${i}
-		fi
-		let ++i
-	done
-	return 0
-}
-
 function get_target_board_type() {
 	TARGET=$1
 	RESULT="$(echo $TARGET | cut -d '_' -f 2)"
@@ -130,10 +48,21 @@ function get_target_build_type() {
 
 function choose_type()
 {
-	choose_info
-	local DEFAULT_NUM DEFAULT_VALUE
+	echo
+	echo "You're building on Linux"
+	echo "Lunch menu...pick a combo:"
+	echo ""
+
+	i=0
+	for conf in ${DEFCONFIG_ARRAY[@]}
+	do
+		let ++i
+		echo "$i. $conf"
+	done
+	echo
+
+	local DEFAULT_NUM
 	DEFAULT_NUM=1
-	DEFAULT_VALUE="rockchip_rk3308_release"
 
 	export TARGET_BUILD_TYPE=
 	local ANSWER
@@ -208,12 +137,6 @@ function lunch()
 	fi
 }
 
-function function_stuff()
-{
-	choose_type $@
-	lunch
-}
-
 if [ "${BASH_SOURCE}" == "$0" ];then
 	echo This script is executed directly...
 	bash -c "source ${BASH_SOURCE}; bash"
@@ -229,5 +152,12 @@ else
 	# Set croot alias
 	alias croot="cd ${TOP_DIR}"
 
-	function_stuff $@
+	DEFCONFIG_ARRAY=(
+	$(cd ${BUILDROOT_DIR}/configs/; ls -v rockchip_* | sed "s/_defconfig$//")
+	)
+
+	DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
+
+	choose_type $@
+	lunch
 fi
