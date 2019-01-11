@@ -3,6 +3,8 @@
 # Uncomment below to see more logs
 # set -x
 
+MISC_DEV=/dev/block/by-name/misc
+
 check_tool()
 {
 	TOOL=$1
@@ -14,71 +16,102 @@ check_tool()
 	return 1
 }
 
-resize_e2fs()
+format_part()
 {
-	DEV=$1
-	MOUNT_POINT=$2
-	PART_NAME=$3
+	echo "Formatting $DEV($FSTYPE)"
 
-	check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return
-	LABEL=$(dumpe2fs -h $DEV | grep "volume name:" | grep -o "[^ ]*$")
-	[ $? -eq 0 ] || { echo "Wrong fs type!"; return; }
+	case $FSGROUP in
+		ext2)
+			# Set max-mount-counts to 0, and disable the time-dependent checking.
+			check_tool mke2fs BR2_PACKAGE_E2FSPROGS && \
+			mke2fs -F -L $PART_NAME $DEV && \
+			tune2fs -c 0 -i 0 $DEV
+			;;
+		vfat)
+			# Use fat32 by default
+			check_tool mkfs.vfat BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT && \
+			mkfs.vfat -I -F 32 -n $PART_NAME $DEV
+			;;
+		ntfs)
+			# Enable compression
+			check_tool mkntfs BR2_PACKAGE_NTFS_3G_NTFSPROGS && \
+			mkntfs -FCQ -L $PART_NAME $DEV
+			;;
+		*)
+			echo Unsupported file system $FSTYPE for $DEV
+			false
+			;;
+	esac
+}
+
+need_resize()
+{
+	case $FSGROUP in
+		ext2)
+			check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return 1
+			LABEL=$(dumpe2fs -h $DEV | grep "name:")
+			;;
+		vfat)
+			check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return 1
+			LABEL=$(fatlabel $DEV)
+			;;
+		ntfs)
+			check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
+			LABEL=$(ntfslabel $DEV)
+			;;
+		*)
+			echo Unsupported file system $FSTYPE for $DEV
+			return 1
+			;;
+	esac
+
+	if [ $? -ne 0 ]; then
+		echo "Wrong fs type($FSTYPE) for $DEV"
+		return 1
+	fi
 
 	# Use volume label to mark resized
-	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
+	[ "$(echo $LABEL|xargs -n 1|tail -1)" != "$PART_NAME" ]
+}
 
-	check_tool e2fsck BR2_PACKAGE_E2FSPROGS_FSCK || return
-	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
-
-	# Do an initial fsck as resize2fs required.
-	if ! mountpoint -q $MOUNT_POINT;then
-		if ! e2fsck -fy $DEV;then
-			echo "Error detected"
-			e2fsck -y $DEV
-		fi
-		[ $? -eq 0 ] || { echo "Fatal error(cannot recover)!"; return; }
-	fi
-
-	# Force using online resize, see:
-	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
+format_resize()
+{
 	TEMP=$(mktemp -d)
-	mount $DEV $TEMP || return
-	resize2fs $DEV
+	$MOUNT $DEV $TEMP || return 1
 
-	# The online resize is unavailable when kernel disabled ext4.
-	# So let's fallback to format it.
-	if [ $? -ne 0 -a $MOUNT_POINT != "/" ];then
-		echo "Unable to resize $DEV, formatting it..."
-
-		# Backup original data
-		tar cf /tmp/${PART_NAME}.tar $TEMP
+	USED_SIZE=$(df $TEMP|tail -1|awk '{ print $3 }')
+	TEMP_SIZE=$(df /tmp/|tail -1|awk '{ print $4 }')
+	if [ $USED_SIZE -gt $(($TEMP_SIZE - 4096)) ]; then
 		umount $TEMP
-
-		mke2fs $DEV
-		tune2fs -c 2 -i 0 $DEV
-
-		# Restore backup data
-		mount $DEV $TEMP
-		tar xf /tmp/${PART_NAME}.tar -C /
-		rm /tmp/${PART_NAME}.tar
+		return 1
 	fi
 
+	echo "Format-resizing $DEV($FSTYPE)"
+
+	TARBALL=/tmp/${PART_NAME}.tar
+
+	# Backup original data
+	tar cf $TARBALL $TEMP
 	umount $TEMP
 
-	# Use volume label to mark resized
-	tune2fs $DEV -L $PART_NAME
+	format_part || { rm $TARBALL; return 1; }
+
+	# Restore backup data
+	$MOUNT $DEV $TEMP
+	tar xf $TARBALL -C /
+	rm $TARBALL
+
+	umount $TEMP
 }
 
 resize_fatresize()
 {
-	DEV=$1
-	SIZE=$(($2 * 1024))
-	MAX_SIZE=$3
-
 	check_tool fatresize BR2_PACKAGE_FATRESIZE || return 1
 
+	SIZE=$(fatresize -i $DEV | grep "Size:" | grep -o "[0-9]*$")
+
 	# Somehow fatresize only works for 256M+ fat
-	[ ! $SIZE -gt $((256 * 1024 * 1024)) ] && return 1
+	[ $SIZE -gt $((256 * 1024 * 1024)) ] && return 1
 
 	MIN_SIZE=$(($MAX_SIZE - 16 * 1024 * 1024))
 	[ $MIN_SIZE -lt $SIZE ] && return 0 # Large enough!
@@ -87,82 +120,75 @@ resize_fatresize()
 		MAX_SIZE=$(($MAX_SIZE - 512 * 1024))
 
 		# Try to resize with fatresize, not always work
-		fatresize -s ${MAX_SIZE} $DEV && return 0
+		fatresize -s ${MAX_SIZE} $DEV && return
 	done
 
 	return 1
 }
 
-resize_fat()
+resize_part()
 {
-	DEV=$1
-	PART_NAME=$3
-	MAX_SIZE=$4
+	need_resize || return
 
-	check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABEL || return
-	LABEL=$(fatlabel $DEV)
-	[ $? -eq 0 ] || { echo "Wrong fs type"; return; }
-
-	# Use volume label to mark resized
-	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
+	echo "Resizing $DEV($FSTYPE)"
 
 	# Prefer to format it when possible
-	TEMP=$(mktemp -d)
-	mount $DEV $TEMP || return
-
-	SIZE=$(df $TEMP|tail -1|awk '{ print $2 }')
-	USED_SIZE=$(df $TEMP|tail -1|awk '{ print $3 }')
-	TEMP_SIZE=$(df /tmp/|tail -1|awk '{ print $4 }')
-	if [ $USED_SIZE -lt $TEMP_SIZE ]; then
-		echo "Formatting it..."
-
-		# Backup original data
-		tar cf /tmp/${PART_NAME}.tar $TEMP
-		umount $TEMP
-
-		mkfs.vfat -F 32 $DEV && FORMATTED=true
-
-		# Restore backup data
-		mount $DEV $TEMP
-		tar xf /tmp/${PART_NAME}.tar -C /
-		rm /tmp/${PART_NAME}.tar
+	if [ ! "$IS_ROOTDEV" ]; then
+		format_resize && return
 	fi
 
-	umount $TEMP
+	case $FSGROUP in
+		ext2)
+			check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
 
-	# Try fatresize (might not work though)
-	if [ -z "$FORMATTED" ]; then
-		resize_fatresize $DEV $SIZE $MAX_SIZE && FORMATTED=true
-	fi
-
-	# Use volume label to mark resized
-	if [ -n "$FORMATTED" ]; then
-		fatlabel $DEV $PART_NAME
-	else
-		echo "Resize failed"
-	fi
+			# Force using online resize, see:
+			# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
+			TEMP=$(mktemp -d)
+			$MOUNT $DEV $TEMP || return
+			resize2fs $DEV && tune2fs $DEV -L $PART_NAME
+			umount $TEMP
+			;;
+		vfat)
+			check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return 1
+			resize_fatresize && fatlabel $DEV $PART_NAME
+			;;
+		ntfs)
+			check_tool ntfsresize BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
+			echo y | ntfsresize -f $DEV && ntfslabel $DEV $PART_NAME
+			;;
+		*)
+			echo Unsupported file system $FSTYPE for $DEV
+			;;
+	esac
 }
 
-resize_ntfs()
+done_oem_command()
 {
-	DEV=$1
-	PART_NAME=$3
-	MAX_SIZE=$4
+	echo "OEM: Done with $cmd"
+	COUNT=$(echo $cmd|wc -c)
+	OFFSETS=$(strings -t d $MISC_DEV | grep -w "$cmd" | awk '{ print $1 }')
 
-	check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
-	LABEL=$(ntfslabel $DEV)
-	[ $? -eq 0 ] || { echo "Wrong fs type"; return; }
-
-	# Use volume label to mark resized
-	echo "$LABEL" |grep -wq "$PART_NAME" && { echo "Already resized"; return; }
-
-	echo y | ntfsresize -f $DEV || { echo "Resize failed"; return; }
-
-	# Use volume label to mark resized
-	ntfslabel $DEV $PART_NAME
+	for offset in $OFFSETS; do
+		dd if=/dev/zero of=$MISC_DEV bs=1 count=$COUNT seek=$offset 2>/dev/null
+	done
 }
 
-do_resize()
+handle_oem_command()
+{
+	[ "$IS_ROOTDEV" ] && return
+	[ "$OEM_CMD" ] || return
+
+	for cmd in $OEM_CMD; do
+		case $cmd in
+			cmd_wipe_$PART_NAME)
+				echo "OEM: $cmd - Wiping $DEV"
+				format_part && done_oem_command $cmd
+				;;
+		esac
+	done
+}
+
+do_part()
 {
 	# Not enough args
 	[ $# -lt 3 ] && return
@@ -173,9 +199,10 @@ do_resize()
 	DEV=$1
 	MOUNT_POINT=$2
 	FSTYPE=$3
+	IS_ROOTDEV=$(echo $MOUNT_POINT | grep -w '/')
 
 	# Find real dev for root dev
-	if [ "$MOUNT_POINT" = '/' ];then
+	if [ "$IS_ROOTDEV" ];then
 		DEV=$(mountpoint -n /|cut -d ' ' -f 1)
 	fi
 
@@ -188,116 +215,114 @@ do_resize()
 	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
 	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
 
-	echo Resizing $DEV $MOUNT_POINT $FSTYPE...
+	echo "Handling $DEV $MOUNT_POINT $FSTYPE"
 
+	# Skip mounted partitions
+	if [ ! "$IS_ROOTDEV" ] && mountpoint -q $MOUNT_POINT; then
+		echo "Already mounted $DEV($MOUNT_POINT)"
+		return
+	fi
+
+	MOUNT="mount -t $FSTYPE"
 	case $FSTYPE in
 		ext[234])
-			check_tool fsck.ext4 BR2_PACKAGE_E2FSPROGS_FSCK
-			resize_e2fs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
-			return
+			FSGROUP=ext2
+			check_tool fsck.$FSGROUP BR2_PACKAGE_E2FSPROGS_FSCK || return
 			;;
 		msdos|fat|vfat)
-			check_tool fsck.fat BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT
-			resize_fat $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
-			return
+			FSGROUP=vfat
+			check_tool fsck.$FSGROUP BR2_PACKAGE_DOSFSTOOLS_FSCK_FAT || return
 			;;
 		ntfs)
-			check_tool fsck.ntfs BR2_PACKAGE_NTFS_3G_NTFSPROGS
-			resize_ntfs $DEV $MOUNT_POINT $PART_NAME $MAX_SIZE
-			return
+			FSGROUP=ntfs
+			MOUNT=ntfs-3g
+			check_tool fsck.$FSGROUP BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
 			;;
+		*)
+			echo "Unsupported file system $FSTYPE for $DEV"
+			return
 	esac
 
-	# Unsupported file system
-}
+	# Handle OEM commands for current partition
+	handle_oem_command
 
-resizeall()
-{
-	echo "Will now resize all file systems"
-	while read LINE;do
-		do_resize $LINE
-	done < /etc/fstab
-}
+	resize_part
 
-checkall()
-{
-	grep -wq "force_fsck" /proc/cmdline && FORCE_FSCK="-f"
-	grep -wq "no_force_fsck" /proc/cmdline && unset FORCE_FSCK
+	# Done with rootdev
+	[ "$IS_ROOTDEV" ] && return
 
-	# Uncomment below to enable force fsck
-	# FORCE_FSCK="-f"
-
-	if [ "$1" ];then
-		FSCKTYPES_OPT="-t $1"
-		echo "Will now check all file systems of types $1"
-	else
-		echo "Will now check all file systems"
+	if [ ! "$SKIP_FSCK" ]; then
+		echo "Checking $DEV($FSTYPE)"
+		fsck.$FSGROUP -y $DEV
 	fi
 
-	SKIP_FSCK="/var/.skip_fsck"
+	echo "Mounting $DEV($FSTYPE)"
+	$MOUNT $DEV $MOUNT_POINT && return
+	[ "$AUTO_MKFS" ] || return
+
+	echo "Failed to mount $DEV, try to format it"
+	format_part && $MOUNT $DEV $MOUNT_POINT
+}
+
+prepare_mount()
+{
+	OEM_CMD=$(strings $MISC_DEV | grep "^cmd_" | xargs)
+	[ "$OEM_CMD" ] && echo "Note: Fount OEM commands - $OEM_CMD"
+
+	AUTO_MKFS="/.auto_mkfs"
+	if [ -f $AUTO_MKFS ];then
+		echo "Note: Will auto format partitons, remove $AUTO_MKFS to disable"
+	else
+		unset AUTO_MKFS
+	fi
+
+	SKIP_FSCK="/.skip_fsck"
 	if [ -f $SKIP_FSCK ];then
-		echo "Skipped, remove $SKIP_FSCK to enable it again"
-		return
+		echo "Note: Will skip fsck, remove $SKIP_FSCK to enable"
 	else
-		echo "Create $SKIP_FSCK to skip the check"
-		echo "This might take awhile if it didn't shutdown properly!"
+		echo "Note: Create $SKIP_FSCK to skip fsck"
+		echo " - The check might take a while if didn't shutdown properly!"
+		unset SKIP_FSCK
 	fi
-
-	fsck -ARy $FORCE_FSCK $FSCKTYPES_OPT
 }
 
 mountall()
 {
-	if [ "$1" ];then
-		MOUNTTYPES_OPT="-t $1"
-		echo "Will now mount all file systems of types $1"
-	else
-		echo "Will now mount all file systems"
-	fi
-	mount -a $MOUNTTYPES_OPT
-}
-
-is_recovery()
-{
 	# Recovery's rootfs is ramfs
-	mountpoint -d /|grep -wq 0:1
+	if mountpoint -d /|grep -wq 0:1; then
+		echo "Only mount basic file systems for recovery"
+		return
+	fi
+
+	echo "Will now mount all partitions in /etc/fstab"
+
+	prepare_mount
+	while read LINE;do
+		do_part $LINE
+	done < /etc/fstab
 }
 
 case "$1" in
-  start|"")
-	RESIZE_LOG=/tmp/resizefs.log
-	CHECK_LOG=/tmp/checkfs.log
-	MOUNT_LOG=/tmp/mountfs.log
+	start|"")
+		# Mount basic file systems firstly
+		mount -a -t "proc,devpts,tmpfs,sysfs,debugfs,pstore"
 
-	SYS_BASE_FSTYPES="proc,devpts,tmpfs,sysfs,debugfs,pstore"
+		LOGFILE=/tmp/mountall.log
 
-	# Mount /tmp firstly to save logs
-	mountpoint -q /tmp || mount -t tmpfs tmpfs /tmp
-
-	if is_recovery;then
-		# Only mount basic file systems for recovery
-		mountall $SYS_BASE_FSTYPES 2>&1 | tee $MOUNT_LOG
-		echo Log saved to $MOUNT_LOG
-	else
-		resizeall 2>&1 | tee $RESIZE_LOG
-		echo Log saved to $RESIZE_LOG
-		checkall 2>&1 | tee $CHECK_LOG
-		echo Log saved to $CHECK_LOG
-		mountall 2>&1 | tee $MOUNT_LOG
-		echo Log saved to $MOUNT_LOG
-	fi
-	;;
-  restart|reload|force-reload)
-	echo "Error: argument '$1' not supported" >&2
-	exit 3
-	;;
-  stop|status)
-	# No-op
-	;;
-  *)
-	echo "Usage: [start|stop]" >&2
-	exit 3
-	;;
+		mountall 2>&1 |tee $LOGFILE
+		echo "Log saved to $LOGFILE"
+		;;
+	restart|reload|force-reload)
+		echo "Error: argument '$1' not supported" >&2
+		exit 3
+		;;
+	stop|status)
+		# No-op
+		;;
+	*)
+		echo "Usage: [start|stop]" >&2
+		exit 3
+		;;
 esac
 
 :
