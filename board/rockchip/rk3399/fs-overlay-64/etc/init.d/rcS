@@ -26,3 +26,4 @@ for i in /etc/init.d/S??* ;do
 done
 
 alsactl restore 0 -f /var/lib/alsa/asound.state
+/usr/bin/enable_bt
