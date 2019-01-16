@@ -13,13 +13,19 @@ RETROARCH_CONF_OPTS += --disable-oss
 RETROARCH_CONF_OPTS += --disable-python
 RETROARCH_CONF_OPTS += --disable-pulse
 RETROARCH_CONF_OPTS += --disable-cheevos
-RETROARCH_CONF_OPTS += --disable-rgui
-RETROARCH_CONF_OPTS += --disable-networking
 RETROARCH_CONF_OPTS += --disable-freetype
 RETROARCH_CONF_OPTS += --disable-7zip
 RETROARCH_CONF_OPTS += --disable-builtinflac
 RETROARCH_CONF_OPTS += --disable-ssl
 RETROARCH_CONF_OPTS += --disable-libxml2
+
+ifeq ($(BR2_PACKAGE_RETROARCH_RGUI),)
+	RETROARCH_CONF_OPTS += --disable-rgui
+endif
+
+ifeq ($(BR2_PACKAGE_RETROARCH_NETWORKING),)
+	RETROARCH_CONF_OPTS += --disable-networking
+endif
 
 ifeq ($(BR2_PACKAGE_RETROARCH_HID),)
 	RETROARCH_CONF_OPTS += --disable-hid --disable-libusb

@@ -7,6 +7,18 @@ config BR2_PACKAGE_RETROARCH
 
 if BR2_PACKAGE_RETROARCH
 
+config BR2_PACKAGE_RETROARCH_RGUI
+	bool "retroarch rgui"
+	default y
+	help
+	  Support rgui menu.
+
+config BR2_PACKAGE_RETROARCH_NETWORKING
+	bool "retroarch networking"
+	default y
+	help
+	  Support networking.
+
 config BR2_PACKAGE_RETROARCH_HID
 	bool "retroarch hid"
 	default y
