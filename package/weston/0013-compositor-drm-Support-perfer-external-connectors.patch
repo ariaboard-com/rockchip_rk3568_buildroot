@@ -1,0 +1,192 @@
+From b8712d01f48e2475e83bcf1af91f73d24d213d6c Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 28 Jan 2019 18:22:18 +0800
+Subject: [PATCH] compositor-drm: Support perfer external connectors
+
+Env "WESTON_DRM_PREFER_EXTERNAL_DUAL":
+    Perfer using external connectors.
+
+Env "WESTON_DRM_PREFER_EXTERNAL":
+    Perfer using external connectors, and disable internal connector
+    when any external connector connected.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 103 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 98 insertions(+), 5 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 90b19de..57efcc3 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -2956,11 +2956,69 @@ destroy_sprites(struct drm_backend *backend)
+ 	}
+ }
+ 
++static inline bool
++connector_is_external(int type)
++{
++	switch (type) {
++		case DRM_MODE_CONNECTOR_LVDS:
++		case DRM_MODE_CONNECTOR_eDP:
++#ifdef DRM_MODE_CONNECTOR_DSI
++		case DRM_MODE_CONNECTOR_DSI:
++#endif
++			return false;
++		default:
++			return true;
++	}
++};
++
++typedef bool (*connector_match_t) (struct drm_backend *b, drmModeConnector *connector);
++
++static bool
++connector_match_all(struct drm_backend *b, drmModeConnector *connector)
++{ return true; }
++
++static bool
++connector_match_external(struct drm_backend *b, drmModeConnector *connector)
++{
++	return connector_is_external(connector->connector_type);
++}
++
++static bool
++connector_match_internal(struct drm_backend *b, drmModeConnector *connector)
++{
++	return !connector_is_external(connector->connector_type);
++}
++
++static bool
++connector_match_fallback(struct drm_backend *b, drmModeConnector *connector)
++{
++	return (wl_list_empty(&b->compositor->output_list) &&
++		wl_list_empty(&b->compositor->pending_output_list));
++}
++
++static connector_match_t connector_matches_default[] = {
++	connector_match_all,
++	NULL,
++};
++
++static connector_match_t connector_matches_external_dual[] = {
++	connector_match_external,
++	connector_match_internal,
++	NULL,
++};
++
++static connector_match_t connector_matches_external[] = {
++	connector_match_external,
++	connector_match_fallback,
++	NULL,
++};
++
+ static int
+ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ {
+ 	drmModeConnector *connector;
+ 	drmModeRes *resources;
++	connector_match_t *matches;
+ 	int i;
+ 
+ 	resources = drmModeGetResources(b->drm.fd);
+@@ -2974,6 +3032,14 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 	b->min_height = resources->min_height;
+ 	b->max_height = resources->max_height;
+ 
++	if (getenv("WESTON_DRM_PREFER_EXTERNAL_DUAL"))
++		matches = connector_matches_external_dual;
++	else if (getenv("WESTON_DRM_PREFER_EXTERNAL"))
++		matches = connector_matches_external;
++	else
++		matches = connector_matches_default;
++
++next_match:
+ 	for (i = 0; i < resources->count_connectors; i++) {
+ 		connector = drmModeGetConnector(b->drm.fd,
+ 						resources->connectors[i]);
+@@ -2982,7 +3048,8 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 
+ 		if (connector->connection == DRM_MODE_CONNECTED &&
+ 		    (b->connector == 0 ||
+-		     connector->connector_id == b->connector)) {
++		     connector->connector_id == b->connector) &&
++		    (*matches)(b, connector)) {
+ 			if (create_output_for_connector(b, resources,
+ 							connector, drm_device) < 0)
+ 				continue;
+@@ -2991,6 +3058,9 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 		}
+ 	}
+ 
++	if (*(++matches))
++		goto next_match;
++
+ 	if (wl_list_empty(&b->compositor->output_list) &&
+ 	    wl_list_empty(&b->compositor->pending_output_list))
+ 		weston_log("No currently active connector found.\n");
+@@ -3001,6 +3071,29 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ }
+ 
+ static void
++destroy_outputs(struct drm_backend *b, struct udev_device *drm_device)
++{
++	drmModeRes *resources;
++	struct drm_output *output, *next;
++
++	resources = drmModeGetResources(b->drm.fd);
++	if (!resources) {
++		weston_log("drmModeGetResources failed\n");
++		return;
++	}
++
++	wl_list_for_each_safe(output, next, &b->compositor->output_list,
++			      base.link)
++		drm_output_destroy(&output->base);
++
++	wl_list_for_each_safe(output, next, &b->compositor->pending_output_list,
++			      base.link)
++		drm_output_destroy(&output->base);
++
++	drmModeFreeResources(resources);
++}
++
++static void
+ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ {
+ 	drmModeConnector *connector;
+@@ -3046,8 +3139,6 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 			continue;
+ 		}
+ 
+-		create_output_for_connector(b, resources,
+-					    connector, drm_device);
+ 		weston_log("connector %d connected\n", connector_id);
+ 	}
+ 
+@@ -3066,7 +3157,6 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 			continue;
+ 
+ 		weston_log("connector %d disconnected\n", output->connector_id);
+-		drm_output_destroy(&output->base);
+ 	}
+ 
+ 	wl_list_for_each_safe(output, next, &b->compositor->pending_output_list,
+@@ -3084,11 +3174,14 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 			continue;
+ 
+ 		weston_log("connector %d disconnected\n", output->connector_id);
+-		drm_output_destroy(&output->base);
+ 	}
+ 
+ 	free(connected);
+ 	drmModeFreeResources(resources);
++
++	// Re-create outputs
++	destroy_outputs(b, drm_device);
++	create_outputs(b, drm_device);
+ }
+ 
+ static int
+-- 
+2.11.0
+
