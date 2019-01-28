@@ -6,44 +6,7 @@ if [ -z "${BASH_SOURCE}" ];then
 fi
 
 function get_target_board_type() {
-	TARGET=$1
-	RESULT="$(echo $TARGET | cut -d '_' -f 2)"
-	echo "$RESULT"
-}
-
-function get_build_config() {
-	TARGET=$1
-	RESULT1="$(echo $TARGET | cut -d '_' -f 3)"
-	RESULT2="$(echo $TARGET | cut -d '_' -f 4)"
-	if [[ $RESULT1 = "debug" ]]; then
-		echo "${DEFCONFIG_ARRAY[$index]}"
-	elif [[ $RESULT1 = "release" ]]; then
-		echo "${DEFCONFIG_ARRAY[$index]}"
-	elif [[ $RESULT2 = "debug" ]]; then
-		echo "${DEFCONFIG_ARRAY[$index]}"
-	elif [[ $RESULT2 = "release" ]]; then
-		echo "${DEFCONFIG_ARRAY[$index]}"
-	else
-		echo "${DEFCONFIG_ARRAY[$index]}"
-	fi
-}
-
-function get_defconfig_name() {
-	echo $TARGET_DIR_NAME
-}
-
-# Checking the file "buildroot/configs/*_defconfig"
-# If it contian of "_32_","_32","32_", and return build_type is 32 bit
-# Else return 64 bit
-function get_target_build_type() {
-	TARGET=$1
-
-	TARGET=${TARGET}_defconfig
-	if [ "${TARGET#*_32_}" == "${TARGET}"  -a "${TARGET#*32_}" == "${TARGET}" -a "${TARGET#*_32}" == "${TARGET}" ]; then
-		echo "64"
-	else
-		echo "32"
-	fi
+	echo $1 | cut -d '_' -f 2
 }
 
 function choose_type()
@@ -53,20 +16,14 @@ function choose_type()
 	echo "Lunch menu...pick a combo:"
 	echo ""
 
-	i=0
-	for conf in ${DEFCONFIG_ARRAY[@]}
-	do
-		let ++i
-		echo "$i. $conf"
-	done
-	echo
+	echo ${DEFCONFIG_ARRAY[@]} | xargs -n 1 | sed "=" | sed "N;s/\n/. /"
 
 	local DEFAULT_NUM
 	DEFAULT_NUM=1
 
-	export TARGET_BUILD_TYPE=
+	unset TARGET_BUILD_CONFIG
 	local ANSWER
-	while [ -z $TARGET_BUILD_TYPE ]
+	while [ -z "$TARGET_BUILD_CONFIG" ]
 	do
 		echo -n "Which would you like? ["$DEFAULT_NUM"] "
 		if [ -z "$1" ]; then
@@ -80,13 +37,10 @@ function choose_type()
 			ANSWER="$DEFAULT_NUM"
 		fi
 
-		if [ -n "`echo $ANSWER | sed -n '/^[0-9][0-9]*$/p'`" ]; then
-			if [ $ANSWER -le $DEFCONFIG_ARRAY_LEN ] && [ $ANSWER -gt 0 ]; then
+		if ! echo $ANSWER | grep -q [^0-9]; then
+			if [ $ANSWER -le $DEFCONFIG_ARRAY_LEN ]; then
 				index=$((${ANSWER}-1))
-				TARGET_BUILD_CONFIG=`get_build_config ${DEFCONFIG_ARRAY[$index]}`
-				TARGET_DIR_NAME="${DEFCONFIG_ARRAY[$index]}"
-				TARGET_BUILD_TYPE=`get_target_build_type ${DEFCONFIG_ARRAY[$index]}`
-				TARGET_BOARD_TYPE=`get_target_board_type ${DEFCONFIG_ARRAY[$index]}`
+				TARGET_BUILD_CONFIG="${DEFCONFIG_ARRAY[$index]}"
 			else
 				echo
 				echo "number not in range. Please try again."
@@ -95,14 +49,14 @@ function choose_type()
 		else
 			echo $ANSWER
 			TARGET_BUILD_CONFIG="$ANSWER"
-			TARGET_DIR_NAME="$ANSWER"
-			TARGET_BUILD_TYPE=`get_target_build_type $ANSWER`
-			TARGET_BOARD_TYPE=`get_target_board_type $ANSWER`
 		fi
+
 		if [ -n "$1" ]; then
 			break
 		fi
 	done
+
+	TARGET_DIR_NAME="$TARGET_BUILD_CONFIG"
 	export TARGET_OUTPUT_DIR="$BUILDROOT_OUTPUT_DIR/$TARGET_DIR_NAME"
 }
 
@@ -115,8 +69,7 @@ function lunch()
 
 	echo "==========================================="
 	echo
-	echo "#TARGET_BOARD=${TARGET_BOARD_TYPE}"
-	echo "#BUILD_TYPE=${TARGET_BUILD_TYPE}"
+	echo "#TARGET_BOARD=`get_target_board_type $TARGET_BUILD_CONFIG`"
 	echo "#OUTPUT_DIR=output/$TARGET_DIR_NAME"
 	echo "#CONFIG=${TARGET_BUILD_CONFIG}_defconfig"
 	echo
@@ -130,10 +83,6 @@ function lunch()
 	if diff ${OLD_CONF} ${CONF} 2>/dev/null|grep -qE "is not set$|=y$";then
 		read -p "Found old config, override it? (y/n):" YES
 		[ "$YES" != y ] && cp ${OLD_CONF} ${CONF}
-	fi
-
-	if [ -z "$index" ]; then
-		return
 	fi
 }
 
