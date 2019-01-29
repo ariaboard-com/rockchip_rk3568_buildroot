@@ -4,7 +4,7 @@
 #
 ################################################################################
 LIBRETRO_ARMSNES_VERSION = dbea0479cb6fba8583c0ca642ad70dd1bf0b58d1
-LIBRETRO_ARMSNES_SITE = $(call github,RetroPie,ARMSNES-libretro,$(LIBRETRO_SNES9X2002_VERSION))
+LIBRETRO_ARMSNES_SITE = $(call github,RetroPie,ARMSNES-libretro,$(LIBRETRO_ARMSNES_VERSION))
 
 define LIBRETRO_ARMSNES_BUILD_CMDS
 	CFLAGS="$(TARGET_CFLAGS)" CXXFLAGS="$(TARGET_CXXFLAGS)" \
