@@ -15,7 +15,7 @@ define LIBRETRO_ARMSNES_BUILD_CMDS
 endef
 
 define LIBRETRO_ARMSNES_INSTALL_TARGET_CMDS
-	$(INSTALL) -D $(@D)/snes9x2002_libretro.so \
+	$(INSTALL) -D $(@D)/libpocketsnes.so \
 		$(TARGET_DIR)/usr/lib/libretro/armsnes_libretro.so
 endef
 
