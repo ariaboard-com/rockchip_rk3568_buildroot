@@ -1,4 +1,4 @@
-From b8712d01f48e2475e83bcf1af91f73d24d213d6c Mon Sep 17 00:00:00 2001
+From bc5918de183892779ed1c3c0913a2fd0c07f4edf Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 28 Jan 2019 18:22:18 +0800
 Subject: [PATCH] compositor-drm: Support perfer external connectors
@@ -12,14 +12,110 @@ Env "WESTON_DRM_PREFER_EXTERNAL":
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/compositor-drm.c | 103 ++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 98 insertions(+), 5 deletions(-)
+ clients/window.c            |  16 ++++
+ desktop-shell/shell.c       |   5 +-
+ libweston/compositor-drm.c  | 174 ++++++++++++++++++++++++++++++++++++++++++--
+ libweston/libinput-device.c |   5 ++
+ 4 files changed, 193 insertions(+), 7 deletions(-)
 
+diff --git a/clients/window.c b/clients/window.c
+index 95796d4..3e1f6be 100644
+--- a/clients/window.c
++++ b/clients/window.c
+@@ -1574,6 +1574,7 @@ window_destroy(struct window *window)
+ 	struct input *input;
+ 	struct window_output *window_output;
+ 	struct window_output *window_output_tmp;
++	struct touch_point *tp, *tmp;
+ 
+ 	wl_list_remove(&window->redraw_task.link);
+ 
+@@ -1587,6 +1588,11 @@ window_destroy(struct window *window)
+ 		if (input->focus_widget &&
+ 		    input->focus_widget->window == window)
+ 			input->focus_widget = NULL;
++
++		wl_list_for_each_safe(tp, tmp, &input->touch_point_list, link) {
++			wl_list_remove(&tp->link);
++			free(tp);
++		}
+ 	}
+ 
+ 	wl_list_for_each_safe(window_output, window_output_tmp,
+@@ -3287,6 +3293,11 @@ touch_handle_down(void *data, struct wl_touch *wl_touch,
+ 	float sx = wl_fixed_to_double(x_w);
+ 	float sy = wl_fixed_to_double(y_w);
+ 
++	if (!surface) {
++		/* enter event for a window we've just destroyed */
++		return;
++	}
++
+ 	input->display->serial = serial;
+ 	input->touch_focus = wl_surface_get_user_data(surface);
+ 	if (!input->touch_focus) {
+@@ -3630,6 +3641,11 @@ data_device_enter(void *data, struct wl_data_device *data_device,
+ 	float y = wl_fixed_to_double(y_w);
+ 	char **p;
+ 
++	if (!surface) {
++		/* enter event for a window we've just destroyed */
++		return;
++	}
++
+ 	window = wl_surface_get_user_data(surface);
+ 	input->drag_enter_serial = serial;
+ 	input->drag_focus = window,
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 415da19..d4689f9 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -4688,7 +4688,10 @@ handle_output_destroy(struct wl_listener *listener, void *data)
+ 	shell_for_each_layer(shell, shell_output_destroy_move_layer, output);
+ 
+ 	wl_list_remove(&output_listener->panel_surface_listener.link);
+-	wl_list_remove(&output_listener->background_surface_listener.link);
++
++	if (output_listener->background_surface_listener.notify)
++		wl_list_remove(&output_listener->background_surface_listener.link);
++
+ 	wl_list_remove(&output_listener->destroy_listener.link);
+ 	wl_list_remove(&output_listener->link);
+ 	free(output_listener);
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 90b19de..57efcc3 100644
+index 90b19de..549ea1c 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
-@@ -2956,11 +2956,69 @@ destroy_sprites(struct drm_backend *backend)
+@@ -79,6 +79,9 @@
+ #define GBM_BO_USE_CURSOR GBM_BO_USE_CURSOR_64X64
+ #endif
+ 
++// Min duration between drm outputs update requests, to avoid glith
++#define DRM_MIN_UPDATE_MS 2000
++
+ struct drm_backend {
+ 	struct weston_backend base;
+ 	struct weston_compositor *compositor;
+@@ -93,6 +96,7 @@ struct drm_backend {
+ 		int id;
+ 		int fd;
+ 		char *filename;
++		char *syspath;
+ 	} drm;
+ 	struct gbm_device *gbm;
+ 	struct wl_listener session_listener;
+@@ -121,6 +125,10 @@ struct drm_backend {
+ 
+ 	uint32_t connector;
+ 	uint32_t pageflip_timeout;
++
++	struct wl_event_source *hotplug_timer;
++	bool pending_update;
++	int64_t last_update_ms;
+ };
+ 
+ struct drm_mode {
+@@ -2956,11 +2964,70 @@ destroy_sprites(struct drm_backend *backend)
  	}
  }
  
@@ -86,10 +182,11 @@ index 90b19de..57efcc3 100644
  	drmModeConnector *connector;
  	drmModeRes *resources;
 +	connector_match_t *matches;
++	struct timespec now;
  	int i;
  
  	resources = drmModeGetResources(b->drm.fd);
-@@ -2974,6 +3032,14 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2974,6 +3041,14 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  	b->min_height = resources->min_height;
  	b->max_height = resources->max_height;
  
@@ -104,7 +201,7 @@ index 90b19de..57efcc3 100644
  	for (i = 0; i < resources->count_connectors; i++) {
  		connector = drmModeGetConnector(b->drm.fd,
  						resources->connectors[i]);
-@@ -2982,7 +3048,8 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2982,7 +3057,8 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  
  		if (connector->connection == DRM_MODE_CONNECTED &&
  		    (b->connector == 0 ||
@@ -114,7 +211,7 @@ index 90b19de..57efcc3 100644
  			if (create_output_for_connector(b, resources,
  							connector, drm_device) < 0)
  				continue;
-@@ -2991,6 +3058,9 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2991,22 +3067,52 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  		}
  	}
  
@@ -124,7 +221,13 @@ index 90b19de..57efcc3 100644
  	if (wl_list_empty(&b->compositor->output_list) &&
  	    wl_list_empty(&b->compositor->pending_output_list))
  		weston_log("No currently active connector found.\n");
-@@ -3001,6 +3071,29 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 
+ 	drmModeFreeResources(resources);
+ 
++	weston_compositor_read_presentation_clock(b->compositor, &now);
++	b->last_update_ms = timespec_to_msec(&now);
++
+ 	return 0;
  }
  
  static void
@@ -154,39 +257,153 @@ index 90b19de..57efcc3 100644
  update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  {
  	drmModeConnector *connector;
-@@ -3046,8 +3139,6 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 	drmModeRes *resources;
+ 	struct drm_output *output, *next;
+ 	uint32_t *connected;
++	bool changed = false;
+ 	int i;
+ 
+ 	resources = drmModeGetResources(b->drm.fd);
+@@ -3046,9 +3152,8 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  		}
  
 -		create_output_for_connector(b, resources,
 -					    connector, drm_device);
  		weston_log("connector %d connected\n", connector_id);
++		changed = true;
  	}
  
-@@ -3066,7 +3157,6 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+ 	wl_list_for_each_safe(output, next, &b->compositor->output_list,
+@@ -3066,7 +3171,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
 -		drm_output_destroy(&output->base);
++		changed = true;
  	}
  
  	wl_list_for_each_safe(output, next, &b->compositor->pending_output_list,
-@@ -3084,11 +3174,14 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3084,11 +3189,61 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
 -		drm_output_destroy(&output->base);
++		changed = true;
  	}
  
  	free(connected);
  	drmModeFreeResources(resources);
 +
-+	// Re-create outputs
++	// Nothing changed, no need to refresh
++	if (!changed)
++		return;
++
++	// Refresh outputs
 +	destroy_outputs(b, drm_device);
 +	create_outputs(b, drm_device);
++}
++
++static int
++hotplug_timer_handler(void *data)
++{
++	struct drm_backend *b = data;
++	struct udev_device *drm_device;
++	struct udev *udev;
++
++	udev = udev_monitor_get_udev(b->udev_monitor);
++	drm_device = udev_device_new_from_syspath(udev, b->drm.syspath);
++
++	update_outputs(b, drm_device);
++	b->pending_update = false;
++
++	udev_device_unref(drm_device);
++	return 0;
++}
++
++static void
++udev_hotplug_event(struct drm_backend *b, struct udev_device *device)
++{
++	struct timespec now;
++	int64_t now_ms, next_ms;
++
++	weston_compositor_read_presentation_clock(b->compositor, &now);
++	now_ms = timespec_to_msec(&now);
++
++	// Already have a pending request
++	if (b->pending_update)
++		return;
++
++	next_ms = b->last_update_ms + DRM_MIN_UPDATE_MS;
++	if (next_ms <= now_ms) {
++		// Long enough to trigger a new request
++		update_outputs(b, device);
++	} else {
++		// Too close to the last request, schedule a new one
++		b->pending_update = true;
++		wl_event_source_timer_update(b->hotplug_timer,
++					     next_ms - now_ms);
++	}
  }
  
  static int
+@@ -3117,7 +3272,7 @@ udev_drm_event(int fd, uint32_t mask, void *data)
+ 	event = udev_monitor_receive_device(b->udev_monitor);
+ 
+ 	if (udev_event_is_hotplug(b, event))
+-		update_outputs(b, event);
++		udev_hotplug_event(b, event);
+ 
+ 	udev_device_unref(event);
+ 
+@@ -3150,6 +3305,8 @@ drm_destroy(struct weston_compositor *ec)
+ 	weston_launcher_destroy(ec->launcher);
+ 
+ 	close(b->drm.fd);
++	free(b->drm.filename);
++	free(b->drm.syspath);
+ 	free(b);
+ }
+ 
+@@ -3239,10 +3396,12 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
+ 	if (b->drm.fd >= 0)
+ 		weston_launcher_close(b->compositor->launcher, b->drm.fd);
+ 	free(b->drm.filename);
++	free(b->drm.syspath);
+ 
+ 	b->drm.fd = fd;
+ 	b->drm.id = id;
+ 	b->drm.filename = strdup(filename);
++	b->drm.syspath = strdup(udev_device_get_syspath(device));
+ 
+ 	drmModeFreeResources(res);
+ 
+@@ -3664,6 +3823,9 @@ drm_backend_create(struct weston_compositor *compositor,
+ 
+ 	udev_device_unref(drm_device);
+ 
++	b->hotplug_timer =
++		wl_event_loop_add_timer(loop, hotplug_timer_handler, b);
++
+ 	weston_compositor_add_debug_binding(compositor, KEY_O,
+ 					    planes_binding, b);
+ 	weston_compositor_add_debug_binding(compositor, KEY_C,
+diff --git a/libweston/libinput-device.c b/libweston/libinput-device.c
+index 5e7182d..9c4d750 100644
+--- a/libweston/libinput-device.c
++++ b/libweston/libinput-device.c
+@@ -427,6 +427,11 @@ notify_output_destroy(struct wl_listener *listener, void *data)
+ 	struct weston_compositor *c = device->seat->compositor;
+ 	struct weston_output *output;
+ 
++	if (device->output_destroy_listener.notify) {
++		wl_list_remove(&device->output_destroy_listener.link);
++		device->output_destroy_listener.notify = NULL;
++	}
++
+ 	if (!device->output_name && !wl_list_empty(&c->output_list)) {
+ 		output = container_of(c->output_list.next,
+ 				      struct weston_output, link);
 -- 
 2.11.0
 
