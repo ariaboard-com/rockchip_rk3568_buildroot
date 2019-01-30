@@ -43,6 +43,11 @@ config BR2_PACKAGE_RK3399
     help
         Use rockchip's rk3399 chip
 
+config BR2_PACKAGE_RK3399PRO
+    bool "rk3399pro chip"
+    help
+        Use rockchip's rk3399pro chip
+
 config BR2_PACKAGE_RK3288
     bool "rk3288 chip"
     help

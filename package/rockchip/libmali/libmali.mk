@@ -112,6 +112,14 @@ define LIBMALI_INSTALL_TARGET_CMDS
 endef
 endif
 
+ifeq ($(BR2_PACKAGE_RK3399PRO),y)
+define LIBMALI_INSTALL_TARGET_CMDS
+	rm -f $(LIBMALI_RM_SO)
+	$(INSTALL) -D -m 644 $(@D)/lib/aarch64-linux-gnu/libmali-midgard-t86x-r14p0-wayland.so $(TARGET_DIR)/usr/lib/
+	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-midgard-t86x-r14p0-wayland.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+endef
+endif
+
 ifeq ($(BR2_PACKAGE_RK3328),y)
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
