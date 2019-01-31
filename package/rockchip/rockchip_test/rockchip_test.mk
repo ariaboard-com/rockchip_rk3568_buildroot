@@ -5,7 +5,7 @@ ROCKCHIP_TEST_VERSION = 20190107
 ROCKCHIP_TEST_SITE_METHOD = local
 ROCKCHIP_TEST_SITE = $(TOPDIR)/package/rockchip/rockchip_test/src
 
-ifeq ($(BR2_PACKAGE_RK1808),y)
+ifeq ($(BR2_PACKAGE_RK1808)$(BR2_PACKAGE_RK3399PRO),yy)
 define ROCKCHIP_TEST_INSTALL_TARGET_CMDS
 	cp -rf  $(@D)/rockchip_test  ${TARGET_DIR}/
 	cp -rf $(@D)/rockchip_test_${ARCH}/* ${TARGET_DIR}/rockchip_test/ || true

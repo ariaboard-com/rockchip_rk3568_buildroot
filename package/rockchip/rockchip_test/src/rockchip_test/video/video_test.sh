@@ -26,7 +26,8 @@ video_test()
 
 multivideo_test()
 {
-	sh ${DIR_VIDEO}/test_gst_multivideo.sh test
+	cd ${DIR_VIDEO}
+	./test_gst_multivideo.sh test
 }
 
 case ${VIDEO_CHOICE} in
