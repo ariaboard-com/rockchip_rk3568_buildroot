@@ -29,7 +29,7 @@ else
 define RKNN_DEMO_INSTALL_TARGET_CMDS
 		mkdir -p $(TARGET_DIR)/usr/share/rknn_demo/
 		mkdir -p $(TARGET_DIR)/usr/local/share/
-		$(INSTALL) -D -m 0644 $(@D)/rknn/ssd/ssd_mobilenet_v1_coco.rknn $(TARGET_DIR)/usr/share/rknn_demo/
+		$(INSTALL) -D -m 0644 $(@D)/rknn/ssd/ssd_inception_v2.rknn $(TARGET_DIR)/usr/share/rknn_demo/
 		$(INSTALL) -D -m 0644 $(@D)/rknn/ssd/coco_labels_list.txt $(TARGET_DIR)/usr/share/rknn_demo/
 		$(INSTALL) -D -m 0644 $(@D)/rknn/ssd/box_priors.txt $(TARGET_DIR)/usr/share/rknn_demo/
 		$(INSTALL) -D -m 0644 $(@D)/minigui/MiniGUI.cfg $(TARGET_DIR)/etc
