@@ -310,9 +310,8 @@ comment "Graphic libraries"
 	source "package/sdl2_ttf/Config.in"
 
 comment "Other GUIs"
-	source "package/qt/Config.in"
 	source "package/qt5/Config.in"
-if BR2_PACKAGE_QT || BR2_PACKAGE_QT5
+if BR2_PACKAGE_QT5
 comment "QT libraries and helper libraries"
 	source "package/grantlee/Config.in"
 	source "package/qextserialport/Config.in"
