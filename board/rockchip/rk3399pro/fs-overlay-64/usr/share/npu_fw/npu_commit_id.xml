@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <project name="android/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9" path="npu/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9" remote="npu" revision="4b341df712969ca2ac0c3cf6294260d406b9d9be" upstream="refs/tags/android-6.0.1_r63"/>
+  <project name="android/rk/u-boot" path="npu/u-boot" remote="npu" revision="a1e5c945ad058e602ed83e564dd636a5e0ea24e7" upstream="next-dev"/>
+  <project name="linux/buildroot/dl" path="npu/buildroot/dl" remote="npu" revision="6c5a3c60b6fee1a7a78c83d20ca3f51329801665" upstream="master"/>
+  <project name="linux/device/rockchip" path="npu/device/rockchip" remote="npu" revision="5f49a9dd41b4f0faebfd5c30c3c97468a4663568" upstream="master">
+    <linkfile dest="npu/mkfirmware.sh" src="common/mkfirmware.sh"/>
+    <linkfile dest="npu/build.sh" src="common/build.sh"/>
+    <linkfile dest="npu/rkflash.sh" src="common/rkflash.sh"/>
+    <linkfile dest="npu/device/rockchip/.BoardConfig.mk" src="rk3399pro-npu/BoardConfig.mk"/>
+  </project>
+  <project name="linux/docs" path="npu/docs" remote="npu" revision="97f851c9c5096f0c6157326f1abb930d6dfb5f2d" upstream="master"/>
+  <project name="linux/external/powermanager" path="npu/external/powermanager" remote="npu" revision="17921d6b75395df5478613973e58916a6cf7c7ad" upstream="master"/>
+  <project name="linux/external/rknpu" path="npu/external/rknpu" remote="npu" revision="d5fec7ca68401d1e87fa11271a95415df8b8cd05" upstream="master"/>
+  <project name="linux/tools" path="npu/tools" remote="npu" revision="50b6ed2696a671c01799f9395b7be3d35103d588" upstream="master">
+    <linkfile dest="npu/tools/windows/AndroidTool/AndroidTool_Release/config.cfg" src="windows/AndroidTool/AndroidTool_Release/rk1808-config.cfg"/>
+    <linkfile dest="npu/tools/windows/AndroidTool/rockdev/package-file" src="windows/AndroidTool/rockdev/rk1808-package-file"/>
+    <linkfile dest="npu/tools/windows/AndroidTool/rockdev/mkupdate.bat" src="windows/AndroidTool/rockdev/rk1808-mkupdate.bat"/>
+    <linkfile dest="npu/tools/linux/Linux_Pack_Firmware/rockdev/mkupdate.sh" src="linux/Linux_Pack_Firmware/rockdev/rk1808-mkupdate.sh"/>
+    <linkfile dest="npu/tools/linux/Linux_Pack_Firmware/rockdev/package-file" src="linux/Linux_Pack_Firmware/rockdev/rk1808-package-file"/>
+  </project>
+  <project name="rk/kernel" path="npu/kernel" remote="npu" revision="7be8a2eb28f016874386c7bd8570640a768dad2a" upstream="develop-4.4"/>
+  <project name="rk/prebuilts/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu" path="npu/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu" remote="npu" revision="f96f76d6be89a6e28d4dac1f233f9aca9921f69b" upstream="master"/>
+  <project name="rk/rk1108/buildroot" path="npu/buildroot" remote="npu" revision="efc3e16f7d0f614c4525485a7240769b176efbea" upstream="rockchip/2018.02-rc3">
+    <linkfile dest="npu/Makefile" src="build/Makefile"/>
+    <linkfile dest="npu/envsetup.sh" src="build/envsetup.sh"/>
+  </project>
+  <project name="rk/rkbin" path="npu/rkbin" remote="npu" revision="666b3f38be3ee05a66ac23dd390718f6bfae811c" upstream="master"/>
+</manifest>

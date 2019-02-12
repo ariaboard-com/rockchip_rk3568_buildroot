@@ -1,0 +1,20 @@
+
+#!/bin/sh
+#
+# Do some initialzation for Rockchip rk3399pro npu with upgrading image....
+#
+
+case "$1" in
+start)
+	./usr/bin/npu-image.sh
+	sleep 1
+        ;;
+stop)
+        ;;
+*)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+esac
+
+exit 0
+
