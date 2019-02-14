@@ -18,6 +18,8 @@ RETROARCH_CONF_OPTS += --disable-7zip
 RETROARCH_CONF_OPTS += --disable-builtinflac
 RETROARCH_CONF_OPTS += --disable-ssl
 RETROARCH_CONF_OPTS += --disable-libxml2
+RETROARCH_CONF_OPTS += --disable-ffmpeg
+RETROARCH_CONF_OPTS += --disable-qt
 
 ifeq ($(BR2_PACKAGE_RETROARCH_RGUI),)
 	RETROARCH_CONF_OPTS += --disable-rgui
