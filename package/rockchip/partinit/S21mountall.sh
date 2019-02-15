@@ -126,40 +126,50 @@ resize_fatresize()
 	return 1
 }
 
+resize_ext2()
+{
+	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
+
+	# Force using online resize, see:
+	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
+	TEMP=$(mktemp -d)
+	$MOUNT $DEV $TEMP || return
+	resize2fs $DEV && tune2fs $DEV -L $PART_NAME
+	umount $TEMP
+}
+
+resize_vfat()
+{
+	check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return
+	resize_fatresize && fatlabel $DEV $PART_NAME
+}
+
+resize_ntfs()
+{
+	check_tool ntfsresize BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
+	echo y | ntfsresize -f $DEV && ntfslabel $DEV $PART_NAME
+}
+
 resize_part()
 {
 	need_resize || return
 
 	echo "Resizing $DEV($FSTYPE)"
 
-	# Prefer to format it when possible
-	if [ ! "$IS_ROOTDEV" ]; then
-		format_resize && return
-	fi
-
 	case $FSGROUP in
-		ext2)
-			check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
-
-			# Force using online resize, see:
-			# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
-			TEMP=$(mktemp -d)
-			$MOUNT $DEV $TEMP || return
-			resize2fs $DEV && tune2fs $DEV -L $PART_NAME
-			umount $TEMP
-			;;
-		vfat)
-			check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return 1
-			resize_fatresize && fatlabel $DEV $PART_NAME
-			;;
-		ntfs)
-			check_tool ntfsresize BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
-			echo y | ntfsresize -f $DEV && ntfslabel $DEV $PART_NAME
+		ext2|vfat|ntfs)
+			eval resize_$FSGROUP
 			;;
 		*)
 			echo Unsupported file system $FSTYPE for $DEV
+			return
 			;;
 	esac
+
+	need_resize || return
+
+	# Fallback to format resize
+	[ ! "$IS_ROOTDEV" ] && format_resize
 }
 
 done_oem_command()
