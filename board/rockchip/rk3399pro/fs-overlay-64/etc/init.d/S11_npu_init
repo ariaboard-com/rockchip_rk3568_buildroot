@@ -8,6 +8,7 @@ case "$1" in
 start)
 	./usr/bin/npu-image.sh
 	sleep 1
+	./usr/bin/npu_transfer_proxy.proxy &
         ;;
 stop)
         ;;
