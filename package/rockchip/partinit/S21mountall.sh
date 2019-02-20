@@ -130,6 +130,14 @@ resize_ext2()
 {
 	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
 
+	if [ "$IS_ROOTDEV" ];then
+		ROOT_RO=$(touch / || echo 1)
+		[ "$ROOT_RO" ] && mount -o remount,rw /
+		resize2fs $DEV && tune2fs $DEV -L $PART_NAME
+		[ "$ROOT_RO" ] && mount -o remount,ro /
+		return
+	fi
+
 	# Force using online resize, see:
 	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
 	TEMP=$(mktemp -d)
