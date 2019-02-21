@@ -15,6 +15,7 @@ info_view
 echo "***********************************************************"
 echo "video test:						1"
 echo "multivideo test:						2"
+echo "multivideo app demo test:					3"
 echo "***********************************************************"
 
 read -t 30 VIDEO_CHOICE
@@ -27,7 +28,7 @@ video_test()
 multivideo_app_demo_test()
 {
 	cd ${DIR_VIDEO}
-	./test_app_demo__multivideo.sh test
+	./test_app_demo_multivideo.sh test
 }
 
 multivideo_test()

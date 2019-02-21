@@ -36,7 +36,7 @@ module_choice()
     echo "ddr freq scaling test 11"
     echo "npu stress test       12"
     echo "camera test           13 (use rkisp_demo)"
-    echo "video test            14 (use gstreamer-wayland)"
+    echo "video test            14 (use gstreamer-wayland and app_demo)"
     echo "gpu test              15 (use glmark2)"
     echo "*****************************************************"
 
