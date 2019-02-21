@@ -24,6 +24,12 @@ video_test()
 	sh ${DIR_VIDEO}/test_gst_video.sh
 }
 
+multivideo_app_demo_test()
+{
+	cd ${DIR_VIDEO}
+	./test_app_demo__multivideo.sh test
+}
+
 multivideo_test()
 {
 	cd ${DIR_VIDEO}
@@ -36,6 +42,9 @@ case ${VIDEO_CHOICE} in
 		;;
 	2)
 		multivideo_test
+		;;
+	3)
+		multivideo_app_demo_test
 		;;
 	*)
 		echo "not fount your input."
