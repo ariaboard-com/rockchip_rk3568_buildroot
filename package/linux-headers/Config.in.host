@@ -26,6 +26,11 @@ config BR2_KERNEL_HEADERS_AS_KERNEL
 	bool "Same as kernel being built"
 	depends on BR2_LINUX_KERNEL
 
+config BR2_KERNEL_HEADERS_3_0
+	bool "Linux 3.0.x kernel headers"
+	depends on !BR2_aarch64
+	select BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_0
+
 config BR2_KERNEL_HEADERS_3_2
 	bool "Linux 3.2.x kernel headers"
 	depends on !BR2_aarch64 && !BR2_arc && !BR2_nios2
@@ -240,6 +245,7 @@ endchoice
 
 config BR2_DEFAULT_KERNEL_HEADERS
 	string
+	default "3.0.36"	if BR2_KERNEL_HEADERS_3_0
 	default "3.2.99"	if BR2_KERNEL_HEADERS_3_2
 	default "4.1.49"	if BR2_KERNEL_HEADERS_4_1
 	default "4.4.118"	if BR2_KERNEL_HEADERS_4_4

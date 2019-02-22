@@ -13,6 +13,9 @@ NTFS_3G_DEPENDENCIES = host-pkgconf
 NTFS_3G_LICENSE = GPL-2.0+, LGPL-2.0+
 NTFS_3G_LICENSE_FILES = COPYING COPYING.LIB
 
+HOST_NTFS_3G_CONF_OPTS += --prefix=/ --disable-ldconfig
+HOST_NTFS_3G_INSTALL_OPTS += DESTDIR=$(HOST_DIR) install
+
 ifeq ($(BR2_PACKAGE_LIBFUSE),y)
 NTFS_3G_CONF_OPTS += --with-fuse=external
 NTFS_3G_DEPENDENCIES += libfuse
@@ -59,3 +62,4 @@ endef
 NTFS_3G_POST_INSTALL_TARGET_HOOKS += NTFS_3G_INSTALL_WRAPPER
 
 $(eval $(autotools-package))
+$(eval $(host-autotools-package))

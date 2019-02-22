@@ -15,8 +15,7 @@ case "$1" in
 		# bt
 		/usr/libexec/bluetooth/bluetoothd --compat &
 
-		# Hack: disable kmssink to using software compositor
-		# export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
+		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
 
 		#for rkisp plugin
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/gstreamer-1.0

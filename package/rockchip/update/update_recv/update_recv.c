@@ -1,12 +1,12 @@
 /*
- *  Copyright (c) 2018 Rockchip Electronics Co. Ltd.
- *  Author: chad.ma <chad.ma@rock-chips.com>
+ *	Copyright (c) 2018 Rockchip Electronics Co. Ltd.
+ *	Author: chad.ma <chad.ma@rock-chips.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	 http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -146,6 +146,7 @@ int WriteFwData(char* imgPath, char* fwName)
 	long long uiEntryOffset = 0;
 	PBYTE pBuffer = NULL;
 	UINT uiBufferSize = LBA_TRANSFER_SIZE;
+	printf("### %s() Enter \n", __func__);
 
 	ShowLog(fwName, false);
 
@@ -188,6 +189,18 @@ int WriteFwData(char* imgPath, char* fwName)
 	{
 		printf("### ERROR:DownloadImage-->No Found item ###\n");
 		return -1;
+	}
+
+	for (idx = 0; idx < rkImageHead.item_count; idx++) {
+		if (strcmp(rkImageHead.item[idx].name, fwName) != 0)
+			continue;
+		else
+			break;
+	}
+
+	if (idx == rkImageHead.item_count) {
+		printf("## Not found %s in update.img ##\n",fwName);
+		goto ERR;
 	}
 
 	pRecvNode = fopen(DEV_RECOVERY_NODE, "wb");
@@ -297,7 +310,6 @@ ERR:
 	}
 	printf("\n\n");
 	printf("================== Update %s Fail ==============\n", fwName);
-
 	return -1;
 }
 
@@ -315,6 +327,8 @@ bool CheckFwData(char* imgPath, char* fwName)
 	PBYTE pBufferFromImg = NULL;
 	PBYTE pBufferFromFlash = NULL;
 	UINT uiBufferSize = LBA_TRANSFER_SIZE;
+
+	printf("### %s() Enter \n", __func__);
 
 	ShowLog(fwName, true);
 

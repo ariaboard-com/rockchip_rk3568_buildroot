@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Start linux launcher...
+#
+
+case "$1" in
+  start)
+  #for rkisp plugin
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/gstreamer-1.0
+  #for rescan rkisp plugin
+  rm /.cache/gstreamer-1.0 -rf
+  #for link cam_iq.xml
+  MEDIA_MAX=3
+  for i in $(seq 0 $MEDIA_MAX); do
+    MEDIA_DEV=/dev/media$i
+    SENSOR=`media-ctl -p -d $MEDIA_DEV |grep ENABLED |grep -v -E "rock|rkisp"|grep -o "\".*\""|tr -d \"|cut -f 1 -d ' '| tr 'a-z' 'A-Z'`
+      if [[ $SENSOR ]]
+      then
+          ln -fs /etc/iqfiles/$SENSOR*.xml /etc/cam_iq.xml
+      fi
+  done
+  ;;
+  stop)
+  ;;
+  *)
+  echo "Usage: $0 {start|stop}"
+  exit 1
+  ;;
+esac
+exit 0

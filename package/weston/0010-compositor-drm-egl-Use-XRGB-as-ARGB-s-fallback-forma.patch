@@ -1,0 +1,26 @@
+From 72fd7e4912aae9af33ff03a2ac29a9b9220e2641 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Fri, 11 May 2018 18:37:27 +0800
+Subject: [PATCH 2/4] compositor-drm: egl: Use XRGB as ARGB's fallback format
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 6b5a9fd..5d8ea46 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -1770,6 +1770,8 @@ static int
+ fallback_format_for(uint32_t format)
+ {
+ 	switch (format) {
++	case GBM_FORMAT_ARGB8888:
++		return GBM_FORMAT_XRGB8888;
+ 	case GBM_FORMAT_XRGB8888:
+ 		return GBM_FORMAT_ARGB8888;
+ 	case GBM_FORMAT_XRGB2101010:
+-- 
+2.11.0
+

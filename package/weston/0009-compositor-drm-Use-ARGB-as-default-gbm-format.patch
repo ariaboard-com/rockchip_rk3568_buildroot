@@ -1,0 +1,26 @@
+From 7060fd498987ec5e706dffc58dcc80109ccc246c Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 22 Oct 2018 09:05:00 +0800
+Subject: [PATCH 1/4] compositor-drm: Use ARGB as default gbm format
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 8e1e788..6b5a9fd 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -3543,7 +3543,7 @@ drm_backend_create(struct weston_compositor *compositor,
+ 	b->use_pixman = config->use_pixman;
+ 	b->pageflip_timeout = config->pageflip_timeout;
+ 
+-	if (parse_gbm_format(config->gbm_format, GBM_FORMAT_XRGB8888, &b->gbm_format) < 0)
++	if (parse_gbm_format(config->gbm_format, GBM_FORMAT_ARGB8888, &b->gbm_format) < 0)
+ 		goto err_compositor;
+ 
+ 	if (config->seat_id)
+-- 
+2.11.0
+

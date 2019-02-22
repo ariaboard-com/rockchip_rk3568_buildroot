@@ -30,12 +30,12 @@ config BR2_PACKAGE_NTFS_3G_NTFSPROGS
 	  Install NTFS utilities.
 
 config BR2_PACKAGE_NTFS_3G_EXTRAS
-	bool "ntfsprogs"
+	bool "extras"
 	help
 	  Install NTFS extra utilities.
 
 config BR2_PACKAGE_NTFS_3G_QUARANTINED
-	bool "ntfsprogs"
+	bool "quarantined"
 	help
 	  Install NTFS quarantined utilities.
 

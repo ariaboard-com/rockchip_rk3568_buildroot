@@ -1,0 +1,36 @@
+From 03e4570dd3dfd17265eafe7aa815898b0152ff3c Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 11 Dec 2018 10:40:55 +0800
+Subject: [PATCH 5/7] gsttools: videooverlay: Make holes for kmssink on wayland
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/gsttools/qgstreamervideooverlay.cpp | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
+index 1fefd7b..9fab7fc 100644
+--- a/src/gsttools/qgstreamervideooverlay.cpp
++++ b/src/gsttools/qgstreamervideooverlay.cpp
+@@ -300,6 +300,18 @@ void QGstreamerVideoOverlay::setWindowHandle_helper(WId id)
+         QPoint pos = getDisplayPosition(window);
+         gst_video_overlay_set_render_rectangle(overlay, pos.x() + m_rect.x(),
+                 pos.y() + m_rect.y(), m_rect.width(), m_rect.height());
++
++        // HACK: Let wayland server to make a hole for kmssink
++        if (!strstr(GST_ELEMENT_NAME(m_videoSink), "kmssink"))
++            goto out;
++
++        struct wl_region *region = wl_compositor_create_region(compositor);
++        wl_region_add(region, pos.x() + m_rect.x(), pos.y() + m_rect.y(),
++                m_rect.width(), m_rect.height());
++        wl_region_add(region, -1, -1, 1, 1);
++        wl_surface_set_opaque_region(surface, region);
++        wl_region_destroy(region);
++
+         goto out;
+     }
+ #endif // ENABLE_WAYLAND_PLATFORM
+-- 
+2.11.0
+

@@ -5,87 +5,6 @@ if [ -z "${BASH_SOURCE}" ];then
 	bash -c $0
 fi
 
-DEFCONFIG_ARRAY=(
-"rockchip_rk3308_release" \
-"rockchip_rk3308_32_release" \
-"rockchip_rk3308_32_debug" \
-"rockchip_rk3308_32_dueros" \
-"rockchip_rk3308_64_dueros" \
-"rockchip_rk3308_mini_release" \
-"rockchip_rk3308_32_mini_release" \
-"rockchip_rk3308_robot32" \
-"rockchip_rk3308_robot64" \
-"rockchip_rk3308_pcba" \
-"rockchip_rk3308_recovery" \
-"rockchip_rk3326_32" \
-"rockchip_rk3326_64" \
-"rockchip_rk3326_recovery" \
-"rockchip_rk3326_robot32" \
-"rockchip_rk3326_robot64" \
-"rockchip_rk3399" \
-"rockchip_rk3399_recovery" \
-"rockchip_rk3288" \
-"rockchip_rk3288_recovery" \
-"rockchip_px30_32" \
-"rockchip_px30_64" \
-"rockchip_px30_robot32" \
-"rockchip_px30_robot64" \
-"rockchip_px30_recovery" \
-"rockchip_px3se" \
-"rockchip_px3se_recovery" \
-"rockchip_rk3328" \
-"rockchip_rk3328_recovery" \
-"rockchip_rk1808" \
-"rockchip_rk1808_recovery" \
-"rockchip_rk3399pro-npu" \
-"rockchip_rk3308_b_release" \
-"rockchip_rk3308_b_32_release" \
-)
-
-DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
-
-i=0
-while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-do
-	let i++
-done
-
-function choose_info()
-{
-	echo
-	echo "You're building on Linux"
-	echo "Lunch menu...pick a combo:"
-	echo ""
-	i=0
-	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-	do
-		if [ $i -lt 100 ]; then
-			echo "$((${i}+1)). ${DEFCONFIG_ARRAY[$i]}"
-		else
-			echo "$((${i}+1)). ${DEFCONFIG_ARRAY[$i]}_release"
-		fi
-		let i++
-	done
-	echo
-}
-
-function get_index() {
-	if [ $# -eq 0 ]; then
-		return 0
-	fi
-
-	i=0
-	while [[ $i -lt $DEFCONFIG_ARRAY_LEN ]]
-	do
-		if [ $1 = "${DEFCONFIG_ARRAY[$i]}_release" ]; then
-			let i++
-			return ${i}
-		fi
-		let i++
-	done
-	return 0
-}
-
 function get_target_board_type() {
 	TARGET=$1
 	RESULT="$(echo $TARGET | cut -d '_' -f 2)"
@@ -129,10 +48,21 @@ function get_target_build_type() {
 
 function choose_type()
 {
-	choose_info
-	local DEFAULT_NUM DEFAULT_VALUE
+	echo
+	echo "You're building on Linux"
+	echo "Lunch menu...pick a combo:"
+	echo ""
+
+	i=0
+	for conf in ${DEFCONFIG_ARRAY[@]}
+	do
+		let ++i
+		echo "$i. $conf"
+	done
+	echo
+
+	local DEFAULT_NUM
 	DEFAULT_NUM=1
-	DEFAULT_VALUE="rockchip_rk3308_release"
 
 	export TARGET_BUILD_TYPE=
 	local ANSWER
@@ -205,36 +135,6 @@ function lunch()
 	if [ -z "$index" ]; then
 		return
 	fi
-
-	# first check the board dir
-	if [ ! -d ${TOP_DIR}/device/rockchip/$TARGET_BOARD_TYPE ]; then
-		# the above shell code seems cut the fixed number 2 3 4 by '_' to get target build info,
-		# obey the fixed name rule when create new target build.
-		echo "<debug> device/rockchip/${TARGET_BOARD_TYPE} is not exist, check the board dirname obey the rule rockchip_[boardtype]_[64/32][_][debug/release/recovery]"
-		return
-	fi
-	echo relink.....
-	TARGET_BOARD_CONFIG_FILE=BoardConfig.mk
-	if [ $TARGET_BUILD_TYPE = 32 ]; then
-		TARGET_BOARD_CONFIG_FILE=BoardConfig_32bit.mk
-	fi
-
-	# Check if had configure file device/rockchip/$TARGET_BOARD_TYPE/*.mk
-	# And Set New TARGET_BOARD_CONFIG_FILE
-	if [ -f "${TOP_DIR}/device/rockchip/$TARGET_BOARD_TYPE/${TARGET_BUILD_CONFIG#rockchip_}_${TARGET_BOARD_CONFIG_FILE}" ]; then
-		TARGET_BOARD_CONFIG_FILE=${TARGET_BUILD_CONFIG#rockchip_}_${TARGET_BOARD_CONFIG_FILE}
-		echo "Set NEW TARGET_BOARD_CONFIG_FILE = device/rockchip/$TARGET_BOARD_TYPE/${TARGET_BOARD_CONFIG_FILE}"
-	fi
-	BOARD_CONFIG=${TOP_DIR}/device/rockchip/.BoardConfig.mk
-	ln -snf $TARGET_BOARD_TYPE/$TARGET_BOARD_CONFIG_FILE $BOARD_CONFIG
-	sed --follow-symlinks -i "s/\(RK_CFG_BUILDROOT=\)..*/\1$TARGET_BUILD_CONFIG/g" $BOARD_CONFIG
-	source $BOARD_CONFIG
-}
-
-function function_stuff()
-{
-	choose_type $@
-	lunch
 }
 
 if [ "${BASH_SOURCE}" == "$0" ];then
@@ -252,5 +152,12 @@ else
 	# Set croot alias
 	alias croot="cd ${TOP_DIR}"
 
-	function_stuff $@
+	DEFCONFIG_ARRAY=(
+	$(cd ${BUILDROOT_DIR}/configs/; ls -v rockchip_* | sed "s/_defconfig$//")
+	)
+
+	DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
+
+	choose_type $@
+	lunch
 fi

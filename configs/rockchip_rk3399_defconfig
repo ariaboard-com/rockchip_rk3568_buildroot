@@ -2,8 +2,10 @@
 #include "base.config"
 #include "base_extra.config"
 #include "gpu.config"
+#include "display.config"
 #include "video_mpp.config"
 #include "video_gst.config"
+#include "video_gst_rtsp.config"
 #include "audio.config"
 #include "camera.config"
 #include "camera_gst.config"
@@ -17,5 +19,4 @@
 BR2_TARGET_GENERIC_HOSTNAME="rk3399"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK3399 Buildroot"
 BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y
-#  - The rk3399 evb used the ttyS0 by default.
 BR2_PACKAGE_RKWIFIBT_BTUART="ttyS0"

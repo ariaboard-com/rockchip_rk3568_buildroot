@@ -16,6 +16,10 @@ NPU_KO_FILE = galcore.ko
 NPU_INIT_FILE = S99NPU_init
 endif
 
+ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)
+BUILD_PYTHON_RKNN=y
+endif
+
 define RKNPU_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/lib/modules/
     mkdir -p $(TARGET_DIR)/usr/share/npu/
@@ -29,6 +33,10 @@ define RKNPU_INSTALL_TARGET_CMDS
 
     if [ -e "$(@D)/test" ]; then \
 	cp -r $(@D)/test $(TARGET_DIR)/usr/share/npu; \
+    fi
+
+    if [ x${BUILD_PYTHON_RKNN} != x ]; then \
+        cp -r $(@D)/rknn/python/rknn $(TARGET_DIR)/usr/lib/python3.6/site-packages/; \
     fi
 
 endef

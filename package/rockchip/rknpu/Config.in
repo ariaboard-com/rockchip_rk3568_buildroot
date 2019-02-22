@@ -2,3 +2,11 @@ config BR2_PACKAGE_RKNPU
 	bool "rknpu"
 	help
 	  "Copy rknpu driver and test case"
+
+config BR2_PACKAGE_PYTHON_RKNN
+        bool "python-rknn"
+        depends on BR2_PACKAGE_PYTHON3
+        depends on BR2_PACKAGE_PYTHON_NUMPY
+        help
+          RKNN Python API for Rockchip NPU Hardware.
+          Currently only support Rockchip RK1808.

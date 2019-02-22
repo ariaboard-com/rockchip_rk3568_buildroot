@@ -1,0 +1,172 @@
+From 1490e6a8f1587c14aec9603134f4e5980f48aa6f Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 10 Dec 2018 19:19:53 +0800
+Subject: [PATCH] HACK: compositor/gl-renderer: Make holes for lower overlay
+ layers
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor.c  | 30 +++++++++++++++++++++
+ libweston/compositor.h  |  3 +++
+ libweston/gl-renderer.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 102 insertions(+)
+
+diff --git a/libweston/compositor.c b/libweston/compositor.c
+index 8701f1a..141c424 100644
+--- a/libweston/compositor.c
++++ b/libweston/compositor.c
+@@ -475,6 +475,7 @@ weston_surface_create(struct weston_compositor *compositor)
+ 	pixman_region32_init(&surface->damage);
+ 	pixman_region32_init(&surface->opaque);
+ 	region_init_infinite(&surface->input);
++	pixman_region32_init(&surface->hole);
+ 
+ 	wl_list_init(&surface->views);
+ 
+@@ -1866,6 +1867,7 @@ weston_surface_destroy(struct weston_surface *surface)
+ 	pixman_region32_fini(&surface->damage);
+ 	pixman_region32_fini(&surface->opaque);
+ 	pixman_region32_fini(&surface->input);
++	pixman_region32_fini(&surface->hole);
+ 
+ 	wl_list_for_each_safe(cb, next, &surface->frame_callback_list, link)
+ 		wl_resource_destroy(cb->resource);
+@@ -2782,6 +2784,34 @@ surface_set_opaque_region(struct wl_client *client,
+ 
+ 	if (region_resource) {
+ 		region = wl_resource_get_user_data(region_resource);
++
++		/**
++		 * HACK: Make a hole for lower overlay layers
++		 * Usage:
++		 * 1/ Set the hole region
++		 *  wl_region_add(region, [hole region]);
++		 * 2/ Add a special rect to mark the region as a hole
++		 *  wl_region_add(region, -1, -1, 1, 1);
++		 *  wl_surface_set_opaque_region(surface, region);
++		 */
++		if (pixman_region32_contains_point(&region->region, -1, -1,
++						   NULL)) {
++			pixman_region32_t hole;
++
++			// Subtract the special rect
++			pixman_region32_init_rect(&hole, -1, -1, 1, 1);
++			pixman_region32_subtract(&hole, &region->region,
++						 &hole);
++
++			pixman_region32_copy(&surface->hole, &hole);
++			pixman_region32_fini(&hole);
++
++			// Trigger repaint to apply the hole
++			if (surface->output)
++				weston_output_damage(surface->output);
++			return;
++		}
++
+ 		pixman_region32_copy(&surface->pending.opaque,
+ 				     &region->region);
+ 	} else {
+diff --git a/libweston/compositor.h b/libweston/compositor.h
+index 769203a..7ac3f69 100644
+--- a/libweston/compositor.h
++++ b/libweston/compositor.h
+@@ -1263,6 +1263,9 @@ struct weston_surface {
+ 
+ 	/* An list of per seat pointer constraints. */
+ 	struct wl_list pointer_constraints;
++
++	/* hole region for lower overlay layers */
++	pixman_region32_t hole;
+ };
+ 
+ struct weston_subsurface {
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index 68b8429..43524ce 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -739,6 +739,68 @@ shader_uniforms(struct gl_shader *shader,
+ }
+ 
+ static void
++clear_region(struct weston_view *ev, pixman_region32_t *region)
++{
++	pixman_box32_t *rects;
++	int i, n, h = ev->output->height;
++
++	rects = pixman_region32_rectangles(region, &n);
++	for (i = 0; i < n; i++) {
++		pixman_box32_t r = rects[i];
++		glScissor(r.x1, h - r.y2, r.x2 - r.x1, r.y2 - r.y1);
++		glEnable(GL_SCISSOR_TEST);
++		glClearColor(0, 0, 0, 0);
++		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
++		glDisable(GL_SCISSOR_TEST);
++	}
++}
++
++static void
++weston_view_to_global_region(struct weston_view *ev, pixman_region32_t *region,
++			     pixman_region32_t *global_region)
++{
++	pixman_box32_t *rects;
++	int i, n;
++	float x1, y1, x2, y2;
++
++	pixman_region32_clear(global_region);
++
++	rects = pixman_region32_rectangles(region, &n);
++	for (i = 0; i < n; i++) {
++		pixman_box32_t r = rects[i];
++		weston_view_to_global_float(ev, r.x1, r.y1, &x1, &y1);
++		weston_view_to_global_float(ev, r.x2, r.y2, &x2, &y2);
++		pixman_region32_union_rect(global_region, global_region,
++					   x1, y1, x2 - x1, y2 - y1);
++	}
++}
++
++static void
++clear_surface_hole(struct weston_view *ev, struct weston_surface *surface,
++		   int x, int y, pixman_region32_t *repaint)
++{
++	/* hole region in global coordinates: */
++	pixman_region32_t hole;
++	/* hole region in surface coordinates: */
++	pixman_region32_t surface_hole;
++
++	if (!pixman_region32_not_empty(&surface->hole))
++		return;
++
++	pixman_region32_init(&hole);
++	pixman_region32_init(&surface_hole);
++	pixman_region32_copy(&surface_hole, &surface->hole);
++	pixman_region32_translate(&surface_hole, x, y);
++
++	weston_view_to_global_region(ev, &surface_hole, &hole);
++	pixman_region32_intersect(&hole, &hole, repaint);
++	clear_region(ev, &hole);
++
++	pixman_region32_fini(&surface_hole);
++	pixman_region32_fini(&hole);
++}
++
++static void
+ draw_view(struct weston_view *ev, struct weston_output *output,
+ 	  pixman_region32_t *damage) /* in global coordinates */
+ {
+@@ -768,6 +830,13 @@ draw_view(struct weston_view *ev, struct weston_output *output,
+ 	if (!pixman_region32_not_empty(&repaint))
+ 		goto out;
+ 
++	// HACK: Make holes for lower overlay layers
++	clear_surface_hole(ev, ev->surface, 0, 0, &repaint);
++	struct weston_subsurface *child;
++	wl_list_for_each(child, &ev->surface->subsurface_list, parent_link)
++		clear_surface_hole(ev, child->surface, child->position.x,
++				   child->position.y, &repaint);
++
+ 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+ 
+ 	if (gr->fan_debug) {
+-- 
+2.11.0
+

@@ -1,0 +1,65 @@
+From 6477f6269f0cb4149e569d7abb7b42845abd6b68 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 14 May 2018 09:38:11 +0800
+Subject: [PATCH] compositor-drm: Create gl-render with alpha support
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 5d8ea46..90b19de 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -1790,20 +1790,41 @@ drm_backend_create_gl_renderer(struct drm_backend *b)
+ 		0,
+ 	};
+ 	int n_formats = 2;
++	int ret;
+ 
+ 	if (format[1])
+ 		n_formats = 3;
+-	if (gl_renderer->display_create(b->compositor,
++
++	// Preferred to use alpha attribs
++	ret = gl_renderer->display_create(b->compositor,
+ 					EGL_PLATFORM_GBM_KHR,
+ 					(void *)b->gbm,
+ 					NULL,
+-					gl_renderer->opaque_attribs,
++					gl_renderer->alpha_attribs,
+ 					format,
+-					n_formats) < 0) {
+-		return -1;
+-	}
++					n_formats);
++	if (!ret)
++		return 0;
+ 
+-	return 0;
++	// Retry with EGL_PLATFORM_WAYLAND_KHR
++	ret = gl_renderer->display_create(b->compositor,
++					EGL_PLATFORM_WAYLAND_KHR,
++					(void *)b->gbm,
++					NULL,
++					gl_renderer->alpha_attribs,
++					format,
++					n_formats);
++	if (!ret)
++		return 0;
++
++	// Fallback to original way
++	return gl_renderer->display_create(b->compositor,
++					EGL_PLATFORM_GBM_KHR,
++					(void *)b->gbm,
++					NULL,
++					gl_renderer->opaque_attribs,
++					format,
++					n_formats);
+ }
+ 
+ static int
+-- 
+2.11.0
+

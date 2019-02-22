@@ -8,7 +8,7 @@ LIBUVC_CONF_OPTS += \
 	-DSTAGING_DIR="$(STAGING_DIR)"
 
 define LIBUVC_FIX_CMAKE_IN
-	$(SED) 's#"@CONF#@STAGING_DIR@@CONF#' \
+	$(SED) 's#"@CONF#"@STAGING_DIR@@CONF#' \
 		$(@D)/libuvcConfig.cmake.in
 endef
 LIBUVC_POST_PATCH_HOOKS += LIBUVC_FIX_CMAKE_IN

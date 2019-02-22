@@ -7,21 +7,36 @@
 RETROARCH_VERSION = 3e27a504ed3b3675d377e985094f3fdb267237bc
 RETROARCH_SITE = https://github.com/libretro/RetroArch.git
 RETROARCH_SITE_METHOD = git
-RETROARCH_DEPENDENCIES = host-pkgconf zlib
+RETROARCH_DEPENDENCIES = host-pkgconf
 
 RETROARCH_CONF_OPTS += --disable-oss
 RETROARCH_CONF_OPTS += --disable-python
 RETROARCH_CONF_OPTS += --disable-pulse
 RETROARCH_CONF_OPTS += --disable-cheevos
-RETROARCH_CONF_OPTS += --disable-zlib
-RETROARCH_CONF_OPTS += --disable-rgui
-RETROARCH_CONF_OPTS += --disable-networking
 RETROARCH_CONF_OPTS += --disable-freetype
 RETROARCH_CONF_OPTS += --disable-7zip
 RETROARCH_CONF_OPTS += --disable-builtinflac
 RETROARCH_CONF_OPTS += --disable-ssl
 RETROARCH_CONF_OPTS += --disable-libxml2
-RETROARCH_CONF_OPTS += --disable-hid --disable-libusb
+
+ifeq ($(BR2_PACKAGE_RETROARCH_RGUI),)
+	RETROARCH_CONF_OPTS += --disable-rgui
+endif
+
+ifeq ($(BR2_PACKAGE_RETROARCH_NETWORKING),)
+	RETROARCH_CONF_OPTS += --disable-networking
+endif
+
+ifeq ($(BR2_PACKAGE_RETROARCH_HID),)
+	RETROARCH_CONF_OPTS += --disable-hid --disable-libusb
+endif
+
+ifeq ($(BR2_PACKAGE_ZLIB),y)
+	RETROARCH_CONF_OPTS += --enable-zlib
+	RETROARCH_DEPENDENCIES += zlib
+else
+	RETROARCH_CONF_OPTS += --disable-zlib
+endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
 	RETROARCH_CONF_OPTS += --enable-x11
@@ -97,6 +112,8 @@ endef
 $(eval $(autotools-package))
 
 # DEFINITION OF LIBRETRO PLATFORM
+LIBRETRO_PLATFORM += buildroot
+
 ifeq ($(BR2_PACKAGE_HAS_LIBEGL),y)
 	LIBRETRO_PLATFORM += gles
 endif
