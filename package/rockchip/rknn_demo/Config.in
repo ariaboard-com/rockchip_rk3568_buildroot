@@ -26,6 +26,10 @@ config BR2_PACKAGE_RKNN_DEMO_ENABLE_JOINT
 	bool "rknn_demo enable_joint"
 	depends on BR2_PACKAGE_RKNN_DEMO
 
+config BR2_PACKAGE_RKNN_DEMO_ENABLE_FRG
+	bool "rknn_demo enable face recognize"
+	depends on BR2_PACKAGE_RKNN_DEMO
+
 comment "v4l2grab needs a toolchain w/ threads, dynamic library, C++ and headers >= 3.0"
 	depends on BR2_USE_MMU
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS \
