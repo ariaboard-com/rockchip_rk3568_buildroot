@@ -18,19 +18,32 @@ config BR2_PACKAGE_RKNN_DEMO
 
 	  http://www.twam.info/software/v4l2grab-grabbing-jpegs-from-v4l2-devices
 
+if BR2_PACKAGE_RKNN_DEMO
+
+choice
+	prompt "rknn demo type"
+	default BR2_PACKAGE_RKNN_DEMO_ENABLE_SSD
+	help
+	  Select a demo function type of rknn.
+
 config BR2_PACKAGE_RKNN_DEMO_ENABLE_SSD
-	bool "rknn_demo enable_ssd"
+	bool "ssd"
 	depends on BR2_PACKAGE_RKNN_DEMO
 
 config BR2_PACKAGE_RKNN_DEMO_ENABLE_JOINT
-	bool "rknn_demo enable_joint"
+	bool "joint"
 	depends on BR2_PACKAGE_RKNN_DEMO
 
 config BR2_PACKAGE_RKNN_DEMO_ENABLE_FRG
-	bool "rknn_demo enable face recognize"
+	bool "face recognize"
 	depends on BR2_PACKAGE_RKNN_DEMO
 
 comment "v4l2grab needs a toolchain w/ threads, dynamic library, C++ and headers >= 3.0"
 	depends on BR2_USE_MMU
 	depends on !BR2_TOOLCHAIN_HAS_THREADS || BR2_STATIC_LIBS \
 		|| !BR2_INSTALL_LIBSTDCPP || !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_0
+
+endchoice
+
+endif
+
