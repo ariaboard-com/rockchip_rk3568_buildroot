@@ -158,7 +158,7 @@ void npu_power_gpio_exit(void) {
 }
 
 void npu_reset(void) {
-	sysfs_write("/sys/power/wake_lock", "npu_lock");
+//	sysfs_write("/sys/power/wake_lock", "npu_lock");
 	sysfs_write(CLKEN_32k_PATH, "1");
 	clk_enable("0");
 	/*power off*/
@@ -205,7 +205,7 @@ void npu_poweroff(void) {
 	set_gpio(CPU_INT_NPU_GPIO, "0");
 	set_gpio(CPU_RESET_NPU_GPIO, "0");
 	clk_enable("0");
-	sysfs_write("/sys/power/wake_unlock", "npu_lock");
+//	sysfs_write("/sys/power/wake_unlock", "npu_lock");
 }
 
 int npu_suspend(void) {
@@ -229,7 +229,7 @@ int npu_suspend(void) {
 			clk_enable("0");
 			/* wait 1s for usb disconnect */
 			sleep(1);
-			sysfs_write("/sys/power/wake_unlock", "npu_lock");
+		//	sysfs_write("/sys/power/wake_unlock", "npu_lock");
 			break;
 		}
 		usleep(10000);
@@ -261,7 +261,7 @@ int npu_resume(void) {
 	/*wait for npu wakeup*/
 	while (--retry) {
 		if (!get_gpio(NPU_PMU_SLEEP_GPIO)) {
-			sysfs_write("/sys/power/wake_lock", "npu_lock");
+	//		sysfs_write("/sys/power/wake_lock", "npu_lock");
 			break;
 		}
 		usleep(10000);
