@@ -1,0 +1,125 @@
+From 452a6ebd1464099e1e3990932d792b2f0ff5e9ab Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 27 Feb 2019 16:52:15 +0800
+Subject: [PATCH 3/3] qwaylandxdgshellv6: Support setting window initial
+ position
+
+Set window position after ack_configure().
+Note:
+1/ (0,0) position(default position) would be ignored.
+2/ The decoration would be ignored when the space not enough.
+
+Also with:
+1/ 5f8db38e Avoid spurious move events after configure call
+2/ Solved conflict due to missing this big commit:
+	(c5ab40d2 "Client: Add acked configure support and implement it for xdg-shell v6")
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+
+Avoid spurious move events after configure call
+
+Whilst wayland can't actually move the window in a QWindow::setGeometry
+call the previous behavior was to keep it so that it appeared to the
+client that it had moved.
+
+The new behavior is non-consistent, QWindow::setPosition will update
+QWindow::position until the first configure call is received at which
+point it will move back to 0,0. This then generates a QMoveEvent for the
+window that hasn't moved.
+
+This patch keeps the QWindow::position consistent with the user request
+and doesn't generate move events.
+
+Reviewed-by: Johan Helsing <johan.helsing@qt.io>
+(cherry picked from commit 5f8db38e49b5bee4962fa9ac048c23a3faae587b)
+
+Conflicts:
+	src/client/qwaylandwindow.cpp
+	[ due to missing this big commit: (c5ab40d2 "Client: Add acked configure support and implement it for xdg-shell v6") ]
+
+Change-Id: Ifb1433b3902d44c1b2e43036bc1805a6e00128fb
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/client/qwaylandwindow.cpp     |  4 +---
+ src/client/qwaylandxdgshellv6.cpp | 23 +++++++++++++++++++++++
+ src/client/qwaylandxdgshellv6_p.h |  1 +
+ 3 files changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 2cabbc00..43589da5 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -347,8 +347,6 @@ void QWaylandWindow::setGeometry(const QRect &rect)
+     sendExposeEvent(QRect(QPoint(), geometry().size()));
+ }
+ 
+-
+-
+ void QWaylandWindow::sendExposeEvent(const QRect &rect)
+ {
+     if (!(mShellSurface && mShellSurface->handleExpose(rect)))
+@@ -486,7 +484,7 @@ void QWaylandWindow::doResize()
+ 
+     widthWithoutMargins = qMax(widthWithoutMargins, window()->minimumSize().width());
+     heightWithoutMargins = qMax(heightWithoutMargins, window()->minimumSize().height());
+-    QRect geometry = QRect(0,0, widthWithoutMargins, heightWithoutMargins);
++    QRect geometry(windowGeometry().topLeft(), QSize(widthWithoutMargins, heightWithoutMargins));
+ 
+     int x = 0;
+     int y = 0;
+diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
+index ac974536..6323cf4b 100644
+--- a/src/client/qwaylandxdgshellv6.cpp
++++ b/src/client/qwaylandxdgshellv6.cpp
+@@ -72,6 +72,26 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
+     m_xdgSurface->m_window->configure(0, m_configureState.width, m_configureState.height);
+ }
+ 
++void QWaylandXdgSurfaceV6::Toplevel::setInitialPosition()
++{
++    QWaylandWindow *window = m_xdgSurface->m_window;
++    QPoint position = window->geometry().topLeft(); // this is absolute
++
++    // What if we do want to be at (0,0)?
++    if (!position.x() && !position.y())
++        return;
++
++    // Only consider decoration when avaliable
++    if (window->decoration()) {
++        if (position.y() > window->decoration()->margins().top())
++            position -= QPoint(window->decoration()->margins().top(),
++                               window->decoration()->margins().left());
++    }
++
++    // HACK: Set window position through .set_window_geometry()
++    m_xdgSurface->set_window_geometry(position.x(), position.y(), 0, 0);
++}
++
+ void QWaylandXdgSurfaceV6::Toplevel::zxdg_toplevel_v6_configure(int32_t width, int32_t height, wl_array *states)
+ {
+     m_configureState.width = width;
+@@ -252,6 +272,9 @@ void QWaylandXdgSurfaceV6::zxdg_surface_v6_configure(uint32_t serial)
+     else if (m_popup)
+         m_popup->applyConfigure();
+ 
++    if (m_toplevel && !m_configured)
++	    m_toplevel->setInitialPosition();
++
+     m_configured = true;
+     ack_configure(serial);
+ 
+diff --git a/src/client/qwaylandxdgshellv6_p.h b/src/client/qwaylandxdgshellv6_p.h
+index fbcaafda..1a3ad917 100644
+--- a/src/client/qwaylandxdgshellv6_p.h
++++ b/src/client/qwaylandxdgshellv6_p.h
+@@ -102,6 +102,7 @@ private:
+         ~Toplevel();
+ 
+         void applyConfigure();
++        void setInitialPosition();
+ 
+         void zxdg_toplevel_v6_configure(int32_t width, int32_t height, wl_array *states) override;
+         void zxdg_toplevel_v6_close() override;
+-- 
+2.11.0
+
