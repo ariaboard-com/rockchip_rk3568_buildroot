@@ -13,6 +13,7 @@
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"
+BR2_ROOTFS_OVERLAY="board/rockchip/rk3036/fs-overlay/"
 BR2_TARGET_GENERIC_HOSTNAME="rk3036"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK3036 Buildroot"
 BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y
