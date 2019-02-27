@@ -11,6 +11,8 @@ CAMERA_ENGINE_RKISP_SITE_METHOD = local
 CAMERA_ENGINE_RKISP_LICENSE = Apache V2.0
 CAMERA_ENGINE_RKISP_LICENSE_FILES = NOTICE
 
+CAMERA_ENGINE_RKISP_INSTALL_STAGING = YES
+
 CAMERA_ENGINE_RKISP_MAKE_OPTS = \
 	TARGET_GCC="$(TARGET_CC)" \
 	TARGET_GPP="$(TARGET_CXX)" \
@@ -55,6 +57,10 @@ RKgstDir = $(TARGET_DIR)/usr/lib/gstreamer-1.0
 RKafDir = $(TARGET_DIR)/usr/lib/rkisp/af
 RKaeDir = $(TARGET_DIR)/usr/lib/rkisp/ae
 RKawbDir = $(TARGET_DIR)/usr/lib/rkisp/awb
+
+define CAMERA_ENGINE_RKISP_INSTALL_STAGING_CMDS
+	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(STAGING_DIR)/usr/lib/
+endef
 
 define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	mkdir -p $(RKgstDir)
