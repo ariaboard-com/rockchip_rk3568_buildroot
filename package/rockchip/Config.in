@@ -185,6 +185,6 @@ source "package/rockchip/libavb/Config.in"
 source "package/rockchip/libavb_ab/Config.in"
 source "package/rockchip/libavb_user/Config.in"
 source "package/rockchip/bootcontrol/Config.in"
-source "package/rockchip/LinuxAB/Config.in"
+source "package/rockchip/updateEngine/Config.in"
 source "package/rockchip/sensor-daemon/Config.in"
 endif
