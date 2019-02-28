@@ -91,7 +91,12 @@ define step_pkg_size_end
 		while read hash file ; do \
 			echo "$(1),$${file}" ; \
 		done >> $(BUILD_DIR)/packages-file-list$(3).txt
-	rm -f $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after
+
+	comm -13 $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after | \
+		grep -v "^directory" | cut -d' ' -f3 > $($(PKG)_DIR)/.br_filelist
+	tar cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T $($(PKG)_DIR)/.br_filelist
+
+	rm -f $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after $($(PKG)_DIR)/.br_filelist
 endef
 
 define step_pkg_size
