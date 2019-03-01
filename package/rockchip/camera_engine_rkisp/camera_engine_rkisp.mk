@@ -60,6 +60,8 @@ RKawbDir = $(TARGET_DIR)/usr/lib/rkisp/awb
 
 define CAMERA_ENGINE_RKISP_INSTALL_STAGING_CMDS
 	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(STAGING_DIR)/usr/lib/
+	mkdir -p $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface
+	$(foreach header,$(wildcard $($(PKG)_BUILDDIR)/interface/*.h),$(INSTALL) -D -m 644 $(header) $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface;)
 endef
 
 define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
