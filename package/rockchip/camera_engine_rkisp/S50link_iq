@@ -13,7 +13,7 @@ case "$1" in
   MEDIA_MAX=3
   for i in $(seq 0 $MEDIA_MAX); do
     MEDIA_DEV=/dev/media$i
-    SENSOR=`media-ctl -p -d $MEDIA_DEV |grep ENABLED |grep -v -E "rock|rkisp"|grep -o "\".*\""|tr -d \"|cut -f 1 -d ' '| tr 'a-z' 'A-Z'`
+    SENSOR=`media-ctl -p -d $MEDIA_DEV |grep ENABLED |grep -v -E "rock|rkisp"|grep -o "\".*\""|tr -d \"|cut -f 1 -d ' '| tr 'a-z' 'A-Z' | cut -d "_" -f 3`
       if [[ $SENSOR ]]
       then
           ln -fs /etc/iqfiles/$SENSOR*.xml /etc/cam_iq.xml
