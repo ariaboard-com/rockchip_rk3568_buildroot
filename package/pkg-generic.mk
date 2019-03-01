@@ -92,9 +92,11 @@ define step_pkg_size_end
 			echo "$(1),$${file}" ; \
 		done >> $(BUILD_DIR)/packages-file-list$(3).txt
 
-	comm -13 $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after | \
-		grep -v "^directory" | cut -d' ' -f3 > $($(PKG)_DIR)/.br_filelist
-	tar cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T $($(PKG)_DIR)/.br_filelist
+	if [ -z "$(3)" ]; then \
+		comm -13 $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after | \
+			grep -v "^directory" | cut -d' ' -f3 > $($(PKG)_DIR)/.br_filelist; \
+		tar cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T $($(PKG)_DIR)/.br_filelist; \
+	fi
 
 	rm -f $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after $($(PKG)_DIR)/.br_filelist
 endef
@@ -342,7 +344,7 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 	$(Q)if test -n "$($(PKG)_CONFIG_SCRIPTS)" ; then \
 		$(RM) -f $(addprefix $(TARGET_DIR)/usr/bin/,$($(PKG)_CONFIG_SCRIPTS)) ; \
 	fi
-	@$(call step_end,install-target)
+	$(call step_end,install-target)
 	$(Q)touch $@
 
 # Remove package sources
