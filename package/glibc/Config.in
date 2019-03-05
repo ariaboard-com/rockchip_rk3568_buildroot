@@ -8,6 +8,12 @@ config BR2_PACKAGE_GLIBC
 
 if BR2_PACKAGE_GLIBC
 
+config BR2_PACKAGE_GLIBC_GEN_LD_CACHE
+	bool "glibc gen ld.so.cache"
+	default y
+	select BR2_PACKAGE_HOST_QEMU
+	select BR2_PACKAGE_HOST_QEMU_LINUX_USER_MODE
+
 config BR2_PACKAGE_GLIBC_2_22
 	bool "glibc 2.22"
 	default y if !BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_2
