@@ -344,7 +344,7 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 	$(Q)if test -n "$($(PKG)_CONFIG_SCRIPTS)" ; then \
 		$(RM) -f $(addprefix $(TARGET_DIR)/usr/bin/,$($(PKG)_CONFIG_SCRIPTS)) ; \
 	fi
-	$(call step_end,install-target)
+	@$(call step_end,install-target)
 	$(Q)touch $@
 
 # Remove package sources
