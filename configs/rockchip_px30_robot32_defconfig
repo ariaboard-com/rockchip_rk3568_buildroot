@@ -2,6 +2,7 @@
 #include "base.config"
 #include "base_extra.config"
 #include "gpu.config"
+#include "video_mpp.config"
 #include "audio.config"
 #include "camera.config"
 #include "debug.config"
