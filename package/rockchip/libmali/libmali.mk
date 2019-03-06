@@ -44,19 +44,25 @@ define LIBMALI_INSTALL_TARGET_CMDS
 endef
 endif
 
+ifeq ($(BR2_PACKAGE_LIBMALI_WITHOUT_CL),y)
+LIBMALI_WAYLAND_NAME = libmali-bifrost-g31-rxp0-wayland-gbm-without-cl
+else
+LIBMALI_WAYLAND_NAME = libmali-bifrost-g31-rxp0-wayland-gbm
+endif
+
 ifeq ($(BR2_aarch64),y)
 ifeq ($(BR2_PACKAGE_RK3326),y)
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
-	$(INSTALL) -D -m 644 $(@D)/lib/aarch64-linux-gnu/libmali-bifrost-g31-rxp0-wayland-gbm.so $(TARGET_DIR)/usr/lib/
-	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-bifrost-g31-rxp0-wayland-gbm.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+	$(INSTALL) -D -m 644 $(@D)/lib/aarch64-linux-gnu/$(LIBMALI_WAYLAND_NAME).so $(TARGET_DIR)/usr/lib/
+	cd $(TARGET_DIR)/usr/lib/ && ln -s $(LIBMALI_WAYLAND_NAME).so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
 endef
 endif
 else
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
-	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/libmali-bifrost-g31-rxp0-wayland-gbm.so $(TARGET_DIR)/usr/lib/
-	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-bifrost-g31-rxp0-wayland-gbm.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/$(LIBMALI_WAYLAND_NAME).so $(TARGET_DIR)/usr/lib/
+	cd $(TARGET_DIR)/usr/lib/ && ln -s $(LIBMALI_WAYLAND_NAME).so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
 endef
 endif
 
@@ -64,15 +70,15 @@ ifeq ($(BR2_aarch64),y)
 ifeq ($(BR2_PACKAGE_PX30),y)
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
-        $(INSTALL) -D -m 644 $(@D)/lib/aarch64-linux-gnu/libmali-bifrost-g31-rxp0-wayland-gbm.so $(TARGET_DIR)/usr/lib/
-	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-bifrost-g31-rxp0-wayland-gbm.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+        $(INSTALL) -D -m 644 $(@D)/lib/aarch64-linux-gnu/$(LIBMALI_WAYLAND_NAME).so $(TARGET_DIR)/usr/lib/
+	cd $(TARGET_DIR)/usr/lib/ && ln -s $(LIBMALI_WAYLAND_NAME).so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
 endef
 endif
 else
 define LIBMALI_INSTALL_TARGET_CMDS
 	rm -f $(LIBMALI_RM_SO)
-	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/libmali-bifrost-g31-rxp0-wayland-gbm.so $(TARGET_DIR)/usr/lib/
-	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-bifrost-g31-rxp0-wayland-gbm.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/$(LIBMALI_WAYLAND_NAME).so $(TARGET_DIR)/usr/lib/
+	cd $(TARGET_DIR)/usr/lib/ && ln -s $(LIBMALI_WAYLAND_NAME).so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
 endef
 endif
 
