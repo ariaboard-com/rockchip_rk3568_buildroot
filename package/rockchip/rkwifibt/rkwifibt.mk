@@ -109,6 +109,8 @@ define RKWIFIBT_ENABLE_BT
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
+    $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
+    $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/
     sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_rtk_firmware
     $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_start $(TARGET_DIR)/usr/bin/bt_realtek_start
@@ -116,7 +118,8 @@ define RKWIFIBT_ENABLE_BT
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_hanup $(TARGET_DIR)/usr/bin/bt_realtek_hfp_hanup
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_accept $(TARGET_DIR)/usr/bin/bt_realtek_hfp_accept
     $(INSTALL) -D -m 0644 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
-    ln -s $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
+    rm -rf $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
+    -ln -s $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
 endef
 
 ifneq ($(call qstrip,$(BT_TTY_DEV)),)
