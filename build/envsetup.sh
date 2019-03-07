@@ -74,7 +74,7 @@ function main()
 	alias croot="cd ${TOP_DIR}"
 
 	DEFCONFIG_ARRAY=(
-		$(cd ${BUILDROOT_DIR}/configs/; ls -v rockchip_* | \
+		$(cd ${BUILDROOT_DIR}/configs/; ls rockchip_* | sort | \
 			sed "s/_defconfig$//" | grep "$1")
 	)
 
