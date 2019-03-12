@@ -5,6 +5,7 @@ source "package/rockchip/rv1108_package/external/libion/Config.in"
 source "package/rockchip/rv1108_package/external/librkfb/Config.in"
 source "package/rockchip/rv1108_package/external/librkrga/Config.in"
 source "package/rockchip/rv1108_package/external/libnanomsg/Config.in"
+source "package/rockchip/rv1108_package/external/libcamerahal/Config.in"
 
 endif
 
