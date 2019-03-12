@@ -6,6 +6,8 @@ source "package/rockchip/rv1108_package/external/librkfb/Config.in"
 source "package/rockchip/rv1108_package/external/librkrga/Config.in"
 source "package/rockchip/rv1108_package/external/libnanomsg/Config.in"
 source "package/rockchip/rv1108_package/external/libcamerahal/Config.in"
+source "package/rockchip/rv1108_package/external/rv1108_softapdemo/Config.in"
+source "package/rockchip/rv1108_package/external/rv1108_softapserver/Config.in"
 
 endif
 
