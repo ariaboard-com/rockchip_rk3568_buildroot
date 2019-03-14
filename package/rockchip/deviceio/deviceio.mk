@@ -9,14 +9,11 @@ DEVICEIO_CONF_OPTS += -DBSA=TRUE -DCYPRESS=TRUE \
 		-DCMAKE_CXX_FLAGS="${CMAKE_C_FLAGS} -I$(DEVICEIO_CYPRESS_BSA)/libbsa/include -I$(DEVICEIO_CYPRESS_BSA)/app_common/include"
 DEVICEIO_DEPENDENCIES += cypress_bsa
 else ifeq ($(BR2_PACKAGE_BROADCOM_BSA), y)
-#DEVICEIO_CONF_OPTS += -DBSA=TRUE -DBROADCOM=TRUE
-
-# use cypress first, to avoid can't compile if select broadcom bsa
-DEVICEIO_CYPRESS_BSA = $(TOPDIR)/../external/bluetooth_bsa/3rdparty/embedded/bsa_examples/linux
-DEVICEIO_CONF_OPTS += -DBSA=TRUE -DCYPRESS=TRUE \
-		-DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -I$(DEVICEIO_CYPRESS_BSA)/libbsa/include -I$(DEVICEIO_CYPRESS_BSA)/app_common/include" \
-		-DCMAKE_CXX_FLAGS="${CMAKE_C_FLAGS} -I$(DEVICEIO_CYPRESS_BSA)/libbsa/include -I$(DEVICEIO_CYPRESS_BSA)/app_common/include"
-DEVICEIO_DEPENDENCIES += cypress_bsa
+DEVICEIO_BROADCOM_BSA = $(TOPDIR)/../external/broadcom_bsa/3rdparty/embedded/bsa_examples/linux
+DEVICEIO_CONF_OPTS += -DBSA=TRUE -DBROADCOM=TRUE \
+                -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -I$(DEVICEIO_BROADCOM_BSA)/libbsa/include -I$(DEVICEIO_BROADCOM_BSA)/app_common/include" \
+                -DCMAKE_CXX_FLAGS="${CMAKE_C_FLAGS} -I$(DEVICEIO_BROADCOM_BSA)/libbsa/include -I$(DEVICEIO_BROADCOM_BSA)/app_common/include"
+DEVICEIO_DEPENDENCIES += broadcom_bsa
 else
 ifeq ($(BR2_PACKAGE_BLUEZ5_UTILS), y)
 DEVICEIO_CONF_OPTS += -DBLUEZ5_UTILS=TRUE
