@@ -58,36 +58,6 @@ format_part()
 	esac
 }
 
-need_resize()
-{
-	case $FSGROUP in
-		ext2)
-			check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return 1
-			LABEL=$(dumpe2fs -h $DEV 2>/dev/null| grep "name:")
-			;;
-		vfat)
-			check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return 1
-			LABEL=$(fatlabel $DEV)
-			;;
-		ntfs)
-			check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
-			LABEL=$(ntfslabel $DEV)
-			;;
-		*)
-			echo Unsupported file system $FSTYPE for $DEV
-			return 1
-			;;
-	esac
-
-	if [ $? -ne 0 ]; then
-		echo "Wrong fs type($FSTYPE) for $DEV"
-		return 1
-	fi
-
-	# Use volume label to mark resized
-	[ "$(echo $LABEL|xargs -n 1|tail -1)" != "$PART_NAME" ]
-}
-
 format_resize()
 {
 	TEMP=$(mktemp -d)
@@ -120,19 +90,23 @@ format_resize()
 
 resize_ext2()
 {
-	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return
+	check_tool resize2fs BR2_PACKAGE_E2FSPROGS_RESIZE2FS || return 1
 
 	# Force using online resize, see:
 	# https://bugs.launchpad.net/ubuntu/+source/e2fsprogs/+bug/1796788.
 	TEMP=$(mktemp -d)
-	$MOUNT $DEV $TEMP || return
+	$MOUNT $DEV $TEMP || return 1
+
 	resize2fs $DEV && tune2fs $DEV -L $PART_NAME
+	RET=$?
+
 	umount $TEMP
+	return $RET
 }
 
 resize_vfat()
 {
-	check_tool fatresize BR2_PACKAGE_FATRESIZE || return
+	check_tool fatresize BR2_PACKAGE_FATRESIZE || return 1
 
 	SIZE=$(fatresize -i $DEV | grep "Size:" | grep -o "[0-9]*$")
 
@@ -148,38 +122,29 @@ resize_vfat()
 		# Try to resize with fatresize, not always work
 		if fatresize -s ${MAX_SIZE} $DEV; then
 			fatlabel $DEV $PART_NAME
-			return
+			return 0
 		fi
 	done
+	return 1
 }
 
 resize_ntfs()
 {
-	check_tool ntfsresize BR2_PACKAGE_NTFS_3G_NTFSPROGS || return
+	check_tool ntfsresize BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
 	echo y | ntfsresize -f $DEV && ntfslabel $DEV $PART_NAME
 }
 
 resize_part()
 {
 	# Already resized
-	need_resize || return
+	# Use volume label to mark resized
+	[ "$FS_LABEL" = "$PART_NAME" ] && return
 
 	echo "Resizing $DEV($FSTYPE)"
 
-	case $FSGROUP in
-		ext2|vfat|ntfs)
-			# Resize needs read-write
-			remount_part rw
-			eval resize_$FSGROUP
-			;;
-		*)
-			echo Unsupported file system $FSTYPE for $DEV
-			return
-			;;
-	esac
-
-	# Check resize result
-	need_resize || return
+	# Resize needs read-write
+	remount_part rw
+	eval resize_$FSGROUP && return
 
 	# Fallback to format resize
 	[ ! "$IS_ROOTDEV" ] && format_resize
@@ -221,10 +186,6 @@ convert_mount_opts()
 
 prepare_part()
 {
-	SYS_PATH=/sys/class/block/${DEV##*/}
-	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
-	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
-
 	case $FSTYPE in
 		ext[234])
 			FSGROUP=ext2
@@ -244,16 +205,40 @@ prepare_part()
 	esac
 
 	case $FSGROUP in
-		ext2|vfat)
+		ext2)
 			MOUNT="busybox mount"
 			MOUNT_OPTS=$(convert_mount_opts "$BUSYBOX_MOUNT_OPTS")
+
+			check_tool dumpe2fs BR2_PACKAGE_E2FSPROGS || return 1
+			LABEL=$(dumpe2fs -h $DEV 2>/dev/null| grep "name:")
+			;;
+		vfat)
+			MOUNT="busybox mount"
+			MOUNT_OPTS=$(convert_mount_opts "$BUSYBOX_MOUNT_OPTS")
+
+			check_tool fatlabel BR2_PACKAGE_DOSFSTOOLS_FATLABE || return 1
+			LABEL=$(fatlabel $DEV)
 			;;
 		ntfs)
 			MOUNT=ntfs-3g
 			check_tool ntfs-3g BR2_PACKAGE_NTFS_3G || return 1
 			MOUNT_OPTS=$(convert_mount_opts "$NTFS_3G_MOUNT_OPTS")
+
+			check_tool ntfslabel BR2_PACKAGE_NTFS_3G_NTFSPROGS || return 1
+			LABEL=$(ntfslabel $DEV)
+			;;
+		*)
+			echo Unsupported file system $FSTYPE for $DEV
+			return 1
 			;;
 	esac
+
+	if [ $? -ne 0 ]; then
+		echo "Wrong fs type($FSTYPE) for $DEV"
+		return 1
+	fi
+
+	FS_LABEL="$(echo $LABEL|xargs -n 1|tail -1)"
 
 	MOUNT_OPTS=${MOUNT_OPTS:+" -o ${MOUNT_OPTS%,}"}
 
@@ -308,11 +293,15 @@ do_part()
 
 	echo "Handling $DEV $MOUNT_POINT $FSTYPE $OPTS $PASS"
 
-	# Set environments and check/mount tools
-	prepare_part || return
+	SYS_PATH=/sys/class/block/${DEV##*/}
+	MAX_SIZE=$(( $(cat ${SYS_PATH}/size) * 512))
+	PART_NAME=$(grep PARTNAME ${SYS_PATH}/uevent | cut -d '=' -f 2)
 
 	# Handle OEM commands for current partition
 	handle_oem_command
+
+	# Check fs types and setup check/mount tools
+	prepare_part || return
 
 	# Resize partition if needed
 	resize_part
