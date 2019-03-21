@@ -20,7 +20,7 @@ DEVICEIO_CONF_OPTS += -DBLUEZ5_UTILS=TRUE
 endif
 
 DEVICEIO_CONF_OPTS += -DBLUEZ=TRUE
-DEVICEIO_DEPENDENCIES += bluez5_utils libglib2
+DEVICEIO_DEPENDENCIES += readline bluez5_utils libglib2
 endif
 
 ifeq ($(call qstrip,$(BR2_ARCH)), arm)
