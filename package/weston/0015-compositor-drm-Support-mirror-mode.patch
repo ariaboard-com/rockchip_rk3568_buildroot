@@ -1,4 +1,4 @@
-From 4015a3d8eb5f5776b2d046dd6fcbac2d72cebf63 Mon Sep 17 00:00:00 2001
+From 099c97af824c5e0a36e8fffb4fc9c3ecb1281860 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 20 Mar 2019 20:05:27 +0800
 Subject: [PATCH 3/3] compositor-drm: Support mirror mode
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 111 insertions(+), 19 deletions(-)
 
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 0e6a60c..24ac283 100644
+index 2c20aac..e5e71d2 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -116,6 +116,8 @@ struct drm_backend {
@@ -234,7 +234,7 @@ index 0e6a60c..24ac283 100644
  	weston_compositor_add_pending_output(&output->base, b->compositor);
  
  	return 0;
-@@ -3904,6 +3994,8 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -3905,6 +3995,8 @@ drm_backend_create(struct weston_compositor *compositor,
  	wl_list_init(&b->sprite_list);
  	create_sprites(b);
  

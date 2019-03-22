@@ -1,4 +1,4 @@
-From 34ba660e3634de32127af4f6690dabcf3095126a Mon Sep 17 00:00:00 2001
+From 92fd628a9c762854c663e30aa3e64385e7b1b069 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 21 Feb 2019 14:48:01 +0800
 Subject: [PATCH 2/3] compositor-drm: Support virtual screen size
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 145 insertions(+), 8 deletions(-)
 
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 30d9dca..0e6a60c 100644
+index cc6503d..2c20aac 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -219,6 +219,7 @@ struct drm_output {
@@ -270,7 +270,7 @@ index 30d9dca..0e6a60c 100644
  
  	output->backlight = backlight_init(drm_device,
  					   connector->connector_type);
-@@ -3376,6 +3498,8 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
+@@ -3377,6 +3499,8 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
  	if (fd < 0)
  		return false;
  
@@ -279,7 +279,7 @@ index 30d9dca..0e6a60c 100644
  	res = drmModeGetResources(fd);
  	if (!res)
  		goto out_fd;
-@@ -3889,6 +4013,7 @@ weston_backend_init(struct weston_compositor *compositor,
+@@ -3890,6 +4014,7 @@ weston_backend_init(struct weston_compositor *compositor,
  {
  	struct drm_backend *b;
  	struct weston_drm_backend_config config = {{ 0, }};
@@ -287,7 +287,7 @@ index 30d9dca..0e6a60c 100644
  
  	if (config_base == NULL ||
  	    config_base->struct_version != WESTON_DRM_BACKEND_CONFIG_VERSION ||
-@@ -3900,6 +4025,18 @@ weston_backend_init(struct weston_compositor *compositor,
+@@ -3901,6 +4026,18 @@ weston_backend_init(struct weston_compositor *compositor,
  	config_init_to_defaults(&config);
  	memcpy(&config, config_base, config_base->struct_size);
  
