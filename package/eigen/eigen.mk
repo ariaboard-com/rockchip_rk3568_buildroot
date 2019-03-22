@@ -28,6 +28,20 @@ define EIGEN_BUILD_CMDS
 		$(@D)/eigen3.pc.in >$(@D)/eigen3.pc
 endef
 
+ifneq ($(BR2_CMAKE),)
+EIGEN_DEPENDENCIES += $(BR2_CMAKE_HOST_DEPENDENCY)
+
+# For FIND_PACKAGE(Eigen3 REQUIRED)
+define EIGEN_INSTALL_CMAKE_MODULE
+	$(BR2_CMAKE) --system-information | \
+		grep -w CMAKE_ROOT | cut -d ' ' -f 2 | \
+		xargs -i cp $(@D)/cmake/FindEigen3.cmake {}/Modules
+	cp $(@D)/signature_of_eigen3_matrix_library $(EIGEN_DEST_DIR)
+endef
+
+EIGEN_POST_INSTALL_STAGING_HOOKS += EIGEN_INSTALL_CMAKE_MODULE
+endif
+
 # This package only consists of headers that need to be
 # copied over to the sysroot for compile time use
 define EIGEN_INSTALL_STAGING_CMDS
