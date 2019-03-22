@@ -32,8 +32,8 @@ extra-models/ssd_mobilenet_fpn
 "
 MODEL_LIST=${1:-vgg_16_maxpool}
 
-#default count 4320000, about 24 hours
-COUNT=${2:-4320000}
+#default count 8640000, about 48 hours
+COUNT=${2:-8640000}
 
 echo "==========COUNT: $COUNT"
 export VSI_NN_LOG_LEVEL=0
@@ -53,3 +53,9 @@ do
   PERF=$(./rknn_inference $RKNN_MODEL $IMAGE_FILE $COUNT 2>&1)
   echo $PERF
 done
+dmesg |grep "GPU[0] hang"
+if [ $? != 0 ]; then
+  echo "====npu stress test PASS====="
+else
+  echo "====npu stress test FAIL===="
+exit
