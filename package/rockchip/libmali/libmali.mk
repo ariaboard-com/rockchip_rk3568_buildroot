@@ -114,7 +114,7 @@ define LIBMALI_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/libmali-midgard-t76x-r14p0-r0p0-wayland.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 644 $(@D)/lib/arm-linux-gnueabihf/libmali-midgard-t76x-r14p0-r1p0-wayland.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_rk3288 $(TARGET_DIR)/etc/init.d/S10libmali
-	cd $(TARGET_DIR)/usr/lib/ && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
+	cd $(TARGET_DIR)/usr/lib/ && ln -s libmali-midgard-t76x-r14p0-r0p0-wayland.so libmali.so && $(LIBMALI_LINK_SO) && $(LIBMALI_LINK_OPENCL_SO) && cd -
 endef
 endif
 
