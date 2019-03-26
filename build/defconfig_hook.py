@@ -26,7 +26,7 @@ def common_config(configs):
     for config in allconfigs.keys():
         allconfigs[config] -= common
 
-    print common
+    print(common)
 
 def load_base(base_cfgs, cfg):
     base_cfgs[cfg] = set()
