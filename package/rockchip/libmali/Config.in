@@ -1,6 +1,10 @@
 config BR2_PACKAGE_LIBMALI
 	bool "rockchip libmali"
 	depends on BR2_TOOLCHAIN_USES_GLIBC
+	depends on BR2_arm || BR2_aarch64
+	select BR2_PACKAGE_MESA3D
+	select BR2_PACKAGE_MESA3D_OPENGL_ES
+	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	select BR2_PACKAGE_HAS_LIBEGL
 	select BR2_PACKAGE_HAS_LIBGLES
 	help
