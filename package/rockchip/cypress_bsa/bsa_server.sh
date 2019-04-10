@@ -11,7 +11,8 @@ case "$1" in
 
     echo 1 > /sys/class/rfkill/rfkill0/state
 
-    mkdir -p /data/bsa/config
+    mkdir -p /data/bsa/config/test_files/av
+    cp /etc/bsa_file/* /data/bsa/config/test_files/av/
     cd /data/bsa/config
     echo "start broadcom bluetooth server bsa_sever"
     bsa_server -r 12 -p $hcd_file -d /dev/ttyS4 -all=0 &
