@@ -10,6 +10,8 @@ config BR2_PACKAGE_RKNN_DEMO
 	select BR2_PACKAGE_LIBPNG12
 	select BR2_PACKAGE_JPEG
 	select BR2_PACKAGE_MINIGUI
+	select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_UVC_APP
 
 	help
 	  Utility for grabbing JPEGs form V4L2 devices. This tool is
