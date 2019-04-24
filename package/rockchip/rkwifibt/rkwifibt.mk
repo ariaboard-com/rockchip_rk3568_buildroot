@@ -52,6 +52,11 @@ CHIP_NAME = AW-NB197
 BT_FIRMWARE = BCM4343A1.hcd
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RK912),y)
+CHIP_VENDOR = ROCKCHIP
+CHIP_NAME = RK912
+endif
+
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723DS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8723DS
@@ -185,6 +190,20 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/src/rk_wifi_init $(TARGET_DIR)/usr/bin/rk_wifi_init
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/brcm_patchram_plus1
     touch $(TARGET_DIR)/usr/bin/bt_pcba_test
+endef
+endif
+
+ifeq ($(CHIP_VENDOR), ROCKCHIP)
+define RKWIFIBT_BUILD_CMDS
+    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+endef
+
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    mkdir -p $(TARGET_DIR)/lib/firmware
+    $(INSTALL) -D -m 0644 $(@D)/firmware/rockchip/WIFI_FIRMWARE/rk912* $(TARGET_DIR)/lib/firmware
+    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_rk912_modules $(TARGET_DIR)/etc/init.d
 endef
 endif
 
