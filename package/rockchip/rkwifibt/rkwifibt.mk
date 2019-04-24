@@ -55,12 +55,19 @@ endif
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723DS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8723DS
+RTK_BT = ENABLE
 BT_FIRMWARE = y
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8189FS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8189FS
+endif
+
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8821CS),y)
+CHIP_VENDOR = REALTEK
+CHIP_NAME = RTL8821CS
+RTK_BT = ENABLE
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_COMPATIBLE),y)
@@ -77,8 +84,7 @@ TARGET_ARCH = arm64
 endif
 
 ifeq ($(CHIP_VENDOR), REALTEK)
-
-ifeq ($(CHIP_NAME), RTL8723DS)
+ifeq ($(RTK_BT), ENABLE)
 
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 define RKWIFIBT_BUILD_CMDS
@@ -109,8 +115,8 @@ define RKWIFIBT_ENABLE_BT
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
-    $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
-    $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/
     sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_rtk_firmware
     $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_start $(TARGET_DIR)/usr/bin/bt_realtek_start
@@ -126,7 +132,7 @@ ifneq ($(call qstrip,$(BT_TTY_DEV)),)
     RKWIFIBT_POST_INSTALL_TARGET_HOOKS+=RKWIFIBT_ENABLE_BT
 endif
 
-endif # RTL8723DS
+endif # RTK_BT
 
 ifeq ($(CHIP_NAME), RTL8189FS)
 define RKWIFIBT_INSTALL_TARGET_CMDS

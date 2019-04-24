@@ -24,6 +24,8 @@ config BR2_PACKAGE_RKWIFIBT_RTL8723DS
     bool "RTL8723DS"
 config BR2_PACKAGE_RKWIFIBT_RTL8189FS
     bool "RTL8189FS"
+config BR2_PACKAGE_RKWIFIBT_RTL8821CS
+    bool "RTL8821CS"
 config BR2_PACKAGE_RKWIFIBT_COMPATIBLE
     bool "Rockchip Compatible with all supported wifi"
 endchoice
