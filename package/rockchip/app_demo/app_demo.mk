@@ -17,4 +17,8 @@ APP_DEMO_CONF_OPTS += "-DDRAW_BY_SDL=1"
 APP_DEMO_CONF_OPTS += "-DDRAW_BY_DRM=1"
 endif
 
+ifeq ($(BR2_PACKAGE_ROCKX),y)
+APP_DEMO_CONF_OPTS += "-DROCKX=ON"
+endif
+
 $(eval $(cmake-package))
