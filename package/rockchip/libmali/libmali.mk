@@ -26,7 +26,7 @@ endif
 endif
 
 ifeq ($(BR2_PACKAGE_LIBMALI_WITHOUT_CL),y)
-LIBMALI_SUFFIX = $(LIBMALI_SUFFIX)-without-cl
+LIBMALI_SUFFIX := $(LIBMALI_SUFFIX)-without-cl
 endif
 
 ifneq ($(BR2_PACKAGE_RK3326)$(BR2_PACKAGE_PX30),)
