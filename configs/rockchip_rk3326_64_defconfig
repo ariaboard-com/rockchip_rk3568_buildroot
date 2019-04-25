@@ -15,6 +15,8 @@
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"
+BR2_ARM_ENABLE_NEON=y
+BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_TARGET_GENERIC_HOSTNAME="rk3326_64"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK3326 Buildroot"
 BR2_ROOTFS_OVERLAY="board/rockchip/rk3326/fs-overlay-64/"
