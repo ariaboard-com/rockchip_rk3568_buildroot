@@ -23,6 +23,14 @@ DEVICEIO_CONF_OPTS += -DBLUEZ=TRUE
 DEVICEIO_DEPENDENCIES += readline bluez5_utils libglib2
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723DS),y)
+DEVICEIO_CONF_OPTS += -DREALTEK=TRUE
+endif
+
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8189FS),y)
+DEVICEIO_CONF_OPTS += -DREALTEK=TRUE
+endif
+
 ifeq ($(call qstrip,$(BR2_ARCH)), arm)
 DEVICEIO_BUILD_TYPE = arm
 else ifeq ($(call qstrip, $(BR2_ARCH)), aarch64)
