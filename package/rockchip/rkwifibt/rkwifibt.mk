@@ -193,7 +193,7 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 endef
 endif
 
-ifeq ($(CHIP_VENDOR), ROCKCHIP)
+ifeq ($(CHIP_NAME), RK912)
 define RKWIFIBT_BUILD_CMDS
     make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
