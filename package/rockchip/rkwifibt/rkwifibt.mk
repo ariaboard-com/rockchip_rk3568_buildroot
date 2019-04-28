@@ -176,7 +176,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     mkdir -p $(TARGET_DIR)/system/lib/modules/
-    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    make -C $(TOPDIR)/../kernel ARCH=$(RK_ARCH)  modules -j18
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
