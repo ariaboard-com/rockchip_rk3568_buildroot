@@ -58,4 +58,4 @@ if [ $? != 0 ]; then
   echo "====npu stress test PASS====="
 else
   echo "====npu stress test FAIL===="
-exit
+fi
