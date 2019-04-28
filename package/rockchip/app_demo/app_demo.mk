@@ -3,7 +3,7 @@ APP_DEMO_SITE_METHOD = local
 APP_DEMO_INSTALL_STAGING = NO
 
 ifeq ($(BR2_PACKAGE_APP_DEMO_IMAGE_PROCESS),y)
-APP_DEMO_DEPENDENCIES += gflags libdrm linux-rga ffmpeg sdl2 sdl2_ttf
+APP_DEMO_DEPENDENCIES += gflags libdrm linux-rga ffmpeg sdl2 sdl2_gfx sdl2_ttf
 endif
 
 APP_DEMO_CONF_OPTS += "-DCMAKE_BUILD_TYPE=Debug" \
