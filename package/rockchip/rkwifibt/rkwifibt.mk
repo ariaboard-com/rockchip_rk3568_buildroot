@@ -130,7 +130,9 @@ define RKWIFIBT_ENABLE_BT
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_accept $(TARGET_DIR)/usr/bin/bt_realtek_hfp_accept
     $(INSTALL) -D -m 0644 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
     rm -rf $(TARGET_DIR)/usr/bin/bt_pcba_test
+    rm -rf $(TARGET_DIR)/usr/bin/bt_init.sh
     cp -f $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    cp -f $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_init.sh
 endef
 
 ifneq ($(call qstrip,$(BT_TTY_DEV)),)
@@ -168,8 +170,10 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/wpa_supplicant.conf $(TARGET_DIR)/etc
     $(INSTALL) -D -m 0755 $(@D)/wifi_start.sh $(TARGET_DIR)/usr/bin
-    rm $(TARGET_DIR)/usr/bin/bt_pcba_test
+    rm -rf $(TARGET_DIR)/usr/bin/bt_pcba_test
+    rm -rf $(TARGET_DIR)/usr/bin/bt_init.sh
     cp -r $(TARGET_DIR)/usr/bin/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    cp -r $(TARGET_DIR)/usr/bin/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_init.sh
 endef
 endif
 
