@@ -22,6 +22,8 @@ endef
 define GALLERY_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/local/gallery
 	cp $(BUILD_DIR)/gallery-$(GALLERY_VERSION)/conf/* $(TARGET_DIR)/usr/local/gallery/
+	mkdir -p $(TARGET_DIR)/usr/share/applications
+	cp $(BUILD_DIR)/gallery-$(GALLERY_VERSION)/gallery.desktop $(TARGET_DIR)/usr/share/applications/
 	$(INSTALL) -D -m 0755 $(@D)/galleryView \
 		$(TARGET_DIR)/usr/local/gallery/galleryView
 endef
