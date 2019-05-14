@@ -3,6 +3,12 @@ config BR2_PACKAGE_RKNPU
 	help
 	  "Copy rknpu driver and test case"
 
+config BR2_PACKAGE_RKNPU_NTB
+	bool "rknpu ntb"
+        depends on BR2_PACKAGE_RKNPU
+	help
+	  "use ntb to communction rknn-toolkit"
+
 config BR2_PACKAGE_PYTHON_RKNN
         bool "python-rknn"
         depends on BR2_PACKAGE_PYTHON3
