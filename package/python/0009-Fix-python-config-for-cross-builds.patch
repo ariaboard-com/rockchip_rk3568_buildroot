@@ -14,6 +14,8 @@ data/results.
 Signed-off-by: Gustavo Zacarias <gustavo@zacarias.com.ar>
 [Bernd: rebased for Python 2.7.15]
 Signed-off-by: Bernd Kuhls <bernd.kuhls@t-online.de>
+[Peter: update for 2.7.16]
+Signed-off-by: Peter Korsgaard <peter@korsgaard.com>
 ---
  Makefile.pre.in          |  13 +++---
  Misc/python-config.sh.in | 102 +++++++++++++++++++++++++++++++++++++++++++++++
@@ -34,16 +36,16 @@ index c1c98ecc5a..727a92af42 100644
  DISTFILES=	README ChangeLog $(CONFIGFILES)
  DISTDIRS=	$(SUBDIRS) $(SUBDIRSTOO) Ext-dummy
  DIST=		$(DISTFILES) $(DISTDIRS)
-@@ -431,7 +431,7 @@ LIBRARY_OBJS=	\
+@@ -403,7 +403,7 @@ LIBRARY_OBJS=	\
  
  # Default target
  all:		@DEF_MAKE_ALL_RULE@
 -build_all:	check-clean-src $(BUILDPYTHON) oldsharedmods sharedmods gdbhooks
 +build_all:	check-clean-src $(BUILDPYTHON) oldsharedmods sharedmods gdbhooks python-config
  
- # Compile a binary with profile guided optimization.
- profile-opt:
-@@ -1179,10 +1179,12 @@ $(srcdir)/Lib/$(PLATDIR):
+ # Check that the source is clean when building out of source.
+ check-clean-src:
+@@ -1190,10 +1190,12 @@ $(srcdir)/Lib/$(PLATDIR):
  	fi; \
  	cd $(srcdir)/Lib/$(PLATDIR); $(RUNSHARED) ./regen
  
