@@ -3,7 +3,7 @@
 # MAME
 #
 ################################################################################
-LIBRETRO_MAME_VERSION = 9f9e6b6c9bde4d50c72e9a5c80496a1fec6b8aa9
+LIBRETRO_MAME_VERSION = 47c241e4f528f663a36ae82a3bbaa789d929e282
 LIBRETRO_MAME_SITE = $(call github,libretro,mame,$(LIBRETRO_MAME_VERSION))
 
 LIBRETRO_MAME_CONF += TARGETOS=linux
@@ -28,7 +28,7 @@ endif
 endif
 
 define LIBRETRO_MAME_BUILD_CMDS
-	CFLAGS="$(TARGET_CFLAGS) $(LIBRETRO_MAME_CFLAGS)" \
+	BUILDDIR="" CFLAGS="$(TARGET_CFLAGS) $(LIBRETRO_MAME_CFLAGS)" \
 	       CXXFLAGS="$(TARGET_CXXFLAGS)" \
 	       LDFLAGS="$(TARGET_LDFLAGS)" \
 	       $(MAKE) -C $(@D) -f Makefile.libretro \

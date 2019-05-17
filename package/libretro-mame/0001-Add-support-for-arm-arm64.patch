@@ -1,7 +1,7 @@
-From 998070312936521f127848148617d532c685648e Mon Sep 17 00:00:00 2001
+From 64aece48ee183544e8e0bdc5349941f4898d8466 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 17 Sep 2018 15:32:19 +0800
-Subject: [PATCH 1/2] Add support for arm/arm64
+Subject: [PATCH 1/3] Add support for arm/arm64
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 29 insertions(+)
 
 diff --git a/makefile b/makefile
-index 3c974c3039..779df1aa47 100644
+index 148bba309d..7ae6203109 100644
 --- a/makefile
 +++ b/makefile
-@@ -1288,8 +1288,18 @@ endif
+@@ -1295,8 +1295,18 @@ endif
  # gmake-linux
  #-------------------------------------------------
  
@@ -32,7 +32,7 @@ index 3c974c3039..779df1aa47 100644
  
  .PHONY: linux_x64
  linux_x64: generate $(PROJECTDIR)/$(MAKETYPE)-linux/Makefile
-@@ -1310,8 +1320,18 @@ linux: generate $(PROJECTDIR)/$(MAKETYPE)-linux/Makefile
+@@ -1317,8 +1327,18 @@ linux: generate $(PROJECTDIR)/$(MAKETYPE)-linux/Makefile
  # gmake-linux-clang
  #-------------------------------------------------
  
@@ -52,19 +52,19 @@ index 3c974c3039..779df1aa47 100644
  .PHONY: linux_x64_clang
  linux_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
 diff --git a/scripts/toolchain.lua b/scripts/toolchain.lua
-index 2663c0a463..3017540fdc 100644
+index d24db0349e..7fdcc5f748 100644
 --- a/scripts/toolchain.lua
 +++ b/scripts/toolchain.lua
-@@ -23,6 +23,8 @@ newoption {
- 		{ "android-x64",   "Android - x64"          },
- 		{ "asmjs",         "Emscripten/asm.js"      },
- 		{ "freebsd",       "FreeBSD"                },
-+		{ "linux-arm",     "Linux - ARM"            },
-+		{ "linux-arm64",   "Linux - ARM64"          },
+@@ -26,6 +26,8 @@ newoption {
+ 		{ "freebsd-clang", "FreeBSD (clang compiler)"},
  		{ "linux-gcc",     "Linux (GCC compiler)"   },
  		{ "linux-clang",   "Linux (Clang compiler)" },
++		{ "linux-arm",     "Linux - ARM"            },
++		{ "linux-arm64",   "Linux - ARM64"          },
  		{ "ios-arm",       "iOS - ARM"              },
-@@ -190,6 +192,13 @@ function toolchain(_buildDir, _subDir)
+ 		{ "ios-simulator", "iOS - Simulator"        },
+ 		{ "mingw32-gcc",   "MinGW32"                },
+@@ -200,6 +202,13 @@ function toolchain(_buildDir, _subDir)
  			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ios-simulator")
  		end
  

@@ -1,7 +1,7 @@
-From 5c58abe77009fba092bff2d5ba641aee7b34f580 Mon Sep 17 00:00:00 2001
+From 1c02e625ae69b0e50c95ba6f19f4015b3201e093 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 17 Sep 2018 16:32:41 +0800
-Subject: [PATCH 2/2] bgfx: khronos: eglplatform.h: Sync mesa's
+Subject: [PATCH 2/3] bgfx: khronos: eglplatform.h: Sync mesa's
  MESA_EGL_NO_X11_HEADERS
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
