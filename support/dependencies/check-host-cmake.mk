@@ -8,7 +8,7 @@
 # package is bumped or a new one added, and it requires a higher
 # version, our cmake infra will catch it and whine.
 #
-BR2_CMAKE_VERSION_MIN = 3.8
+BR2_CMAKE_VERSION_MIN = 3.1
 
 BR2_CMAKE_CANDIDATES ?= cmake cmake3
 BR2_CMAKE ?= $(call suitable-host-package,cmake,\
