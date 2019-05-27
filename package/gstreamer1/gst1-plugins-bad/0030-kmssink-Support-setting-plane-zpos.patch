@@ -1,7 +1,7 @@
-From af26838f40d109eb3f960ecf6b46939287be2908 Mon Sep 17 00:00:00 2001
+From 9a1fd9a7e75ceed845d6c4cce6c06ad57148cfda Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 21:24:37 +0800
-Subject: [PATCH] kmssink: Support setting plane zpos
+Subject: [PATCH 30/30] kmssink: Support setting plane zpos
 
 Using min zpos when attached to window by default.
 Set env KMSSINK_PLANE_ZPOS to specify plane zpos.
@@ -14,18 +14,18 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 3402ec5..f63501b 100755
+index 7e3d6b361..703a9115b 100755
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
-@@ -47,6 +47,7 @@
- #include <gst/allocators/gstdmabuf.h>
+@@ -52,6 +52,7 @@
+ #include <drm_fourcc.h>
  
  #include <fcntl.h>
 +#include <stdlib.h>
- #include <string.h>
  
  #include "gstkmssink.h"
-@@ -153,10 +154,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
+ #include "gstkmsutils.h"
+@@ -160,10 +161,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
  }
  
  static void
@@ -47,7 +47,7 @@ index 3402ec5..f63501b 100755
  }
  
  static int
-@@ -1414,6 +1426,64 @@ done:
+@@ -1533,6 +1545,64 @@ done:
    return buf;
  }
  
@@ -112,7 +112,7 @@ index 3402ec5..f63501b 100755
  static GstFlowReturn
  gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
  {
-@@ -1431,8 +1501,10 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
+@@ -1550,8 +1620,10 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
  
    res = GST_FLOW_ERROR;
  
@@ -125,13 +125,13 @@ index 3402ec5..f63501b 100755
    if (buf)
      buffer = gst_kms_sink_get_input_buffer (self, buf);
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
-index 4458cf9..53c6218 100755
+index 624e496eb..6485ec97e 100755
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
-@@ -95,6 +95,8 @@ struct _GstKMSSink {
+@@ -91,6 +91,8 @@ struct _GstKMSSink {
+   /* reconfigure info if driver doesn't scale */
+   GstVideoRectangle pending_rect;
    gboolean reconfigure;
- 
-   drmModeCrtcPtr original_crtc;
 +
 +  guintptr window_handle;
  };

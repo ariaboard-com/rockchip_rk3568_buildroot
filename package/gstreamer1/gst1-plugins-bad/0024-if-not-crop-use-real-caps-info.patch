@@ -1,7 +1,7 @@
-From b5e7c52bad3605738845f616ab531ae43513f979 Mon Sep 17 00:00:00 2001
+From 1f0a6de8e98d6c86783b4485e48288f2012ec75a Mon Sep 17 00:00:00 2001
 From: "james.lin" <james.lin@rock-chips.com>
 Date: Fri, 13 Apr 2018 11:58:00 +0800
-Subject: [PATCH 5/6] if not crop use real caps info
+Subject: [PATCH 24/30] if not crop use real caps info
 
 Signed-off-by: james.lin <james.lin@rock-chips.com>
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -15,10 +15,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
 old mode 100644
 new mode 100755
-index 1fec66d..0c6f186
+index 1c219809d..b103dadfe
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
-@@ -1020,6 +1020,7 @@ gst_kms_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+@@ -1154,6 +1154,7 @@ gst_kms_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
      goto modesetting_failed;
  
    self->vinfo = vinfo;
@@ -26,7 +26,7 @@ index 1fec66d..0c6f186
  
    GST_OBJECT_LOCK (self);
    if (self->reconfigure) {
-@@ -1462,8 +1463,8 @@ retry_set_plane:
+@@ -1596,8 +1597,8 @@ retry_set_plane:
      src.w = crop->width;
      src.h = crop->height;
    } else {
@@ -40,11 +40,11 @@ index 1fec66d..0c6f186
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
 old mode 100644
 new mode 100755
-index a80699c..92d51aa
+index 65407dab4..624e496eb
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
-@@ -67,6 +67,7 @@ struct _GstKMSSink {
-   gboolean modesetting_enabled;
+@@ -70,6 +70,7 @@ struct _GstKMSSink {
+   GstStructure *plane_props;
  
    GstVideoInfo vinfo;
 +  GstVideoInfo rinfo;

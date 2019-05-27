@@ -1,7 +1,7 @@
-From b7ed00e8ef1d155a0ad8b0b7a1f387e1df626eee Mon Sep 17 00:00:00 2001
+From d0f141ae8f7ea03bde0df4f6bc3fc2dd81a709aa Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 25 Dec 2018 16:20:35 +0800
-Subject: [PATCH 2/2] waylandsink: Enable changing window handle
+Subject: [PATCH 29/30] waylandsink: Enable changing window handle
 
 Changing window handle is dangerous, but we need this feature for:
 https://redmine.rockchip.com.cn/issues/184629
@@ -12,10 +12,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index deb6428..0a3db1b 100644
+index 78dd294a0..df3b8c7e3 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
-@@ -885,8 +885,8 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
+@@ -918,8 +918,8 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
    g_return_if_fail (sink != NULL);
  
    if (sink->window != NULL) {
@@ -26,7 +26,7 @@ index deb6428..0a3db1b 100644
    }
  
    g_mutex_lock (&sink->render_lock);
-@@ -894,8 +894,6 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
+@@ -927,8 +927,6 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
    GST_DEBUG_OBJECT (sink, "Setting window handle %" GST_PTR_FORMAT,
        (void *) handle);
  
