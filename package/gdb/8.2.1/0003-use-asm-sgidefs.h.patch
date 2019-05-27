@@ -1,4 +1,4 @@
-From 12a0b8d81e1fda6ba98abdce8d6f09f9555ebcf5 Mon Sep 17 00:00:00 2001
+From b286989e94e09c992462771cdbd3dc684f660b4f Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <amccurdy@gmail.com>
 Date: Sat, 30 Apr 2016 15:29:06 -0700
 Subject: [PATCH] use <asm/sgidefs.h>
@@ -13,8 +13,7 @@ instead.
 Upstream-Status: Pending
 
 [Vincent:
-Taken from https://sourceware.org/bugzilla/show_bug.cgi?id=21070
-Patch has been adapted to apply on 7.10.1.]
+Taken from: https://sourceware.org/bugzilla/show_bug.cgi?id=21070]
 
 Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
@@ -24,7 +23,7 @@ Signed-off-by: Vicente Olivert Riera <Vincent.Riera@imgtec.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gdb/mips-linux-nat.c b/gdb/mips-linux-nat.c
-index 9f6d697..8f57bb2 100644
+index 21b1f583b92..de525ae6b01 100644
 --- a/gdb/mips-linux-nat.c
 +++ b/gdb/mips-linux-nat.c
 @@ -31,7 +31,7 @@
@@ -33,9 +32,9 @@ index 9f6d697..8f57bb2 100644
  
 -#include <sgidefs.h>
 +#include <asm/sgidefs.h>
- #include <sys/ptrace.h>
+ #include "nat/gdb_ptrace.h"
  #include <asm/ptrace.h>
-
+ #include "inf-ptrace.h"
 -- 
-2.13.1
- 
+2.14.4
+
