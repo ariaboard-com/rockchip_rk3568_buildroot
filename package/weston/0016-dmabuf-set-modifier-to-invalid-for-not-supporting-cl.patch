@@ -1,0 +1,66 @@
+From 1d8a0a1590de2eff79c407b25afa0a5cee0adbf7 Mon Sep 17 00:00:00 2001
+From: Emre Ucan <eucan@de.adit-jv.com>
+Date: Tue, 9 Jan 2018 14:00:30 +0100
+Subject: [PATCH] dmabuf: set modifier to invalid for not supporting clients
+
+modifier_hi and modifier_lo are set to 0 by clients,
+which are not supporting modifiers. Modifier attributes
+of buffers of these clients set to 0 too in linux-dmabuf.c
+
+import_simple_dmabuf function in gl-renderer.c compares
+modifier attribute of the buffer with DRM_FORMAT_MOD_INVALID.
+DRM_FORMAT_MOD_INVALID is equal to ((1ULL<<56) - 1).
+Therefore, modifer 0 is accepted as valid. Then, the function
+checks support for eglQueryDmaBufModifiersEXT.
+If it is not supported import_simple_dmabuf function is returning
+NULL.
+
+This patch sets the modifier attribute to DRM_FORMAT_MOD_INVALID
+for clients which are not supporting modifiers. Without this patch
+linux-dmabuf protocol is not working for not supporting clients.
+
+Fixes: b138d7afb3a2a7d51dccb12f08d70c2d86766901 ("gl-renderer: Ignore INVALID modifier")
+Signed-off-by: Emre Ucan <eucan@de.adit-jv.com>
+Reviewed-by: Daniel Stone <daniels@collabora.com>
+Tested-by: Tomohito Esaki <etom@igel.co.jp>
+---
+ libweston/gl-renderer.c  | 2 +-
+ libweston/linux-dmabuf.c | 9 +++++++--
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
+index 43524ce..f1a7e78 100644
+--- a/libweston/gl-renderer.c
++++ b/libweston/gl-renderer.c
+@@ -2056,7 +2056,7 @@ gl_renderer_import_dmabuf(struct weston_compositor *ec,
+ 
+ 	for (i = 0; i < dmabuf->attributes.n_planes; i++) {
+ 		/* return if EGL doesn't support import modifiers */
+-		if (dmabuf->attributes.modifier[i] != 0)
++		if (dmabuf->attributes.modifier[i] != DRM_FORMAT_MOD_INVALID)
+ 			if (!gr->has_dmabuf_import_modifiers)
+ 				return false;
+ 
+diff --git a/libweston/linux-dmabuf.c b/libweston/linux-dmabuf.c
+index ccdcfb0..148c61f 100644
+--- a/libweston/linux-dmabuf.c
++++ b/libweston/linux-dmabuf.c
+@@ -111,8 +111,13 @@ params_add(struct wl_client *client,
+ 	buffer->attributes.fd[plane_idx] = name_fd;
+ 	buffer->attributes.offset[plane_idx] = offset;
+ 	buffer->attributes.stride[plane_idx] = stride;
+-	buffer->attributes.modifier[plane_idx] = ((uint64_t)modifier_hi << 32) |
+-	                                         modifier_lo;
++
++	if (wl_resource_get_version(params_resource) < ZWP_LINUX_DMABUF_V1_MODIFIER_SINCE_VERSION)
++		buffer->attributes.modifier[plane_idx] = DRM_FORMAT_MOD_INVALID;
++	else
++		buffer->attributes.modifier[plane_idx] = ((uint64_t)modifier_hi << 32) |
++							 modifier_lo;
++
+ 	buffer->attributes.n_planes++;
+ }
+ 
+-- 
+2.11.0
+
