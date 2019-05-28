@@ -9,5 +9,39 @@ config BR2_PACKAGE_RECOVERY
         select BR2_PACKAGE_DOSFSTOOLS_MKFS_FAT
         select BR2_PACKAGE_E2FSPROGS
         select BR2_PACKAGE_E2FSPROGS_RESIZE2FS
+        select BR2_PACKAGE_LIBCURL
+        select BR2_PACKAGE_OPENSSL
 	help
 	  Rockchip recovery for linux.
+
+if BR2_PACKAGE_RECOVERY
+
+config BR2_PACKAGE_RECOVERY_BOOTCONTROL
+    bool "Linux AB bool control"
+
+choice
+    default BR2_PACKAGE_RECOVERY_SUCCESSFUL_BOOT
+    prompt "Linux A/B bringup features."
+config BR2_PACKAGE_RECOVERY_SUCCESSFUL_BOOT
+    bool "successful_boot"
+config BR2_PACKAGE_RECOVERY_RETRY
+    bool "retry time"
+endchoice
+
+choice
+    default BR2_PACKAGE_RECOVERY_USE_RKUPDATE
+    prompt "choice the update bin of recovery."
+config BR2_PACKAGE_RECOVERY_USE_RKUPDATE
+    bool "rkupdate"
+    select BR2_PACKAGE_RECOVERY_RECOVERYBIN
+config BR2_PACKAGE_RECOVERY_USE_UPDATEENGINE
+    bool "updateEngine"
+endchoice
+
+config BR2_PACKAGE_RECOVERY_RECOVERYBIN
+    bool "recovery bin"
+
+config BR2_PACKAGE_RECOVERY_UPDATEENGINEBIN
+    bool "updateEngine bin"
+
+endif
