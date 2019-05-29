@@ -13,15 +13,21 @@ info_view()
 
 info_view
 echo "*****************************************************"
-echo "camera app test:                                    1"
-echo "camera stresstest:                                  2"
+echo "camera rkisp test:                                  1"
+echo "camera usb test:                                    2"
+echo "camera stresstest:                                  3"
 echo "*****************************************************"
 
 read -t 30 CAMERA_CHOICE
 
-camera_app_test()
+camera_rkisp_test()
 {
-	sh ${DIR_CAMERA}/camera_rkisp.sh
+	sh ${DIR_CAMERA}/camera_rkisp_test.sh
+}
+
+camera_usb_test()
+{
+	sh ${DIR_CAMERA}/camera_usb_test.sh
 }
 
 camera_stresstest()
@@ -31,9 +37,12 @@ camera_stresstest()
 
 case ${CAMERA_CHOICE} in
 	1)
-		camera_app_test
+		camera_rkisp_test
 		;;
 	2)
+		camera_usb_test
+		;;
+	3)
 		camera_stresstest
 		;;
 	*)
