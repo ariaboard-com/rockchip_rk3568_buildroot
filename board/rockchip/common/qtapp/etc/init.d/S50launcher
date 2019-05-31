@@ -16,13 +16,13 @@ case "$1" in
 		/usr/libexec/bluetooth/bluetoothd --compat &
 
 		#for kmssink
-		export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
+		#export QT_GSTREAMER_WINDOW_VIDEOSINK=kmssink
 
 		#for rkisp plugin
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/gstreamer-1.0
 
 		#for waylandsink
-		#export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
+		export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
 
 		#for dual display with morror mode by default
 		export WESTON_DRM_MIRROR=1
