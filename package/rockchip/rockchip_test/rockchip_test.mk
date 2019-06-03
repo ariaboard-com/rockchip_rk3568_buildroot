@@ -1,7 +1,7 @@
 # add test tool for rockchip platform
 # Author : Hans Yang <yhx@rock-chips.com>
 
-ROCKCHIP_TEST_VERSION = 20190528
+ROCKCHIP_TEST_VERSION = 20190603
 ROCKCHIP_TEST_SITE_METHOD = local
 ROCKCHIP_TEST_SITE = $(TOPDIR)/package/rockchip/rockchip_test/src
 

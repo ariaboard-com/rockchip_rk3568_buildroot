@@ -40,7 +40,7 @@ elif [[ $COMPATIBLE =~ "rk3326" ]]; then
     CHIPNAME="rk3326"
 elif [[ $COMPATIBLE =~ "rk3399" ]]; then
     CHIPNAME="rk3399"
-elif [[ $COMPATIBLE =~ "rk3399" && $COMPATIBLE =~ "rk3399pro"]]; then
+elif [[ $COMPATIBLE =~ "rk3399" && $COMPATIBLE =~ "rk3399pro" ]]; then
     CHIPNAME="rk3399pro"
 elif [[ $COMPATIBLE =~ "rk1808" ]]; then
     CHIPNAME="rk1808"
