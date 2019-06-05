@@ -1,0 +1,31 @@
+From 143b7594d611f3a48f2f41aba0afc73074596708 Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Thu, 16 May 2019 15:48:14 -0400
+Subject: [PATCH 2/5] glamor: Fix more fallback paths with non-GXcopy rop with
+ GLES
+
+Desktop GL can handle arbitrary rops here, GLES can't. The switch
+statement attempts to optimize some cases that GLES can still handle if
+we precompute the right pixel value, but we were then throwing that
+pixel value away and using gc->fgPixel anyway. Fix this, and now
+xts-render passes against glamor+gles.
+---
+ glamor/glamor_transform.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/glamor/glamor_transform.c b/glamor/glamor_transform.c
+index 2d5a634a8c..358c508a88 100644
+--- a/glamor/glamor_transform.c
++++ b/glamor/glamor_transform.c
+@@ -159,7 +159,7 @@ glamor_set_solid(PixmapPtr      pixmap,
+             return FALSE;
+         }
+     }
+-    glamor_set_color(pixmap, gc->fgPixel, uniform);
++    glamor_set_color(pixmap, pixel, uniform);
+ 
+     return TRUE;
+ }
+-- 
+2.11.0
+
