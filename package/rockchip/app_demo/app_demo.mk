@@ -19,7 +19,7 @@ APP_DEMO_CONF_OPTS += "-DDRAW_BY_DRM=1"
 endif
 
 ifeq ($(BR2_PACKAGE_ROCKX),y)
-APP_DEMO_CONF_OPTS += "-DROCKX=ON"
+APP_DEMO_CONF_OPTS += "-DROCKX=ON" "-DROCKX_HERDER_DIR=$(STAGING_DIR)/usr/include/rockx"
 endif
 
 $(eval $(cmake-package))
