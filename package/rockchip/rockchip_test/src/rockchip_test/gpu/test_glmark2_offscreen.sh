@@ -28,24 +28,26 @@ fi
 }
 
 COMPATIBLE=$(cat /proc/device-tree/compatible)
-if [[ $COMPATIBLE =~ "rk3288" ]]; then
+if [[ $(expr $COMPATIBLE : ".*rk3288") -ne 0 ]]; then
     CHIPNAME="rk3288"
-elif [[ $COMPATIBLE =~ "rk3308" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3308") -ne 0 ]]; then
     CHIPNAME="rk3308"
-elif [[ $COMPATIBLE =~ "rk3328" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3328") -ne 0 ]]; then
     CHIPNAME="rk3328"
-elif [[ $COMPATIBLE =~ "rk3399" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3399") -ne 0 ]]; then
     CHIPNAME="rk3399"
-elif [[ $COMPATIBLE =~ "rk3326" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3326") -ne 0 ]]; then
     CHIPNAME="rk3326"
-elif [[ $COMPATIBLE =~ "rk3399" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3399") -ne 0 ]]; then
     CHIPNAME="rk3399"
-elif [[ $COMPATIBLE =~ "rk3399" && $COMPATIBLE =~ "rk3399pro" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk3399pro") -ne 0 ]]; then
     CHIPNAME="rk3399pro"
-elif [[ $COMPATIBLE =~ "rk1808" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*rk1808") -ne 0 ]]; then
     CHIPNAME="rk1808"
-elif [[ $COMPATIBLE =~ "px3se" ]]; then
+elif [[ $(expr $COMPATIBLE : ".*px3se") -ne 0 ]]; then
     CHIPNAME="px3se"
+elif [[ $(expr $COMPATIBLE : ".*px30") -ne 0 ]]; then
+    CHIPNAME="px30"
 else
     CHIPNAME="rk3399"
 fi
