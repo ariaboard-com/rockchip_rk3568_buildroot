@@ -9,13 +9,9 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  sys/kms/gstkmssink.c | 5 +++--
  sys/kms/gstkmssink.h | 1 +
  2 files changed, 4 insertions(+), 2 deletions(-)
- mode change 100644 => 100755 sys/kms/gstkmssink.c
- mode change 100644 => 100755 sys/kms/gstkmssink.h
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-old mode 100644
-new mode 100755
-index 1c219809d..b103dadfe
+index 1c219809d..b103dadfe 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
 @@ -1154,6 +1154,7 @@ gst_kms_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
@@ -38,9 +34,7 @@ index 1c219809d..b103dadfe
  
    if ((GST_VIDEO_INFO_FORMAT(&self->vinfo) == GST_VIDEO_FORMAT_P010_10LE) && (src.w >= 3840))
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
-old mode 100644
-new mode 100755
-index 65407dab4..624e496eb
+index 65407dab4..624e496eb 100644
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
 @@ -70,6 +70,7 @@ struct _GstKMSSink {

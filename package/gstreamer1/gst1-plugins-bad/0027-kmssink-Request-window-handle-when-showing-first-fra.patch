@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 6b217e9b0..7e3d6b361 100755
+index 6b217e9b0..7e3d6b361 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
 @@ -1550,6 +1550,9 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)

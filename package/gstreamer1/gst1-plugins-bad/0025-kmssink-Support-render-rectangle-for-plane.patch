@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index b103dadfe..6b217e9b0 100755
+index b103dadfe..6b217e9b0 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
 @@ -456,6 +456,9 @@ configure_mode_setting (GstKMSSink * self, GstVideoInfo * vinfo)

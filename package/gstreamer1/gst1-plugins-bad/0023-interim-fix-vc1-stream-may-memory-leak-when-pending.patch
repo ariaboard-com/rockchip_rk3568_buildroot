@@ -7,12 +7,9 @@ Signed-off-by: james.lin <james.lin@rock-chips.com>
 ---
  gst/mpegtsdemux/tsdemux.c | 8 ++++++++
  1 file changed, 8 insertions(+)
- mode change 100644 => 100755 gst/mpegtsdemux/tsdemux.c
 
 diff --git a/gst/mpegtsdemux/tsdemux.c b/gst/mpegtsdemux/tsdemux.c
-old mode 100644
-new mode 100755
-index e5c78e7ad..c5fc6f1e1
+index e5c78e7ad..c5fc6f1e1 100644
 --- a/gst/mpegtsdemux/tsdemux.c
 +++ b/gst/mpegtsdemux/tsdemux.c
 @@ -2920,6 +2920,14 @@ gst_ts_demux_push_pending_data (GstTSDemux * demux, TSDemuxStream * stream,
