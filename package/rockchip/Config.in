@@ -196,4 +196,5 @@ source "package/rockchip/bootcontrol/Config.in"
 source "package/rockchip/LinuxAB/Config.in"
 source "package/rockchip/sensor-daemon/Config.in"
 source "package/rockchip/rtc_demo/Config.in"
+source "package/rockchip/rk_webui/Config.in"
 endif
