@@ -73,4 +73,13 @@ endef
 RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_NTB_CONFIG
 endif
 
+ifeq ($(BR2_PACKAGE_RKNPU_ACM),y)
+define RKSCRIPT_ADD_ACM_CONFIG
+	if test ! `grep usb_acm_en $(RKSCRIPT_USB_CONFIG_FILE)` ; then \
+		echo usb_acm_en >> $(RKSCRIPT_USB_CONFIG_FILE) ; \
+	fi
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_ACM_CONFIG
+endif
+
 $(eval $(generic-package))
