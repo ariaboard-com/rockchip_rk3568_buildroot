@@ -60,6 +60,11 @@ config BR2_PACKAGE_RKMEDIA_ALSA_CAPTURE
 
 endif # BR2_PACKAGE_ALSA_LIB
 
+config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
+    bool "camera capture"
+    help
+      wrapped function of v4l2 capture
+
 config BR2_PACKAGE_RKMEDIA_LIVE555
     bool "live555"
     select BR2_PACKAGE_LIVE555
