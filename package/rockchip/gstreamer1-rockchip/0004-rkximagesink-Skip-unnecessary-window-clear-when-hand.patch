@@ -1,0 +1,45 @@
+From b2d88d85c86511b0f7b75717318a8dd411f5a3b5 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 18 Jun 2019 18:57:05 +0800
+Subject: [PATCH 1/2] rkximagesink: Skip unnecessary window clear when handling
+ expose
+
+There's no need to clear window when there's a image ready to show.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ gst/rkximage/ximagesink.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/gst/rkximage/ximagesink.c b/gst/rkximage/ximagesink.c
+index c0ceeac..4b8049e 100644
+--- a/gst/rkximage/ximagesink.c
++++ b/gst/rkximage/ximagesink.c
+@@ -47,6 +47,8 @@ static void gst_x_image_sink_reset (GstRkXImageSink * ximagesink);
+ static void gst_x_image_sink_xwindow_update_geometry (GstRkXImageSink *
+     ximagesink);
+ static void gst_x_image_sink_expose (GstVideoOverlay * overlay);
++static void gst_x_image_sink_xwindow_clear (GstRkXImageSink * ximagesink,
++    GstXWindow * xwindow);
+ 
+ #ifndef GST_CAPS_FEATURE_MEMORY_DMABUF
+ #define GST_CAPS_FEATURE_MEMORY_DMABUF "memory:DMABuf"
+@@ -529,6 +531,7 @@ gst_x_image_sink_ximage_put (GstRkXImageSink * ximagesink, GstBuffer * ximage)
+       if (!gst_is_dmabuf_memory (mem))
+         return GST_FLOW_ERROR;
+     } else {
++      gst_x_image_sink_xwindow_clear (ximagesink, ximagesink->xwindow);
+       g_mutex_unlock (&ximagesink->flow_lock);
+       return TRUE;
+     }
+@@ -1660,7 +1663,6 @@ gst_x_image_sink_expose (GstVideoOverlay * overlay)
+   GstRkXImageSink *ximagesink = GST_X_IMAGE_SINK (overlay);
+ 
+   gst_x_image_sink_xwindow_update_geometry (ximagesink);
+-  gst_x_image_sink_xwindow_clear (ximagesink, ximagesink->xwindow);
+   gst_x_image_sink_ximage_put (ximagesink, NULL);
+ }
+ 
+-- 
+2.11.0
+
