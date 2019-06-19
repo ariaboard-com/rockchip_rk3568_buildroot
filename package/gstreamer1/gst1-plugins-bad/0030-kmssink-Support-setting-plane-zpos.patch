@@ -1,4 +1,4 @@
-From 9a1fd9a7e75ceed845d6c4cce6c06ad57148cfda Mon Sep 17 00:00:00 2001
+From 184b9812d4b2d5cac87fb0622b3a5727a3899a02 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 21:24:37 +0800
 Subject: [PATCH 30/30] kmssink: Support setting plane zpos
@@ -9,23 +9,24 @@ Set env KMSSINK_PLANE_ON_TOP to force max zpos
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- sys/kms/gstkmssink.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ sys/kms/gstkmssink.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++-
  sys/kms/gstkmssink.h |  2 ++
- 2 files changed, 75 insertions(+), 1 deletion(-)
+ 2 files changed, 76 insertions(+), 1 deletion(-)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 7e3d6b361..703a9115b 100644
+index 7e3d6b3..d037ec7 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
-@@ -52,6 +52,7 @@
+@@ -52,6 +52,8 @@
  #include <drm_fourcc.h>
  
  #include <fcntl.h>
 +#include <stdlib.h>
++#include <string.h>
  
  #include "gstkmssink.h"
  #include "gstkmsutils.h"
-@@ -160,10 +161,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
+@@ -160,10 +162,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
  }
  
  static void
@@ -47,7 +48,7 @@ index 7e3d6b361..703a9115b 100644
  }
  
  static int
-@@ -1533,6 +1545,64 @@ done:
+@@ -1533,6 +1546,64 @@ done:
    return buf;
  }
  
@@ -90,7 +91,7 @@ index 7e3d6b361..703a9115b 100644
 +  min = prop->values[0];
 +  max = prop->values[1];
 +
-+  zpos = self->window_handle ? min : max;
++  zpos = self->window_handle ? min : min + 1;
 +
 +  buf = getenv ("KMSSINK_PLANE_ZPOS");
 +  if (buf)
@@ -98,7 +99,7 @@ index 7e3d6b361..703a9115b 100644
 +  else if (getenv ("KMSSINK_PLANE_ON_TOP"))
 +    zpos = max;
 +
-+  GST_INFO_OBJECT (self, "set plane zpos = %lld (%lld~%lld)", zpos, min, max);
++  GST_INFO_OBJECT (self, "set plane zpos = %lu (%lu~%lu)", zpos, min, max);
 +
 +  drmModeObjectSetProperty (self->fd, self->plane_id,
 +      DRM_MODE_OBJECT_PLANE, props->props[i], zpos);
@@ -112,7 +113,7 @@ index 7e3d6b361..703a9115b 100644
  static GstFlowReturn
  gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
  {
-@@ -1550,8 +1620,10 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
+@@ -1550,8 +1621,10 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
  
    res = GST_FLOW_ERROR;
  
@@ -125,7 +126,7 @@ index 7e3d6b361..703a9115b 100644
    if (buf)
      buffer = gst_kms_sink_get_input_buffer (self, buf);
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
-index 624e496eb..6485ec97e 100644
+index 624e496..6485ec9 100644
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
 @@ -91,6 +91,8 @@ struct _GstKMSSink {
