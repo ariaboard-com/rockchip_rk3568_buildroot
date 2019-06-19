@@ -27,15 +27,8 @@ for i in $(seq 0 $MEDIA_MAX); do
 	if echo $ISP_NODE | grep -q "^/dev/video"
 	then
 		CAM_NUM=$(($CAM_NUM + 1));
-		if echo $Link | grep -q "0 link"
-		then
-			CAM_NUM=$(($CAM_NUM - 1));
-			eval VIDEO_NODE$i="";
-			echo "     Check /dev/media$i didn't link anycamera($(eval echo \$VIDEO_NODE$i)) "
-		else
-			eval VIDEO_NODE$i=$ISP_NODE;
-			echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
-		fi
+		eval VIDEO_NODE$i=$ISP_NODE;
+		echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
 	elif echo $CIF_NODE | grep -q "^/dev/video"
 	then
 		CAM_NUM=$(($CAM_NUM + 1));
