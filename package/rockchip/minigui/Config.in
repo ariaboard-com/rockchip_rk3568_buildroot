@@ -1,6 +1,7 @@
 config BR2_PACKAGE_MINIGUI
 	bool "Minigui core lib"
 	select BR2_PACKAGE_JPEG
+	select BR2_PACKAGE_LIBPNG12
 	help
           http://www.minigui.org
 

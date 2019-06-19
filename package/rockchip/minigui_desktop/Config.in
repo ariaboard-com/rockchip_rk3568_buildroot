@@ -1,0 +1,5 @@
+config BR2_PACKAGE_MINIGUI_DESKTOP
+	bool "Minigui demo desktop"
+	depends on BR2_PACKAGE_MINIGUI
+	help
+	  Minigui demo desktop
