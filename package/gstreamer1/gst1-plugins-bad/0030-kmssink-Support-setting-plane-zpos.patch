@@ -1,20 +1,22 @@
-From 184b9812d4b2d5cac87fb0622b3a5727a3899a02 Mon Sep 17 00:00:00 2001
+From ac2c80c0c134f0010fd30482433c5ffa315a9c20 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Wed, 26 Dec 2018 21:24:37 +0800
+Date: Thu, 20 Jun 2019 11:20:12 +0800
 Subject: [PATCH 30/30] kmssink: Support setting plane zpos
 
-Using min zpos when attached to window by default.
 Set env KMSSINK_PLANE_ZPOS to specify plane zpos.
-Set env KMSSINK_PLANE_ON_TOP to force max zpos
+Set env KMSSINK_PLANE_ON_TOP to set max zpos.
+Set env KMSSINK_PLANE_ON_BOTTOM to set min zpos.
+
+Default zpos is max.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- sys/kms/gstkmssink.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- sys/kms/gstkmssink.h |  2 ++
- 2 files changed, 76 insertions(+), 1 deletion(-)
+ sys/kms/gstkmssink.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ sys/kms/gstkmssink.h |  1 +
+ 2 files changed, 82 insertions(+)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 7e3d6b3..d037ec7 100644
+index b701063..3ca630f 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
 @@ -52,6 +52,8 @@
@@ -26,34 +28,12 @@ index 7e3d6b3..d037ec7 100644
  
  #include "gstkmssink.h"
  #include "gstkmsutils.h"
-@@ -160,10 +162,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
- }
- 
- static void
-+gst_kms_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
-+{
-+  GstKMSSink *self = GST_KMS_SINK (overlay);
-+
-+  g_return_if_fail (self != NULL);
-+
-+  self->window_handle = handle;
-+}
-+
-+static void
- gst_kms_sink_video_overlay_init (GstVideoOverlayInterface * iface)
- {
-   iface->expose = gst_kms_sink_expose;
-   iface->set_render_rectangle = gst_kms_sink_set_render_rectangle;
-+  iface->set_window_handle = gst_kms_sink_set_window_handle;
- }
- 
- static int
-@@ -1533,6 +1546,64 @@ done:
-   return buf;
+@@ -701,6 +703,76 @@ gst_kms_sink_update_plane_properties (GstKMSSink * self)
+   gst_kms_sink_update_properties (&iter, self->plane_props);
  }
  
 +static void
-+configure_plane_zpos (GstKMSSink * self)
++gst_kms_sink_configure_plane_zpos (GstKMSSink * self, gboolean restore)
 +{
 +  drmModeObjectPropertiesPtr props = NULL;
 +  drmModePropertyPtr prop = NULL;
@@ -91,15 +71,27 @@ index 7e3d6b3..d037ec7 100644
 +  min = prop->values[0];
 +  max = prop->values[1];
 +
-+  zpos = self->window_handle ? min : min + 1;
++  if (restore) {
++    if (self->saved_zpos < 0)
++      goto out;
 +
-+  buf = getenv ("KMSSINK_PLANE_ZPOS");
-+  if (buf)
-+    zpos = atoi (buf);
-+  else if (getenv ("KMSSINK_PLANE_ON_TOP"))
-+    zpos = max;
++    zpos = self->saved_zpos;
++  } else {
++    zpos = min + 1;
++
++    buf = getenv ("KMSSINK_PLANE_ZPOS");
++    if (buf)
++      zpos = atoi (buf);
++    else if (getenv ("KMSSINK_PLANE_ON_TOP"))
++      zpos = max;
++    else if (getenv ("KMSSINK_PLANE_ON_BOTTOM"))
++      zpos = min;
++  }
 +
 +  GST_INFO_OBJECT (self, "set plane zpos = %lu (%lu~%lu)", zpos, min, max);
++
++  if (self->saved_zpos < 0)
++    self->saved_zpos = props->prop_values[i];
 +
 +  drmModeObjectSetProperty (self->fd, self->plane_id,
 +      DRM_MODE_OBJECT_PLANE, props->props[i], zpos);
@@ -110,34 +102,51 @@ index 7e3d6b3..d037ec7 100644
 +  drmModeFreeResources (res);
 +}
 +
- static GstFlowReturn
- gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
+ static gboolean
+ gst_kms_sink_start (GstBaseSink * bsink)
  {
-@@ -1550,8 +1621,10 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
+@@ -919,6 +991,11 @@ gst_kms_sink_stop (GstBaseSink * bsink)
+   if (self->allocator)
+     gst_kms_allocator_clear_cache (self->allocator);
+ 
++  if (self->saved_zpos >= 0) {
++    gst_kms_sink_configure_plane_zpos (self, TRUE);
++    self->saved_zpos = -1;
++  }
++
+   gst_buffer_replace (&self->last_buffer, NULL);
+   gst_caps_replace (&self->allowed_caps, NULL);
+   gst_object_replace ((GstObject **) & self->pool, NULL);
+@@ -1563,6 +1640,9 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
  
    res = GST_FLOW_ERROR;
  
--  if (!self->last_buffer)
-+  if (!self->last_buffer) {
-     gst_video_overlay_prepare_window_handle (GST_VIDEO_OVERLAY (&self->videosink));
-+    configure_plane_zpos (self);
-+  }
- 
++  if (!self->last_buffer)
++    gst_kms_sink_configure_plane_zpos (self, FALSE);
++
    if (buf)
      buffer = gst_kms_sink_get_input_buffer (self, buf);
+   else if (self->last_buffer)
+@@ -1879,6 +1959,7 @@ gst_kms_sink_init (GstKMSSink * sink)
+   sink->fd = -1;
+   sink->conn_id = -1;
+   sink->plane_id = -1;
++  sink->saved_zpos = -1;
+   sink->can_scale = TRUE;
+   gst_poll_fd_init (&sink->pollfd);
+   sink->poll = gst_poll_new (TRUE);
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
-index 624e496..6485ec9 100644
+index 6485ec9..516e232 100644
 --- a/sys/kms/gstkmssink.h
 +++ b/sys/kms/gstkmssink.h
-@@ -91,6 +91,8 @@ struct _GstKMSSink {
-   /* reconfigure info if driver doesn't scale */
-   GstVideoRectangle pending_rect;
-   gboolean reconfigure;
-+
-+  guintptr window_handle;
- };
+@@ -53,6 +53,7 @@ struct _GstKMSSink {
+   gint crtc_id;
+   gint plane_id;
+   guint pipe;
++  guint saved_zpos;
  
- struct _GstKMSSinkClass {
+   /* crtc data */
+   guint16 hdisplay, vdisplay;
 -- 
 2.11.0
 
