@@ -1,27 +1,62 @@
-From 181e42866930dff01afc584dd6d50feb9dbb217a Mon Sep 17 00:00:00 2001
+From d4154b1371ecd1b72ffbb9fcf7ab379b0e5ac831 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Mon, 10 Dec 2018 19:55:18 +0800
-Subject: [PATCH 27/30] kmssink: Request window handle when showing first frame
+Date: Thu, 20 Jun 2019 12:43:20 +0800
+Subject: [PATCH 27/30] kmssink: Request window handle
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- sys/kms/gstkmssink.c | 3 +++
- 1 file changed, 3 insertions(+)
+ sys/kms/gstkmssink.c | 13 +++++++++++++
+ sys/kms/gstkmssink.h |  2 ++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
-index 6b217e9b0..7e3d6b361 100644
+index 6b217e9..b701063 100644
 --- a/sys/kms/gstkmssink.c
 +++ b/sys/kms/gstkmssink.c
-@@ -1550,6 +1550,9 @@ gst_kms_sink_show_frame (GstVideoSink * vsink, GstBuffer * buf)
+@@ -160,10 +160,21 @@ gst_kms_sink_expose (GstVideoOverlay * overlay)
+ }
  
-   res = GST_FLOW_ERROR;
- 
-+  if (!self->last_buffer)
-+    gst_video_overlay_prepare_window_handle (GST_VIDEO_OVERLAY (&self->videosink));
+ static void
++gst_kms_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
++{
++  GstKMSSink *self = GST_KMS_SINK (overlay);
 +
-   if (buf)
-     buffer = gst_kms_sink_get_input_buffer (self, buf);
-   else if (self->last_buffer)
++  g_return_if_fail (self != NULL);
++
++  self->window_handle = handle;
++}
++
++static void
+ gst_kms_sink_video_overlay_init (GstVideoOverlayInterface * iface)
+ {
+   iface->expose = gst_kms_sink_expose;
+   iface->set_render_rectangle = gst_kms_sink_set_render_rectangle;
++  iface->set_window_handle = gst_kms_sink_set_window_handle;
+ }
+ 
+ static int
+@@ -1166,6 +1177,8 @@ gst_kms_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+   }
+   GST_OBJECT_UNLOCK (self);
+ 
++  gst_video_overlay_prepare_window_handle (GST_VIDEO_OVERLAY (bsink));
++
+   GST_DEBUG_OBJECT (self, "negotiated caps = %" GST_PTR_FORMAT, caps);
+ 
+   return TRUE;
+diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
+index 624e496..6485ec9 100644
+--- a/sys/kms/gstkmssink.h
++++ b/sys/kms/gstkmssink.h
+@@ -91,6 +91,8 @@ struct _GstKMSSink {
+   /* reconfigure info if driver doesn't scale */
+   GstVideoRectangle pending_rect;
+   gboolean reconfigure;
++
++  guintptr window_handle;
+ };
+ 
+ struct _GstKMSSinkClass {
 -- 
 2.11.0
 
