@@ -10,26 +10,41 @@ ALSA_PLUGINS_SITE = ftp://ftp.alsa-project.org/pub/plugins
 ALSA_PLUGINS_LICENSE = GPLv2
 ALSA_PLUGINS_LICENSE_FILES = COPYING
 ALSA_PLUGINS_INSTALL_STAGING = YES
-ALSA_PLUGINS_DEPENDENCIES = host-pkgconf alsa-lib \
-	$(if $(BR2_PACKAGE_NCURSES),ncurses) \
-	$(if $(BR2_PACKAGE_LIBSAMPLERATE),libsamplerate)
-# Regenerate aclocal.m4 to pick the patched
-# version of alsa.m4 from alsa-lib
-#ALSA_PLUGINS_AUTORECONF = YES
-#ALSA_PLUGINS_GETTEXTIZE = YES
+ALSA_PLUGINS_DEPENDENCIES = host-pkgconf alsa-lib
 
-#ALSA_PLUGINS_CONF_OPTS = \
-						 --disable-libtool-lock  \
-						 --disable-oss           \
-						 --disable-mix           \
-						 --disable-usbstream     \
-						 --disable-arcamav       \
-						 --disable-jack          \
-						 --disable-pulseaudio    \
-						 --disable-samplerate    \
-						 --enable-maemo-plugin   
+ifeq ($(BR2_PACKAGE_FFMPEG),y)
+ALSA_PLUGINS_DEPENDENCIES = ffmpeg
+ALSA_PLUGINS_CONF_OPTS += --enable-avcodec
+else
+ALSA_PLUGINS_CONF_OPTS += --disable-avcodec
+endif
 
+ifeq ($(BR2_PACKAGE_PULSEAUDIO),y)
+ALSA_PLUGINS_DEPENDENCIES = pulseaudio
+ALSA_PLUGINS_CONF_OPTS += --enable-pulseaudio
 
-ALSA_PLUGINS_CONF_OPTS = 
+define ALSA_PLUGINS_DEFAULT_PULSEAUDIO
+	cd $(TARGET_DIR)/usr/share/alsa/alsa.conf.d && \
+		mv 99-pulseaudio-default.conf.example 99-pulseaudio-default.conf
+endef
+ALSA_PLUGINS_POST_INSTALL_TARGET_HOOKS += ALSA_PLUGINS_DEFAULT_PULSEAUDIO
+
+else
+ALSA_PLUGINS_CONF_OPTS += --disable-pulseaudio
+endif
+
+ifeq ($(BR2_PACKAGE_LIBSAMPLERATE),y)
+ALSA_PLUGINS_DEPENDENCIES = libsamplerate
+ALSA_PLUGINS_CONF_OPTS += --enable-samplerate
+else
+ALSA_PLUGINS_CONF_OPTS += --disable-samplerate
+endif
+
+ifeq ($(BR2_PACKAGE_SPEEX),y)
+ALSA_PLUGINS_DEPENDENCIES = speex
+ALSA_PLUGINS_CONF_OPTS += --with-speex=lib
+else
+ALSA_PLUGINS_CONF_OPTS += --with-speex=builtin
+endif
 
 $(eval $(autotools-package))
