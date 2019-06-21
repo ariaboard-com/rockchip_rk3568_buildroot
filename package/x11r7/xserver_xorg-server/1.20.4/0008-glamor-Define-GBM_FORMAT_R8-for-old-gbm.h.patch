@@ -1,7 +1,7 @@
-From e603777262970cb237d43ad0344e3764c4ecdce8 Mon Sep 17 00:00:00 2001
+From 5e189e1ceae0daaaa00c64f2e8554dc9b01023b4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 5 Jun 2019 18:59:38 +0800
-Subject: [PATCH 3/5] glamor: Define GBM_FORMAT_R8 for old gbm.h
+Subject: [PATCH 08/10] glamor: Define GBM_FORMAT_R8 for old gbm.h
 
 Old version of gbm.h may not have GBM_FORMAT_R8.
 
@@ -11,7 +11,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/glamor/glamor_egl.c b/glamor/glamor_egl.c
-index d3c678d6bf..8d46380867 100644
+index d3c678d6b..8d4638086 100644
 --- a/glamor/glamor_egl.c
 +++ b/glamor/glamor_egl.c
 @@ -48,6 +48,10 @@

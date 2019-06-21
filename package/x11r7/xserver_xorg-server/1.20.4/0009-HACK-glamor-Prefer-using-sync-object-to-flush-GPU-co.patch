@@ -1,7 +1,7 @@
-From 9e63b4e9b2355d9715ebb2256c6d539a1775e7c1 Mon Sep 17 00:00:00 2001
+From 8b5be55119d48bfd781d8213899f2b1366c72671 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 3 Jun 2019 19:16:53 +0800
-Subject: [PATCH 4/5] HACK: glamor: Prefer using sync object to flush GPU
+Subject: [PATCH 09/10] HACK: glamor: Prefer using sync object to flush GPU
  commands for GLES
 
 Somehow the glFlush() not working on mali GPU.
@@ -16,7 +16,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 34 insertions(+), 9 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index cd8798a5ae..05eb80dfac 100644
+index cd8798a5a..05eb80dfa 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2110,6 +2110,10 @@ if test "x$GLAMOR" = xyes; then
@@ -31,7 +31,7 @@ index cd8798a5ae..05eb80dfac 100644
  AM_CONDITIONAL([GLAMOR_EGL], [test "x$GBM" = xyes])
  
 diff --git a/glamor/glamor.c b/glamor/glamor.c
-index b1c7d9f13d..62a397d6c8 100644
+index b1c7d9f13..a0fe0b18f 100644
 --- a/glamor/glamor.c
 +++ b/glamor/glamor.c
 @@ -254,10 +254,7 @@ glamor_destroy_pixmap(PixmapPtr pixmap)
@@ -68,7 +68,7 @@ index b1c7d9f13d..62a397d6c8 100644
 +
 +    glamor_make_current(glamor_priv);
 +
-+    if (glamor_priv-?gl_flavor != GLAMOR_GL_DESKTOP) {
++    if (glamor_priv->gl_flavor != GLAMOR_GL_DESKTOP) {
 +#ifdef GLAMOR_HAS_GL_FENCE
 +        GLsync sync;
 +
@@ -84,7 +84,7 @@ index b1c7d9f13d..62a397d6c8 100644
 +    }
 +}
 diff --git a/glamor/glamor.h b/glamor/glamor.h
-index 09e9c895cb..efcc841e42 100644
+index 09e9c895c..efcc841e4 100644
 --- a/glamor/glamor.h
 +++ b/glamor/glamor.h
 @@ -413,6 +413,7 @@ extern Bool _X_EXPORT glamor_change_window_attributes(WindowPtr pWin, unsigned l
@@ -96,7 +96,7 @@ index 09e9c895cb..efcc841e42 100644
  
  #ifdef GLAMOR_FOR_XORG
 diff --git a/glamor/glamor_sync.c b/glamor/glamor_sync.c
-index 907e0c6137..ea5ba5c9f1 100644
+index 907e0c613..ea5ba5c9f 100644
 --- a/glamor/glamor_sync.c
 +++ b/glamor/glamor_sync.c
 @@ -48,12 +48,10 @@ static void
@@ -114,7 +114,7 @@ index 907e0c6137..ea5ba5c9f1 100644
  	fence->funcs.SetTriggered = glamor_fence->set_triggered;
  	fence->funcs.SetTriggered(fence);
 diff --git a/include/dix-config.h.in b/include/dix-config.h.in
-index c64321ef13..61f50e4b91 100644
+index c64321ef1..61f50e4b9 100644
 --- a/include/dix-config.h.in
 +++ b/include/dix-config.h.in
 @@ -479,6 +479,9 @@
