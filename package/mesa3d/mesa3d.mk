@@ -220,4 +220,14 @@ endif
 # Avoid automatic search of llvm-config
 MESA3D_CONF_OPTS += --with-llvm-prefix=$(STAGING_DIR)/usr/bin
 
+# Hack for rockchip libmali
+ifeq ($(BR2_PACKAGE_LIBMALI),y)
+define MESA3D_REPLACE_MALI_GBM_PC
+        $(INSTALL) -D -m 0644 package/mesa3d/mali_gbm.pc \
+		$(STAGING_DIR)/usr/lib/pkgconfig/gbm.pc
+endef
+
+MESA3D_POST_INSTALL_STAGING_HOOKS += MESA3D_REPLACE_MALI_GBM_PC
+endif
+
 $(eval $(autotools-package))
