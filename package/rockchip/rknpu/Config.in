@@ -9,6 +9,17 @@ config BR2_PACKAGE_RKNPU_NTB
 	help
 	  "use ntb to communction rknn-toolkit"
 
+config BR2_PACKAGE_RKNPU_PCIE
+	bool "rknpu pcie"
+	help
+	  "Copy rknpu driver and test case for pcie interface"
+
+config BR2_PACKAGE_RKNPU_ACM
+	bool "rknpu acm"
+        depends on BR2_PACKAGE_RKNPU_PCIE
+	help
+	  "use acm for camera cmd"
+
 config BR2_PACKAGE_PYTHON_RKNN
         bool "python-rknn"
         depends on BR2_PACKAGE_PYTHON3
