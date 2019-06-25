@@ -7,6 +7,6 @@ Name: gbm
 Description: Mali GBM library
 Requires.private: 
 Version: 10.4.0
-Libs:-lwayland-client -lwayland-server  -L${libdir} -lgbm
+Libs: -L${libdir} -lgbm
 Libs.private: 
 Cflags: -I${includedir} 
