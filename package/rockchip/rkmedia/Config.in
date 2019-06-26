@@ -65,6 +65,18 @@ config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
     help
       wrapped function of v4l2 capture
 
+config BR2_PACKAGE_RKMEDIA_RKRGA
+    bool "rkrga"
+    select BR2_PACKAGE_LINUX_RGA
+    help
+      wrapped function of librga
+
+config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
+    bool "drm output"
+    select BR2_PACKAGE_LIBDRM
+    help
+      wrapped function of drm output
+
 config BR2_PACKAGE_RKMEDIA_LIVE555
     bool "live555"
     select BR2_PACKAGE_LIVE555
