@@ -1,6 +1,7 @@
 config BR2_PACKAGE_N4
     bool "rk n4 camera"
     default n
+    select BR2_PACKAGE_LIBSERIALPORT
     select BR2_PACKAGE_LIBV4L
     select BR2_PACKAGE_LIBV4L_UTILS
     select BR2_PACKAGE_RKMEDIA

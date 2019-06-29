@@ -2,7 +2,7 @@ N4_SITE = $(TOPDIR)/../app/n4
 N4_SITE_METHOD = local
 N4_INSTALL_STAGING = NO
 
-N4_DEPENDENCIES = host-ninja libv4l rkmedia
+N4_DEPENDENCIES = host-ninja libserialport libv4l rkmedia
 
 #N4_CONF_OPTS = -DWARNINGS_AS_ERRORS=ON
 
