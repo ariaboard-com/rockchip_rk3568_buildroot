@@ -3,3 +3,7 @@ sha256 009d69fb39f6c0e2b0cd89a7e9302cd0ae1872d02c787d3a37f2cacca5ddb7a7 qtwebeng
 
 # Hash from: https://download.qt.io/official_releases/qt/5.9/5.9.4/submodules/qtwebengine-opensource-src-5.9.4.tar.xz.mirrorlist
 sha256 04b4305489b326bbbfe32b5f1da4a33ae034e54130776e3616b9e6d45a5a8271 qtwebengine-opensource-src-5.9.4.tar.xz
+
+# Hash from: https://download.qt.io/official_releases/qt/5.12/5.12.2/submodules/qtwebengine-everywhere-src-5.12.2.tar.xz.sha256
+sha256 082b1d6e60c1be61881bc8533acc67d9688620d6b3a538417f62b27b34ead493 qtwebengine-everywhere-src-5.12.2.tar.xz
+
