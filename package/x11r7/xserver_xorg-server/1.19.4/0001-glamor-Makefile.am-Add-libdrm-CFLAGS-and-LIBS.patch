@@ -1,0 +1,28 @@
+From 7100ffc0ebc0036d6032c4c4128e4b3843d4ad5d Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 4 Jul 2019 15:58:24 +0800
+Subject: [PATCH] glamor: Makefile.am: Add libdrm CFLAGS and LIBS
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ glamor/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/glamor/Makefile.am b/glamor/Makefile.am
+index 8c79994..6765160 100644
+--- a/glamor/Makefile.am
++++ b/glamor/Makefile.am
+@@ -1,8 +1,8 @@
+ noinst_LTLIBRARIES = libglamor.la libglamor_egl_stubs.la
+ 
+-libglamor_la_LIBADD = $(GLAMOR_LIBS)
++libglamor_la_LIBADD = $(GLAMOR_LIBS) $(LIBDRM_LIBS)
+ 
+-AM_CFLAGS = $(CWARNFLAGS) $(DIX_CFLAGS) $(GLAMOR_CFLAGS)
++AM_CFLAGS = $(CWARNFLAGS) $(DIX_CFLAGS) $(GLAMOR_CFLAGS) $(LIBDRM_CFLAGS)
+ 
+ libglamor_la_SOURCES = \
+ 	glamor.c \
+-- 
+2.11.0
+
