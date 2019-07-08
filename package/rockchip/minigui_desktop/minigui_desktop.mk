@@ -15,9 +15,6 @@ ifeq ($(BR2_PACKAGE_FFMPEG_SWSCALE),y)
 MINIGUI_MAKE_ENV += ENABLE_VIDEO=1
 endif
 
-MINIGUI_MAKE_ENV += ENABLE_BATT=1 \
-                    ENABLE_WIFI=1
-
 define MINIGUI_DESKTOP_IMAGE_COPY
         mkdir -p $(TARGET_DIR)/usr/local/share/
         cp -r $(PROJECT_DIR)/minigui $(TARGET_DIR)/usr/local/share/
