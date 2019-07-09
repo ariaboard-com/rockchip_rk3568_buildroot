@@ -1,4 +1,0 @@
-#!/bin/sh
-#
-
-amixer cset name='Playback Path' 'SPK'

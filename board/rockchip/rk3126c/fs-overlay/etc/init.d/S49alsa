@@ -4,6 +4,7 @@
 case "$1" in
   start)
     alsactl restore -f /userdata/asound.state
+    amixer cset name='Playback Path' 'SPK'
     amixer cset name='Master Playback Volume' 100
     ;;
   stop)
