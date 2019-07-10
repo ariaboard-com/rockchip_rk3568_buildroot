@@ -5,9 +5,8 @@
 ################################################################################
 
 ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_V_1_19),y)
-XSERVER_XORG_SERVER_SITE = https://github.com/rockchip-linux/xserver.git
-XSERVER_XORG_SERVER_VERSION = b304068103590b4d8f967469d181b625bc638ae6
-XSERVER_XORG_SERVER_SITE_METHOD = git
+XSERVER_XORG_SERVER_VERSION = eca4d098cedac245f89110920cf99c3a920a9eff
+XSERVER_XORG_SERVER_SITE = $(call github,rockchip-linux,xserver,$(XSERVER_XORG_SERVER_VERSION))
 else
 XSERVER_XORG_SERVER_VERSION = $(call qstrip,$(BR2_PACKAGE_XSERVER_XORG_SERVER_VERSION))
 XSERVER_XORG_SERVER_SOURCE = xorg-server-$(XSERVER_XORG_SERVER_VERSION).tar.bz2
