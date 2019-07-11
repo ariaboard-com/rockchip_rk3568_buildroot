@@ -71,6 +71,12 @@ config BR2_PACKAGE_RKMEDIA_RKRGA
     help
       wrapped function of librga
 
+config BR2_PACKAGE_RKMEDIA_RKNN
+    bool "rknn"
+    select BR2_PACKAGE_RKNPU
+    help
+      wrapped function of rknn
+
 config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
     bool "drm output"
     select BR2_PACKAGE_LIBDRM
