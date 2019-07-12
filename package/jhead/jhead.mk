@@ -27,6 +27,7 @@ define JHEAD_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/jhead $(TARGET_DIR)/usr/bin/jhead
 	$(INSTALL) -m 0755 -D $(@D)/libjhead.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -m 0755 -D $(@D)/libjhead.so $(STAGING_DIR)/usr/lib/
+	$(INSTALL) -m 0755 -D $(@D)/jhead.h $(STAGING_DIR)/usr/include/
 endef
 
 $(eval $(generic-package))
