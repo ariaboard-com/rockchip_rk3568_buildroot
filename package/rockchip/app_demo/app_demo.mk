@@ -23,4 +23,18 @@ APP_DEMO_DEPENDENCIES += rockx
 APP_DEMO_CONF_OPTS += "-DROCKX=ON" "-DROCKX_HERDER_DIR=$(STAGING_DIR)/usr/include/rockx"
 endif
 
+ifeq ($(BR2_PACKAGE_APP_DEMO_NPU_UVC_CONNECTION),y)
+
+APP_DEMO_DEPENDENCIES += rkmedia uvc_app
+APP_DEMO_CONF_OPTS += "-DMODULE_RK_NPU_UVC_DEMO=ON" \
+	"-DRKNPU_HEADER_DIR=$(RKNPU_BUILDDIR)/rknn/include"
+
+ifeq ($(BR2_PACKAGE_RK1808),y)
+APP_DEMO_CONF_OPTS += "-DNPU_DEVICE=ON"
+else
+APP_DEMO_CONF_OPTS += "-DNPU_HOST=ON"
+endif
+
+endif
+
 $(eval $(cmake-package))
