@@ -1,0 +1,3 @@
+menuconfig BR2_PACKAGE_RKFFPLAY
+	bool "rkffplay"
+
