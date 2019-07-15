@@ -1,7 +1,7 @@
-From 935967a453b47ae7c8e9ad3d94eef3813eab58db Mon Sep 17 00:00:00 2001
+From 0473cffdfffe16f6682206bdc11a3f93ea19adcb Mon Sep 17 00:00:00 2001
 From: Richard Oehlinger <richard.oehlinger@adbsafegate.com>
 Date: Mon, 18 Mar 2019 10:15:13 +0100
-Subject: [PATCH] Fix compile failure with gstreamer 0.10
+Subject: [PATCH 01/10] Fix compile failure with gstreamer 0.10
 
 This fixes an compile failure introduced in commit 67c4ec55.
 
@@ -16,10 +16,10 @@ https://github.com/qt/qtmultimedia/commit/935967a453b47ae7c8e9ad3d94eef3813eab58
  1 file changed, 5 insertions(+)
 
 diff --git a/src/gsttools/qgstreamerplayersession.cpp b/src/gsttools/qgstreamerplayersession.cpp
-index f21c94c5c..9858f61c9 100644
+index bd402fb..ab20638 100644
 --- a/src/gsttools/qgstreamerplayersession.cpp
 +++ b/src/gsttools/qgstreamerplayersession.cpp
-@@ -402,9 +402,14 @@ void QGstreamerPlayerSession::setPipeline(GstElement *pipeline)
+@@ -396,9 +396,14 @@ void QGstreamerPlayerSession::setPipeline(GstElement *pipeline)
  
      if (m_renderer) {
          auto it = gst_bin_iterate_sinks(GST_BIN(pipeline));
@@ -34,3 +34,6 @@ index f21c94c5c..9858f61c9 100644
              if (QLatin1String(GST_OBJECT_NAME(child)) == QLatin1String("qtvideosink")) {
                  m_renderer->setVideoSink(child);
                  break;
+-- 
+2.7.4
+
