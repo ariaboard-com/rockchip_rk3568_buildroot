@@ -438,10 +438,10 @@ echo "wlan0 shows up"
 echo "checking wlan0 scan ..."
 check_in_loop 15 check_scan
 
-wifi_ssid=`cat $wifi_scan_results_file | sed -n "1p"`
+wifi_ssid=`cat $wifi_scan_results_file | sed -n "1p" | cut -f 2 -d :`
 echo "wifi ssid: $wifi_ssid"
 
-if [ -z "$wifi_ssid" ];then
+if [ $wifi_ssid -eq 0 ];then
 	echo "wifi failed !!!!!"
 	dmesg >> /data/wifi/wifi_onoff_fail.txt
 
