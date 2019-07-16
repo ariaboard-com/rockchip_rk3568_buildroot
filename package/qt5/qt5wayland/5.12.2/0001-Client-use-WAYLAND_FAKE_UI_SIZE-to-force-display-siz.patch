@@ -1,0 +1,29 @@
+From 0d22bd74f55a4e20b99a76e8039e93a918bb63dd Mon Sep 17 00:00:00 2001
+From: Ziyuan Xu <xzy.xu@rock-chips.com>
+Date: Mon, 15 Jul 2019 17:57:02 +0800
+Subject: [PATCH 1/5] Client: use WAYLAND_FAKE_UI_SIZE to force display size
+
+Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
+---
+ src/client/qwaylandscreen.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
+index 38d61f8..8953a61 100644
+--- a/src/client/qwaylandscreen.cpp
++++ b/src/client/qwaylandscreen.cpp
+@@ -208,6 +208,11 @@ void QWaylandScreen::output_mode(uint32_t flags, int width, int height, int refr
+     if (!(flags & WL_OUTPUT_MODE_CURRENT))
+         return;
+ 
++    char *_displaysize = getenv("WAYLAND_FAKE_UI_SIZE");
++    if (_displaysize != NULL) {
++        sscanf(_displaysize, "%dx%d@%d", &width, &height, &refresh);
++    }
++
+     QSize size(width, height);
+     if (size != mGeometry.size())
+         mGeometry.setSize(size);
+-- 
+2.7.4
+
