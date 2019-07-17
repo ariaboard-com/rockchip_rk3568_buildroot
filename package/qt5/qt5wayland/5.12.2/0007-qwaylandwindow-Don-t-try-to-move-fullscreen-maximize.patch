@@ -1,24 +1,24 @@
-From 8870b0a21428456d0f3041e04aca115225dad4af Mon Sep 17 00:00:00 2001
+From b57b922e0773b1435bae3658313faeda4b53a528 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 4 Mar 2019 17:22:51 +0800
-Subject: [PATCH 2/2] qwaylandwindow: Don't try to move fullscreen/maximized
- window
+Subject: [PATCH] qwaylandwindow: Don't try to move fullscreen/maximized window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylandwindow.cpp | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/client/qwaylandwindow.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 1c1aa47..e3f8c4b 100644
+index 1c1aa47..aabaa7e 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -334,7 +334,10 @@ void QWaylandWindow::setGeometry_helper(const QRect &rect)
+@@ -334,7 +334,11 @@ void QWaylandWindow::setGeometry_helper(const QRect &rect)
  
  void QWaylandWindow::setGeometry(const QRect &rect)
  {
 -    setGeometry_helper(rect);
-+    if (mState == Qt::WindowFullScreen || mState == Qt::WindowMaximized)
++    if (window()->windowStates() == Qt::WindowFullScreen
++        || window()->windowStates() == Qt::WindowMaximized)
 +        setGeometry_helper(QRect(QPoint(), rect.size()));
 +    else
 +        setGeometry_helper(rect);
