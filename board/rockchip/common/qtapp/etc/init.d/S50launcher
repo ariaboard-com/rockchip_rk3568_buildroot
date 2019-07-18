@@ -33,7 +33,7 @@ case "$1" in
 		export XDG_RUNTIME_DIR=/tmp/.xdg
 		weston --tty=2 --idle-time=0&
 		sleep 1
-		/usr/local/QLauncher/QLauncher &
+		/usr/bin/QLauncher &
 
 		#for Carmachine wayland
 		#/usr/bin/Carmachine -platform wayland -plugin EvdevTouch -plugin EvdevKeyboard &
