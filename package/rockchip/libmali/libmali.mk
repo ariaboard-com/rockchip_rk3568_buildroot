@@ -11,15 +11,10 @@ LIBMALI_SITE_METHOD = local
 LIBMALI_DEPENDENCIES = mesa3d
 
 ifeq ($(BR2_PACKAGE_WAYLAND),y)
-# Somehow the px30/3326's wayland mali named "-wayland-gbm"
-ifneq ($(BR2_PACKAGE_PX30)$(BR2_PACKAGE_RK3326),)
-LIBMALI_SUFFIX = -wayland-gbm
-else
 LIBMALI_SUFFIX = -wayland
-endif
 else
 ifeq ($(BR2_PACKAGE_XORG7)),y)
-LIBMALI_SUFFIX = -x11-fbdev
+LIBMALI_SUFFIX =
 else
 LIBMALI_SUFFIX = -gbm
 endif
