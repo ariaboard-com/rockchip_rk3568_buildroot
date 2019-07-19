@@ -1,4 +1,3 @@
-if BR2_PACKAGE_RKWIFIBT_AWCM256 || BR2_PACKAGE_RKWIFIBT_AWNB197
 config BR2_PACKAGE_CYPRESS_BSA
     bool "broadcom(cypress) bsa server and app"
     help
@@ -13,5 +12,4 @@ choice
 	config BR2_PACKAGE_CYPRESS_BSA_AWNB197
 		bool "AW-NB197"
 endchoice
-endif
 endif

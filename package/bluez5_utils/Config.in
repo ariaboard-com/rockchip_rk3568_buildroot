@@ -9,8 +9,6 @@ config BR2_PACKAGE_BLUEZ5_UTILS
 	# wordexp support not in our uClibc configuration
 	depends on !BR2_TOOLCHAIN_USES_UCLIBC
 	depends on BR2_TOOLCHAIN_HAS_SYNC_4
-	depends on !BR2_PACKAGE_BROADCOM_BSA
-	depends on !BR2_PACKAGE_CYPRESS_BSA
 	select BR2_PACKAGE_DBUS
 	select BR2_PACKAGE_LIBGLIB2
 	help

@@ -1,8 +1,5 @@
-if BR2_PACKAGE_RKWIFIBT_AP6212A || BR2_PACKAGE_RKWIFIBT_AP6255 ||\
-   BR2_PACKAGE_RKWIFIBT_AP6354 || BR2_PACKAGE_RKWIFIBT_AP6236
 config BR2_PACKAGE_BROADCOM_BSA
     bool "broadcom(ampak) bsa server and app"
-    default y
     help
 	broadcom bsa server and app
 if BR2_PACKAGE_BROADCOM_BSA
@@ -17,5 +14,4 @@ choice
 	config BR2_PACKAGE_BROADCOM_BSA_AP6354
 		bool "AP6354"
 endchoice
-endif
 endif
