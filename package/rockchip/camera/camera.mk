@@ -22,10 +22,10 @@ endef
 define CAMERA_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/local/camera
 	cp $(BUILD_DIR)/camera-$(CAMERA_VERSION)/conf/* $(TARGET_DIR)/usr/local/camera/
+	cp $(BUILD_DIR)/camera-$(CAMERA_VERSION)/conf/icon_camera.png $(TARGET_DIR)/usr/share/icon/
 	mkdir -p $(TARGET_DIR)/usr/share/applications
 	cp $(BUILD_DIR)/camera-$(CAMERA_VERSION)/camera.desktop $(TARGET_DIR)/usr/share/applications/
-	$(INSTALL) -D -m 0755 $(@D)/cameraView \
-		$(TARGET_DIR)/usr/local/camera/cameraView
+	$(INSTALL) -D -m 0755 $(@D)/cameraView 	$(TARGET_DIR)/usr/bin/cameraView
 endef
 
 $(eval $(generic-package))
