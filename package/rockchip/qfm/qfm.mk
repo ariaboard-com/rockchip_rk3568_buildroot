@@ -20,6 +20,7 @@ define QFM_BUILD_CMDS
 endef
 
 define QFM_INSTALL_TARGET_CMDS
+	mkdir -p $(TARGET_DIR)/usr/share/applications $(TARGET_DIR)/usr/share/icon
 	$(INSTALL) -D -m 0644 $(@D)/image/icon_folder.png $(TARGET_DIR)/usr/share/icon/
 	$(INSTALL) -D -m 0755 $(@D)/qfm	$(TARGET_DIR)/usr/bin/qfm
 endef

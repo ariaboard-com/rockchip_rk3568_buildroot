@@ -23,7 +23,7 @@ define MUSIC_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/local/music
 	cp $(BUILD_DIR)/music-$(MUSIC_VERSION)/conf/* $(TARGET_DIR)/usr/local/music/
 	cp $(BUILD_DIR)/music-$(MUSIC_VERSION)/conf/icon_music.png $(TARGET_DIR)/usr/share/icon/
-	mkdir -p $(TARGET_DIR)/usr/share/applications
+	mkdir -p $(TARGET_DIR)/usr/share/applications $(TARGET_DIR)/usr/share/icon
 	cp $(BUILD_DIR)/music-$(MUSIC_VERSION)/music.desktop $(TARGET_DIR)/usr/share/applications/
 	$(INSTALL) -D -m 0755 $(@D)/musicPlayer $(TARGET_DIR)/usr/bin/musicPlayer
 endef
