@@ -20,10 +20,9 @@ define SETTINGS_BUILD_CMDS
 endef
 
 define SETTINGS_INSTALL_TARGET_CMDS
-	mkdir -p $(TARGET_DIR)/usr/local/settings
+	mkdir -p $(TARGET_DIR)/usr/local/settings $(TARGET_DIR)/usr/share/applications $(TARGET_DIR)/usr/share/icon
 	cp $(BUILD_DIR)/settings-$(SETTINGS_VERSION)/conf/* $(TARGET_DIR)/usr/local/settings/
 	cp $(BUILD_DIR)/settings-$(SETTINGS_VERSION)/conf/icon_setting.png $(TARGET_DIR)/usr/share/icon/
-	mkdir -p $(TARGET_DIR)/usr/share/applications $(TARGET_DIR)/usr/share/icon
 	cp $(BUILD_DIR)/settings-$(SETTINGS_VERSION)/setting.desktop $(TARGET_DIR)/usr/share/applications/
 	$(INSTALL) -D -m 0755 $(@D)/settings $(TARGET_DIR)/usr/bin/settings
 endef
