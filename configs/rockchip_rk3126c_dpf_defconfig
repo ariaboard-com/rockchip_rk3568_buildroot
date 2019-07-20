@@ -2,7 +2,6 @@
 #include "base.config"
 #include "base_extra.config"
 #include "gpu.config"
-#include "display.config"
 #include "video_mpp.config"
 #include "audio.config"
 #include "wifi.config"
@@ -18,9 +17,11 @@ BR2_PACKAGE_DEVICEIO=y
 BR2_PACKAGE_RKFFPLAY=y
 BR2_PACKAGE_FFMPEG=y
 BR2_PACKAGE_FFMPEG_AVRESAMPLE=y
+BR2_PACKAGE_FFMPEG_SWSCALE=y
 BR2_PACKAGE_SDL2=y
 BR2_PACKAGE_SDL2_KMSDRM=y
 BR2_PACKAGE_SDL2_OPENGLES=y
+BR2_PACKAGE_WAYLAND=y
 BR2_PACKAGE_READLINE=y
 BR2_PACKAGE_BLUEZ5_UTILS=y
 BR2_PACKAGE_NTP=y
