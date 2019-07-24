@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Start 3A daemon for each /dev/mediaX device
+#
+
+case "$1" in
+  start)
+    for MEDIA_DEV in $(ls -1 /dev/media*); do
+      start-stop-daemon -S -b --exec /usr/bin/rkisp_3A_server -- \
+        --mmedia=$MEDIA_DEV
+    done
+    ;;
+  stop)
+    start-stop-daemon -K -n rkisp_3A_server
+    ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0
