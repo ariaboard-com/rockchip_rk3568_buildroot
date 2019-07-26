@@ -4,6 +4,12 @@ N4_INSTALL_STAGING = NO
 
 N4_DEPENDENCIES = host-ninja libserialport libv4l rkmedia
 
+define INSTALL_N4_KERNEL_HEADER
+cp $(TOPDIR)/../kernel/include/uapi/linux/rk-npu-usb-msg.h $(STAGING_DIR)/usr/include/linux/
+endef
+
+N4_PRE_CONFIGURE_HOOKS += INSTALL_N4_KERNEL_HEADER
+
 #N4_CONF_OPTS = -DWARNINGS_AS_ERRORS=ON
 
 N4_CONF_OPTS += -G Ninja
