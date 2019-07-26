@@ -1,16 +1,18 @@
-From ad01ac4b1cbd994bbe8450fb42dc83dc13b2a73c Mon Sep 17 00:00:00 2001
+From 604bfac88a03d8649f9fb910f46f05a5e4bf27a5 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 9 Jul 2019 19:47:41 +0800
-Subject: [PATCH 1/5] glamor: Store gbm_bo in glamor_pixmap_private instead of
- egl image
+Subject: [PATCH 34/41] glamor: Store gbm_bo in glamor_pixmap_private instead
+ of egl image
 
 GBM_BO_IMPORT_EGL_IMAGE is not supported in mali gbm.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- glamor/glamor_egl.c  | 55 +++++++++++++++++++++-------------------------------
- glamor/glamor_priv.h |  6 +++++-
- 2 files changed, 27 insertions(+), 34 deletions(-)
+ glamor/glamor_egl.c                       | 55 +++++++++++++------------------
+ glamor/glamor_priv.h                      |  6 +++-
+ hw/xfree86/drivers/modesetting/pageflip.c |  3 ++
+ hw/xfree86/drivers/modesetting/present.c  |  1 -
+ 4 files changed, 30 insertions(+), 35 deletions(-)
 
 diff --git a/glamor/glamor_egl.c b/glamor/glamor_egl.c
 index 984df6605..b9e37d804 100644
@@ -205,6 +207,46 @@ index 10c74c1b5..135546b9d 100644
      Bool used_modifiers;
  #endif
      /** block width of this large pixmap. */
+diff --git a/hw/xfree86/drivers/modesetting/pageflip.c b/hw/xfree86/drivers/modesetting/pageflip.c
+index 9667f132d..062578f2f 100644
+--- a/hw/xfree86/drivers/modesetting/pageflip.c
++++ b/hw/xfree86/drivers/modesetting/pageflip.c
+@@ -256,6 +256,7 @@ ms_do_pageflip(ScreenPtr screen,
+ 
+     flipdata = calloc(1, sizeof(struct ms_flipdata));
+     if (!flipdata) {
++        new_front_bo.gbm = NULL;
+         drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+         xf86DrvMsg(scrn->scrnIndex, X_ERROR,
+                    "Failed to allocate flipdata.\n");
+@@ -311,6 +312,7 @@ ms_do_pageflip(ScreenPtr screen,
+         }
+     }
+ 
++    new_front_bo.gbm = NULL;
+     drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+ 
+     /*
+@@ -338,6 +340,7 @@ error_undo:
+ error_out:
+     xf86DrvMsg(scrn->scrnIndex, X_WARNING, "Page flip failed: %s\n",
+                strerror(errno));
++    new_front_bo.gbm = NULL;
+     drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+     /* if only the local reference - free the structure,
+      * else drop the local reference and return */
+diff --git a/hw/xfree86/drivers/modesetting/present.c b/hw/xfree86/drivers/modesetting/present.c
+index dda7cc064..6f66c9fd3 100644
+--- a/hw/xfree86/drivers/modesetting/present.c
++++ b/hw/xfree86/drivers/modesetting/present.c
+@@ -263,7 +263,6 @@ ms_present_check_flip(RRCrtcPtr crtc,
+ 
+         format = gbm_bo_get_format(gbm);
+         modifier = gbm_bo_get_modifier(gbm);
+-        gbm_bo_destroy(gbm);
+ 
+         if (!drmmode_is_format_supported(scrn, format, modifier)) {
+             if (reason)
 -- 
 2.11.0
 

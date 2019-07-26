@@ -1,7 +1,7 @@
-From 55374b8a2b60bc83c9dce86945c5c58e4e72c59c Mon Sep 17 00:00:00 2001
+From 473918f6bb4ed3f33320435ccb00b032b96394da Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 9 Jul 2019 19:51:32 +0800
-Subject: [PATCH 2/5] glamor: prepare: Prefer using gbm_bo_map/gbm_bo_unmap
+Subject: [PATCH 35/41] glamor: prepare: Prefer using gbm_bo_map/gbm_bo_unmap
 
 Prefer using gbm_bo_map/gbm_bo_unmap instead of glamor_transfer, to
 avoid buffer copying.

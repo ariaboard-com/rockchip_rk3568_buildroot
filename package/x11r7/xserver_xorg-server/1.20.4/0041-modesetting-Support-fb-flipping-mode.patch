@@ -1,0 +1,774 @@
+From 0695dd48780b4e589eb2adf0f82eef26b5d3c04b Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 24 Jul 2019 17:18:23 +0800
+Subject: [PATCH 41/41] modesetting: Support fb flipping mode
+
+Currently the modesetting only do page flipping for present and dri2.
+
+Add fb flipping mode for other cases to avoid tearing.
+
+Use option "FlipFB" to enable it:
+1/ "none" - disabled
+2/ "transformed" - enable when transformed(e.g. rotated) (default option)
+3/ "always" - always trying to enable it
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ hw/xfree86/drivers/modesetting/driver.c          |  37 ++-
+ hw/xfree86/drivers/modesetting/driver.h          |   9 +
+ hw/xfree86/drivers/modesetting/drmmode_display.c | 365 ++++++++++++++++++++++-
+ hw/xfree86/drivers/modesetting/drmmode_display.h |  28 ++
+ hw/xfree86/drivers/modesetting/pageflip.c        |  80 +++--
+ 5 files changed, 482 insertions(+), 37 deletions(-)
+
+diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
+index 8d29b130f..c2324c006 100644
+--- a/hw/xfree86/drivers/modesetting/driver.c
++++ b/hw/xfree86/drivers/modesetting/driver.c
+@@ -131,6 +131,7 @@ static const OptionInfoRec Options[] = {
+     {OPTION_PAGEFLIP, "PageFlip", OPTV_BOOLEAN, {0}, FALSE},
+     {OPTION_ZAPHOD_HEADS, "ZaphodHeads", OPTV_STRING, {0}, FALSE},
+     {OPTION_DOUBLE_SHADOW, "DoubleShadow", OPTV_BOOLEAN, {0}, FALSE},
++    {OPTION_FLIP_FB, "FlipFB", OPTV_STRING, {0}, FALSE},
+     {-1, NULL, OPTV_NONE, {0}, FALSE}
+ };
+ 
+@@ -682,6 +683,9 @@ static void
+ msBlockHandler(ScreenPtr pScreen, void *timeout)
+ {
+     modesettingPtr ms = modesettingPTR(xf86ScreenToScrn(pScreen));
++    ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
++    xf86CrtcConfigPtr xf86_config = XF86_CRTC_CONFIG_PTR(pScrn);
++    int c;
+ 
+     pScreen->BlockHandler = ms->BlockHandler;
+     pScreen->BlockHandler(pScreen, timeout);
+@@ -689,8 +693,22 @@ msBlockHandler(ScreenPtr pScreen, void *timeout)
+     pScreen->BlockHandler = msBlockHandler;
+     if (pScreen->isGPU && !ms->drmmode.reverse_prime_offload_mode)
+         dispatch_slave_dirty(pScreen);
+-    else if (ms->dirty_enabled)
+-        dispatch_dirty(pScreen);
++    else {
++        if (ms->dirty_enabled)
++            dispatch_dirty(pScreen);
++
++        for (c = 0; c < xf86_config->num_crtc; c++) {
++            xf86CrtcPtr crtc = xf86_config->crtc[c];
++            drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++
++            if (!drmmode_crtc || drmmode_flip_fb(crtc, timeout))
++                continue;
++
++            drmmode_crtc->can_flip_fb = FALSE;
++            drmmode_set_desired_modes(pScrn, &ms->drmmode, TRUE);
++            break;
++        }
++    }
+ 
+     ms_dirty_update(pScreen, timeout);
+ }
+@@ -892,6 +910,7 @@ PreInit(ScrnInfoPtr pScrn, int flags)
+     modesettingPtr ms;
+     rgb defaultWeight = { 0, 0, 0 };
+     EntityInfoPtr pEnt;
++    const char *str_value;
+     uint64_t value = 0;
+     int ret;
+     int bppflags, connector_count;
+@@ -1024,6 +1043,20 @@ PreInit(ScrnInfoPtr pScrn, int flags)
+     ms->drmmode.pageflip =
+         xf86ReturnOptValBool(ms->drmmode.Options, OPTION_PAGEFLIP, TRUE);
+ 
++    str_value = xf86GetOptValString(ms->drmmode.Options, OPTION_FLIP_FB);
++    if (!str_value || !strcmp(str_value, "transformed"))
++        ms->drmmode.fb_flip_mode = DRMMODE_FB_FLIP_TRANSFORMED;
++    else if (!strcmp(str_value, "always"))
++        ms->drmmode.fb_flip_mode = DRMMODE_FB_FLIP_ALWAYS;
++    else
++        ms->drmmode.fb_flip_mode = DRMMODE_FB_FLIP_NONE;
++
++    if (ms->drmmode.fb_flip_mode != DRMMODE_FB_FLIP_NONE)
++        xf86DrvMsg(pScrn->scrnIndex, X_INFO,
++                   "FlipFB: %s\n",
++                   (ms->drmmode.fb_flip_mode == DRMMODE_FB_FLIP_ALWAYS ?
++                    "Always" : "Transformed"));
++
+     pScrn->capabilities = 0;
+     ret = drmGetCap(ms->fd, DRM_CAP_PRIME, &value);
+     if (ret == 0) {
+diff --git a/hw/xfree86/drivers/modesetting/driver.h b/hw/xfree86/drivers/modesetting/driver.h
+index c8db4b8a4..9ceb92113 100644
+--- a/hw/xfree86/drivers/modesetting/driver.h
++++ b/hw/xfree86/drivers/modesetting/driver.h
+@@ -51,6 +51,7 @@ typedef enum {
+     OPTION_PAGEFLIP,
+     OPTION_ZAPHOD_HEADS,
+     OPTION_DOUBLE_SHADOW,
++    OPTION_FLIP_FB,
+ } modesettingOpts;
+ 
+ typedef struct
+@@ -170,6 +171,14 @@ typedef void (*ms_pageflip_handler_proc)(modesettingPtr ms,
+ 
+ typedef void (*ms_pageflip_abort_proc)(modesettingPtr ms, void *data);
+ 
++Bool ms_do_pageflip_bo(ScreenPtr screen,
++                       drmmode_bo *new_front_bo,
++                       void *event,
++                       int ref_crtc_vblank_pipe,
++                       Bool async,
++                       ms_pageflip_handler_proc pageflip_handler,
++                       ms_pageflip_abort_proc pageflip_abort);
++
+ Bool ms_do_pageflip(ScreenPtr screen,
+                     PixmapPtr new_front,
+                     void *event,
+diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
+index 336f7686e..1496f0bf6 100644
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.c
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
+@@ -58,6 +58,11 @@ static PixmapPtr drmmode_create_pixmap_header(ScreenPtr pScreen, int width, int
+                                               int depth, int bitsPerPixel, int devKind,
+                                               void *pPixData);
+ 
++static void drmmode_destroy_flip_fb(xf86CrtcPtr crtc);
++static Bool drmmode_create_flip_fb(xf86CrtcPtr crtc);
++static Bool drmmode_apply_transform(xf86CrtcPtr crtc);
++static Bool drmmode_update_fb(xf86CrtcPtr crtc);
++
+ static inline uint32_t *
+ formats_ptr(struct drm_format_modifier_blob *blob)
+ {
+@@ -601,6 +606,7 @@ drmmode_crtc_get_fb_id(xf86CrtcPtr crtc, uint32_t *fb_id, int *x, int *y)
+ {
+     drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
+     drmmode_ptr drmmode = drmmode_crtc->drmmode;
++    ScreenPtr screen = xf86ScrnToScreen(drmmode->scrn);
+     int ret;
+ 
+     *fb_id = 0;
+@@ -619,7 +625,11 @@ drmmode_crtc_get_fb_id(xf86CrtcPtr crtc, uint32_t *fb_id, int *x, int *y)
+         *fb_id = drmmode_crtc->rotate_fb_id;
+         *x = *y = 0;
+     }
+-    else {
++    else if (!screen->isGPU && drmmode_crtc->flip_fb_enabled) {
++        drmmode_update_fb(crtc);
++        *fb_id = drmmode_crtc->flip_fb[drmmode_crtc->current_fb].fb_id;
++        *x = *y = 0;
++    } else {
+         *fb_id = drmmode->fb_id;
+         *x = crtc->x;
+         *y = crtc->y;
+@@ -1254,6 +1264,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
+                                    PixmapPtr front, PixmapPtr back)
+ {
+     drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    ScrnInfoPtr scrn = crtc->scrn;
++    modesettingPtr ms = modesettingPTR(scrn);
+ 
+     drmmode_crtc->enable_flipping = TRUE;
+ 
+@@ -1274,6 +1286,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
+         return FALSE;
+     }
+ 
++    drmmode_set_desired_modes(scrn, &ms->drmmode, TRUE);
++
+     return TRUE;
+ }
+ 
+@@ -1281,6 +1295,8 @@ void
+ drmmode_DisableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode)
+ {
+     drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    ScrnInfoPtr scrn = crtc->scrn;
++    modesettingPtr ms = modesettingPTR(scrn);
+ 
+     drmmode_crtc->enable_flipping = FALSE;
+ 
+@@ -1290,6 +1306,8 @@ drmmode_DisableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode)
+ 
+     drmmode_set_target_scanout_pixmap(crtc, NULL,
+                                       &drmmode_crtc->prime_pixmap_back);
++
++    drmmode_set_desired_modes(scrn, &ms->drmmode, TRUE);
+ }
+ 
+ static void
+@@ -1488,9 +1506,8 @@ drmmode_set_mode_major(xf86CrtcPtr crtc, DisplayModePtr mode,
+         crtc->y = y;
+         crtc->rotation = rotation;
+ 
+-        if (!xf86CrtcRotate(crtc)) {
++        if (!drmmode_apply_transform(crtc))
+             goto done;
+-        }
+ 
+         crtc->funcs->gamma_set(crtc, crtc->gamma_red, crtc->gamma_green,
+                                crtc->gamma_blue, crtc->gamma_size);
+@@ -2192,6 +2209,11 @@ drmmode_crtc_init(ScrnInfoPtr pScrn, drmmode_ptr drmmode, drmModeResPtr mode_res
+     drmmode_crtc->vblank_pipe = drmmode_crtc_vblank_pipe(num);
+     xorg_list_init(&drmmode_crtc->mode_list);
+ 
++    if (drmmode->fb_flip_mode == DRMMODE_FB_FLIP_NONE)
++        drmmode_crtc->can_flip_fb = FALSE;
++    else
++        drmmode_crtc->can_flip_fb = TRUE;
++
+     if (ms->atomic_modeset) {
+         props = drmModeObjectGetProperties(drmmode->fd, mode_res->crtcs[num],
+                                            DRM_MODE_OBJECT_CRTC);
+@@ -3486,7 +3508,7 @@ drmmode_set_desired_modes(ScrnInfoPtr pScrn, drmmode_ptr drmmode, Bool set_hw)
+             crtc->rotation = crtc->desiredRotation;
+             crtc->x = crtc->desiredX;
+             crtc->y = crtc->desiredY;
+-            if (!xf86CrtcRotate(crtc))
++            if (!drmmode_apply_transform(crtc))
+                 return FALSE;
+         }
+     }
+@@ -3854,6 +3876,7 @@ drmmode_free_bos(ScrnInfoPtr pScrn, drmmode_ptr drmmode)
+         drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
+ 
+         dumb_bo_destroy(drmmode->fd, drmmode_crtc->cursor_bo);
++        drmmode_destroy_flip_fb(crtc);
+     }
+ }
+ 
+@@ -3910,3 +3933,337 @@ drmmode_get_default_bpp(ScrnInfoPtr pScrn, drmmode_ptr drmmode, int *depth,
+     drmModeFreeResources(mode_res);
+     return;
+ }
++
++static void
++drmmode_destroy_flip_fb(xf86CrtcPtr crtc)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    drmmode_ptr drmmode = drmmode_crtc->drmmode;
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(drmmode_crtc->flip_fb); i++) {
++        drmmode_fb *fb = &drmmode_crtc->flip_fb[i];
++
++        if (fb->fb_id)
++            drmModeRmFB(drmmode->fd, fb->fb_id);
++        fb->fb_id = 0;
++
++        drmmode_bo_destroy(drmmode, &fb->bo);
++
++        if (fb->pixmap)
++            fb->pixmap->drawable.pScreen->DestroyPixmap(fb->pixmap);
++        fb->pixmap = NULL;
++
++        if (fb->damage)
++            DamageDestroy(fb->damage);
++        fb->damage = NULL;
++    }
++}
++
++static Bool
++drmmode_create_flip_fb(xf86CrtcPtr crtc)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    drmmode_ptr drmmode = drmmode_crtc->drmmode;
++    ScreenPtr screen = xf86ScrnToScreen(crtc->scrn);
++    ScrnInfoPtr scrn = crtc->scrn;
++    int i, width, height, pitch, bpp;
++    void *data;
++
++    width = crtc->mode.HDisplay;
++    height = crtc->mode.VDisplay;
++    bpp = drmmode->kbpp;
++
++    drmmode_destroy_flip_fb(crtc);
++
++    for (i = 0; i < ARRAY_SIZE(drmmode_crtc->flip_fb); i++) {
++        drmmode_fb *fb = &drmmode_crtc->flip_fb[i];
++
++        if (!drmmode_create_bo(drmmode, &fb->bo, width, height, bpp))
++            goto fail;
++
++        if (drmmode_bo_import(drmmode, &fb->bo, &fb->fb_id) < 0)
++            goto fail;
++
++        data = drmmode_bo_map(drmmode, &fb->bo);
++        pitch = drmmode_bo_get_pitch(&fb->bo);
++        fb->pixmap = drmmode_create_pixmap_header(screen, width, height,
++                                                  scrn->depth, bpp,
++                                                  pitch, data);
++        if (!fb->pixmap ||
++            !drmmode_set_pixmap_bo(drmmode, fb->pixmap, &fb->bo))
++            goto fail;
++    }
++
++    return TRUE;
++
++fail:
++    drmmode_destroy_flip_fb(crtc);
++    return FALSE;
++}
++
++static Bool
++drmmode_apply_transform(xf86CrtcPtr crtc)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    drmmode_ptr drmmode = drmmode_crtc->drmmode;
++
++    /* fb flipping disabled or doing shared pixmap flipping */
++    if (!drmmode_crtc->can_flip_fb || drmmode_crtc->enable_flipping)
++        goto bail;
++
++    crtc->driverIsPerformingTransform = XF86DriverTransformOutput;
++
++    /* should always success */
++    xf86CrtcRotate(crtc);
++
++    if (!crtc->transform_in_use) {
++        crtc->driverIsPerformingTransform = 0;
++
++        if (drmmode->fb_flip_mode == DRMMODE_FB_FLIP_TRANSFORMED)
++            goto bail;
++    }
++
++    if (!drmmode_create_flip_fb(crtc)) {
++        drmmode_crtc->can_flip_fb = FALSE;
++        goto fail;
++    }
++
++    drmmode_crtc->flip_fb_enabled = TRUE;
++
++    return TRUE;
++
++fail:
++    drmmode_crtc->can_flip_fb = FALSE;
++
++bail:
++    drmmode_destroy_flip_fb(crtc);
++    drmmode_crtc->flip_fb_enabled = FALSE;
++
++    crtc->driverIsPerformingTransform = 0;
++    return xf86CrtcRotate(crtc);
++}
++
++static void
++drmmode_flip_damage_destroy(DamagePtr damage, void *closure)
++{
++    drmmode_fb *fb = closure;
++
++    fb->damage = NULL;
++}
++
++static void
++drmmode_transform_bounds(xf86CrtcPtr crtc, BoxPtr box)
++{
++    box->x1 -= crtc->filter_width >> 1;
++    box->x2 += crtc->filter_width >> 1;
++    box->y1 -= crtc->filter_height >> 1;
++    box->y2 += crtc->filter_height >> 1;
++    pixman_f_transform_bounds(&crtc->f_framebuffer_to_crtc, box);
++
++    if (box->x1 < 0)
++        box->x1 = 0;
++    if (box->y1 < 0)
++        box->y1 = 0;
++    if (box->x2 > crtc->mode.HDisplay)
++        box->x2 = crtc->mode.HDisplay;
++    if (box->y2 > crtc->mode.VDisplay)
++        box->y2 = crtc->mode.VDisplay;
++}
++
++static Bool
++drmmode_update_fb(xf86CrtcPtr crtc)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    modesettingPtr ms = modesettingPTR(crtc->scrn);
++    ScreenPtr screen = xf86ScrnToScreen(crtc->scrn);
++    SourceValidateProcPtr SourceValidate = screen->SourceValidate;
++    WindowPtr root = screen->root;
++    PixmapPtr dst_pixmap;
++    RegionRec dirty;
++    drmmode_fb *fb;
++    BoxPtr box;
++    int n;
++
++    fb = &drmmode_crtc->flip_fb[drmmode_crtc->current_fb];
++
++    /* setup a damage to track dirty */
++    if (!fb->damage) {
++        fb->damage = DamageCreate(NULL, drmmode_flip_damage_destroy,
++                                  DamageReportNone, TRUE, screen, fb);
++        DamageRegister(&screen->root->drawable, fb->damage);
++
++        fb->need_clear = TRUE;
++    }
++
++    if (fb->need_clear) {
++        BoxRec rect = {
++            .x1 = 0,
++            .y1 = 0,
++            .x2 = screen->width,
++            .y2 = screen->height,
++        };
++
++        RegionInit(&dirty, &rect, 1);
++    } else {
++        RegionInit(&dirty, NULL, 0);
++        RegionCopy(&dirty, DamageRegion(fb->damage));
++
++        if (!RegionNotEmpty(&dirty))
++            return TRUE;
++    }
++
++    n = RegionNumRects(&dirty);
++    box = RegionRects(&dirty);
++
++    dst_pixmap = fb->pixmap;
++
++    /* base on xf86Rotate.c xf86RotateCrtcRedisplay() */
++    if (crtc->driverIsPerformingTransform) {
++        PictFormatPtr format = PictureWindowFormat(screen->root);
++        int error;
++        PicturePtr src, dst;
++        XID include_inferiors = IncludeInferiors;
++
++        src = CreatePicture(None, &root->drawable, format,
++                            CPSubwindowMode,
++                            &include_inferiors,
++                            serverClient, &error);
++        if (!src)
++            return FALSE;
++
++
++        dst = CreatePicture(None,
++                            &dst_pixmap->drawable,
++                            format, 0L, NULL, serverClient, &error);
++        if (!dst) {
++            FreePicture(src, None);
++            return FALSE;
++        }
++
++        error = SetPictureTransform(src, &crtc->crtc_to_framebuffer);
++        if (error) {
++            FreePicture(src, None);
++            FreePicture(dst, None);
++            return FALSE;
++        }
++
++        if (crtc->transform_in_use && crtc->filter)
++            SetPicturePictFilter(src, crtc->filter, crtc->params, crtc->nparams);
++
++        screen->SourceValidate = NULL;
++        while (n--) {
++            drmmode_transform_bounds(crtc, box);
++
++            CompositePicture(PictOpSrc,
++                             src, NULL, dst,
++                             box->x1, box->y1, 0, 0, box->x1,
++                             box->y1, box->x2 - box->x1,
++                             box->y2 - box->y1);
++
++            box++;
++        }
++        screen->SourceValidate = SourceValidate;
++
++        FreePicture(src, None);
++        FreePicture(dst, None);
++    } else {
++        GCPtr gc = GetScratchGC(dst_pixmap->drawable.depth, screen);
++        ChangeGCVal subWindowMode;
++
++        subWindowMode.val = IncludeInferiors;
++        ChangeGC(NullClient, gc, GCSubwindowMode, &subWindowMode);
++
++        ValidateGC(&dst_pixmap->drawable, gc);
++        screen->SourceValidate = NULL;
++        while (n--) {
++            drmmode_transform_bounds(crtc, box);
++
++            (*gc->ops->CopyArea)(&root->drawable, &dst_pixmap->drawable, gc,
++                                 crtc->x + box->x1, crtc->y + box->y1,
++                                 box->x2 - box->x1, box->y2 - box->y1,
++                                 box->x1, box->y1);
++
++            box++;
++        }
++        screen->SourceValidate = SourceValidate;
++        FreeScratchGC(gc);
++    }
++
++    if (ms->drmmode.glamor)
++        glamor_finish(screen);
++
++    fb->need_clear = FALSE;
++    DamageEmpty(fb->damage);
++
++    return TRUE;
++}
++
++static void
++drmmode_flip_fb_handler(modesettingPtr ms, uint64_t msc,
++                        uint64_t ust, void *data)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = data;
++
++    drmmode_crtc->flipping = FALSE;
++}
++
++static void
++drmmode_flip_fb_abort(modesettingPtr ms, void *data)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = data;
++
++    drmmode_crtc->flipping = FALSE;
++}
++
++    Bool
++drmmode_flip_fb(xf86CrtcPtr crtc, int *timeout)
++{
++    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
++    drmmode_ptr drmmode = drmmode_crtc->drmmode;
++    ScreenPtr screen = xf86ScrnToScreen(drmmode->scrn);
++    drmmode_fb *fb;
++    uint64_t ust, msc;
++
++    if (!drmmode_crtc || !crtc->enabled ||
++        drmmode_crtc->dpms_mode != DPMSModeOn || drmmode_crtc->rotate_fb_id)
++        return TRUE;
++
++    if (!drmmode_crtc->flip_fb_enabled)
++        return TRUE;
++
++    if (drmmode->dri2_flipping || drmmode->present_flipping)
++        return TRUE;
++
++    /* merge update requests when still flipping */
++    ms_get_crtc_ust_msc(crtc, &ust, &msc);
++    if (drmmode_crtc->flipping && drmmode_crtc->flipping_msc > (msc - 3)) {
++        if (*timeout)
++            *timeout = 3;
++        return TRUE;
++    }
++
++    fb = &drmmode_crtc->flip_fb[drmmode_crtc->current_fb];
++
++    /* keep the current fb */
++    if (fb->damage && !RegionNotEmpty(DamageRegion(fb->damage)) &&
++        !fb->need_clear)
++        return TRUE;
++
++    drmmode_crtc->current_fb++;
++    drmmode_crtc->current_fb %= ARRAY_SIZE(drmmode_crtc->flip_fb);
++
++    if (!drmmode_update_fb(crtc))
++        return FALSE;
++
++    fb = &drmmode_crtc->flip_fb[drmmode_crtc->current_fb];
++    if (!ms_do_pageflip_bo(screen, &fb->bo, drmmode_crtc,
++                           drmmode_crtc->vblank_pipe, TRUE,
++                           drmmode_flip_fb_handler, drmmode_flip_fb_abort))
++        return FALSE;
++
++    ms_get_crtc_ust_msc(crtc, &ust, &drmmode_crtc->flipping_msc);
++    drmmode_crtc->flipping = TRUE;
++
++    return TRUE;
++}
+diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.h b/hw/xfree86/drivers/modesetting/drmmode_display.h
+index cde661450..c043b802e 100644
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.h
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.h
+@@ -80,6 +80,12 @@ typedef struct {
+ #endif
+ } drmmode_bo;
+ 
++enum drmmode_fb_flip_mode {
++    DRMMODE_FB_FLIP_NONE,
++    DRMMODE_FB_FLIP_TRANSFORMED,
++    DRMMODE_FB_FLIP_ALWAYS
++};
++
+ typedef struct {
+     int fd;
+     unsigned fb_id;
+@@ -110,6 +116,8 @@ typedef struct {
+     void *shadow_fb;
+     void *shadow_fb2;
+ 
++    enum drmmode_fb_flip_mode fb_flip_mode;
++
+     DevPrivateKeyRec pixmapPrivateKeyRec;
+ 
+     Bool reverse_prime_offload_mode;
+@@ -151,6 +159,16 @@ typedef struct {
+ } drmmode_format_rec, *drmmode_format_ptr;
+ 
+ typedef struct {
++    drmmode_bo bo;
++    unsigned fb_id;
++
++    PixmapPtr pixmap;
++    DamagePtr damage;
++
++    Bool need_clear;
++} drmmode_fb;
++
++typedef struct {
+     drmmode_ptr drmmode;
+     drmModeCrtcPtr mode_crtc;
+     uint32_t vblank_pipe;
+@@ -169,6 +187,14 @@ typedef struct {
+     drmmode_bo rotate_bo;
+     unsigned rotate_fb_id;
+ 
++    /** support fb flipping to avoid tearing */
++    drmmode_fb flip_fb[2];
++    unsigned current_fb;
++    uint64_t flipping_msc; /* vblank count of the latest fb flipping */
++    Bool can_flip_fb;
++    Bool flip_fb_enabled;
++    Bool flipping;
++
+     PixmapPtr prime_pixmap;
+     PixmapPtr prime_pixmap_back;
+     unsigned prime_pixmap_x;
+@@ -285,4 +311,6 @@ int drmmode_crtc_flip(xf86CrtcPtr crtc, uint32_t fb_id, uint32_t flags, void *da
+ 
+ void drmmode_set_dpms(ScrnInfoPtr scrn, int PowerManagementMode, int flags);
+ 
++Bool drmmode_flip_fb(xf86CrtcPtr crtc, int *timeout);
++
+ #endif
+diff --git a/hw/xfree86/drivers/modesetting/pageflip.c b/hw/xfree86/drivers/modesetting/pageflip.c
+index 062578f2f..9551f8891 100644
+--- a/hw/xfree86/drivers/modesetting/pageflip.c
++++ b/hw/xfree86/drivers/modesetting/pageflip.c
+@@ -225,39 +225,23 @@ queue_flip_on_crtc(ScreenPtr screen, xf86CrtcPtr crtc,
+ 
+ 
+ Bool
+-ms_do_pageflip(ScreenPtr screen,
+-               PixmapPtr new_front,
+-               void *event,
+-               int ref_crtc_vblank_pipe,
+-               Bool async,
+-               ms_pageflip_handler_proc pageflip_handler,
+-               ms_pageflip_abort_proc pageflip_abort)
++ms_do_pageflip_bo(ScreenPtr screen,
++                  drmmode_bo *new_front_bo,
++                  void *event,
++                  int ref_crtc_vblank_pipe,
++                  Bool async,
++                  ms_pageflip_handler_proc pageflip_handler,
++                  ms_pageflip_abort_proc pageflip_abort)
+ {
+-#ifndef GLAMOR_HAS_GBM
+-    return FALSE;
+-#else
+     ScrnInfoPtr scrn = xf86ScreenToScrn(screen);
+     modesettingPtr ms = modesettingPTR(scrn);
+     xf86CrtcConfigPtr config = XF86_CRTC_CONFIG_PTR(scrn);
+-    drmmode_bo new_front_bo;
+     uint32_t flags;
+     int i;
+     struct ms_flipdata *flipdata;
+-    glamor_block_handler(screen);
+-
+-    new_front_bo.gbm = glamor_gbm_bo_from_pixmap(screen, new_front);
+-    new_front_bo.dumb = NULL;
+-
+-    if (!new_front_bo.gbm) {
+-        xf86DrvMsg(scrn->scrnIndex, X_ERROR,
+-                   "Failed to get GBM bo for flip to new front.\n");
+-        return FALSE;
+-    }
+ 
+     flipdata = calloc(1, sizeof(struct ms_flipdata));
+     if (!flipdata) {
+-        new_front_bo.gbm = NULL;
+-        drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+         xf86DrvMsg(scrn->scrnIndex, X_ERROR,
+                    "Failed to allocate flipdata.\n");
+         return FALSE;
+@@ -280,9 +264,7 @@ ms_do_pageflip(ScreenPtr screen,
+     /* Create a new handle for the back buffer */
+     flipdata->old_fb_id = ms->drmmode.fb_id;
+ 
+-    new_front_bo.width = new_front->drawable.width;
+-    new_front_bo.height = new_front->drawable.height;
+-    if (drmmode_bo_import(&ms->drmmode, &new_front_bo,
++    if (drmmode_bo_import(&ms->drmmode, new_front_bo,
+                           &ms->drmmode.fb_id))
+         goto error_out;
+ 
+@@ -312,9 +294,6 @@ ms_do_pageflip(ScreenPtr screen,
+         }
+     }
+ 
+-    new_front_bo.gbm = NULL;
+-    drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+-
+     /*
+      * Do we have more than our local reference,
+      * if so and no errors, then drop our local
+@@ -340,8 +319,6 @@ error_undo:
+ error_out:
+     xf86DrvMsg(scrn->scrnIndex, X_WARNING, "Page flip failed: %s\n",
+                strerror(errno));
+-    new_front_bo.gbm = NULL;
+-    drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
+     /* if only the local reference - free the structure,
+      * else drop the local reference and return */
+     if (flipdata->flip_count == 1)
+@@ -350,6 +327,47 @@ error_out:
+         flipdata->flip_count--;
+ 
+     return FALSE;
++}
++
++Bool
++ms_do_pageflip(ScreenPtr screen,
++               PixmapPtr new_front,
++               void *event,
++               int ref_crtc_vblank_pipe,
++               Bool async,
++               ms_pageflip_handler_proc pageflip_handler,
++               ms_pageflip_abort_proc pageflip_abort)
++{
++#ifndef GLAMOR_HAS_GBM
++    return FALSE;
++#else
++    ScrnInfoPtr scrn = xf86ScreenToScrn(screen);
++    modesettingPtr ms = modesettingPTR(scrn);
++    drmmode_bo new_front_bo;
++    Bool ret;
++
++    if (ms->drmmode.glamor)
++        glamor_block_handler(screen);
++
++    new_front_bo.gbm = glamor_gbm_bo_from_pixmap(screen, new_front);
++    new_front_bo.dumb = NULL;
++    new_front_bo.width = new_front->drawable.width;
++    new_front_bo.height = new_front->drawable.height;
++
++    if (!new_front_bo.gbm) {
++        xf86DrvMsg(scrn->scrnIndex, X_ERROR,
++                   "Failed to get GBM bo for flip to new front.\n");
++        return FALSE;
++    }
++
++    ret = ms_do_pageflip_bo(screen, &new_front_bo, event,
++                            ref_crtc_vblank_pipe, async,
++                            pageflip_handler, pageflip_abort);
++
++    new_front_bo.gbm = NULL;
++    drmmode_bo_destroy(&ms->drmmode, &new_front_bo);
++
++    return ret;
+ #endif /* GLAMOR_HAS_GBM */
+ }
+ 
+-- 
+2.11.0
+

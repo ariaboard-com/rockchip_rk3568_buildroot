@@ -1,7 +1,7 @@
-From 2d6cbe04cc6ac0acab7cebf384a6d95fe01dc6d6 Mon Sep 17 00:00:00 2001
+From 4d1cae6024e7509f892c2dc45686482ae5bc8d0f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 28 Jun 2019 17:27:16 +0800
-Subject: [PATCH] glamor: xv: Fix sw cursor rendering issue
+Subject: [PATCH 33/41] glamor: xv: Fix sw cursor rendering issue
 
 When reporting damage, the misprite will try to restore the under
 cursor area.

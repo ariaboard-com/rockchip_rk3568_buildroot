@@ -1,7 +1,7 @@
-From 0d691659f41f62d62081a229fd8a9468d2a45ba0 Mon Sep 17 00:00:00 2001
+From 74820c8abdd0c6d538d4744e884ce45a01f806a2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 3 Jun 2019 19:16:53 +0800
-Subject: [PATCH 30/32] HACK: glamor: Prefer using sync object to flush GPU
+Subject: [PATCH 30/41] HACK: glamor: Prefer using sync object to flush GPU
  commands for GLES
 
 Somehow the glFlush() not working on mali GPU.
@@ -9,17 +9,16 @@ Somehow the glFlush() not working on mali GPU.
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  configure.ac            |  4 ++++
- glamor/glamor.c         | 31 +++++++++++++++++++++++++------
- glamor/glamor.h         |  1 +
+ glamor/glamor.c         | 19 ++++++++++++++++---
  glamor/glamor_sync.c    |  4 +---
  include/dix-config.h.in |  3 +++
- 5 files changed, 34 insertions(+), 9 deletions(-)
+ 4 files changed, 24 insertions(+), 6 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index cd8798a5a..05eb80dfa 100644
+index 30544218a..948fa3e08 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2110,6 +2110,10 @@ if test "x$GLAMOR" = xyes; then
+@@ -2113,6 +2113,10 @@ if test "x$GLAMOR" = xyes; then
  			AC_MSG_ERROR([Glamor for Xorg requires $LIBGBM])
  		fi
  	fi
@@ -31,42 +30,14 @@ index cd8798a5a..05eb80dfa 100644
  AM_CONDITIONAL([GLAMOR_EGL], [test "x$GBM" = xyes])
  
 diff --git a/glamor/glamor.c b/glamor/glamor.c
-index 4b935de59..8f442e386 100644
+index 4b935de59..17e1a11a4 100644
 --- a/glamor/glamor.c
 +++ b/glamor/glamor.c
-@@ -253,10 +253,7 @@ glamor_destroy_pixmap(PixmapPtr pixmap)
- void
- glamor_block_handler(ScreenPtr screen)
- {
--    glamor_screen_private *glamor_priv = glamor_get_screen_private(screen);
--
--    glamor_make_current(glamor_priv);
--    glFlush();
-+    glamor_flush(screen);
- }
- 
- static void
-@@ -264,8 +261,7 @@ _glamor_block_handler(ScreenPtr screen, void *timeout)
- {
+@@ -256,7 +256,21 @@ glamor_block_handler(ScreenPtr screen)
      glamor_screen_private *glamor_priv = glamor_get_screen_private(screen);
  
--    glamor_make_current(glamor_priv);
--    glFlush();
-+    glamor_flush(screen);
- 
-     screen->BlockHandler = glamor_priv->saved_procs.block_handler;
-     screen->BlockHandler(screen, timeout);
-@@ -1089,3 +1085,26 @@ glamor_finish(ScreenPtr screen)
      glamor_make_current(glamor_priv);
-     glFinish();
- }
-+
-+void
-+glamor_flush(ScreenPtr screen)
-+{
-+    glamor_screen_private *glamor_priv = glamor_get_screen_private(screen);
-+
-+    glamor_make_current(glamor_priv);
+-    glFlush();
 +
 +    if (glamor_priv->is_gles) {
 +#ifdef GLAMOR_HAS_GL_FENCE
@@ -77,26 +48,26 @@ index 4b935de59..8f442e386 100644
 +        glWaitSync(sync, 0, GL_TIMEOUT_IGNORED);
 +        glDeleteSync(sync);
 +#else
-+        glFinish();
++        glamor_finish(screen);
 +#endif
 +    } else {
 +        glFlush();
 +    }
-+}
-diff --git a/glamor/glamor.h b/glamor/glamor.h
-index c972694e3..2ffc325d0 100644
---- a/glamor/glamor.h
-+++ b/glamor/glamor.h
-@@ -414,6 +414,7 @@ extern Bool _X_EXPORT glamor_change_window_attributes(WindowPtr pWin, unsigned l
- extern void _X_EXPORT glamor_copy_window(WindowPtr window, DDXPointRec old_origin, RegionPtr src_region);
+ }
  
- extern _X_EXPORT void glamor_finish(ScreenPtr screen);
-+extern _X_EXPORT void glamor_flush(ScreenPtr screen);
- #define HAS_GLAMOR_TEXT 1
+ static void
+@@ -264,8 +278,7 @@ _glamor_block_handler(ScreenPtr screen, void *timeout)
+ {
+     glamor_screen_private *glamor_priv = glamor_get_screen_private(screen);
  
- #ifdef GLAMOR_FOR_XORG
+-    glamor_make_current(glamor_priv);
+-    glFlush();
++    glamor_block_handler(screen);
+ 
+     screen->BlockHandler = glamor_priv->saved_procs.block_handler;
+     screen->BlockHandler(screen, timeout);
 diff --git a/glamor/glamor_sync.c b/glamor/glamor_sync.c
-index 907e0c613..ea5ba5c9f 100644
+index 907e0c613..9d88fd4b8 100644
 --- a/glamor/glamor_sync.c
 +++ b/glamor/glamor_sync.c
 @@ -48,12 +48,10 @@ static void
@@ -109,7 +80,7 @@ index 907e0c613..ea5ba5c9f 100644
  	/* Flush pending rendering operations */
 -        glamor_make_current(glamor);
 -        glFlush();
-+	glamor_flush(screen);
++	glamor_block_handler(screen);
  
  	fence->funcs.SetTriggered = glamor_fence->set_triggered;
  	fence->funcs.SetTriggered(fence);

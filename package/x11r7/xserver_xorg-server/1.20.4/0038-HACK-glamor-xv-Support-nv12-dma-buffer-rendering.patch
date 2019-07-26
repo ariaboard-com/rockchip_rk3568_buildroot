@@ -1,7 +1,7 @@
-From eb392fabb67c8b9bd91542975ce60a5061e44b6c Mon Sep 17 00:00:00 2001
+From 118fb720709434c38756adb706039bd96ea0a663 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 17 Jul 2019 16:41:29 +0800
-Subject: [PATCH] HACK: glamor: xv: Support nv12 dma buffer rendering
+Subject: [PATCH 38/41] HACK: glamor: xv: Support nv12 dma buffer rendering
 
 Requires:
 1. Some hacks in xv client(set/get port attributes), e.g. gst xvimage.
@@ -17,7 +17,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 392 insertions(+), 10 deletions(-)
 
 diff --git a/glamor/glamor_priv.h b/glamor/glamor_priv.h
-index e2e5ece38..2736267ec 100644
+index 2960a2e6d..c71b65895 100644
 --- a/glamor/glamor_priv.h
 +++ b/glamor/glamor_priv.h
 @@ -307,6 +307,7 @@ typedef struct glamor_screen_private {
@@ -28,7 +28,7 @@ index e2e5ece38..2736267ec 100644
  
      struct glamor_context ctx;
  } glamor_screen_private;
-@@ -874,6 +875,10 @@ typedef struct {
+@@ -873,6 +874,10 @@ typedef struct {
      int saturation;
      int hue;
      int contrast;

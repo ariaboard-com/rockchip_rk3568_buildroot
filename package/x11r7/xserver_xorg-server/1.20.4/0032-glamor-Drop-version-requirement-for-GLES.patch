@@ -1,7 +1,7 @@
-From 72b3f4b56e1098f5a0becaee8e23ae3d1f2305b3 Mon Sep 17 00:00:00 2001
+From 3a27a5def8b8d67687e32c08603001448ea13a9e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 11 Jun 2019 11:40:34 +0800
-Subject: [PATCH 32/32] glamor: Drop version requirement for GLES
+Subject: [PATCH 32/41] glamor: Drop version requirement for GLES
 
 The GLES has different version definition.
 

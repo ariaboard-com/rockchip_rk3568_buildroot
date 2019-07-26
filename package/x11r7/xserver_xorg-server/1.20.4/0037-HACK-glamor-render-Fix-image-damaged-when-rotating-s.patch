@@ -1,7 +1,7 @@
-From 55ea4bd405c0f8110e8b4a014b5bd4ff371084c4 Mon Sep 17 00:00:00 2001
+From b07affae619f6d31ff2e972b91712ebf34f986ef Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 12 Jul 2019 10:36:29 +0800
-Subject: [PATCH 5/5] HACK: glamor: render: Fix image damaged when rotating
+Subject: [PATCH 37/41] HACK: glamor: render: Fix image damaged when rotating
  screen
 
 With mali gles, the images seem to be damaged when rotating screen.
