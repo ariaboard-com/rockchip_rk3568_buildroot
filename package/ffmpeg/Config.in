@@ -103,6 +103,10 @@ config BR2_PACKAGE_FFMPEG_DECODERS
 	  Run ./configure --list-decoders in the ffmpeg sources
 	  directory to know the available options.
 
+config BR2_PACKAGE_FFMPEG_DISABLE_DECODERS
+	string "Disabled decoders"
+	default ""
+
 config BR2_PACKAGE_FFMPEG_MUXERS
 	string "Enabled muxers"
 	default "all"

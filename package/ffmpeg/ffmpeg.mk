@@ -113,6 +113,10 @@ FFMPEG_CONF_OPTS += --disable-encoders \
 	$(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_ENCODERS)),--enable-encoder=$(x))
 endif
 
+ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_DISABLE_DECODERS)),)
+FFMPEG_CONF_OPTS += $(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_DISABLE_DECODERS)),--disable-encoder=$(x))
+endif
+
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_DECODERS)),all)
 FFMPEG_CONF_OPTS += --disable-decoders \
 	$(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_DECODERS)),--enable-decoder=$(x))
