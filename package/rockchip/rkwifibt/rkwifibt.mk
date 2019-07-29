@@ -57,6 +57,16 @@ CHIP_VENDOR = ROCKCHIP
 CHIP_NAME = RK912
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723CS),y)
+CHIP_VENDOR = REALTEK
+CHIP_NAME = RTL8723DS
+#BT firmare is same to RKL8723DS
+WIFI_MODULE = ENABLE
+WIFI_KO = 8723cs.ko
+RTK_BT = ENABLE
+BT_FIRMWARE = y
+endif
+
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723DS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8723DS
@@ -146,6 +156,24 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
 endef
 endif #RTL8189FS
+
+ifeq ($(WIFI_MODULE), ENABLE)
+
+define RKWIFIBT_BUILD_MODULE
+    mkdir -p $(TARGET_DIR)/system/lib/modules/
+    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+endef
+
+define RKWIFIBT_INSTALL_MODULE
+	$(SED) "/load wifi modules/a\\	\	insmod \/system\/lib\/modules\/$(WIFI_KO)" \
+		$(TARGET_DIR)/etc/init.d/S66load_wifi_modules
+endef
+
+RKWIFIBT_POST_BUILD_HOOKS += RKWIFIBT_BUILD_MODULE
+RKWIFIBT_POST_INSTALL_TARGET_HOOKS+=RKWIFIBT_INSTALL_MODULE
+endif
 
 endif # CHIP_VENDOR
 
