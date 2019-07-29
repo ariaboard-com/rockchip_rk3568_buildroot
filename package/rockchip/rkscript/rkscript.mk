@@ -82,4 +82,16 @@ endef
 RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_ACM_CONFIG
 endif
 
+ifeq ($(BR2_PACKAGE_USB_MODULE),y)
+RKSCRIPT_USB_MODULE = $(call qstrip,$(BR2_PACKAGE_USB_MODULE_NAME))
+define RKSCRIPT_ADD_USB_MODULE_SUPPORT
+	find $(TOPDIR)/../kernel/drivers/phy/* -name "$(RKSCRIPT_USB_MODULE)" | \
+	xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+
+	$(SED) "/parameter_init/i\\	insmod \/system\/lib\/modules\/$(RKSCRIPT_USB_MODULE)" \
+		$(TARGET_DIR)/etc/init.d/S50usbdevice
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_USB_MODULE_SUPPORT
+endif
+
 $(eval $(generic-package))

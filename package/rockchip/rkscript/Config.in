@@ -2,3 +2,15 @@ config BR2_PACKAGE_RKSCRIPT
 	bool "rockchip script"
 	help
 	  rockchip script for linux use.
+
+config BR2_PACKAGE_USB_MODULE
+	bool "rockchip usb module"
+	help
+	  rockchip usb module support
+
+config BR2_PACKAGE_USB_MODULE_NAME
+	string "rockchip usb module name"
+	default "phy-rockchip-inno-usb2.ko"
+	depends on BR2_PACKAGE_USB_MODULE
+	help
+		rockchip usb module name
