@@ -21,6 +21,8 @@ define MINIGUI_DESKTOP_IMAGE_COPY
         cp -r $(PROJECT_DIR)/S99minigui_app $(TARGET_DIR)/etc/init.d/S99minigui_app
         cp -r $(PROJECT_DIR)/minigui/MiniGUI.cfg.$(MINIGUI_TARGET) \
 			  $(TARGET_DIR)/etc/MiniGUI.cfg
+	$(SED) "s/event0/$(call qstrip,$(BR2_PACKAGE_MINIGUI_RKKEYBOARD_EVENT))/" \
+		$(TARGET_DIR)/etc/MiniGUI.cfg
 endef
 
 define MINIGUI_DESKTOP_BUILD_CMDS

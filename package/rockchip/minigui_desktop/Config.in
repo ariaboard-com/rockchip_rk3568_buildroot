@@ -8,3 +8,10 @@ config BR2_PACKAGE_MINIGUI_DESKTOP
 	select BR2_PACKAGE_FREETYPE
 	help
 	  Minigui demo desktop
+
+config BR2_PACKAGE_MINIGUI_RKKEYBOARD_EVENT
+	string "RK KEY BOARD EVENT"
+	default "event0"
+	depends on BR2_PACKAGE_MINIGUI_DESKTOP
+	help
+		RK KEY BOARD EVENT
