@@ -1,0 +1,15 @@
+ret=`ps -ef |grep rtk_hciattach |grep -v "grep" |wc -l`
+
+if [ ${ret} = 1 ]; then
+	killall rtk_hciattach
+	sleep 1
+fi
+
+rfkill block bluetooth
+rfkill unblock bluetooth
+	
+/usr/bin/rtk_hciattach -n -s 115200 /dev/ttyS2 rtk_h5 1500000 noflow &
+
+usr/libexec/bluetooth/bluetoothd --compat -n &
+hciconfig hci0 up
+

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+hciconfig hci0 up
+hciconfig hci0 piscan
+hciconfig hci0 class 0x240404
+sleep 1
+bluealsa --profile=a2dp-sink &
+sleep 1
+bluealsa-aplay --profile-a2dp 00:00:00:00:00:00 &
+

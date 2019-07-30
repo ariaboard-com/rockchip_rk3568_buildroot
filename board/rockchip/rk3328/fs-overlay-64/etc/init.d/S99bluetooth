@@ -1,0 +1,14 @@
+#! /bin/sh
+
+wifi_chip=$(cat /proc/device-tree/wireless-wlan/wifi_chip_type)
+
+case "$1" in
+	start)
+		if [ $wifi_chip = rtl8723ds ]; then
+			/usr/bin/rtk_enable
+		fi
+	;;
+esac
+
+sleep 1
+/usr/bin/bt_alsa
