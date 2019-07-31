@@ -1,0 +1,29 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_RKFACE
+	bool "rv1108 package Rockchip Face Algorithm"
+
+if BR2_PACKAGE_RKFACE
+menu "RK Face Configures"
+
+config RV_TARGET_RKFACE_AUTHORIZATION
+    bool "Enable rkface Authorization "
+    default n
+
+config RV_TARGET_RKFACE_DETECTION
+    bool "Enable rk face detection"
+    default y
+
+config RV_TARGET_RKFACE_RECOGNITION
+    bool "Enable rk face recognition"
+    default y
+
+config RV_TARGET_RKLIVING_DETECTION
+    bool "Enable rk living detection"
+    default n
+endmenu
+endif 
+
+endif
+

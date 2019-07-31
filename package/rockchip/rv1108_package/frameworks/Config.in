@@ -9,6 +9,8 @@ source "package/rockchip/rv1108_package/frameworks/messenger/Config.in"
 source "package/rockchip/rv1108_package/frameworks/model_loader/Config.in"
 source "package/rockchip/rv1108_package/frameworks/preisp/Config.in"
 source "package/rockchip/rv1108_package/frameworks/rkcamera/Config.in"
+source "package/rockchip/rv1108_package/frameworks/rkface/Config.in"
+source "package/rockchip/rv1108_package/frameworks/rv1108_vendor_storage/Config.in"
 
 endif
 

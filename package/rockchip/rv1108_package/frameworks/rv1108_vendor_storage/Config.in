@@ -1,0 +1,18 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_RV1108_VENDOR_STORAGE
+	bool "rv1108 package vendor storage"
+
+if BR2_PACKAGE_RV1108_VENDOR_STORAGE
+menu "vendor storage setting options"
+
+    config RV_TARGET_VENDOR_STORAGE_TEST
+        bool "Rockchip vendor storage test"
+        default n
+
+endmenu
+endif
+
+endif
+
