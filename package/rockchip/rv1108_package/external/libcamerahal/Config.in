@@ -5,5 +5,19 @@ config BR2_PACKAGE_LIBCAMERAHAL
 	bool "rv1108 package libcamerahal"
 	help
 
+if BR2_PACKAGE_LIBCAMERAHAL
+menu "libcamerahal options"
+config RV_TARGET_LIBCAMERAHAL_USE_IQ_BIN
+	bool "use iq bin replace xml"
+	default n
+
+config RV_TARGET_LIBCAMERAHAL_IQ_BIN_NAME
+	string "iq bin name"
+	default "name_not_exist"
+	depends on RV_TARGET_LIBCAMERAHAL_USE_IQ_BIN
+
+endmenu
+endif
+
 endif
 
