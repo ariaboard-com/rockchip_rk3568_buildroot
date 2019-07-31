@@ -3,6 +3,7 @@ if BR2_PACKAGE_RV1108
 # BSP packages
 source "package/rockchip/rv1108_package/frameworks/adk/Config.in"
 source "package/rockchip/rv1108_package/frameworks/database/Config.in"
+source "package/rockchip/rv1108_package/frameworks/hal/Config.in"
 
 endif
 
