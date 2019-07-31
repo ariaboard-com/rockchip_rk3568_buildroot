@@ -6,6 +6,7 @@ source "package/rockchip/rv1108_package/frameworks/database/Config.in"
 source "package/rockchip/rv1108_package/frameworks/hal/Config.in"
 source "package/rockchip/rv1108_package/frameworks/librkuvc/Config.in"
 source "package/rockchip/rv1108_package/frameworks/messenger/Config.in"
+source "package/rockchip/rv1108_package/frameworks/model_loader/Config.in"
 
 endif
 
