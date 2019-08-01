@@ -12,7 +12,7 @@ endif
 
 ifeq ($(RV_TARGET_PCBA_SELTTEST_APP),y)
     PCBA_TEST_CONF_OPTS += -DUSE_PCBA_SELFTEST_APP=1
-    PCBA_TEST_DEPENDENCIES += rv1108_minigui libjpeg rv1108_libpng tslib
+    PCBA_TEST_DEPENDENCIES += rv1108_minigui libjpeg libpng12 tslib
 endif
 
 $(eval $(cmake-package))

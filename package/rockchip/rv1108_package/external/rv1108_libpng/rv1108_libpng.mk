@@ -2,6 +2,8 @@ RV1108_LIBPNG_SITE = $(TOPDIR)/../external/libpng
 RV1108_LIBPNG_SITE_METHOD = local
 RV1108_LIBPNG_INSTALL_STAGING = YES
 
+RV1108_LIBPNG_DEPENDENCIES = zlib
+
 RV1108_LIBPNG_CONF_OPTS = \
 	--host=arm-linux \
 	 --with-pic
@@ -20,9 +22,9 @@ define RV1108_LIBPNG_INSTALL_STAGING_CMDS
     $(INSTALL) -D $(@D)/.libs/*.so* $(STAGING_DIR)/usr/lib/
 endef
 
-define RV1108_LIBPNG_INSTALL_TARGET_CMDS
-    $(INSTALL) -D $(@D)/*.h $(TARGET_DIR)/usr/include/
-    $(INSTALL) -D $(@D)/.libs/*.so* $(TARGET_DIR)/usr/lib/
-endef
+#define RV1108_LIBPNG_INSTALL_TARGET_CMDS
+#    $(INSTALL) -D $(@D)/*.h $(TARGET_DIR)/usr/include/
+#    $(INSTALL) -D $(@D)/.libs/*.so* $(TARGET_DIR)/usr/lib/
+#endef
 
 $(eval $(generic-package))
