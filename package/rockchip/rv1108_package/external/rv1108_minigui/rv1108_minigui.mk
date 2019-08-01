@@ -6,8 +6,12 @@ RV1108_MINIGUI_LICENSE_FILES = COPYING
 RV1108_MINIGUI_LICENSE = GPLv3
 RV1108_MINIGUI_AUTORECONF = YES
 
+RV1108_MINIGUI_DEPENDENCIES = host-pkgconf libion librkfb librkrga
+
 RV1108_MINIGUI_CONF_OPTS = \
+	--prefix=$(STAGING_DIR)/usr/ \
 	--host=arm-linux \
+	--build=i386-linux \
 	--with-osname=linux \
 	--with-targetname=rkfb \
 	--enable-autoial \
@@ -46,9 +50,9 @@ else
 RV1108_MINIGUI_CONF_OPTS += --disable-jpgsupport
 endif
 
-ifeq ($(BR2_PACKAGE_LIBPNG),y)
+ifeq ($(BR2_PACKAGE_RV1108_LIBPNG),y)
 RV1108_MINIGUI_CONF_OPTS += --enable-pngsupport
-RV1108_MINIGUI_DEPENDENCIES += libpng
+RV1108_MINIGUI_DEPENDENCIES += rv1108_libpng
 else
 RV1108_MINIGUI_CONF_OPTS += --disable-pngsupport
 endif
@@ -68,4 +72,23 @@ RV1108_MINIGUI_CONF_OPTS += \
 RV1108_MINIGUI_DEPENDENCIES += freetype
 endif
 
+INCLUDE_PATH=$(STAGING_DIR)/usr/include/
+define RV1108_MINIGUI_CONFIGURE_CMDS
+    cd $(@D); $(TARGET_MAKE_ENV) ./configure $(RV1108_MINIGUI_CONF_OPTS) CFLAGS="$(CFLAGS) -I $(INCLUDE_PATH)"
+endef
+
+define RV1108_MINIGUI_BUILD_CMDS
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
+endef
+
+define RV1108_MINIGUI_INSTALL_STAGING_CMDS
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
+endef
+
+define RV1108_MINIGUI_INSTALL_TARGET_CMDS
+    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
+endef
+
+
 $(eval $(generic-package))
+#$(eval $(autotools-package))
