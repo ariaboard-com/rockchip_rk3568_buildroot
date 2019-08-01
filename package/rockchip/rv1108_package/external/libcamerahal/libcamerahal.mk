@@ -35,6 +35,7 @@ define LIBCAMERAHAL_INSTALL_STAGING_CMDS
 	mkdir -p $(STAGING_DIR)/etc/cam_iq/
 	$(INSTALL) -D -m 0755 $(@D)/camera_engine_cifisp/IQ/*.xml $(STAGING_DIR)/etc/cam_iq/
 	mkdir -p $(STAGING_DIR)/usr/include/CameraHal/linux
+        $(foreach header,$(wildcard $(@D)/camera_engine_cifisp/include/*.h), $(INSTALL) -D -m 644 $(header) $(STAGING_DIR)/usr/include/CameraHal;)
 	$(foreach header,$(wildcard $(@D)/camera_engine_cifisp/HAL/include/*.h),$(INSTALL) -D -m 644 $(header) $(STAGING_DIR)/usr/include/CameraHal;)
 	cp -fr $(@D)/camera_engine_cifisp/include/linux/* $(STAGING_DIR)/usr/include/CameraHal/linux
 	cp -fr $(@D)/camera_engine_cifisp/include/* $(STAGING_DIR)/usr/include/

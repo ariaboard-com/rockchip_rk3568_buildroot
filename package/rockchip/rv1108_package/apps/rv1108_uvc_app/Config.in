@@ -1,0 +1,21 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_RV1108_UVC_APP
+	bool "rv1108 package uvc app"
+	select BR2_PACKAGE_MPP
+	select BR2_PACKAGE_LIBRKUVC
+	select BR2_PACKAGE_JHEAD
+
+if BR2_PACKAGE_RV1108_UVC_APP
+menu "uvc app setting options"
+config RV_TARGET_ISP_FORMAT
+    string "ISP video capture format"
+    default "HAL_FRMAE_FMT_NV12"
+config RV_TARGET_CIF_FORMAT
+    string "CIF video capture format"
+    default "HAL_FRMAE_FMT_NV12"
+endmenu
+endif
+endif
+
