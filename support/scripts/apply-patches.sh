@@ -119,10 +119,28 @@ function apply_patch {
         exit 1
     fi
     echo "${path}/${patch}" >> ${builddir}/.applied_patches_list
+
+    cd ${builddir}
+    if [ -n "$BR2_GEN_GIT" ]; then
+        if [ ! -d .git ]; then
+            git init
+            git add -f .
+            git commit --no-edit -m "init"
+        fi
+    fi
+
     ${uncomp} "${path}/$patch" | patch -g0 -p1 -E -d "${builddir}" -t -N $silent
     if [ $? != 0 ] ; then
         echo "Patch failed!  Please fix ${patch}!"
         exit 1
+    fi
+
+    if [ -n "$BR2_GEN_GIT" ]; then
+        git am "${path}/${patch}" --exclude "*" ||
+            git commit --allow-empty --no-edit -m "${patch}"
+
+        git add -f .
+        git commit --allow-empty --amend --no-edit
     fi
 }
 
