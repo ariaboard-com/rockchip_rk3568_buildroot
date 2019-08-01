@@ -1,0 +1,12 @@
+UPDATER_SITE = $(TOPDIR)/../app/updater
+UPDATER_SITE_METHOD = local
+UPDATER_INSTALL_STAGING = YES
+
+ifeq ($(RV_TARGET_UPDATER_FOR_EMMC),y)
+    UPDATER_CONF_OPTS += -DUSE_EMMC=1
+endif
+ifeq ($(RV_TARGET_UPDATER_FOR_NOR),y)
+    UPDATER_CONF_OPTS += -DUSE_NOR=1
+endif
+
+$(eval $(cmake-package))
