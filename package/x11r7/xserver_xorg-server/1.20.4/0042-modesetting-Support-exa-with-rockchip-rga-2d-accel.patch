@@ -1,0 +1,1061 @@
+From 648d87e371ebefc21ffcf52f5d17c238ecdff8f4 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 29 Jul 2019 14:26:11 +0800
+Subject: [PATCH 42/43] modesetting: Support exa with rockchip rga 2d accel
+
+Implementing neccessarily exa APIs for basic window moving and
+screen transforms.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ configure.ac                                     |  14 +
+ hw/xfree86/drivers/modesetting/Makefile.am       |   4 +-
+ hw/xfree86/drivers/modesetting/driver.c          |  46 ++
+ hw/xfree86/drivers/modesetting/driver.h          |   4 +
+ hw/xfree86/drivers/modesetting/drmmode_display.c |   5 +-
+ hw/xfree86/drivers/modesetting/drmmode_display.h |   3 +
+ hw/xfree86/drivers/modesetting/dumb_bo.c         |  18 +
+ hw/xfree86/drivers/modesetting/dumb_bo.h         |   1 +
+ hw/xfree86/drivers/modesetting/exa.c             | 784 +++++++++++++++++++++++
+ include/dix-config.h.in                          |   3 +
+ 10 files changed, 880 insertions(+), 2 deletions(-)
+ create mode 100644 hw/xfree86/drivers/modesetting/exa.c
+
+diff --git a/configure.ac b/configure.ac
+index 7cf384064..5e234143f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2079,6 +2079,20 @@ AM_CONDITIONAL([DGA], [test "x$DGA" = xyes])
+ AM_CONDITIONAL([XORG_BUS_PLATFORM], [test "x$CONFIG_UDEV_KMS" = xyes])
+ AM_CONDITIONAL([XORG_DRIVER_MODESETTING], [test "x$XORG_DRIVER_MODESETTING" = xyes])
+ 
++dnl modesetting
++if test "x$XORG_DRIVER_MODESETTING" = xyes; then
++	RGA_LIBS=
++	RGA_HEADER=
++
++	AC_CHECK_LIB([rga], [c_RkRgaInit], RGA_LIBS="-lrga")
++	AC_CHECK_HEADERS([rga/RgaApi.h], RGA_HEADER="yes")
++
++	if test "x$RGA_LIBS" != "x" && test "x$RGA_HEADER" = "xyes"; then
++		AC_SUBST(RGA_LIBS)
++		AC_DEFINE(MODESETTING_WITH_RGA, 1, [Have rockchip rga])
++	fi
++fi
++
+ dnl glamor
+ if test "x$GLAMOR" = xauto; then
+ 	if echo "$XORG" "$XEPHYR" "$XWAYLAND" | grep -q yes ; then
+diff --git a/hw/xfree86/drivers/modesetting/Makefile.am b/hw/xfree86/drivers/modesetting/Makefile.am
+index e0411ef51..c1e3ccb5a 100644
+--- a/hw/xfree86/drivers/modesetting/Makefile.am
++++ b/hw/xfree86/drivers/modesetting/Makefile.am
+@@ -29,6 +29,7 @@ AM_CFLAGS = $(DIX_CFLAGS) $(XORG_CFLAGS) $(LIBDRM_CFLAGS) $(UDEV_CFLAGS) $(CWARN
+ AM_CPPFLAGS = \
+ 	$(XORG_INCS) \
+ 	-I$(top_srcdir)/glamor \
++	-I$(top_srcdir)/exa \
+ 	-I$(srcdir)/../../ddc \
+ 	-I$(srcdir)/../../dri2 \
+ 	-I$(srcdir)/../../i2c \
+@@ -39,7 +40,7 @@ AM_CPPFLAGS = \
+ 
+ modesetting_drv_la_LTLIBRARIES = modesetting_drv.la
+ modesetting_drv_la_LDFLAGS = -module -avoid-version
+-modesetting_drv_la_LIBADD = $(UDEV_LIBS) $(DRM_LIBS)
++modesetting_drv_la_LIBADD = $(UDEV_LIBS) $(DRM_LIBS) $(RGA_LIBS)
+ modesetting_drv_ladir = @moduledir@/drivers
+ 
+ modesetting_drv_la_SOURCES = \
+@@ -53,6 +54,7 @@ modesetting_drv_la_SOURCES = \
+ 	 present.c \
+ 	 vblank.c \
+ 	 pageflip.c \
++	 exa.c \
+ 	 $(NULL)
+ 
+ drivermandir = $(DRIVER_MAN_DIR)
+diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
+index efa10fa6a..720c10833 100644
+--- a/hw/xfree86/drivers/modesetting/driver.c
++++ b/hw/xfree86/drivers/modesetting/driver.c
+@@ -762,6 +762,37 @@ FreeRec(ScrnInfoPtr pScrn)
+ }
+ 
+ static void
++try_enable_exa(ScrnInfoPtr pScrn)
++{
++    ScreenPtr pScreen = xf86ScrnToScreen(pScrn);
++    modesettingPtr ms = modesettingPTR(pScrn);
++
++    if (!xf86LoadSubModule(pScrn, "exa"))
++        goto fail;
++
++    ms->drmmode.exa = exaDriverAlloc();
++    if (!ms->drmmode.exa)
++        goto fail;
++
++    if (!ms_setup_exa(pScrn, ms->drmmode.exa))
++        goto fail;
++
++    if (!exaDriverInit(pScreen, ms->drmmode.exa))
++        goto fail;
++
++    xf86DrvMsg(pScrn->scrnIndex, X_INFO, "exa initialized\n");
++
++    return;
++
++fail:
++    if (ms->drmmode.exa)
++        free(ms->drmmode.exa);
++    ms->drmmode.exa = NULL;
++
++    xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "exa initialization failed\n");
++}
++
++static void
+ try_enable_glamor(ScrnInfoPtr pScrn)
+ {
+     modesettingPtr ms = modesettingPTR(pScrn);
+@@ -1391,6 +1422,8 @@ CreateScreenResources(ScreenPtr pScreen)
+         pixels = drmmode_map_front_bo(&ms->drmmode);
+         if (!pixels)
+             return FALSE;
++
++        drmmode_glamor_handle_new_screen_pixmap(&ms->drmmode);
+     }
+ 
+     rootPixmap = pScreen->GetScreenPixmap(pScreen);
+@@ -1594,6 +1627,7 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
+     ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+     modesettingPtr ms = modesettingPTR(pScrn);
+     VisualPtr visual;
++    const char *str_value;
+ 
+     pScrn->pScreen = pScreen;
+ 
+@@ -1677,6 +1711,11 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
+ 
+     xf86SetBlackWhitePixels(pScreen);
+ 
++    str_value = xf86GetOptValString(ms->drmmode.Options,
++                                    OPTION_ACCEL_METHOD);
++    if (str_value && !strcmp(str_value, "exa"))
++        try_enable_exa(pScrn);
++
+     xf86SetBackingStore(pScreen);
+     xf86SetSilkenMouse(pScreen);
+     miDCInitialize(pScreen, xf86GetPointerScreenFuncs());
+@@ -1890,6 +1929,13 @@ CloseScreen(ScreenPtr pScreen)
+         LeaveVT(pScrn);
+     }
+ 
++    if (ms->drmmode.exa) {
++        exaDriverFini(pScreen);
++        ms_cleanup_exa(pScrn, ms->drmmode.exa);
++        free(ms->drmmode.exa);
++    }
++    ms->drmmode.exa = NULL;
++
+     pScreen->CreateScreenResources = ms->createScreenResources;
+     pScreen->BlockHandler = ms->BlockHandler;
+ 
+diff --git a/hw/xfree86/drivers/modesetting/driver.h b/hw/xfree86/drivers/modesetting/driver.h
+index 9ceb92113..c443cfe21 100644
+--- a/hw/xfree86/drivers/modesetting/driver.h
++++ b/hw/xfree86/drivers/modesetting/driver.h
+@@ -190,3 +190,7 @@ Bool ms_do_pageflip(ScreenPtr screen,
+ #endif
+ 
+ int ms_flush_drm_events(ScreenPtr screen);
++
++Bool ms_setup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
++void ms_cleanup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
++Bool ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap, struct dumb_bo *bo);
+diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
+index a5607cfb2..a2695b2a0 100644
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.c
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
+@@ -3101,9 +3101,12 @@ drmmode_clones_init(ScrnInfoPtr scrn, drmmode_ptr drmmode, drmModeResPtr mode_re
+ static Bool
+ drmmode_set_pixmap_bo(drmmode_ptr drmmode, PixmapPtr pixmap, drmmode_bo *bo)
+ {
+-#ifdef GLAMOR_HAS_GBM
+     ScrnInfoPtr scrn = drmmode->scrn;
+ 
++    if (drmmode->exa)
++        return ms_set_pixmap_bo(scrn, pixmap, bo->dumb);
++
++#ifdef GLAMOR_HAS_GBM
+     if (!drmmode->glamor)
+         return TRUE;
+ 
+diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.h b/hw/xfree86/drivers/modesetting/drmmode_display.h
+index c043b802e..3aa10a42b 100644
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.h
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.h
+@@ -32,6 +32,7 @@
+ #include "libudev.h"
+ #endif
+ 
++#include "exa.h"
+ #include "dumb_bo.h"
+ 
+ struct gbm_device;
+@@ -108,6 +109,8 @@ typedef struct {
+     OptionInfoPtr Options;
+ 
+     Bool glamor;
++    ExaDriverPtr exa;
++
+     Bool shadow_enable;
+     Bool shadow_enable2;
+     /** Is Option "PageFlip" enabled? */
+diff --git a/hw/xfree86/drivers/modesetting/dumb_bo.c b/hw/xfree86/drivers/modesetting/dumb_bo.c
+index cf13f0a9c..e5fb54a89 100644
+--- a/hw/xfree86/drivers/modesetting/dumb_bo.c
++++ b/hw/xfree86/drivers/modesetting/dumb_bo.c
+@@ -97,6 +97,24 @@ dumb_bo_map(int fd, struct dumb_bo *bo)
+ }
+ 
+ int
++dumb_bo_get_fd(int fd, struct dumb_bo *bo, uint32_t flags)
++{
++    struct drm_prime_handle args;
++    int ret;
++
++    memset(&args, 0, sizeof(args));
++    args.fd = -1;
++    args.handle = bo->handle;
++    args.flags = flags;
++
++    ret = drmIoctl(fd, DRM_IOCTL_PRIME_HANDLE_TO_FD, &args);
++    if (ret)
++        return ret;
++
++    return args.fd;
++}
++
++int
+ dumb_bo_destroy(int fd, struct dumb_bo *bo)
+ {
+     struct drm_mode_destroy_dumb arg;
+diff --git a/hw/xfree86/drivers/modesetting/dumb_bo.h b/hw/xfree86/drivers/modesetting/dumb_bo.h
+index 9235e61e2..50f334b2e 100644
+--- a/hw/xfree86/drivers/modesetting/dumb_bo.h
++++ b/hw/xfree86/drivers/modesetting/dumb_bo.h
+@@ -39,6 +39,7 @@ struct dumb_bo {
+ struct dumb_bo *dumb_bo_create(int fd, const unsigned width,
+                                const unsigned height, const unsigned bpp);
+ int dumb_bo_map(int fd, struct dumb_bo *bo);
++int dumb_bo_get_fd(int fd, struct dumb_bo *bo, uint32_t flags);
+ int dumb_bo_destroy(int fd, struct dumb_bo *bo);
+ struct dumb_bo *dumb_get_bo_from_fd(int fd, int handle, int pitch, int size);
+ 
+diff --git a/hw/xfree86/drivers/modesetting/exa.c b/hw/xfree86/drivers/modesetting/exa.c
+new file mode 100644
+index 000000000..b5e65f835
+--- /dev/null
++++ b/hw/xfree86/drivers/modesetting/exa.c
+@@ -0,0 +1,784 @@
++/*
++ *  Copyright (c) 2019, Fuzhou Rockchip Electronics Co., Ltd
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ */
++
++#ifdef HAVE_DIX_CONFIG_H
++#include "dix-config.h"
++#endif
++
++#include "exa.h"
++#include "xf86.h"
++#include "driver.h"
++#include "dumb_bo.h"
++#include "fbpict.h"
++
++#include <unistd.h>
++
++#ifdef MODESETTING_WITH_RGA
++#include <rga/rga.h>
++#include <rga/RgaApi.h>
++#endif
++
++#define ABS(n)      ((n) < 0 ? -(n) : (n))
++#define ANGLE(n)    ((n) < 0 ? (n) + 360 : (n))
++#define MIN(a, b)   ((a) < (b) ? (a) : (b))
++
++struct ms_exa_pixmap_priv {
++    struct dumb_bo *bo;
++    int fd;
++    int pitch;
++    Bool imported;
++};
++
++struct ms_exa_prepare_args {
++    struct {
++        int alu;
++        Pixel planemask;
++        Pixel fg;
++    } solid;
++    struct {
++        PixmapPtr pSrcPixmap;
++        int alu;
++        Pixel planemask;
++    } copy;
++    struct {
++        int op;
++        PicturePtr pSrcPicture;
++        PicturePtr pMaskPicture;
++        PicturePtr pDstPicture;
++        PixmapPtr pSrc;
++        PixmapPtr pMask;
++        PixmapPtr pDst;
++
++        int rotate;
++        Bool reflect_x;
++    } composite;
++};
++
++static struct ms_exa_prepare_args exa_prepare_args = {0};
++static struct ms_exa_pixmap_priv *exa_scratch_pixmap = NULL;
++
++#ifdef MODESETTING_WITH_RGA
++
++static inline RgaSURF_FORMAT
++rga_get_pixmap_format(PixmapPtr pPix)
++{
++    switch (pPix->drawable.bitsPerPixel) {
++    case 32:
++        return RK_FORMAT_RGBA_8888;
++    case 16:
++        return RK_FORMAT_RGB_565;
++    default:
++        return RK_FORMAT_UNKNOWN;
++    }
++}
++
++static void
++rga_prepare_info(PixmapPtr pPixmap, rga_info_t *info,
++                 int x, int y, int w, int h)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
++    int pitch;
++
++    memset(info, 0, sizeof(rga_info_t));
++
++    info->fd = -1;
++    info->mmuFlag = 1;
++
++    if (!priv) {
++        info->virAddr = pPixmap->devPrivate.ptr;
++        pitch = pPixmap->devKind;
++    } else {
++        info->fd = priv->fd;
++        pitch = priv->pitch;
++    }
++
++    rga_set_rect(&info->rect, x, y, w, h,
++                 pitch * 8 / pPixmap->drawable.bitsPerPixel,
++                 pPixmap->drawable.height,
++                 rga_get_pixmap_format(pPixmap));
++}
++
++static Bool
++rga_check_pixmap(PixmapPtr pPixmap)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
++    RgaSURF_FORMAT format;
++
++    /* Skip small pixmaps */
++    if (pPixmap->drawable.width <= 2 &&
++        pPixmap->drawable.height <= 2)
++        return FALSE;
++
++    format = rga_get_pixmap_format(pPixmap);
++    if (format == RK_FORMAT_UNKNOWN)
++        return FALSE;
++
++    if (!priv) {
++        if (!pPixmap->devKind || !pPixmap->devPrivate.ptr)
++            return FALSE;
++
++        return TRUE;
++    }
++
++    if (priv->fd > 0)
++        return TRUE;
++
++    return FALSE;
++}
++
++#endif
++
++static void ms_exa_done(PixmapPtr pPixmap) {}
++
++static Bool
++ms_prepare_access(PixmapPtr pPix, int index)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPix);
++
++    if (pPix->devPrivate.ptr)
++        return TRUE;
++
++    if (!priv)
++        return FALSE;
++
++    pPix->devPrivate.ptr = priv->bo->ptr;
++
++    return pPix->devPrivate.ptr != NULL;
++}
++
++static void
++ms_finish_access(PixmapPtr pPix, int index)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPix);
++
++    if (priv && priv->bo)
++        pPix->devPrivate.ptr = NULL;
++}
++
++static Bool
++ms_prepare_solid(PixmapPtr pPixmap,
++                 int alu, Pixel planemask, Pixel fg)
++{
++#ifdef MODESETTING_WITH_RGA
++    //int rop;
++
++    if (planemask != ~0U)
++        return FALSE;
++
++    if (!rga_check_pixmap(pPixmap))
++        return FALSE;
++
++    /* TODO: Support rop */
++    switch (alu) {
++    case GXcopy:
++        break;
++    case GXclear:
++    case GXset:
++    case GXcopyInverted:
++    default:
++        return FALSE;
++    }
++
++    exa_prepare_args.solid.alu = alu;
++    exa_prepare_args.solid.planemask = planemask;
++    exa_prepare_args.solid.fg = fg;
++#endif
++
++    return TRUE;
++}
++
++static void
++ms_solid_bail(PixmapPtr pPixmap, int x1, int y1, int x2, int y2)
++{
++    ScreenPtr screen = pPixmap->drawable.pScreen;
++    ChangeGCVal val[3];
++    GCPtr gc;
++
++    gc = GetScratchGC(pPixmap->drawable.depth, screen);
++
++    val[0].val = exa_prepare_args.solid.alu;
++    val[1].val = exa_prepare_args.solid.planemask;
++    val[2].val = exa_prepare_args.solid.fg;
++    ChangeGC(NullClient, gc, GCFunction | GCPlaneMask | GCForeground, val);
++    ValidateGC(&pPixmap->drawable, gc);
++
++    ms_prepare_access(pPixmap, 0);
++    fbFill(&pPixmap->drawable, gc, x1, y1, x2 - x1, y2 - y1);
++    ms_finish_access(pPixmap, 0);
++
++    FreeScratchGC(gc);
++}
++
++static void
++ms_solid(PixmapPtr pPixmap, int x1, int y1, int x2, int y2)
++{
++#ifdef MODESETTING_WITH_RGA
++    rga_info_t dst_info = {0};
++
++    rga_prepare_info(pPixmap, &dst_info, x1, y1, x2 - x1, y2 - y1);
++
++    dst_info.color = exa_prepare_args.solid.fg;
++
++    if (c_RkRgaColorFill(&dst_info) < 0)
++        goto bail;
++
++    return;
++
++bail:
++#endif
++
++    ms_solid_bail(pPixmap, x1, y1, x2, y2);
++}
++
++static Bool
++ms_prepare_copy(PixmapPtr pSrcPixmap,
++                PixmapPtr pDstPixmap,
++                int dx, int dy, int alu, Pixel planemask)
++{
++#ifdef MODESETTING_WITH_RGA
++    //int rop;
++
++    if (planemask != ~0U)
++        return FALSE;
++
++    if (!rga_check_pixmap(pSrcPixmap))
++        return FALSE;
++
++    if (!rga_check_pixmap(pDstPixmap))
++        return FALSE;
++
++    if (pSrcPixmap->drawable.bitsPerPixel != pDstPixmap->drawable.bitsPerPixel)
++        return FALSE;
++
++    /* TODO: Support rop */
++    switch (alu) {
++    case GXcopy:
++        break;
++    case GXclear:
++    case GXset:
++    case GXcopyInverted:
++    default:
++        return FALSE;
++    }
++
++    exa_prepare_args.copy.pSrcPixmap = pSrcPixmap;
++    exa_prepare_args.copy.alu = alu;
++    exa_prepare_args.copy.planemask = planemask;
++#endif
++
++    return TRUE;
++}
++
++static void
++ms_copy_bail(PixmapPtr pDstPixmap, int srcX, int srcY,
++             int dstX, int dstY, int width, int height)
++{
++    PixmapPtr pSrcPixmap = exa_prepare_args.copy.pSrcPixmap;
++    ScreenPtr screen = pDstPixmap->drawable.pScreen;
++    ChangeGCVal val[2];
++    GCPtr gc;
++
++    gc = GetScratchGC(pDstPixmap->drawable.depth, screen);
++
++    val[0].val = exa_prepare_args.copy.alu;
++    val[1].val = exa_prepare_args.copy.planemask;
++    ChangeGC(NullClient, gc, GCFunction | GCPlaneMask, val);
++    ValidateGC(&pDstPixmap->drawable, gc);
++
++    ms_prepare_access(pSrcPixmap, 0);
++    ms_prepare_access(pDstPixmap, 0);
++    fbCopyArea(&pSrcPixmap->drawable, &pDstPixmap->drawable, gc,
++               srcX, srcY, width, height, dstX, dstY);
++    ms_finish_access(pDstPixmap, 0);
++    ms_finish_access(pSrcPixmap, 0);
++
++    FreeScratchGC(gc);
++}
++
++static void
++ms_copy(PixmapPtr pDstPixmap, int srcX, int srcY,
++        int dstX, int dstY, int width, int height)
++{
++#ifdef MODESETTING_WITH_RGA
++    PixmapPtr pSrcPixmap = exa_prepare_args.copy.pSrcPixmap;
++    ScreenPtr screen = pSrcPixmap->drawable.pScreen;
++    ScrnInfoPtr scrn = xf86Screens[screen->myNum];
++    modesettingPtr ms = modesettingPTR(scrn);
++    rga_info_t src_info = {0};
++    rga_info_t dst_info = {0};
++    rga_info_t tmp_info = {0};
++    struct dumb_bo *tmp_bo = NULL;
++
++    if (width <= 2 || height <= 2)
++        goto bail;
++
++    rga_prepare_info(pSrcPixmap, &src_info, srcX, srcY, width, height);
++    rga_prepare_info(pDstPixmap, &dst_info, dstX, dstY, width, height);
++
++    /* need an extra buffer for overlap copy */
++    if (pSrcPixmap == pDstPixmap &&
++        (ABS(dstX - srcX) < width || ABS(dstY - srcX) < height)) {
++        if (exa_scratch_pixmap) {
++            tmp_info.fd = exa_scratch_pixmap->fd;
++        } else {
++            tmp_bo = dumb_bo_create(ms->drmmode.fd, width, height, 32);
++            if (!tmp_bo)
++                goto bail;
++
++            tmp_info.fd = dumb_bo_get_fd(ms->drmmode.fd, tmp_bo, 0);
++        }
++
++        tmp_info.mmuFlag = 1;
++
++        rga_set_rect(&tmp_info.rect, 0, 0, width, height,
++                     width, height, rga_get_pixmap_format(pDstPixmap));
++
++        if (c_RkRgaBlit(&src_info, &tmp_info, NULL) < 0)
++            goto bail;
++
++        src_info = tmp_info;
++    }
++
++    if (c_RkRgaBlit(&src_info, &dst_info, NULL) < 0)
++        goto bail;
++
++    return;
++
++bail:
++    if (tmp_bo) {
++        dumb_bo_destroy(ms->drmmode.fd, tmp_bo);
++        close(tmp_info.fd);
++    }
++#endif
++
++    ms_copy_bail(pDstPixmap, srcX, srcY, dstX, dstY, width, height);
++}
++
++static Bool
++ms_check_composite(int op,
++                   PicturePtr pSrcPicture,
++                   PicturePtr pMaskPicture, PicturePtr pDstPicture)
++{
++#ifdef MODESETTING_WITH_RGA
++    /* TODO: Support other op */
++    if (op != PictOpSrc)
++        return FALSE;
++
++    /* TODO: Support mask */
++    if (pMaskPicture)
++        return FALSE;
++
++    /* TODO: Multiply transform from src and dst */
++    if (pDstPicture->transform)
++        return FALSE;
++#endif
++
++    return TRUE;
++}
++
++static Bool
++ms_prepare_composite(int op,
++                     PicturePtr pSrcPicture,
++                     PicturePtr pMaskPicture,
++                     PicturePtr pDstPicture,
++                     PixmapPtr pSrc, PixmapPtr pMask, PixmapPtr pDst)
++{
++#ifdef MODESETTING_WITH_RGA
++    PictTransformPtr t = pSrcPicture->transform;
++    PictVector v;
++    double x, y, dx, dy;
++    int r1, r2;
++
++    if (!rga_check_pixmap(pSrc))
++        return FALSE;
++
++    if (!rga_check_pixmap(pDst))
++        return FALSE;
++
++    if (pDst == pSrc)
++        return FALSE;
++
++    /* TODO: Support repeat */
++    if (pSrcPicture->repeat)
++        return FALSE;
++
++    /* TODO: Handle pSrcPicture->filter */
++
++    if (t->matrix[2][0] || t->matrix[2][1] || !t->matrix[2][2])
++        return FALSE;
++
++    dx = t->matrix[0][2] / (double) t->matrix[2][2];
++    dy = t->matrix[1][2] / (double) t->matrix[2][2];
++
++    v.vector[0] = IntToxFixed(1);
++    v.vector[1] = IntToxFixed(0);
++    v.vector[2] = xFixed1;
++    PictureTransformPoint(t, &v);
++    x = pixman_fixed_to_double(v.vector[0]) - dx;
++    y = pixman_fixed_to_double(v.vector[1]) - dy;
++    r1 = (int) ANGLE(atan2(y, x) * 180 / M_PI);
++
++    /* Only support 0/90/180/270 rotations */
++    if (r1 % 90)
++        return FALSE;
++
++    v.vector[0] = IntToxFixed(0);
++    v.vector[1] = IntToxFixed(1);
++    v.vector[2] = xFixed1;
++    PictureTransformPoint(t, &v);
++    x = pixman_fixed_to_double(v.vector[0]) - dx;
++    y = pixman_fixed_to_double(v.vector[1]) - dy;
++    r2 = (int) ANGLE(atan2(y, x) * 180 / M_PI - 90);
++
++    exa_prepare_args.composite.rotate = 360 - r1;
++    exa_prepare_args.composite.reflect_x = r1 != r2;
++
++    exa_prepare_args.composite.op = op;
++    exa_prepare_args.composite.pSrcPicture = pSrcPicture;
++    exa_prepare_args.composite.pMaskPicture = pMaskPicture;
++    exa_prepare_args.composite.pDstPicture = pDstPicture;
++    exa_prepare_args.composite.pSrc = pSrc;
++    exa_prepare_args.composite.pMask = pMask;
++#endif
++
++    return TRUE;
++}
++
++static void
++ms_composite_bail(PixmapPtr pDst, int srcX, int srcY,
++                  int maskX, int maskY, int dstX, int dstY,
++                  int width, int height)
++{
++    PicturePtr pSrcPicture = exa_prepare_args.composite.pSrcPicture;
++    PicturePtr pMaskPicture = exa_prepare_args.composite.pMaskPicture;
++    PicturePtr pDstPicture = exa_prepare_args.composite.pDstPicture;
++    PixmapPtr pSrc = exa_prepare_args.composite.pSrc;
++    PixmapPtr pMask = exa_prepare_args.composite.pMask;
++    int op = exa_prepare_args.composite.op;
++
++    if (pMask)
++        ms_prepare_access(pMask, 0);
++
++    ms_prepare_access(pSrc, 0);
++    ms_prepare_access(pDst, 0);
++    fbComposite(op, pSrcPicture, pMaskPicture, pDstPicture,
++                srcX, srcY, maskX, maskY, dstX, dstY, width, height);
++    ms_finish_access(pDst, 0);
++    ms_finish_access(pSrc, 0);
++
++    if (pMask)
++        ms_finish_access(pMask, 0);
++}
++
++static void
++ms_composite(PixmapPtr pDst, int srcX, int srcY,
++             int maskX, int maskY, int dstX, int dstY,
++             int width, int height)
++{
++#ifdef MODESETTING_WITH_RGA
++    PictTransformPtr t = exa_prepare_args.composite.pSrcPicture->transform;
++    PixmapPtr pSrc = exa_prepare_args.composite.pSrc;
++    ScreenPtr screen = pSrc->drawable.pScreen;
++    ScrnInfoPtr scrn = xf86Screens[screen->myNum];
++    modesettingPtr ms = modesettingPTR(scrn);
++    BoxRec box = {
++        .x1 = srcX,
++        .y1 = srcY,
++        .x2 = srcX + width,
++        .y2 = srcY + height,
++    };
++    rga_info_t src_info = {0};
++    rga_info_t dst_info = {0};
++    rga_info_t tmp_info = {0};
++    struct dumb_bo *tmp_bo = NULL;
++    Bool reflect_x = exa_prepare_args.composite.reflect_x;
++    int rotate = exa_prepare_args.composite.rotate;
++
++    if (width <= 2 || height <= 2)
++        goto bail;
++
++    pixman_transform_bounds(t, &box);
++
++    rga_prepare_info(pSrc, &src_info, box.x1, box.y1,
++                     box.x2 - box.x1, box.y2 - box.y1);
++    rga_prepare_info(pDst, &dst_info, dstX, dstY, width, height);
++
++    if (rotate == 90)
++        src_info.rotation = HAL_TRANSFORM_ROT_90;
++    else if (rotate == 180)
++        src_info.rotation = HAL_TRANSFORM_ROT_180;
++    else if (rotate == 270)
++        src_info.rotation = HAL_TRANSFORM_ROT_270;
++
++    /* need an extra buffer for reflect + rotate composite */
++    if (reflect_x && rotate) {
++        if (exa_scratch_pixmap) {
++            tmp_info.fd = exa_scratch_pixmap->fd;
++        } else {
++            tmp_bo = dumb_bo_create(ms->drmmode.fd, width, height, 32);
++            if (!tmp_bo)
++                goto bail;
++
++            tmp_info.fd = dumb_bo_get_fd(ms->drmmode.fd, tmp_bo, 0);
++        }
++
++        tmp_info.mmuFlag = 1;
++
++        rga_set_rect(&tmp_info.rect, 0, 0, width, height,
++                     width, height, rga_get_pixmap_format(pDst));
++
++        if (c_RkRgaBlit(&src_info, &tmp_info, NULL) < 0)
++            goto bail;
++
++        src_info = tmp_info;
++    }
++
++    if (reflect_x)
++        src_info.rotation = HAL_TRANSFORM_FLIP_V;
++
++    if (c_RkRgaBlit(&src_info, &dst_info, NULL) < 0)
++        goto bail;
++
++    return;
++
++bail:
++    if (tmp_bo) {
++        dumb_bo_destroy(ms->drmmode.fd, tmp_bo);
++        close(tmp_info.fd);
++    }
++#endif
++
++    ms_composite_bail(pDst, srcX, srcY, maskX, maskY,
++                      dstX, dstY, width, height);
++}
++
++static Bool
++ms_upload_to_screen(PixmapPtr pDst, int x, int y, int w, int h,
++                    char *src, int src_pitch)
++{
++#ifndef MODESETTING_WITH_RGA
++    return FALSE;
++#else
++    rga_info_t src_info = {0};
++    rga_info_t dst_info = {0};
++    int bpp = pDst->drawable.bitsPerPixel;
++
++    if (!rga_check_pixmap(pDst) || (w <= 64 && h <= 64))
++        return FALSE;
++
++    rga_prepare_info(pDst, &dst_info, x, y, w, h);
++
++    src_info.fd = -1;
++    src_info.mmuFlag = 1;
++    src_info.virAddr = src;
++
++    rga_set_rect(&src_info.rect, 0, 0, w, h,
++                 src_pitch * 8 / bpp, h,
++                 rga_get_pixmap_format(pDst));
++
++    return !c_RkRgaBlit(&src_info, &dst_info, NULL);
++#endif
++}
++
++static Bool
++ms_download_from_screen(PixmapPtr pSrc, int x, int y, int w, int h,
++                        char *dst, int dst_pitch)
++{
++#ifndef MODESETTING_WITH_RGA
++    return FALSE;
++#else
++    rga_info_t src_info = {0};
++    rga_info_t dst_info = {0};
++    int bpp = pSrc->drawable.bitsPerPixel;
++
++    if (!rga_check_pixmap(pSrc) || (w <= 64 && h <= 64))
++        return FALSE;
++
++    rga_prepare_info(pSrc, &src_info, x, y, w, h);
++
++    dst_info.fd = -1;
++    dst_info.mmuFlag = 1;
++    dst_info.virAddr = dst;
++
++    rga_set_rect(&dst_info.rect, 0, 0, w, h,
++                 dst_pitch * 8 / bpp, h,
++                 rga_get_pixmap_format(pSrc));
++
++    return !c_RkRgaBlit(&src_info, &dst_info, NULL);
++#endif
++}
++
++static void
++ms_wait_marker(ScreenPtr pScreen, int marker)
++{
++    // TODO: Use async rga, and sync for specified request here.
++}
++
++static int
++ms_mark_sync(ScreenPtr pScreen)
++{
++    // TODO: return latest request(marker).
++    return 0;
++}
++
++static void
++ms_destroy_pixmap(ScreenPtr pScreen, void *driverPriv)
++{
++    ScrnInfoPtr scrn = xf86Screens[pScreen->myNum];
++    modesettingPtr ms = modesettingPTR(scrn);
++    struct ms_exa_pixmap_priv *priv = driverPriv;
++
++    if (priv->fd > 0)
++        close(priv->fd);
++
++    if (!priv->imported && priv->bo)
++        dumb_bo_destroy(ms->drmmode.fd, priv->bo);
++
++    free(priv);
++}
++
++static void *
++ms_create_pixmap2(ScreenPtr pScreen, int width, int height,
++                  int depth, int usage_hint, int bitsPerPixel,
++                  int *new_fb_pitch)
++{
++    ScrnInfoPtr scrn = xf86Screens[pScreen->myNum];
++    modesettingPtr ms = modesettingPTR(scrn);
++    struct ms_exa_pixmap_priv *priv;
++
++    priv = calloc(1, sizeof(struct ms_exa_pixmap_priv));
++    if (!priv)
++        return NULL;
++
++    if (!width && !height)
++        return priv;
++
++    priv->bo = dumb_bo_create(ms->drmmode.fd, width, height, bitsPerPixel);
++    if (!priv->bo)
++        goto fail;
++
++    priv->fd = dumb_bo_get_fd(ms->drmmode.fd, priv->bo, 0);
++    priv->pitch = priv->bo->pitch;
++
++    dumb_bo_map(ms->drmmode.fd, priv->bo);
++
++    if (new_fb_pitch)
++        *new_fb_pitch = priv->pitch;
++
++    return priv;
++
++fail:
++    free(priv);
++    return NULL;
++}
++
++static Bool
++ms_pixmap_is_offscreen(PixmapPtr pPixmap)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
++
++    return priv && priv->bo;
++}
++
++Bool
++ms_setup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa)
++{
++    ScreenPtr screen = scrn->pScreen;
++
++    if (!exa)
++        return FALSE;
++
++    xf86DrvMsg(scrn->scrnIndex, X_INFO, "Using internal exa\n");
++
++    if (c_RkRgaInit() < 0)
++        return FALSE;
++
++    exa->exa_major = EXA_VERSION_MAJOR;
++    exa->exa_minor = EXA_VERSION_MINOR;
++
++    exa->pixmapPitchAlign = 8;
++    exa->flags = EXA_OFFSCREEN_PIXMAPS;
++    exa->maxX = 4096;
++    exa->maxY = 4096;
++
++    exa->PrepareSolid = ms_prepare_solid;
++    exa->Solid = ms_solid;
++    exa->DoneSolid = ms_exa_done;
++
++    exa->PrepareCopy = ms_prepare_copy;
++    exa->Copy = ms_copy;
++    exa->DoneCopy = ms_exa_done;
++
++    exa->CheckComposite = ms_check_composite;
++    exa->PrepareComposite = ms_prepare_composite;
++    exa->Composite = ms_composite;
++    exa->DoneComposite = ms_exa_done;
++
++    /* Disable upload/download, until rga2 crash issue fixed */
++//    exa->UploadToScreen = ms_upload_to_screen;
++//    exa->DownloadFromScreen = ms_download_from_screen;
++
++    exa->WaitMarker = ms_wait_marker;
++    exa->MarkSync = ms_mark_sync;
++
++    // bo based pixmap ops
++    exa->flags |= EXA_HANDLES_PIXMAPS | EXA_SUPPORTS_PREPARE_AUX;
++
++    exa->DestroyPixmap = ms_destroy_pixmap;
++    exa->CreatePixmap2 = ms_create_pixmap2;
++    exa->PrepareAccess = ms_prepare_access;
++    exa->FinishAccess = ms_finish_access;
++    exa->PixmapIsOffscreen = ms_pixmap_is_offscreen;
++
++    exa_scratch_pixmap = ms_create_pixmap2(screen, 4096, 4096, 32, 0, 32, NULL);
++
++    return TRUE;
++}
++
++void
++ms_cleanup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa)
++{
++    ScreenPtr screen = scrn->pScreen;
++    if (exa_scratch_pixmap)
++        ms_destroy_pixmap(screen, exa_scratch_pixmap);
++}
++
++Bool
++ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap, struct dumb_bo *bo)
++{
++    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
++    modesettingPtr ms = modesettingPTR(scrn);
++
++    if (!ms->drmmode.exa || !priv)
++        return FALSE;
++
++    if (priv->fd > 0)
++        close(priv->fd);
++
++    if (!priv->imported && priv->bo)
++        dumb_bo_destroy(ms->drmmode.fd, priv->bo);
++
++    priv->bo = bo;
++    priv->fd = dumb_bo_get_fd(ms->drmmode.fd, priv->bo, 0);
++    priv->pitch = priv->bo->pitch;
++
++    dumb_bo_map(ms->drmmode.fd, priv->bo);
++
++    priv->imported = TRUE;
++
++    pPixmap->devPrivate.ptr = NULL;
++    pPixmap->devKind = priv->pitch;
++
++    return TRUE;
++}
+diff --git a/include/dix-config.h.in b/include/dix-config.h.in
+index 3afc00c62..9742fde85 100644
+--- a/include/dix-config.h.in
++++ b/include/dix-config.h.in
+@@ -470,6 +470,9 @@
+ /* Ask fontsproto to make font path element names const */
+ #define FONT_PATH_ELEMENT_NAME_CONST    1
+ 
++/* Build modesetting has rga support */
++#undef MODESETTING_WITH_RGA
++
+ /* Build GLAMOR */
+ #undef GLAMOR
+ 
+-- 
+2.11.0
+

@@ -1,7 +1,7 @@
-From 0695dd48780b4e589eb2adf0f82eef26b5d3c04b Mon Sep 17 00:00:00 2001
+From 99f00dd5388c331d5a6f8aa12ce879a60c24ebed Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 24 Jul 2019 17:18:23 +0800
-Subject: [PATCH 41/41] modesetting: Support fb flipping mode
+Subject: [PATCH 41/43] modesetting: Support fb flipping mode
 
 Currently the modesetting only do page flipping for present and dri2.
 
@@ -14,15 +14,15 @@ Use option "FlipFB" to enable it:
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- hw/xfree86/drivers/modesetting/driver.c          |  37 ++-
+ hw/xfree86/drivers/modesetting/driver.c          |  46 ++-
  hw/xfree86/drivers/modesetting/driver.h          |   9 +
- hw/xfree86/drivers/modesetting/drmmode_display.c | 365 ++++++++++++++++++++++-
+ hw/xfree86/drivers/modesetting/drmmode_display.c | 371 ++++++++++++++++++++++-
  hw/xfree86/drivers/modesetting/drmmode_display.h |  28 ++
  hw/xfree86/drivers/modesetting/pageflip.c        |  80 +++--
- 5 files changed, 482 insertions(+), 37 deletions(-)
+ 5 files changed, 497 insertions(+), 37 deletions(-)
 
 diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
-index 8d29b130f..c2324c006 100644
+index 8d29b130f..efa10fa6a 100644
 --- a/hw/xfree86/drivers/modesetting/driver.c
 +++ b/hw/xfree86/drivers/modesetting/driver.c
 @@ -131,6 +131,7 @@ static const OptionInfoRec Options[] = {
@@ -97,6 +97,22 @@ index 8d29b130f..c2324c006 100644
      pScrn->capabilities = 0;
      ret = drmGetCap(ms->fd, DRM_CAP_PRIME, &value);
      if (ret == 0) {
+@@ -1815,6 +1848,15 @@ CloseScreen(ScreenPtr pScreen)
+     modesettingPtr ms = modesettingPTR(pScrn);
+     modesettingEntPtr ms_ent = ms_ent_priv(pScrn);
+ 
++    xf86CrtcConfigPtr xf86_config = XF86_CRTC_CONFIG_PTR(pScrn);
++    int c;
++
++    /* HACK: All filters would be reset after screen closed */
++    for (c = 0; c < xf86_config->num_crtc; c++) {
++        xf86CrtcPtr crtc = xf86_config->crtc[c];
++        crtc->transform.filter = NULL;
++    }
++
+     /* Clear mask of assigned crtc's in this generation */
+     ms_ent->assigned_crtcs = 0;
+ 
 diff --git a/hw/xfree86/drivers/modesetting/driver.h b/hw/xfree86/drivers/modesetting/driver.h
 index c8db4b8a4..9ceb92113 100644
 --- a/hw/xfree86/drivers/modesetting/driver.h
@@ -125,7 +141,7 @@ index c8db4b8a4..9ceb92113 100644
                      PixmapPtr new_front,
                      void *event,
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
-index 336f7686e..1496f0bf6 100644
+index 336f7686e..a5607cfb2 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.c
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
 @@ -58,6 +58,11 @@ static PixmapPtr drmmode_create_pixmap_header(ScreenPtr pScreen, int width, int
@@ -148,20 +164,19 @@ index 336f7686e..1496f0bf6 100644
      int ret;
  
      *fb_id = 0;
-@@ -619,7 +625,11 @@ drmmode_crtc_get_fb_id(xf86CrtcPtr crtc, uint32_t *fb_id, int *x, int *y)
+@@ -619,7 +625,10 @@ drmmode_crtc_get_fb_id(xf86CrtcPtr crtc, uint32_t *fb_id, int *x, int *y)
          *fb_id = drmmode_crtc->rotate_fb_id;
          *x = *y = 0;
      }
 -    else {
 +    else if (!screen->isGPU && drmmode_crtc->flip_fb_enabled) {
-+        drmmode_update_fb(crtc);
 +        *fb_id = drmmode_crtc->flip_fb[drmmode_crtc->current_fb].fb_id;
 +        *x = *y = 0;
 +    } else {
          *fb_id = drmmode->fb_id;
          *x = crtc->x;
          *y = crtc->y;
-@@ -1254,6 +1264,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
+@@ -1254,6 +1263,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
                                     PixmapPtr front, PixmapPtr back)
  {
      drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
@@ -170,7 +185,7 @@ index 336f7686e..1496f0bf6 100644
  
      drmmode_crtc->enable_flipping = TRUE;
  
-@@ -1274,6 +1286,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
+@@ -1274,6 +1285,8 @@ drmmode_EnableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode,
          return FALSE;
      }
  
@@ -179,7 +194,7 @@ index 336f7686e..1496f0bf6 100644
      return TRUE;
  }
  
-@@ -1281,6 +1295,8 @@ void
+@@ -1281,6 +1294,8 @@ void
  drmmode_DisableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode)
  {
      drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
@@ -188,7 +203,7 @@ index 336f7686e..1496f0bf6 100644
  
      drmmode_crtc->enable_flipping = FALSE;
  
-@@ -1290,6 +1306,8 @@ drmmode_DisableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode)
+@@ -1290,6 +1305,8 @@ drmmode_DisableSharedPixmapFlipping(xf86CrtcPtr crtc, drmmode_ptr drmmode)
  
      drmmode_set_target_scanout_pixmap(crtc, NULL,
                                        &drmmode_crtc->prime_pixmap_back);
@@ -197,7 +212,7 @@ index 336f7686e..1496f0bf6 100644
  }
  
  static void
-@@ -1488,9 +1506,8 @@ drmmode_set_mode_major(xf86CrtcPtr crtc, DisplayModePtr mode,
+@@ -1488,9 +1505,8 @@ drmmode_set_mode_major(xf86CrtcPtr crtc, DisplayModePtr mode,
          crtc->y = y;
          crtc->rotation = rotation;
  
@@ -208,7 +223,7 @@ index 336f7686e..1496f0bf6 100644
  
          crtc->funcs->gamma_set(crtc, crtc->gamma_red, crtc->gamma_green,
                                 crtc->gamma_blue, crtc->gamma_size);
-@@ -2192,6 +2209,11 @@ drmmode_crtc_init(ScrnInfoPtr pScrn, drmmode_ptr drmmode, drmModeResPtr mode_res
+@@ -2192,6 +2208,11 @@ drmmode_crtc_init(ScrnInfoPtr pScrn, drmmode_ptr drmmode, drmModeResPtr mode_res
      drmmode_crtc->vblank_pipe = drmmode_crtc_vblank_pipe(num);
      xorg_list_init(&drmmode_crtc->mode_list);
  
@@ -220,7 +235,7 @@ index 336f7686e..1496f0bf6 100644
      if (ms->atomic_modeset) {
          props = drmModeObjectGetProperties(drmmode->fd, mode_res->crtcs[num],
                                             DRM_MODE_OBJECT_CRTC);
-@@ -3486,7 +3508,7 @@ drmmode_set_desired_modes(ScrnInfoPtr pScrn, drmmode_ptr drmmode, Bool set_hw)
+@@ -3486,7 +3507,7 @@ drmmode_set_desired_modes(ScrnInfoPtr pScrn, drmmode_ptr drmmode, Bool set_hw)
              crtc->rotation = crtc->desiredRotation;
              crtc->x = crtc->desiredX;
              crtc->y = crtc->desiredY;
@@ -229,7 +244,7 @@ index 336f7686e..1496f0bf6 100644
                  return FALSE;
          }
      }
-@@ -3854,6 +3876,7 @@ drmmode_free_bos(ScrnInfoPtr pScrn, drmmode_ptr drmmode)
+@@ -3854,6 +3875,7 @@ drmmode_free_bos(ScrnInfoPtr pScrn, drmmode_ptr drmmode)
          drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
  
          dumb_bo_destroy(drmmode->fd, drmmode_crtc->cursor_bo);
@@ -237,7 +252,7 @@ index 336f7686e..1496f0bf6 100644
      }
  }
  
-@@ -3910,3 +3933,337 @@ drmmode_get_default_bpp(ScrnInfoPtr pScrn, drmmode_ptr drmmode, int *depth,
+@@ -3910,3 +3932,344 @@ drmmode_get_default_bpp(ScrnInfoPtr pScrn, drmmode_ptr drmmode, int *depth,
      drmModeFreeResources(mode_res);
      return;
  }
@@ -273,10 +288,7 @@ index 336f7686e..1496f0bf6 100644
 +{
 +    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
 +    drmmode_ptr drmmode = drmmode_crtc->drmmode;
-+    ScreenPtr screen = xf86ScrnToScreen(crtc->scrn);
-+    ScrnInfoPtr scrn = crtc->scrn;
-+    int i, width, height, pitch, bpp;
-+    void *data;
++    int i, width, height, bpp;
 +
 +    width = crtc->mode.HDisplay;
 +    height = crtc->mode.VDisplay;
@@ -291,15 +303,6 @@ index 336f7686e..1496f0bf6 100644
 +            goto fail;
 +
 +        if (drmmode_bo_import(drmmode, &fb->bo, &fb->fb_id) < 0)
-+            goto fail;
-+
-+        data = drmmode_bo_map(drmmode, &fb->bo);
-+        pitch = drmmode_bo_get_pitch(&fb->bo);
-+        fb->pixmap = drmmode_create_pixmap_header(screen, width, height,
-+                                                  scrn->depth, bpp,
-+                                                  pitch, data);
-+        if (!fb->pixmap ||
-+            !drmmode_set_pixmap_bo(drmmode, fb->pixmap, &fb->bo))
 +            goto fail;
 +    }
 +
@@ -357,6 +360,10 @@ index 336f7686e..1496f0bf6 100644
 +{
 +    drmmode_fb *fb = closure;
 +
++    if (fb->pixmap)
++        fb->pixmap->drawable.pScreen->DestroyPixmap(fb->pixmap);
++    fb->pixmap = NULL;
++
 +    fb->damage = NULL;
 +}
 +
@@ -383,8 +390,9 @@ index 336f7686e..1496f0bf6 100644
 +drmmode_update_fb(xf86CrtcPtr crtc)
 +{
 +    drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
-+    modesettingPtr ms = modesettingPTR(crtc->scrn);
-+    ScreenPtr screen = xf86ScrnToScreen(crtc->scrn);
++    ScrnInfoPtr scrn = crtc->scrn;
++    modesettingPtr ms = modesettingPTR(scrn);
++    ScreenPtr screen = xf86ScrnToScreen(scrn);
 +    SourceValidateProcPtr SourceValidate = screen->SourceValidate;
 +    WindowPtr root = screen->root;
 +    PixmapPtr dst_pixmap;
@@ -395,8 +403,22 @@ index 336f7686e..1496f0bf6 100644
 +
 +    fb = &drmmode_crtc->flip_fb[drmmode_crtc->current_fb];
 +
-+    /* setup a damage to track dirty */
-+    if (!fb->damage) {
++    if (!fb->pixmap) {
++        void *data = drmmode_bo_map(&ms->drmmode, &fb->bo);
++        int pitch = drmmode_bo_get_pitch(&fb->bo);
++        fb->pixmap = drmmode_create_pixmap_header(screen,
++                                                  fb->bo.width,
++                                                  fb->bo.height,
++                                                  scrn->depth,
++                                                  ms->drmmode.kbpp,
++                                                  pitch, data);
++        if (!fb->pixmap)
++            return FALSE;
++
++        if (!drmmode_set_pixmap_bo(&ms->drmmode, fb->pixmap, &fb->bo))
++            return FALSE;
++
++        /* setup a damage to track dirty */
 +        fb->damage = DamageCreate(NULL, drmmode_flip_damage_destroy,
 +                                  DamageReportNone, TRUE, screen, fb);
 +        DamageRegister(&screen->root->drawable, fb->damage);
