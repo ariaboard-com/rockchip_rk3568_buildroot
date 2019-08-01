@@ -1,7 +1,7 @@
-From ab355300f9e0358c5310f8d09ecb5dd7164f07e6 Mon Sep 17 00:00:00 2001
+From 1499d5656c0a506f4ee05616e629cfcf91a2e22e Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Wed, 19 Jul 2017 17:43:15 +0800
-Subject: [PATCH 04/14] qt5base: eglfs_kms set framebuffer support transparent
+Subject: [PATCH 04/19] qt5base: eglfs_kms set framebuffer support transparent
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Binyuan Lan <lby@rock-chips.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/src/plugins/platforms/eglfs/deviceintegration/eglfs_kms/qeglfskmsgbmscreen.cpp b/src/plugins/platforms/eglfs/deviceintegration/eglfs_kms/qeglfskmsgbmscreen.cpp
-index 87fb3146..ca858084 100644
+index 87fb3146c7..ca858084c4 100644
 --- a/src/plugins/platforms/eglfs/deviceintegration/eglfs_kms/qeglfskmsgbmscreen.cpp
 +++ b/src/plugins/platforms/eglfs/deviceintegration/eglfs_kms/qeglfskmsgbmscreen.cpp
 @@ -82,13 +82,14 @@ QEglFSKmsGbmScreen::FrameBuffer *QEglFSKmsGbmScreen::framebufferForBufferObject(

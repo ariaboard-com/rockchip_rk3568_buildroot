@@ -1,7 +1,7 @@
-From 63fb2757480516689c9ae61c096a1f7477d470f2 Mon Sep 17 00:00:00 2001
+From 08c989e561dc969cabfcf6323672a8f148850a0d Mon Sep 17 00:00:00 2001
 From: Yuqing Zhu <carol.zhu@nxp.com>
 Date: Mon, 27 Mar 2017 15:33:35 +0800
-Subject: [PATCH 02/14] qtbase: Fix build error when using EGL
+Subject: [PATCH 02/19] qtbase: Fix build error when using EGL
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -19,7 +19,7 @@ Signed-off-by: Gaël PORTAY <gael.portay@savoirfairelinux.com>
  1 file changed, 6 insertions(+)
 
 diff --git a/mkspecs/features/egl.prf b/mkspecs/features/egl.prf
-index 9fa0c9e2..85d5852b 100644
+index 9fa0c9e219..85d5852ba6 100644
 --- a/mkspecs/features/egl.prf
 +++ b/mkspecs/features/egl.prf
 @@ -1,3 +1,9 @@

@@ -1,7 +1,7 @@
-From b6b650726efe54e5576ec6b3bc4384dd0b6bf354 Mon Sep 17 00:00:00 2001
+From 6c458c165c407516d5305e9ae4e79f40cbcc78ca Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 6 Jun 2018 21:26:46 +0800
-Subject: [PATCH 07/21] qoffscreensurface: Clear current surface before destroy
+Subject: [PATCH 07/20] qoffscreensurface: Clear current surface before destroy
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

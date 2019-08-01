@@ -1,7 +1,7 @@
-From 31c720fa73e39f73dc341966ae6a74d29151a7dc Mon Sep 17 00:00:00 2001
+From 04e63bfeb10fa6057610b589184b8bffba12b121 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:50:55 +0800
-Subject: [PATCH 08/21] qwindow: Add interface to override win id for video
+Subject: [PATCH 08/20] qwindow: Add interface to override win id for video
  window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>

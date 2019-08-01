@@ -1,7 +1,7 @@
-From 8bf125a6e0b53214142ac75416e1443363340f4e Mon Sep 17 00:00:00 2001
+From 1e8a44ecc5f92451a7beabd46860ffb40932e2d2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 6 Mar 2020 17:20:40 +0800
-Subject: [PATCH 10/14] qscreen: Update toplevel windows' screen when needed
+Subject: [PATCH 10/18] qscreen: Update toplevel windows' screen when needed
 
 Update toplevel windows' screen when creating new primary screen, since
 we cleared it during destroying the old one.

@@ -1,7 +1,7 @@
-From 89f9f1851126f9c5af08ef546c7acb03b9a3f458 Mon Sep 17 00:00:00 2001
+From e49854275d6c8d77f468f2a18cd13f0a6a966599 Mon Sep 17 00:00:00 2001
 From: Caesar Wang <wxt@rock-chips.com>
 Date: Tue, 3 Jul 2018 10:54:03 +0800
-Subject: [PATCH 04/14] qt5base: fix QT eglfs display bug
+Subject: [PATCH 04/18] qt5base: fix QT eglfs display bug
 
 The app occur Segmentation fault when it exit and click screen
 

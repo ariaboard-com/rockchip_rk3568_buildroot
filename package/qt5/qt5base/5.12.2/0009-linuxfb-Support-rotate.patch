@@ -1,7 +1,7 @@
-From a3187710de0b648c3e44b9ea6dda80859c4b3153 Mon Sep 17 00:00:00 2001
+From 4600a7110c51cccfc77676aced785815c25ca132 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 29 Apr 2019 12:11:42 +0800
-Subject: [PATCH 09/14] linuxfb: Support rotate
+Subject: [PATCH 09/18] linuxfb: Support rotate
 
 Base on:
 https://borkedlabs.com/blog/2015/06-01-qt5-linuxfb-rotation-for-lcds/

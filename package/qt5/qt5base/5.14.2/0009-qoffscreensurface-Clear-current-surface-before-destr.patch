@@ -1,7 +1,7 @@
-From 94ef8c6885f5fe12e62b215d4be6a5803229218a Mon Sep 17 00:00:00 2001
+From c9597ae41812034d76c13ba140cd2f802028253a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 6 Jun 2018 21:26:46 +0800
-Subject: [PATCH 09/18] qoffscreensurface: Clear current surface before destroy
+Subject: [PATCH 09/22] qoffscreensurface: Clear current surface before destroy
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 6 insertions(+)
 
 diff --git a/src/gui/kernel/qoffscreensurface.cpp b/src/gui/kernel/qoffscreensurface.cpp
-index 0cc11ca3b..602f6c60f 100644
+index 0cc11ca3..602f6c60 100644
 --- a/src/gui/kernel/qoffscreensurface.cpp
 +++ b/src/gui/kernel/qoffscreensurface.cpp
 @@ -234,6 +234,12 @@ void QOffscreenSurface::destroy()

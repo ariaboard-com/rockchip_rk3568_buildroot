@@ -1,7 +1,7 @@
-From 03a2ece7f85dea18c07f5dbc6a0c68d27f97e96c Mon Sep 17 00:00:00 2001
+From 349565972e246c10b47daa03a8bce3220e260604 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 16 Apr 2019 18:46:49 +0800
-Subject: [PATCH 10/21] linuxfb: Use triple buffer by default
+Subject: [PATCH 10/20] linuxfb: Use triple buffer by default
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
