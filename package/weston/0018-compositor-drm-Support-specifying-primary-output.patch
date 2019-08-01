@@ -1,0 +1,66 @@
+From dfe828c44ba4ae29303aea25f4e225133207152d Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 1 Aug 2019 17:45:01 +0800
+Subject: [PATCH 18/20] compositor-drm: Support specifying primary output
+
+Use WESTON_DRM_PRIMARY environment to specify primary output, for
+example:
+export WESTON_DRM_PRIMARY=HDMI-A-1
+
+It's handy when there are multiple internal/external monitors.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 34570d6..db0b55c 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -3197,6 +3197,20 @@ connector_is_external(int type)
+ typedef bool (*connector_match_t) (struct drm_backend *b, drmModeConnector *connector);
+ 
+ static bool
++connector_match_primary(struct drm_backend *b, drmModeConnector *connector)
++{
++	const char *name = make_connector_name(connector);
++	const char *buf;
++	bool primary;
++
++	buf = getenv("WESTON_DRM_PRIMARY");
++	primary = buf && !strcmp(buf, name);
++
++	free((void *)name);
++	return primary;
++}
++
++static bool
+ connector_match_external(struct drm_backend *b, drmModeConnector *connector)
+ {
+ 	return connector_is_external(connector->connector_type);
+@@ -3216,18 +3230,21 @@ connector_match_fallback(struct drm_backend *b, drmModeConnector *connector)
+ }
+ 
+ static connector_match_t connector_matches_default[] = {
++	connector_match_primary,
+ 	connector_match_internal,
+ 	connector_match_external,
+ 	NULL,
+ };
+ 
+ static connector_match_t connector_matches_external_dual[] = {
++	connector_match_primary,
+ 	connector_match_external,
+ 	connector_match_internal,
+ 	NULL,
+ };
+ 
+ static connector_match_t connector_matches_external[] = {
++	connector_match_primary,
+ 	connector_match_external,
+ 	connector_match_fallback,
+ 	NULL,
+-- 
+2.11.0
+
