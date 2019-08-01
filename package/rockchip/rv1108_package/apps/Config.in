@@ -4,6 +4,7 @@ if BR2_PACKAGE_RV1108
 source "package/rockchip/rv1108_package/apps/at_server/Config.in"
 source "package/rockchip/rv1108_package/apps/face_service/Config.in"
 source "package/rockchip/rv1108_package/apps/lock/Config.in"
+source "package/rockchip/rv1108_package/apps/pcba_test/Config.in"
 source "package/rockchip/rv1108_package/apps/peephole/Config.in"
 source "package/rockchip/rv1108_package/apps/updater/Config.in"
 source "package/rockchip/rv1108_package/apps/rv1108_uvc_app/Config.in"

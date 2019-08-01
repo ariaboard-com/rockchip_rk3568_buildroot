@@ -1,0 +1,8 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_PCBA_TEST
+	bool "rv1108 package pcba_test"
+
+endif
+

@@ -1,0 +1,18 @@
+PCBA_TEST_SITE = $(TOPDIR)/../app/pcba_test
+PCBA_TEST_SITE_METHOD = local
+PCBA_TEST_INSTALL_STAGING = YES
+
+# add dependencies
+PCBA_TEST_DEPENDENCIES = librkrga librkfb adk
+
+
+ifeq ($(RV_TARGET_PCBA_PCTOOL_APP),y)
+    PCBA_TEST_CONF_OPTS += -DUSE_PCBA_PCTOOL_APP=1
+endif
+
+ifeq ($(RV_TARGET_PCBA_SELTTEST_APP),y)
+    PCBA_TEST_CONF_OPTS += -DUSE_PCBA_SELFTEST_APP=1
+    PCBA_TEST_DEPENDENCIES += rv1108_minigui libjpeg rv1108_libpng tslib
+endif
+
+$(eval $(cmake-package))
