@@ -4,12 +4,10 @@ RV1108_MINIGUI_INSTALL_STAGING = YES
 
 RV1108_MINIGUI_LICENSE_FILES = COPYING
 RV1108_MINIGUI_LICENSE = GPLv3
-RV1108_MINIGUI_AUTORECONF = YES
 
 RV1108_MINIGUI_DEPENDENCIES = host-pkgconf libion librkfb librkrga
 
 RV1108_MINIGUI_CONF_OPTS = \
-	--prefix=$(STAGING_DIR)/usr/ \
 	--host=arm-linux \
 	--build=i386-linux \
 	--with-osname=linux \
@@ -82,13 +80,12 @@ define RV1108_MINIGUI_BUILD_CMDS
 endef
 
 define RV1108_MINIGUI_INSTALL_STAGING_CMDS
-    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
+    $(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(STAGING_DIR) -C $(@D) install
 endef
 
 define RV1108_MINIGUI_INSTALL_TARGET_CMDS
-    $(TARGET_MAKE_ENV) $(MAKE) -C $(@D) install
+    $(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
 endef
 
 
 $(eval $(generic-package))
-#$(eval $(autotools-package))
