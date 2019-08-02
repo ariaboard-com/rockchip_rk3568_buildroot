@@ -232,6 +232,9 @@ endif
 define XSERVER_XORG_SERVER_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 755 package/x11r7/xserver_xorg-server/S40xorg \
 		$(TARGET_DIR)/etc/init.d/S40xorg
+
+	$(INSTALL) -D -m 755 package/x11r7/xserver_xorg-server/20-modesetting.conf \
+		$(TARGET_DIR)/usr/share/X11/xorg.conf.d
 endef
 
 $(eval $(autotools-package))
