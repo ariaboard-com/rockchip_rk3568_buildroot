@@ -1,26 +1,16 @@
-From df11f283d07dac5e497efff4cc10f07f9810d0eb Mon Sep 17 00:00:00 2001
+From d25bf9ebe3bc97391ebf2007c1d2920897b0f99f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 21 Feb 2019 14:48:01 +0800
-Subject: [PATCH 14/20] compositor-drm: Support virtual screen size
+Subject: [PATCH] compositor-drm: Support virtual screen size
 
 Support setting virtual screen size, for example:
     export WESTON_DRM_VIRTUAL_SIZE=1024x768
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- .applied_patches_list      |   1 +
  libweston/compositor-drm.c | 153 ++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 146 insertions(+), 8 deletions(-)
+ 1 file changed, 145 insertions(+), 8 deletions(-)
 
-diff --git a/.applied_patches_list b/.applied_patches_list
-index 17ab4b9..2e955fc 100644
---- a/.applied_patches_list
-+++ b/.applied_patches_list
-@@ -11,3 +11,4 @@
- /arm64/buildroot/package/weston/0011-compositor-drm-Create-gl-render-with-alpha-support.patch
- /arm64/buildroot/package/weston/0012-HACK-compositor-gl-renderer-Make-holes-for-lower-ove.patch
- /arm64/buildroot/package/weston/0013-compositor-drm-Support-perfer-external-connectors.patch
-+/arm64/buildroot/package/weston/0014-compositor-drm-Support-virtual-screen-size.patch
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
 index cc6503d..e8aed3c 100644
 --- a/libweston/compositor-drm.c
