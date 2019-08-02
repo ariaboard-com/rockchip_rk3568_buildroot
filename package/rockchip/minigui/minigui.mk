@@ -22,9 +22,9 @@ MINIGUI_CONF_OPTS = \
     --with-targetname=drmcon \
     --disable-videopcxvfb \
     --with-ttfsupport=none \
-    --enable-autoial \
+    --disable-autoial \
     --disable-vbfsupport \
-    --disable-tslibial \
+    --enable-tslibial \
     --disable-textmode \
     --enable-vbfsupport \
     --disable-pcxvfb \
@@ -33,7 +33,7 @@ MINIGUI_CONF_OPTS = \
     --disable-jpgsupport \
     --disable-fontcourier \
     --disable-screensaver \
-    --enable-cisco_touchpad_ial \
+    --enable-RKKeybroad_ial \
     --enable-jpgsupport \
     --disable-fontsserif \
     --disable-fontsystem \

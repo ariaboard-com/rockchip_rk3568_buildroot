@@ -1,0 +1,40 @@
+From d0f141ae8f7ea03bde0df4f6bc3fc2dd81a709aa Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 25 Dec 2018 16:20:35 +0800
+Subject: [PATCH 29/30] waylandsink: Enable changing window handle
+
+Changing window handle is dangerous, but we need this feature for:
+https://redmine.rockchip.com.cn/issues/184629
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ ext/wayland/gstwaylandsink.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index 78dd294a0..df3b8c7e3 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -918,8 +918,8 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
+   g_return_if_fail (sink != NULL);
+ 
+   if (sink->window != NULL) {
+-    GST_WARNING_OBJECT (sink, "changing window handle is not supported");
+-    return;
++    GST_WARNING_OBJECT (sink, "changing window handle is dangerous");
++    g_clear_object (&sink->window);
+   }
+ 
+   g_mutex_lock (&sink->render_lock);
+@@ -927,8 +927,6 @@ gst_wayland_sink_set_window_handle (GstVideoOverlay * overlay, guintptr handle)
+   GST_DEBUG_OBJECT (sink, "Setting window handle %" GST_PTR_FORMAT,
+       (void *) handle);
+ 
+-  g_clear_object (&sink->window);
+-
+   if (handle) {
+     if (G_LIKELY (gst_wayland_sink_find_display (sink))) {
+       /* we cannot use our own display with an external window handle */
+-- 
+2.11.0
+

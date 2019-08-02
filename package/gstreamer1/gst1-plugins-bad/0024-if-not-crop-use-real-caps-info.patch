@@ -1,0 +1,50 @@
+From 1f0a6de8e98d6c86783b4485e48288f2012ec75a Mon Sep 17 00:00:00 2001
+From: "james.lin" <james.lin@rock-chips.com>
+Date: Fri, 13 Apr 2018 11:58:00 +0800
+Subject: [PATCH 24/30] if not crop use real caps info
+
+Signed-off-by: james.lin <james.lin@rock-chips.com>
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ sys/kms/gstkmssink.c | 5 +++--
+ sys/kms/gstkmssink.h | 1 +
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
+index 1c219809d..b103dadfe 100644
+--- a/sys/kms/gstkmssink.c
++++ b/sys/kms/gstkmssink.c
+@@ -1154,6 +1154,7 @@ gst_kms_sink_set_caps (GstBaseSink * bsink, GstCaps * caps)
+     goto modesetting_failed;
+ 
+   self->vinfo = vinfo;
++  self->rinfo = vinfo;
+ 
+   GST_OBJECT_LOCK (self);
+   if (self->reconfigure) {
+@@ -1596,8 +1597,8 @@ retry_set_plane:
+     src.w = crop->width;
+     src.h = crop->height;
+   } else {
+-    src.w = GST_VIDEO_INFO_WIDTH (&self->vinfo);
+-    src.h = GST_VIDEO_INFO_HEIGHT (&self->vinfo);
++    src.w = GST_VIDEO_INFO_WIDTH (&self->rinfo);
++    src.h = GST_VIDEO_INFO_HEIGHT (&self->rinfo);
+   }
+ 
+   if ((GST_VIDEO_INFO_FORMAT(&self->vinfo) == GST_VIDEO_FORMAT_P010_10LE) && (src.w >= 3840))
+diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
+index 65407dab4..624e496eb 100644
+--- a/sys/kms/gstkmssink.h
++++ b/sys/kms/gstkmssink.h
+@@ -70,6 +70,7 @@ struct _GstKMSSink {
+   GstStructure *plane_props;
+ 
+   GstVideoInfo vinfo;
++  GstVideoInfo rinfo;
+   GstCaps *allowed_caps;
+   GstBufferPool *pool;
+   GstAllocator *allocator;
+-- 
+2.11.0
+

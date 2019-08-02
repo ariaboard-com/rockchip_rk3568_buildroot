@@ -1,7 +1,7 @@
 #!/bin/sh
 
 delay=10
-total=30000
+total=${1:-10000}
 fudev=/dev/sda
 CNT=/data/cfg/rockchip_test/reboot_cnt
 
@@ -12,6 +12,27 @@ fi
 
 if [ ! -e "/data/cfg/rockchip_test/auto_reboot.sh" ]; then
 	cp /rockchip_test/auto_reboot/auto_reboot.sh /data/cfg/rockchip_test
+fi
+
+if [ ! -e "/etc/init.d/S99_auto_reboot" ]; then
+	echo "create S99_auto_reboot"
+	touch /etc/init.d/S99_auto_reboot
+	chmod 755 /etc/init.d/S99_auto_reboot
+	cat >> /etc/init.d/S99_auto_reboot <<EOF
+	case "\$1" in
+	  start)
+		source /rockchip_test/auto_reboot/auto_reboot.sh $total&
+		;;
+	  stop)
+		printf "stop finished\n"
+		;;
+	  *)
+		echo "Usage: $0 {start|stop}"
+		exit 1
+		;;
+	esac
+	exit 0
+EOF
 fi
 
 while true
@@ -40,12 +61,13 @@ then
     echo "off" > $CNT
     echo "do cleaning ..."
     rm -rf /data/cfg/rockchip_test/auto_reboot.sh
-	rm -f $CNT
+    rm -f $CNT
+    rm /etc/init.d/S99_auto_reboot
     exit 0
 fi
 
 echo $cnt > $CNT
-echo "current cnt = $cnt"
+echo "current cnt = $cnt, total cnt = $total"
 echo "You can stop reboot by: echo off > /data/cfg/rockchip_test/reboot_cnt"
 sleep $delay
 cnt=`cat $CNT`
@@ -67,6 +89,7 @@ if [ $cnt != "off" ]; then
 else
     echo "Auto reboot is off"
     rm -rf /data/cfg/rockchip_test/auto_reboot.sh
+    rm /etc/init.d/S99_auto_reboot
     rm -f $CNT
 fi
 exit 0

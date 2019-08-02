@@ -8,6 +8,11 @@ LINUX_VERSION = $(call qstrip,$(BR2_LINUX_KERNEL_VERSION))
 LINUX_LICENSE = GPL-2.0
 LINUX_LICENSE_FILES = COPYING
 
+# HACK: Make it virtual for other kernel related packages, e.g. linux-tools.
+ifeq ($(BR2_PACKAGE_LINUX),)
+LINUX_IS_VIRTUAL = YES
+endif
+
 define LINUX_HELP_CMDS
 	@echo '  linux-menuconfig       - Run Linux kernel menuconfig'
 	@echo '  linux-savedefconfig    - Run Linux kernel savedefconfig'

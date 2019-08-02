@@ -5,7 +5,7 @@ echo "======================================================="
 if [ $# -eq 0 ];
 then
 	echo "If you want to test rkisp camera 1000 times"
-	echo "CMD: test_rkisp.sh 1000"
+	echo "CMD: camera_stresstest.sh 1000"
 	exit
 fi
 #num is test times
@@ -13,7 +13,7 @@ TEST_NUM=0;
 #cam link num
 CAM_NUM=0;
 #media node max
-MEDIA_MAX=10;
+MEDIA_MAX=12;
 #cif path node name
 CIF_PATH="stream_cif"
 #isp path node name
@@ -27,15 +27,8 @@ for i in $(seq 0 $MEDIA_MAX); do
 	if echo $ISP_NODE | grep -q "^/dev/video"
 	then
 		CAM_NUM=$(($CAM_NUM + 1));
-		if echo $Link | grep -q "0 link"
-		then
-			CAM_NUM=$(($CAM_NUM - 1));
-			eval VIDEO_NODE$i="";
-			echo "     Check /dev/media$i didn't link anycamera($(eval echo \$VIDEO_NODE$i)) "
-		else
-			eval VIDEO_NODE$i=$ISP_NODE;
-			echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
-		fi
+		eval VIDEO_NODE$i=$ISP_NODE;
+		echo "     Check /dev/media$i is ISP-camera($(eval echo \$VIDEO_NODE$i))"
 	elif echo $CIF_NODE | grep -q "^/dev/video"
 	then
 		CAM_NUM=$(($CAM_NUM + 1));

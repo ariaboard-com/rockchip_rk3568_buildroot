@@ -52,15 +52,27 @@ CHIP_NAME = AW-NB197
 BT_FIRMWARE = BCM4343A1.hcd
 endif
 
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RK912),y)
+CHIP_VENDOR = ROCKCHIP
+CHIP_NAME = RK912
+endif
+
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723DS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8723DS
+RTK_BT = ENABLE
 BT_FIRMWARE = y
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8189FS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8189FS
+endif
+
+ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8821CS),y)
+CHIP_VENDOR = REALTEK
+CHIP_NAME = RTL8821CS
+RTK_BT = ENABLE
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_COMPATIBLE),y)
@@ -77,8 +89,7 @@ TARGET_ARCH = arm64
 endif
 
 ifeq ($(CHIP_VENDOR), REALTEK)
-
-ifeq ($(CHIP_NAME), RTL8723DS)
+ifeq ($(RTK_BT), ENABLE)
 
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 define RKWIFIBT_BUILD_CMDS
@@ -109,21 +120,26 @@ define RKWIFIBT_ENABLE_BT
 
     mkdir -p $(TARGET_DIR)/lib/firmware/rtlbt/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(CHIP_NAME)/mp_* $(TARGET_DIR)/lib/firmware/
     sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_rtk_firmware
-    $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_start $(TARGET_DIR)/usr/bin/bt_realtek_start
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_start $(TARGET_DIR)/usr/bin/bt_realtek_hfp_start
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_hanup $(TARGET_DIR)/usr/bin/bt_realtek_hfp_hanup
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek_hfp_accept $(TARGET_DIR)/usr/bin/bt_realtek_hfp_accept
     $(INSTALL) -D -m 0644 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
-    ln -s $(TARGET_DIR)/usr/bin/bt_pcba_test $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware
+    rm -rf $(TARGET_DIR)/usr/bin/bt_pcba_test
+    rm -rf $(TARGET_DIR)/usr/bin/bt_init.sh
+    cp -f $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    cp -f $(TARGET_DIR)/usr/bin/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/bt_init.sh
 endef
 
 ifneq ($(call qstrip,$(BT_TTY_DEV)),)
     RKWIFIBT_POST_INSTALL_TARGET_HOOKS+=RKWIFIBT_ENABLE_BT
 endif
 
-endif # RTL8723DS
+endif # RTK_BT
 
 ifeq ($(CHIP_NAME), RTL8189FS)
 define RKWIFIBT_INSTALL_TARGET_CMDS
@@ -150,10 +166,14 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
     sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BT_FIRMWARE)/g' $(@D)/bt_load_broadcom_firmware
     sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/bt_load_broadcom_firmware
-    $(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    $(INSTALL) -D -m 0755 $(@D)/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_load_broadcom_firmware
     $(INSTALL) -D -m 0755 $(RKWIFIBT_BIN_DIR)/* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/wpa_supplicant.conf $(TARGET_DIR)/etc
     $(INSTALL) -D -m 0755 $(@D)/wifi_start.sh $(TARGET_DIR)/usr/bin
+    rm -rf $(TARGET_DIR)/usr/bin/bt_pcba_test
+    rm -rf $(TARGET_DIR)/usr/bin/bt_init.sh
+    cp -r $(TARGET_DIR)/usr/bin/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_pcba_test
+    cp -r $(TARGET_DIR)/usr/bin/bt_load_broadcom_firmware $(TARGET_DIR)/usr/bin/bt_init.sh
 endef
 endif
 
@@ -162,7 +182,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     mkdir -p $(TARGET_DIR)/system/lib/modules/
-    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    make -C $(TOPDIR)/../kernel ARCH=$(RK_ARCH)  modules -j18
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
@@ -175,6 +195,22 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d
     $(INSTALL) -D -m 0755 $(@D)/src/rk_wifi_init $(TARGET_DIR)/usr/bin/rk_wifi_init
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/brcm_patchram_plus1
+    touch $(TARGET_DIR)/usr/bin/bt_pcba_test
+endef
+endif
+
+ifeq ($(CHIP_NAME), RK912)
+define RKWIFIBT_BUILD_CMDS
+    mkdir -p $(TARGET_DIR)/system/lib/modules/
+    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+endef
+
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    mkdir -p $(TARGET_DIR)/lib/firmware
+    $(INSTALL) -D -m 0644 $(@D)/firmware/rockchip/WIFI_FIRMWARE/rk912* $(TARGET_DIR)/lib/firmware
+    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_rk912_modules $(TARGET_DIR)/etc/init.d
 endef
 endif
 

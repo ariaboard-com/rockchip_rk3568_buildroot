@@ -1,0 +1,33 @@
+From 78220b3fb321dabacd990010d513c137da6f1cf3 Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Wed, 6 Jun 2018 15:56:26 -0400
+Subject: [PATCH 06/32] glamor: Enable modifier support for xfree86 too
+
+This was left disabled in 1.20.0, it's time to start being sure it
+works.
+
+Signed-off-by: Adam Jackson <ajax@redhat.com>
+Acked-by: Keith Packard <keithp@keithp.com>
+Acked-by: Daniel Stone <daniels@collabora.com>
+---
+ glamor/glamor_egl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/glamor/glamor_egl.c b/glamor/glamor_egl.c
+index d3c678d6b..a5b22ab3c 100644
+--- a/glamor/glamor_egl.c
++++ b/glamor/glamor_egl.c
+@@ -1023,8 +1023,8 @@ glamor_egl_init(ScrnInfoPtr scrn, int fd)
+        if (xf86Info.debug != NULL)
+            glamor_egl->dmabuf_capable = !!strstr(xf86Info.debug,
+                                                 "dmabuf_capable");
+-        else
+-            glamor_egl->dmabuf_capable = FALSE;
++       else
++           glamor_egl->dmabuf_capable = TRUE;
+     }
+ #endif
+ 
+-- 
+2.11.0
+

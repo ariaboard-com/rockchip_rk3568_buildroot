@@ -1,0 +1,24 @@
+#!/bin/sh
+
+case "$1" in
+        start)
+                printf "Start QT Launcher: "
+		export QT_QPA_FB_DRM=1
+		export QT_QPA_PLATFORM=linuxfb:rotation=270
+		export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=rotate=90
+		/usr/local/QLauncher/QLauncher&
+                ;;
+        stop)
+		killall QLauncher
+		printf "stop QLauncher"
+                ;;
+        restart|reload)
+                $0 stop
+                $0 start
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|restart}"
+                exit 1
+esac
+exit 0
+

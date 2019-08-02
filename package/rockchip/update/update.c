@@ -208,7 +208,8 @@ int rebootUpdate(char *path){
 
 	if(path){
 		printf("find %s\n", path);
-			installPackage(path);
+		installPackage(path);
+		return 0;
 	}
 
 	if(access(DATA_UPDATE_FILE,F_OK) == -1){

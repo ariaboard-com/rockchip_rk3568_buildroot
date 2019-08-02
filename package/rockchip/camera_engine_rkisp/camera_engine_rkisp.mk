@@ -11,6 +11,8 @@ CAMERA_ENGINE_RKISP_SITE_METHOD = local
 CAMERA_ENGINE_RKISP_LICENSE = Apache V2.0
 CAMERA_ENGINE_RKISP_LICENSE_FILES = NOTICE
 
+CAMERA_ENGINE_RKISP_INSTALL_STAGING = YES
+
 CAMERA_ENGINE_RKISP_MAKE_OPTS = \
 	TARGET_GCC="$(TARGET_CC)" \
 	TARGET_GPP="$(TARGET_CXX)" \
@@ -30,9 +32,16 @@ endif
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 CAMERA_ENGINE_RKISP_LIB = lib32
 CAMERA_ENGINE_RKISP_GLIB_H = glib-2.0-32
+CAMERA_ENGINE_RKISP_MAKE_OPTS += ARCH=arm
 else
 CAMERA_ENGINE_RKISP_LIB = lib64
 CAMERA_ENGINE_RKISP_GLIB_H = glib-2.0-64
+CAMERA_ENGINE_RKISP_MAKE_OPTS += ARCH=aarch64
+endif
+
+ifeq ($(BR2_PACKAGE_TINYXML2),y)
+CAMERA_ENGINE_RKISP_CONF_OPTS = \
+			IS_NEED_COMPILE_TINYXML2=false
 endif
 
 export BUILD_OUPUT_GSTREAMER_LIBS:=$(@D)/ext/rkisp/usr/$(CAMERA_ENGINE_RKISP_LIB)/gstreamer-1.0
@@ -55,6 +64,12 @@ RKgstDir = $(TARGET_DIR)/usr/lib/gstreamer-1.0
 RKafDir = $(TARGET_DIR)/usr/lib/rkisp/af
 RKaeDir = $(TARGET_DIR)/usr/lib/rkisp/ae
 RKawbDir = $(TARGET_DIR)/usr/lib/rkisp/awb
+
+define CAMERA_ENGINE_RKISP_INSTALL_STAGING_CMDS
+	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(STAGING_DIR)/usr/lib/
+	mkdir -p $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface
+	$(foreach header,$(wildcard $($(PKG)_BUILDDIR)/interface/*.h),$(INSTALL) -D -m 644 $(header) $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface;)
+endef
 
 define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	mkdir -p $(RKgstDir)

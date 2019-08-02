@@ -21,7 +21,8 @@ endef
 
 define QLAUNCHER_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/local/QLauncher
-	cp $(BUILD_DIR)/QLauncher-$(QLAUNCHER_VERSION)/resources/images/* $(TARGET_DIR)/usr/local/QLauncher/
+	mkdir -p $(TARGET_DIR)/usr/share/backgrounds
+	cp $(BUILD_DIR)/QLauncher-$(QLAUNCHER_VERSION)/resources/images/* $(TARGET_DIR)/usr/share/backgrounds/
 	$(INSTALL) -D -m 0755 $(@D)/QLauncher \
 		$(TARGET_DIR)/usr/local/QLauncher/QLauncher
 endef

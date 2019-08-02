@@ -1,0 +1,79 @@
+From d9edc0de7ba61f7a406854da999a93044bd0f084 Mon Sep 17 00:00:00 2001
+From: Binyuan Lan <lby@rock-chips.com>
+Date: Thu, 20 Jul 2017 23:03:04 +0800
+Subject: [PATCH 21/30] kmssink: Add GST_VIDEO_FORMAT_P010_10LE and drm open
+ hacks
+
+Signed-off-by: Binyuan Lan <lby@rock-chips.com>
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ sys/kms/gstkmsallocator.c | 5 +++++
+ sys/kms/gstkmssink.c      | 9 +++++++++
+ sys/kms/gstkmsutils.c     | 1 +
+ 3 files changed, 15 insertions(+)
+
+diff --git a/sys/kms/gstkmsallocator.c b/sys/kms/gstkmsallocator.c
+index 916326b16..67020edba 100644
+--- a/sys/kms/gstkmsallocator.c
++++ b/sys/kms/gstkmsallocator.c
+@@ -460,6 +460,11 @@ gst_kms_allocator_add_fb (GstKMSAllocator * alloc, GstKMSMemory * kmsmem,
+ 
+     pitches[i] = GST_VIDEO_INFO_PLANE_STRIDE (vinfo, i);
+     offsets[i] = in_offsets[i];
++
++    if ((GST_VIDEO_INFO_FORMAT(vinfo) == GST_VIDEO_FORMAT_P010_10LE) && (w >= 3840)) {
++	    pitches[i] *= 2;
++	    h = GST_VIDEO_INFO_HEIGHT (vinfo) / 2;
++    }
+   }
+ 
+   GST_DEBUG_OBJECT (alloc, "bo handles: %d, %d, %d, %d", bo_handles[0],
+diff --git a/sys/kms/gstkmssink.c b/sys/kms/gstkmssink.c
+index 4386987f7..1c219809d 100644
+--- a/sys/kms/gstkmssink.c
++++ b/sys/kms/gstkmssink.c
+@@ -51,6 +51,8 @@
+ #include <xf86drmMode.h>
+ #include <drm_fourcc.h>
+ 
++#include <fcntl.h>
++
+ #include "gstkmssink.h"
+ #include "gstkmsutils.h"
+ #include "gstkmsbufferpool.h"
+@@ -710,6 +712,10 @@ gst_kms_sink_start (GstBaseSink * bsink)
+     self->fd = drmOpen (self->devname, self->bus_id);
+   else
+     self->fd = kms_open (&self->devname);
++
++  if (self->fd < 0)
++    self->fd = open ("/dev/dri/card0", O_RDWR);
++
+   if (self->fd < 0)
+     goto open_failed;
+ 
+@@ -1594,6 +1600,9 @@ retry_set_plane:
+     src.h = GST_VIDEO_INFO_HEIGHT (&self->vinfo);
+   }
+ 
++  if ((GST_VIDEO_INFO_FORMAT(&self->vinfo) == GST_VIDEO_FORMAT_P010_10LE) && (src.w >= 3840))
++    src.h /=2;
++
+   /* handle out of screen case */
+   if ((result.x + result.w) > self->hdisplay)
+     result.w = self->hdisplay - result.x;
+diff --git a/sys/kms/gstkmsutils.c b/sys/kms/gstkmsutils.c
+index 90311f3fa..3f2918d23 100644
+--- a/sys/kms/gstkmsutils.c
++++ b/sys/kms/gstkmsutils.c
+@@ -49,6 +49,7 @@ static const struct
+   DEF_FMT (XBGR8888, RGBx),
+   DEF_FMT (BGR888, RGB),
+   DEF_FMT (RGB888, BGR),
++  DEF_FMT (NV12_10, P010_10LE),
+ #else
+   DEF_FMT (ARGB8888, ARGB),
+   DEF_FMT (XRGB8888, xRGB),
+-- 
+2.11.0
+

@@ -13,6 +13,6 @@ fi
 echo "**********************DDR STRESSAPPTEST TEST 48H*************************"
 echo "***run: stressapptest -s 172800 -i 4 -C 4 -W --stop_on_errors -M 128*****"
 echo "**********************DDR STRESSAPPTEST TEST****************************"
-stressapptest -s 172800 -i 4 -C 4 -W --stop_on_errors -M 128 > $RESULT_LOG & 
+stressapptest -s 172800 -i 4 -C 4 -W --stop_on_errors -M 128 -l $RESULT_LOG &
 
 echo "******DDR STRESSAPPTEST START: you can see the log at $RESULT_LOG********"

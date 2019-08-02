@@ -12,11 +12,11 @@ echo "every cpu frqeucny will stay $2 seconds"
 
 #disalbe thermal
 if [ -e /sys/class/thermal/thermal_zone0 ]; then
-  echo disabled > /sys/class/thermal/thermal_zone0/mode
+  echo user_space >/sys/class/thermal/thermal_zone0/policy
 fi
 
 if [ -e /sys/class/thermal/thermal_zone1 ]; then
-  echo disabled > /sys/class/thermal/thermal_zone1/mode
+  echo user_space > /sys/class/thermal/thermal_zone1/policy
 fi
 
 #caculate how many cpu core

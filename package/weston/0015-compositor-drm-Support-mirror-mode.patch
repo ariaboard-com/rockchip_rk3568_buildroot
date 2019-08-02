@@ -1,0 +1,248 @@
+From 099c97af824c5e0a36e8fffb4fc9c3ecb1281860 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 20 Mar 2019 20:05:27 +0800
+Subject: [PATCH 3/3] compositor-drm: Support mirror mode
+
+Set env "WESTON_DRM_MIRROR" to enable mirror mode, and set env
+"WESTON_DRM_KEEP_RATIO" to keep the aspect ratio.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 130 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 111 insertions(+), 19 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 2c20aac..e5e71d2 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -116,6 +116,8 @@ struct drm_backend {
+ 
+ 	int cursors_are_broken;
+ 
++	struct wl_list mirror_list;
++
+ 	int use_pixman;
+ 
+ 	struct udev_input input;
+@@ -218,6 +220,9 @@ struct drm_output {
+ 	struct weston_output base;
+ 	drmModeConnector *connector;
+ 
++	struct wl_list link;
++	bool is_mirror;
++
+ 	uint32_t crtc_id; /* object ID to pass to DRM functions */
+ 	uint32_t plane_id; /* object ID to pass to DRM functions */
+ 	int pipe; /* index of CRTC in resource array / bitmasks */
+@@ -864,6 +869,39 @@ drm_waitvblank_pipe(struct drm_output *output)
+ 		return 0;
+ }
+ 
++static void
++drm_output_prepare_fb(struct drm_output *output, pixman_region32_t *damage)
++{
++	struct weston_compositor *c = output->base.compositor;
++	struct drm_backend *b = to_drm_backend(c);
++
++	// The first output is default output
++	struct weston_output *def_output_base =
++		container_of(c->output_list.next, struct weston_output, link);
++	struct drm_output *default_output = to_drm_output(def_output_base);
++
++	if (!output->is_mirror) {
++		drm_output_render(output, damage);
++
++		// Repaint all mirrors
++		wl_list_for_each(output, &b->mirror_list, link)
++			weston_output_schedule_repaint(&output->base);
++		return;
++	}
++
++	assert(output != default_output);
++
++	if (output->fb_pending)
++		drm_fb_unref(output->fb_pending);
++
++	// Reusing default output's current fb
++	output->fb_pending = default_output->fb_current;
++	if (!output->fb_pending)
++		return;
++
++	drm_fb_ref(output->fb_pending);
++}
++
+ static int
+ drm_output_repaint(struct weston_output *output_base,
+ 		   pixman_region32_t *damage,
+@@ -874,6 +912,7 @@ drm_output_repaint(struct weston_output *output_base,
+ 		to_drm_backend(output->base.compositor);
+ 	struct drm_plane *s;
+ 	struct drm_mode *mode;
++	int dx, dy, dw, dh, sw, sh;
+ 	int ret = 0;
+ 
+ 	if (output->disable_pending || output->destroy_pending)
+@@ -891,7 +930,7 @@ drm_output_repaint(struct weston_output *output_base,
+ 		output->cursor_plane.y = INT32_MIN;
+ 	}
+ 
+-	drm_output_render(output, damage);
++	drm_output_prepare_fb(output, damage);
+ 	if (!output->fb_pending)
+ 		return -1;
+ 
+@@ -924,17 +963,33 @@ drm_output_repaint(struct weston_output *output_base,
+ 		output->state_invalid = false;
+ 	}
+ 
++	dx = dy = 0;
++	dw = mode->mode_info.hdisplay;
++	dh = mode->mode_info.vdisplay;
++	sw = output->fb_pending->width;
++	sh = output->fb_pending->height;
++
++	if (output->is_mirror && getenv("WESTON_DRM_KEEP_RATIO")) {
++		float src_ratio = (float) sw / sh;
++		float dst_ratio = (float) dw / dh;
++		int offset;
++
++		if (src_ratio > dst_ratio) {
++			offset = dh - dw / src_ratio;
++			dy = offset / 2;
++			dh -= offset;
++		} else {
++			offset = dw - dh * src_ratio;
++			dx = offset / 2;
++			dw -= offset;
++		}
++	}
+ 
+ 	ret = drmModeSetPlane(backend->drm.fd,
+ 			      output->plane_id,
+ 			      output->crtc_id,
+ 			      output->fb_pending->fb_id, 0,
+-			      0, 0,
+-			      mode->mode_info.hdisplay,
+-			      mode->mode_info.vdisplay,
+-			      0, 0,
+-			      output->fb_pending->width << 16,
+-			      output->fb_pending->height << 16);
++			      dx, dy, dw, dh, 0, 0, sw << 16, sh << 16);
+ 	if (ret) {
+ 		weston_log("set plane failed: %m\n");
+ 		goto err_pageflip;
+@@ -1590,6 +1645,11 @@ drm_assign_planes(struct weston_output *output_base, void *repaint_data)
+ 					  &ev->transform.boundingbox);
+ 
+ 		next_plane = NULL;
++
++		// Force single plane in mirror mode
++		if (!wl_list_empty(&b->mirror_list))
++			next_plane = primary;
++
+ 		if (pixman_region32_not_empty(&surface_overlap))
+ 			next_plane = primary;
+ 		if (next_plane == NULL)
+@@ -1717,6 +1777,10 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+ 	drm_fb_unref(output->fb_dummy);
+ 	output->fb_dummy = NULL;
+ 
++	// No renderer for mirrors
++	if (output->is_mirror)
++		return 0;
++
+ 	if (b->use_pixman) {
+ 		drm_output_fini_pixman(output);
+ 		if (drm_output_init_pixman(output, b) < 0) {
+@@ -2776,14 +2840,28 @@ drm_output_enable(struct weston_output *base)
+ 	if (b->pageflip_timeout)
+ 		drm_output_pageflip_timer_create(output);
+ 
+-	if (b->use_pixman) {
+-		if (drm_output_init_pixman(output, b) < 0) {
+-			weston_log("Failed to init output pixman state\n");
++	// No renderer for mirrors
++	if (!output->is_mirror) {
++		if (b->use_pixman) {
++			if (drm_output_init_pixman(output, b) < 0) {
++				weston_log("Failed to init output pixman state\n");
++				goto err_free;
++			}
++		} else if (drm_output_init_egl(output, b) < 0) {
++			weston_log("Failed to init output gl state\n");
+ 			goto err_free;
+ 		}
+-	} else if (drm_output_init_egl(output, b) < 0) {
+-		weston_log("Failed to init output gl state\n");
+-		goto err_free;
++	} else {
++		wl_list_insert(&b->mirror_list, &output->link);
++
++		// HACK: Make it unavailable for views?
++		output->base.x = -output->base.width;
++		output->base.y = -output->base.height;
++		pixman_region32_init_rect(&output->base.region,
++					  output->base.x,
++					  output->base.y,
++					  output->base.width,
++					  output->base.height);
+ 	}
+ 
+ 	if (output->backlight) {
+@@ -2819,8 +2897,9 @@ drm_output_enable(struct weston_output *base)
+ 	weston_compositor_stack_plane(b->compositor, &output->fb_plane,
+ 				      &b->compositor->primary_plane);
+ 
+-	weston_log("Output %s, (connector %d, crtc %d)\n",
+-		   output->base.name, output->connector_id, output->crtc_id);
++	weston_log("Output %s%s, (connector %d, crtc %d)\n",
++		   output->base.name, output->is_mirror ? " (mirror)" : "",
++		   output->connector_id, output->crtc_id);
+ 	wl_list_for_each(m, &output->base.mode_list, link)
+ 		weston_log_continue(STAMP_SPACE "mode %dx%d@%.1f%s%s%s\n",
+ 				    m->width, m->height, m->refresh / 1000.0,
+@@ -2854,10 +2933,14 @@ drm_output_deinit(struct weston_output *base)
+ 	drm_fb_unref(output->fb_current);
+ 	output->fb_current = NULL;
+ 
+-	if (b->use_pixman)
+-		drm_output_fini_pixman(output);
+-	else
+-		drm_output_fini_egl(output);
++	if (!output->is_mirror) {
++		if (b->use_pixman)
++			drm_output_fini_pixman(output);
++		else
++			drm_output_fini_egl(output);
++	} else {
++		wl_list_remove(&output->link);
++	}
+ 
+ 	weston_plane_release(&output->fb_plane);
+ 	weston_plane_release(&output->cursor_plane);
+@@ -3008,6 +3091,13 @@ create_output_for_connector(struct drm_backend *b,
+ 		}
+ 	}
+ 
++	if (getenv("WESTON_DRM_MIRROR")) {
++		// Assuming the first output is main output
++		output->is_mirror =
++			!wl_list_empty(&b->compositor->output_list) ||
++			!wl_list_empty(&b->compositor->pending_output_list);
++	}
++
+ 	weston_compositor_add_pending_output(&output->base, b->compositor);
+ 
+ 	return 0;
+@@ -3905,6 +3995,8 @@ drm_backend_create(struct weston_compositor *compositor,
+ 	wl_list_init(&b->sprite_list);
+ 	create_sprites(b);
+ 
++	wl_list_init(&b->mirror_list);
++
+ 	if (udev_input_init(&b->input,
+ 			    compositor, b->udev, seat_id,
+ 			    config->configure_device) < 0) {
+-- 
+2.11.0
+

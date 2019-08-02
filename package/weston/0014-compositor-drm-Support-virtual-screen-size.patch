@@ -1,0 +1,311 @@
+From 92fd628a9c762854c663e30aa3e64385e7b1b069 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 21 Feb 2019 14:48:01 +0800
+Subject: [PATCH 2/3] compositor-drm: Support virtual screen size
+
+Support setting virtual screen size, for example:
+    export WESTON_DRM_VIRTUAL_SIZE=1024x768
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 153 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 145 insertions(+), 8 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index cc6503d..2c20aac 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -219,6 +219,7 @@ struct drm_output {
+ 	drmModeConnector *connector;
+ 
+ 	uint32_t crtc_id; /* object ID to pass to DRM functions */
++	uint32_t plane_id; /* object ID to pass to DRM functions */
+ 	int pipe; /* index of CRTC in resource array / bitmasks */
+ 	uint32_t connector_id;
+ 	drmModeCrtcPtr original_crtc;
+@@ -253,6 +254,8 @@ struct drm_output {
+ 	/* Framebuffer we are going to submit to the kernel when the current
+ 	 * repaint is flushed. */
+ 	struct drm_fb *fb_pending;
++	/* The dummy framebuffer for SET_CRTC. */
++	struct drm_fb *fb_dummy;
+ 
+ 	struct drm_fb *dumb[2];
+ 	pixman_image_t *image[2];
+@@ -267,6 +270,9 @@ struct drm_output {
+ 
+ static struct gl_renderer_interface *gl_renderer;
+ 
++static int drm_virtual_width = 0;
++static int drm_virtual_height = 0;
++
+ static const char default_seat[] = "seat0";
+ 
+ static inline struct drm_output *
+@@ -890,21 +896,50 @@ drm_output_repaint(struct weston_output *output_base,
+ 		return -1;
+ 
+ 	mode = container_of(output->base.current_mode, struct drm_mode, base);
+-	if (output->state_invalid || !output->fb_current ||
+-	    output->fb_current->stride != output->fb_pending->stride) {
++
++	if (output->state_invalid || !output->fb_current) {
++		if (!output->fb_dummy) {
++			output->fb_dummy =
++				drm_fb_create_dumb(backend,
++						   mode->mode_info.hdisplay,
++						   mode->mode_info.vdisplay,
++						   backend->gbm_format);
++			if (!output->fb_dummy) {
++				weston_log("Failed to create fb_dummy\n");
++				goto err_pageflip;
++			}
++		}
++
+ 		ret = drmModeSetCrtc(backend->drm.fd, output->crtc_id,
+-				     output->fb_pending->fb_id, 0, 0,
++				     output->fb_dummy->fb_id, 0, 0,
+ 				     &output->connector_id, 1,
+ 				     &mode->mode_info);
+ 		if (ret) {
+ 			weston_log("set mode failed: %m\n");
+ 			goto err_pageflip;
+ 		}
++
+ 		output_base->set_dpms(output_base, WESTON_DPMS_ON);
+ 
+ 		output->state_invalid = false;
+ 	}
+ 
++
++	ret = drmModeSetPlane(backend->drm.fd,
++			      output->plane_id,
++			      output->crtc_id,
++			      output->fb_pending->fb_id, 0,
++			      0, 0,
++			      mode->mode_info.hdisplay,
++			      mode->mode_info.vdisplay,
++			      0, 0,
++			      output->fb_pending->width << 16,
++			      output->fb_pending->height << 16);
++	if (ret) {
++		weston_log("set plane failed: %m\n");
++		goto err_pageflip;
++	}
++
+ 	if (drmModePageFlip(backend->drm.fd, output->crtc_id,
+ 			    output->fb_pending->fb_id,
+ 			    DRM_MODE_PAGE_FLIP_EVENT, output) < 0) {
+@@ -1101,6 +1136,9 @@ vblank_handler(int fd, unsigned int frame, unsigned int sec, unsigned int usec,
+ 	drm_fb_unref(s->fb_last);
+ 	s->fb_last = NULL;
+ 
++	drm_fb_unref(output->fb_dummy);
++	output->fb_dummy = NULL;
++
+ 	if (!output->page_flip_pending && !output->vblank_pending) {
+ 		/* Stop the pageflip timer instead of rearming it here */
+ 		if (output->pageflip_timer)
+@@ -1133,6 +1171,9 @@ page_flip_handler(int fd, unsigned int frame,
+ 	drm_fb_unref(output->fb_last);
+ 	output->fb_last = NULL;
+ 
++	drm_fb_unref(output->fb_dummy);
++	output->fb_dummy = NULL;
++
+ 	if (output->destroy_pending)
+ 		drm_output_destroy(&output->base);
+ 	else if (output->disable_pending)
+@@ -1605,8 +1646,8 @@ choose_mode (struct drm_output *output, struct weston_mode *target_mode)
+ 		return (struct drm_mode *)output->base.current_mode;
+ 
+ 	wl_list_for_each(mode, &output->base.mode_list, base.link) {
+-		if (mode->mode_info.hdisplay == target_mode->width &&
+-		    mode->mode_info.vdisplay == target_mode->height) {
++		if (mode->base.width == target_mode->width &&
++		    mode->base.height == target_mode->height) {
+ 			if (mode->base.refresh == target_mode->refresh ||
+ 			    target_mode->refresh == 0) {
+ 				return mode;
+@@ -1673,6 +1714,9 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+ 	assert(!output->fb_pending);
+ 	output->fb_last = output->fb_current = NULL;
+ 
++	drm_fb_unref(output->fb_dummy);
++	output->fb_dummy = NULL;
++
+ 	if (b->use_pixman) {
+ 		drm_output_fini_pixman(output);
+ 		if (drm_output_init_pixman(output, b) < 0) {
+@@ -1881,6 +1925,16 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+ 	mode->base.width = info->hdisplay;
+ 	mode->base.height = info->vdisplay;
+ 
++	if (drm_virtual_width && drm_virtual_height) {
++		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
++			   output->base.name, drm_virtual_width,
++			   drm_virtual_height, mode->base.width,
++			   mode->base.height);
++
++		mode->base.width = drm_virtual_width;
++		mode->base.height = drm_virtual_height;
++	}
++
+ 	/* Calculate higher precision (mHz) refresh rate */
+ 	refresh = (info->clock * 1000000LL / info->htotal +
+ 		   info->vtotal / 2) / info->vtotal;
+@@ -2041,6 +2095,64 @@ make_connector_name(const drmModeConnector *con)
+ }
+ 
+ static int
++drm_plane_is_primary(struct drm_backend *b, int plane_id)
++{
++    drmModeObjectPropertiesPtr props;
++    drmModePropertyPtr prop;
++    unsigned i, type = 0;
++
++    props = drmModeObjectGetProperties(b->drm.fd, plane_id,
++				       DRM_MODE_OBJECT_PLANE);
++    if (!props)
++	    return 0;
++
++    for (i = 0; i < props->count_props; i++) {
++	    prop = drmModeGetProperty(b->drm.fd, props->props[i]);
++	    if (prop && !strcmp(prop->name, "type"))
++		    type = props->prop_values[i];
++	    drmModeFreeProperty(prop);
++    }
++
++    drmModeFreeObjectProperties(props);
++    return type == DRM_PLANE_TYPE_PRIMARY;
++}
++
++static int
++find_plane_for_crtc(struct drm_backend *b, int pipe)
++{
++	drmModePlaneRes *kplane_res;
++	drmModePlane *kplane;
++	uint32_t i, plane_id, possible_crtcs;
++	int ret = -1;
++
++	kplane_res = drmModeGetPlaneResources(b->drm.fd);
++	if (!kplane_res) {
++		weston_log("failed to get plane resources: %s\n",
++			strerror(errno));
++		return -1;
++	}
++
++	for (i = 0; i < kplane_res->count_planes; i++) {
++		kplane = drmModeGetPlane(b->drm.fd, kplane_res->planes[i]);
++		if (!kplane)
++			continue;
++
++		plane_id = kplane->plane_id;
++		possible_crtcs = kplane->possible_crtcs;
++		drmModeFreePlane(kplane);
++
++		if (drm_plane_is_primary(b, plane_id) &&
++		    (possible_crtcs & (1 << pipe))) {
++			ret = plane_id;
++			break;
++		}
++	}
++
++	drmModeFreePlaneResources(kplane_res);
++	return ret;
++}
++
++static int
+ find_crtc_for_connector(struct drm_backend *b,
+ 			drmModeRes *resources, drmModeConnector *connector)
+ {
+@@ -2531,8 +2643,8 @@ drm_output_choose_initial_mode(struct drm_backend *backend,
+ 	}
+ 
+ 	wl_list_for_each_reverse(drm_mode, &output->base.mode_list, base.link) {
+-		if (width == drm_mode->base.width &&
+-		    height == drm_mode->base.height &&
++		if (width == drm_mode->mode_info.hdisplay &&
++		    height == drm_mode->mode_info.vdisplay &&
+ 		    (refresh == 0 || refresh == drm_mode->mode_info.vrefresh))
+ 			configured = drm_mode;
+ 
+@@ -2750,6 +2862,9 @@ drm_output_deinit(struct weston_output *base)
+ 	weston_plane_release(&output->fb_plane);
+ 	weston_plane_release(&output->cursor_plane);
+ 
++	drm_fb_unref(output->fb_dummy);
++	output->fb_dummy = NULL;
++
+ 	drmModeFreeProperty(output->dpms_prop);
+ 
+ 	/* Turn off hardware cursor */
+@@ -2844,7 +2959,7 @@ create_output_for_connector(struct drm_backend *b,
+ {
+ 	struct drm_output *output;
+ 	struct drm_mode *drm_mode;
+-	int i;
++	int i, plane_id;
+ 
+ 	i = find_crtc_for_connector(b, resources, connector);
+ 	if (i < 0) {
+@@ -2852,6 +2967,12 @@ create_output_for_connector(struct drm_backend *b,
+ 		goto err;
+ 	}
+ 
++	plane_id = find_plane_for_crtc(b, i);
++	if (plane_id < 0) {
++		weston_log("No usable primary plane for crtc.\n");
++		goto err;
++	}
++
+ 	output = zalloc(sizeof *output);
+ 	if (output == NULL)
+ 		goto err;
+@@ -2860,6 +2981,7 @@ create_output_for_connector(struct drm_backend *b,
+ 	output->crtc_id = resources->crtcs[i];
+ 	output->pipe = i;
+ 	output->connector_id = connector->connector_id;
++	output->plane_id = plane_id;
+ 
+ 	output->backlight = backlight_init(drm_device,
+ 					   connector->connector_type);
+@@ -3377,6 +3499,8 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
+ 	if (fd < 0)
+ 		return false;
+ 
++	drmSetClientCap(fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
++
+ 	res = drmModeGetResources(fd);
+ 	if (!res)
+ 		goto out_fd;
+@@ -3890,6 +4014,7 @@ weston_backend_init(struct weston_compositor *compositor,
+ {
+ 	struct drm_backend *b;
+ 	struct weston_drm_backend_config config = {{ 0, }};
++	char *buf;
+ 
+ 	if (config_base == NULL ||
+ 	    config_base->struct_version != WESTON_DRM_BACKEND_CONFIG_VERSION ||
+@@ -3901,6 +4026,18 @@ weston_backend_init(struct weston_compositor *compositor,
+ 	config_init_to_defaults(&config);
+ 	memcpy(&config, config_base, config_base->struct_size);
+ 
++	buf = getenv("WESTON_DRM_VIRTUAL_SIZE");
++	if (buf) {
++		int w, h;
++
++		if (sscanf(buf, "%dx%d", &w, &h) == 2) {
++			weston_log("virtual screen size %dx%d\n", w, h);
++
++			drm_virtual_width = w;
++			drm_virtual_height = h;
++		}
++	}
++
+ 	b = drm_backend_create(compositor, &config);
+ 	if (b == NULL)
+ 		return -1;
+-- 
+2.11.0
+

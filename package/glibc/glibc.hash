@@ -1,6 +1,8 @@
 # Locally calculated (fetched from Github)
-sha256  00fbc845678a96f4acc574c4bda4be76506ecd8bafb2d08c58bfa3507625c81a     glibc-glibc-2.26-146-gd300041c533a3d837c9f37a099bcc95466860e98.tar.gz
+sha256  a5d4cbe7eceaefd8bce1104994379818169961b59346d2f3897966912237b1e6  glibc-2.29-11-ge28ad442e73b00ae2047d89c8cc7f9b2a0de5436.tar.gz
 # Locally calculated (fetched from Github)
-sha256  5aa9adeac09727db0b8a52794186563771e74d70410e9fd86431e339953fd4bb     glibc-arc-2017.09-release.tar.gz
+sha256  cc2aa6b16641ebcf1492bf6245897d8c263c96b6e30375d09351306a12b6d529  glibc-arc-2018.09-release.tar.gz
+# Locally calculated (fetched from Github)
+sha256 703877c0df77fce00719fe55cc62b07bb8d5f44fdb704bbb1b0bf2cf38afe10a  glibc-06983fe52cfe8e4779035c27e8cc5d2caab31531.tar.gz
 
 sha256  eb731406903befef1d8f878a46be75ef862b9056ab0cde1626d08a7a05328948     glibc-2.22.tar.xz

@@ -8,7 +8,10 @@ RKNPU_SITE_METHOD = local
 RKNPU_SITE = $(TOPDIR)/../external/rknpu
 NPU_TEST_FILE = $(@D)/test
 
-ifeq ($(BR2_PACKAGE_RK3399PRO_NPU),y)
+ifeq ($(BR2_PACKAGE_RKNPU_PCIE),y)
+NPU_KO_FILE = galcore_rk3399pro-npu-pcie.ko
+NPU_INIT_FILE = S99NPU_init
+else ifeq ($(BR2_PACKAGE_RKNPU),y)
 NPU_KO_FILE = galcore_rk3399pro-npu.ko
 NPU_INIT_FILE = S99NPU_init_rk3399pro-npu
 else

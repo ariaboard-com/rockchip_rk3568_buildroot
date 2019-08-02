@@ -1,0 +1,104 @@
+menuconfig BR2_PACKAGE_RKMEDIA
+	bool "rkmedia"
+
+if BR2_PACKAGE_RKMEDIA
+
+config BR2_PACKAGE_RKMEDIA_MPP
+    bool "rk mpp wrapper"
+    select BR2_PACKAGE_MPP
+    help
+      wrapped function of rk mpp
+
+if BR2_PACKAGE_RKMEDIA_MPP
+
+config BR2_PACKAGE_RKMEDIA_MPP_ENCODER
+    bool "rk mpp encoder"
+    default y
+    help
+      wrapped function of rk mpp encoder
+
+config BR2_PACKAGE_RKMEDIA_MPP_DECODER
+    bool "rk mpp decoder"
+    default y
+    help
+      wrapped function of rk mpp decoder
+
+endif # BR2_PACKAGE_RKMEDIA_MPP
+
+config BR2_PACKAGE_RKMEDIA_OGG
+    bool "ogg"
+    select BR2_PACKAGE_LIBVORBIS
+    help
+      wrapped function of ogg vorbis
+
+if BR2_PACKAGE_RKMEDIA_OGG
+
+config BR2_PACKAGE_RKMEDIA_OGGVORBIS_DEMUXER
+    bool "ogg vorbis demuxer_decode"
+    default y
+    help
+      wrapped function of libvorbisfile
+
+config BR2_PACKAGE_RKMEDIA_OGGVORBIS_MUXER
+    bool "ogg vorbis encode_muxer"
+    help
+      wrapped function of libvorbisenc
+
+endif # BR2_PACKAGE_RKMEDIA_OGG
+
+if BR2_PACKAGE_ALSA_LIB
+
+config BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK
+    bool "alsa playback"
+    help
+      wrapped function of alsa playback
+
+config BR2_PACKAGE_RKMEDIA_ALSA_CAPTURE
+    bool "alsa capture"
+    help
+      wrapped function of alsa capture
+
+endif # BR2_PACKAGE_ALSA_LIB
+
+config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
+    bool "camera capture"
+    help
+      wrapped function of v4l2 capture
+
+config BR2_PACKAGE_RKMEDIA_RKRGA
+    bool "rkrga"
+    select BR2_PACKAGE_LINUX_RGA
+    help
+      wrapped function of librga
+
+config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
+    bool "drm output"
+    select BR2_PACKAGE_LIBDRM
+    help
+      wrapped function of drm output
+
+config BR2_PACKAGE_RKMEDIA_LIVE555
+    bool "live555"
+    select BR2_PACKAGE_LIVE555
+    help
+      live555 is an rtsp server and client
+
+if BR2_PACKAGE_RKMEDIA_LIVE555
+
+config BR2_PACKAGE_RKMEDIA_RTSP_SERVER
+    bool "rtsp server"
+    help
+      live555 rtsp server
+
+if BR2_PACKAGE_RKMEDIA_RTSP_SERVER
+
+config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H264
+    bool "rtsp server h264 session"
+    help
+      live555 rtsp server h264 session
+
+endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
+
+endif # BR2_PACKAGE_RKMEDIA_LIVE555
+
+endif # BR2_PACKAGE_RKMEDIA

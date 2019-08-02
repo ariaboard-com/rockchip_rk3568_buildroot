@@ -42,13 +42,11 @@ endif
 
 ifeq ($(BR2_PACKAGE_XORG7),y)
 MESA3D_DEPENDENCIES += \
-	xproto_xf86driproto \
-	xproto_dri2proto \
-	xproto_glproto \
 	xlib_libX11 \
 	xlib_libXext \
 	xlib_libXdamage \
 	xlib_libXfixes \
+	xorgproto \
 	libxcb
 MESA3D_CONF_OPTS += --enable-glx --disable-mangling
 # quote from mesa3d configure "Building xa requires at least one non swrast gallium driver."
@@ -97,8 +95,8 @@ ifeq ($(BR2_PACKAGE_MESA3D_DRI_DRIVER),)
 MESA3D_CONF_OPTS += \
 	--without-dri-drivers --disable-dri3
 else
-ifeq ($(BR2_PACKAGE_XLIB_LIBXSHMFENCE)$(BR2_PACKAGE_XPROTO_DRI3PROTO),yy)
-MESA3D_DEPENDENCIES += xlib_libxshmfence xproto_dri3proto xproto_presentproto
+ifeq ($(BR2_PACKAGE_XLIB_LIBXSHMFENCE),y)
+MESA3D_DEPENDENCIES += xlib_libxshmfence
 MESA3D_CONF_OPTS += --enable-dri3
 else
 MESA3D_CONF_OPTS += --disable-dri3
@@ -221,5 +219,15 @@ endif
 
 # Avoid automatic search of llvm-config
 MESA3D_CONF_OPTS += --with-llvm-prefix=$(STAGING_DIR)/usr/bin
+
+# Hack for rockchip libmali
+ifeq ($(BR2_PACKAGE_LIBMALI),y)
+define MESA3D_REPLACE_MALI_GBM_PC
+        $(INSTALL) -D -m 0644 package/mesa3d/mali_gbm.pc \
+		$(STAGING_DIR)/usr/lib/pkgconfig/gbm.pc
+endef
+
+MESA3D_POST_INSTALL_STAGING_HOOKS += MESA3D_REPLACE_MALI_GBM_PC
+endif
 
 $(eval $(autotools-package))

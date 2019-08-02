@@ -91,6 +91,13 @@ define step_pkg_size_end
 		while read hash file ; do \
 			echo "$(1),$${file}" ; \
 		done >> $(BUILD_DIR)/packages-file-list$(3).txt
+
+	if [ -z "$(3)" ]; then \
+		grep "^$(1)," $(BUILD_DIR)/packages-file-list$(3).txt | \
+			cut -d',' -f 2 | \
+			tar --no-recursion -cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T -; \
+	fi
+
 	rm -f $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after
 endef
 

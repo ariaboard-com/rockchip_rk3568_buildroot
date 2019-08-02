@@ -567,6 +567,13 @@ sdk: world
 	$(INSTALL) -m 755 $(TOPDIR)/support/misc/relocate-sdk.sh $(HOST_DIR)/relocate-sdk.sh
 	echo $(HOST_DIR) > $(HOST_DIR)/share/buildroot/sdk-location
 
+.PHONY: reinstall
+clean-for-reinstall: $(patsubst %,%-clean-for-reinstall,$(PACKAGES))
+	rm -rf $(TARGET_DIR) $(BINARIES_DIR) $(HOST_DIR)
+	find $(BUILD_DIR) -name ".stamp_*_installed" -delete
+
+reinstall: clean-for-reinstall all
+
 # Compatibility symlink in case a post-build script still uses $(HOST_DIR)/usr
 $(HOST_DIR)/usr: $(HOST_DIR)
 	@ln -snf . $@
@@ -722,10 +729,14 @@ endif
 # debugging symbols.
 	find $(TARGET_DIR)/lib/ -type f -name 'ld-*.so*' | \
 		xargs -r $(STRIPCMD) $(STRIP_STRIP_DEBUG)
+
+ifneq ($(BR2_TOOLCHAIN_USES_GLIBC),y)
 	test -f $(TARGET_DIR)/etc/ld.so.conf && \
 		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf file"; exit 1; } || true
 	test -d $(TARGET_DIR)/etc/ld.so.conf.d && \
 		{ echo "ERROR: we shouldn't have a /etc/ld.so.conf.d directory"; exit 1; } || true
+endif
+
 	mkdir -p $(TARGET_DIR)/etc
 	( \
 		echo "NAME=Buildroot"; \
@@ -1005,6 +1016,7 @@ help:
 	@echo '  all                    - make world'
 	@echo '  toolchain              - build toolchain'
 	@echo '  sdk                    - build relocatable SDK'
+	@echo '  reinstall              - reinstall all'
 	@echo
 	@echo 'Configuration:'
 	@echo '  menuconfig             - interactive curses-based configurator'

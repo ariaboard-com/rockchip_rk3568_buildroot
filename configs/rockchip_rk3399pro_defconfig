@@ -1,0 +1,31 @@
+#include "rk3399pro_arm64.config"
+#include "base.config"
+#include "base_extra.config"
+#include "gpu.config"
+#include "display.config"
+#include "demo.config"
+#include "video_mpp.config"
+#include "video_gst.config"
+#include "video_gst_rtsp.config"
+#include "audio.config"
+#include "camera.config"
+#include "camera_gst.config"
+#include "test.config"
+#include "debug.config"
+#include "benchmark.config"
+#include "wifi.config"
+#include "bt.config"
+#include "qt.config"
+#include "qt_app.config"
+#include "ntfs.config"
+BR2_ROOTFS_OVERLAY="board/rockchip/rk3399pro/fs-overlay-64/"
+BR2_TARGET_GENERIC_HOSTNAME="rk3399pro"
+BR2_TARGET_GENERIC_ISSUE="Welcome to RK3399PRO Buildroot"
+BR2_PACKAGE_RKWIFIBT_COMPATIBLE=y
+BR2_PACKAGE_RKWIFIBT_BTUART="ttyS0"
+BR2_PACKAGE_MINIGUI_ENABLE_RGA=y
+BR2_PACKAGE_MINIGUI_ENABLE_FREETYPE=y
+BR2_PACKAGE_MINIGUI_ENABLE_PNG=y
+BR2_PACKAGE_NPU_POWERCTRL=y
+BR2_PACKAGE_RKNN_DEMO=y
+BR2_PACKAGE_RKNN_DEMO_ENABLE_SSD=y

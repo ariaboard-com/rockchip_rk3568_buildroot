@@ -1,0 +1,5 @@
+#include "rk3126c_arm.config"
+#include "base.config"
+#include "base_extra.config"
+#include "recovery.config"
+BR2_PACKAGE_RKSCRIPT=y

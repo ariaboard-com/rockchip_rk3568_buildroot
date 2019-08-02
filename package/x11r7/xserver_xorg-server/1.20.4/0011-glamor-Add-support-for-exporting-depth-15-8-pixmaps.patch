@@ -1,0 +1,30 @@
+From 36005420014aa7a989fb656b1e59a06a9a99c04e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Michel=20D=C3=A4nzer?= <michel.daenzer@amd.com>
+Date: Fri, 5 Oct 2018 12:24:23 +0200
+Subject: [PATCH 11/32] glamor: Add support for exporting depth 15/8 pixmaps
+
+This allows X to run with glamor at these depths.
+---
+ glamor/glamor_egl.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/glamor/glamor_egl.c b/glamor/glamor_egl.c
+index 210c11824..ca7ea8c98 100644
+--- a/glamor/glamor_egl.c
++++ b/glamor/glamor_egl.c
+@@ -291,6 +291,12 @@ glamor_make_pixmap_exportable(PixmapPtr pixmap, Bool modifiers_ok)
+     case 16:
+         format = GBM_FORMAT_RGB565;
+         break;
++    case 15:
++        format = GBM_FORMAT_ARGB1555;
++        break;
++    case 8:
++        format = GBM_FORMAT_R8;
++        break;
+     default:
+         xf86DrvMsg(scrn->scrnIndex, X_ERROR,
+                    "Failed to make %d depth, %dbpp pixmap exportable\n",
+-- 
+2.11.0
+
