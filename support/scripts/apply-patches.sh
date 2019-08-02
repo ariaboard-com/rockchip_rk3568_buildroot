@@ -124,7 +124,8 @@ function apply_patch {
     if [ -n "$BR2_GEN_GIT" ]; then
         if [ ! -d .git ]; then
             git init
-            git add -f .
+            echo -e ".*" >> .gitignore
+            git add -f .gitignore *
             git commit --no-edit -m "init"
         fi
     fi
@@ -139,7 +140,7 @@ function apply_patch {
         git am "${path}/${patch}" --exclude "*" ||
             git commit --allow-empty --no-edit -m "${patch}"
 
-        git add -f .
+        git add -f *
         git commit --allow-empty --amend --no-edit
     fi
 }
