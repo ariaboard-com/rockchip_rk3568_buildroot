@@ -6,7 +6,7 @@ case "$1" in
 		export QT_QPA_FB_DRM=1
 		export QT_QPA_PLATFORM=linuxfb:rotation=270
 		export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=rotate=90
-		/usr/local/QLauncher/QLauncher&
+		/usr/bin/QLauncher&
                 ;;
         stop)
 		killall QLauncher
