@@ -1,7 +1,7 @@
-From 6371b38749844b80f929e6ea7109dd17feeac62c Mon Sep 17 00:00:00 2001
+From 216eb6762eb5f8f9221531ac35447b98dbb4e52a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 1 Aug 2019 20:51:22 +0800
-Subject: [PATCH 2/2] compositor-drm: Support rotate and scale in mirror mode
+Subject: [PATCH] compositor-drm: Support rotate and scale in mirror mode
 
 Use rockchip rga for mirror mode.
 
@@ -10,8 +10,8 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  Makefile.am                |   1 +
  config.h.in                |   6 +
  configure.ac               |  10 ++
- libweston/compositor-drm.c | 322 +++++++++++++++++++++++++++++++++++++--------
- 4 files changed, 283 insertions(+), 56 deletions(-)
+ libweston/compositor-drm.c | 341 +++++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 299 insertions(+), 59 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
 index e9679e6..7686e7b 100644
@@ -64,7 +64,7 @@ index 0961ca8..01a18de 100644
  PKG_CHECK_MODULES(LIBINPUT_BACKEND, [libinput >= 0.8.0])
  PKG_CHECK_MODULES(COMPOSITOR, [$COMPOSITOR_MODULES])
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index d593c04..9883f93 100644
+index d593c04..b78fb73 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -63,6 +63,11 @@
@@ -79,15 +79,16 @@ index d593c04..9883f93 100644
  #ifndef DRM_CAP_TIMESTAMP_MONOTONIC
  #define DRM_CAP_TIMESTAMP_MONOTONIC 0x6
  #endif
-@@ -222,6 +227,7 @@ struct drm_output {
+@@ -222,6 +227,8 @@ struct drm_output {
  
  	struct wl_list link;
  	bool is_mirror;
++	pixman_box32_t plane_bounds;
 +	bool can_scale;
  
  	uint32_t crtc_id; /* object ID to pass to DRM functions */
  	uint32_t plane_id; /* object ID to pass to DRM functions */
-@@ -869,37 +875,212 @@ drm_waitvblank_pipe(struct drm_output *output)
+@@ -869,37 +876,216 @@ drm_waitvblank_pipe(struct drm_output *output)
  		return 0;
  }
  
@@ -129,6 +130,7 @@ index d593c04..9883f93 100644
 +	    int rotation, int dx, int dy, int dw, int dh)
 +{
 +#ifndef HAVE_RGA
++	/* TODO: Use pixman to do the copy */
 +	return -1;
 +#else
 +	RgaSURF_FORMAT src_format, dst_format;
@@ -207,7 +209,7 @@ index d593c04..9883f93 100644
 +	struct drm_mode *mode;
 +	struct drm_fb *fb;
 +	int rotation, sw, sh, dx, dy, dw, dh;
-+	bool transform = false;
++	bool scale = false;
  
 -	// The first output is default output
 -	struct weston_output *def_output_base =
@@ -224,7 +226,7 @@ index d593c04..9883f93 100644
 -		// Repaint all mirrors
 -		wl_list_for_each(output, &b->mirror_list, link)
 -			weston_output_schedule_repaint(&output->base);
-+	// Reusing primary output's current fb
++	// Mirroring primary output's current fb
 +	fb = primary_output->fb_current;
 +	if (!fb)
  		return;
@@ -232,6 +234,7 @@ index d593c04..9883f93 100644
 -
 -	assert(output != default_output);
  
++	/* TODO: Is it safe to do this? */
  	if (output->fb_pending)
  		drm_fb_unref(output->fb_pending);
  
@@ -242,9 +245,6 @@ index d593c04..9883f93 100644
 +	rotation -= drm_output_get_rotation(primary_output);
 +	if (rotation < 0)
 +		rotation += 360;
-+
-+	if (rotation)
-+		transform = true;
 +
 +	mode = container_of(output->base.current_mode, struct drm_mode, base);
 +
@@ -276,20 +276,25 @@ index d593c04..9883f93 100644
 +		}
 +	}
 +
-+	if (dx || dy)
-+		transform = true;
++	if (dw != mode->mode_info.hdisplay ||
++	    dh != mode->mode_info.vdisplay)
++		scale = true;
 +
-+	if (!output->can_scale &&
-+	    (dw != mode->mode_info.hdisplay ||
-+	     dh != mode->mode_info.vdisplay))
-+		transform = true;
++	if (!rotation && (!scale || output->can_scale)) {
++		/* Use the priamry output fb directly */
++		output->plane_bounds.x1 = dx;
++		output->plane_bounds.y1 = dy;
++		output->plane_bounds.x2 = dx + dw;
++		output->plane_bounds.y2 = dy + dh;
 +
-+	if (!transform) {
 +		output->fb_pending = fb;
 +		drm_fb_ref(output->fb_pending);
- 		return;
++		return;
 +	}
 +
++	memset(&output->plane_bounds, 0, sizeof(pixman_box32_t));
++
++	/* Mirroring to dumb fb */
 +	output->current_image ^= 1;
 +	output->fb_pending = drm_fb_ref(output->dumb[output->current_image]);
 +
@@ -305,7 +310,7 @@ index d593c04..9883f93 100644
 +
 +	if (output->is_mirror) {
 +		drm_output_prepare_mirror_fb(output);
-+		return;
+ 		return;
 +	}
 +
 +	drm_output_render(output, damage);
@@ -317,21 +322,25 @@ index d593c04..9883f93 100644
  }
  
  static int
-@@ -963,27 +1144,13 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -963,34 +1149,26 @@ drm_output_repaint(struct weston_output *output_base,
  		output->state_invalid = false;
  	}
  
 -	dx = dy = 0;
- 	dw = mode->mode_info.hdisplay;
- 	dh = mode->mode_info.vdisplay;
- 	sw = output->fb_pending->width;
- 	sh = output->fb_pending->height;
- 
+-	dw = mode->mode_info.hdisplay;
+-	dh = mode->mode_info.vdisplay;
+-	sw = output->fb_pending->width;
+-	sh = output->fb_pending->height;
+-
 -	if (output->is_mirror && getenv("WESTON_DRM_KEEP_RATIO")) {
 -		float src_ratio = (float) sw / sh;
 -		float dst_ratio = (float) dw / dh;
 -		int offset;
--
++	dx = output->plane_bounds.x1;
++	dy = output->plane_bounds.y1;
++	dw = output->plane_bounds.x2 - output->plane_bounds.x1;
++	dh = output->plane_bounds.y2 - output->plane_bounds.y1;
+ 
 -		if (src_ratio > dst_ratio) {
 -			offset = dh - dw / src_ratio;
 -			dy = offset / 2;
@@ -341,13 +350,17 @@ index d593c04..9883f93 100644
 -			dx = offset / 2;
 -			dw -= offset;
 -		}
--	}
-+	dx = (dw - sw) / 2;
-+	dy = (dh - sh) / 2;
++	if (!dw || !dh) {
++		dw = mode->mode_info.hdisplay;
++		dh = mode->mode_info.vdisplay;
+ 	}
  
++	sw = output->fb_pending->width;
++	sh = output->fb_pending->height;
++
  	ret = drmModeSetPlane(backend->drm.fd,
  			      output->plane_id,
-@@ -991,6 +1158,7 @@ drm_output_repaint(struct weston_output *output_base,
+ 			      output->crtc_id,
  			      output->fb_pending->fb_id, 0,
  			      dx, dy, dw, dh, 0, 0, sw << 16, sh << 16);
  	if (ret) {
@@ -355,7 +368,7 @@ index d593c04..9883f93 100644
  		weston_log("set plane failed: %m\n");
  		goto err_pageflip;
  	}
-@@ -1777,11 +1945,7 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+@@ -1777,11 +1955,7 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
  	drm_fb_unref(output->fb_dummy);
  	output->fb_dummy = NULL;
  
@@ -368,7 +381,7 @@ index d593c04..9883f93 100644
  		drm_output_fini_pixman(output);
  		if (drm_output_init_pixman(output, b) < 0) {
  			weston_log("failed to init output pixman state with "
-@@ -1989,7 +2153,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+@@ -1989,7 +2163,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
  	mode->base.width = info->hdisplay;
  	mode->base.height = info->vdisplay;
  
@@ -378,7 +391,7 @@ index d593c04..9883f93 100644
  		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
  			   output->base.name, drm_virtual_width,
  			   drm_virtual_height, mode->base.width,
-@@ -2181,6 +2346,52 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
+@@ -2181,6 +2356,55 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
  	return type == DRM_PLANE_TYPE_PRIMARY;
  }
  
@@ -390,6 +403,9 @@ index d593c04..9883f93 100644
 +	uint64_t value;
 +	unsigned i;
 +	bool ret = false;
++
++	if (!getenv("WESTON_DRM_ALLOW_SCALE"))
++		return false;
 +
 +	props = drmModeObjectGetProperties(b->drm.fd, plane_id,
 +					   DRM_MODE_OBJECT_PLANE);
@@ -431,7 +447,7 @@ index d593c04..9883f93 100644
  static int
  find_plane_for_crtc(struct drm_backend *b, int pipe)
  {
-@@ -2840,18 +3051,17 @@ drm_output_enable(struct weston_output *base)
+@@ -2840,18 +3064,17 @@ drm_output_enable(struct weston_output *base)
  	if (b->pageflip_timeout)
  		drm_output_pageflip_timer_create(output);
  
@@ -459,7 +475,7 @@ index d593c04..9883f93 100644
  		wl_list_insert(&b->mirror_list, &output->link);
  
  		// HACK: Make it unavailable for views?
-@@ -2933,14 +3143,13 @@ drm_output_deinit(struct weston_output *base)
+@@ -2933,14 +3156,13 @@ drm_output_deinit(struct weston_output *base)
  	drm_fb_unref(output->fb_current);
  	output->fb_current = NULL;
  
@@ -480,7 +496,7 @@ index d593c04..9883f93 100644
  
  	weston_plane_release(&output->fb_plane);
  	weston_plane_release(&output->cursor_plane);
-@@ -3068,6 +3277,7 @@ create_output_for_connector(struct drm_backend *b,
+@@ -3068,6 +3290,7 @@ create_output_for_connector(struct drm_backend *b,
  	output->pipe = i;
  	output->connector_id = connector->connector_id;
  	output->plane_id = plane_id;
