@@ -1,0 +1,8 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_PROCESS_UNITS
+	bool "rv1108 package Camera stream processing unit"
+	default n
+endif
+

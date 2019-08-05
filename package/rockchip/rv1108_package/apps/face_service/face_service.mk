@@ -3,7 +3,7 @@ FACE_SERVICE_SITE_METHOD = local
 FACE_SERVICE_INSTALL_STAGING = YES
 
 # add dependencies
-FACE_SERVICE_DEPENDENCIES = hal adk messenger librkrga librkfb messenger adk libcamerahal rkcamera
+FACE_SERVICE_DEPENDENCIES = hal adk messenger librkrga librkfb messenger adk libcamerahal rkcamera process_units
 
 
 ifeq ($(BR2_PACKAGE_MODEL_LOADER),y)
@@ -68,8 +68,6 @@ ifeq ($(BR2_PACKAGE_RV1108_VENDOR_STORAGE),y)
     FACE_SERVICE_DEPENDENCIES += rv1108_vendor_storage
     FACE_SERVICE_CONF_OPTS += -DUSE_VENDOR_STORAGE=1
 endif
-
-RV_BOARD_VERSION = rv1108-lock-evb-v10
 
 FACE_SERVICE_CONF_OPTS += \
     -DDISPLAY_RESOLUTION=$(call qstrip,$(RV_LCD_RESOLUTION)) \
