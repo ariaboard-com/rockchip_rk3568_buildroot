@@ -7,14 +7,14 @@ config BR2_PACKAGE_LIBCAMERAHAL
 
 if BR2_PACKAGE_LIBCAMERAHAL
 menu "libcamerahal options"
-config RV_TARGET_LIBCAMERAHAL_USE_IQ_BIN
+config BR2_PACKAGE_LIBCAMERAHAL_USE_IQ_BIN
 	bool "use iq bin replace xml"
 	default n
 
-config RV_TARGET_LIBCAMERAHAL_IQ_BIN_NAME
+config BR2_PACKAGE_LIBCAMERAHAL_IQ_BIN_NAME
 	string "iq bin name"
 	default "name_not_exist"
-	depends on RV_TARGET_LIBCAMERAHAL_USE_IQ_BIN
+	depends on BR2_PACKAGE_LIBCAMERAHAL_USE_IQ_BIN
 
 endmenu
 endif

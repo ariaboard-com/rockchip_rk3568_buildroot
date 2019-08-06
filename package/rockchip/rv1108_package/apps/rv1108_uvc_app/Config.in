@@ -9,10 +9,10 @@ config BR2_PACKAGE_RV1108_UVC_APP
 
 if BR2_PACKAGE_RV1108_UVC_APP
 menu "uvc app setting options"
-config RV_TARGET_ISP_FORMAT
+config BR2_PACKAGE_RV1108_UVC_APP_ISP_FORMAT
     string "ISP video capture format"
     default "HAL_FRMAE_FMT_NV12"
-config RV_TARGET_CIF_FORMAT
+config BR2_PACKAGE_RV1108_UVC_APP_CIF_FORMAT
     string "CIF video capture format"
     default "HAL_FRMAE_FMT_NV12"
 endmenu

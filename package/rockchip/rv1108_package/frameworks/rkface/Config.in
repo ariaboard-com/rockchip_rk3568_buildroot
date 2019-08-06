@@ -7,19 +7,19 @@ config BR2_PACKAGE_RKFACE
 if BR2_PACKAGE_RKFACE
 menu "RK Face Configures"
 
-config RV_TARGET_RKFACE_AUTHORIZATION
+config BR2_PACKAGE_RKFACE_AUTHORIZATION
     bool "Enable rkface Authorization "
     default n
 
-config RV_TARGET_RKFACE_DETECTION
+config BR2_PACKAGE_RKFACE_DETECTION
     bool "Enable rk face detection"
     default y
 
-config RV_TARGET_RKFACE_RECOGNITION
+config BR2_PACKAGE_RKFACE_RECOGNITION
     bool "Enable rk face recognition"
     default y
 
-config RV_TARGET_RKLIVING_DETECTION
+config BR2_PACKAGE_RKFACE_RKLIVING_DETECTION
     bool "Enable rk living detection"
     default n
 endmenu

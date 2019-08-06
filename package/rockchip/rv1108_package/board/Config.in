@@ -1,0 +1,27 @@
+config BR2_RV1108_BOARD_VERSION
+        string "Board version"
+        default "rv1108-lock-evb-v10"
+
+#
+# LCD Info
+#
+menu "lcd infomation"
+
+config BR2_RV1108_LCD_RESOLUTION
+	string "LCD resolution"
+	default "360x640"
+
+config BR2_RV1108_LCD_BACKLIGHT_HIGH
+	int "LCD backlight high value"
+	default 250
+
+config BR2_RV1108_LCD_BACKLIGHT_MEDIAN
+	int "LCD backlight median value"
+	default 200
+
+config BR2_RV1108_LCD_BACKLIGHT_LOW
+	int "LCD backlight low value"
+	default 150
+endmenu
+
+

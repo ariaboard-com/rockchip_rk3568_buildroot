@@ -7,11 +7,11 @@ config BR2_PACKAGE_UPDATER
 if BR2_PACKAGE_UPDATER
 menu "rv1108 updater options"
 
-    config RV_TARGET_UPDATER_FOR_EMMC
+    config BR2_PACKAGE_UPDATER_FOR_EMMC
         bool "updater support fot emmc"
         default y
 
-	config RV_TARGET_UPDATER_FOR_NOR
+	config BR2_PACKAGE_UPDATER_FOR_NOR
         bool "updater support fot nor"
         default n
 endmenu

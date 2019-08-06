@@ -10,35 +10,35 @@ menu "lock app setting options"
 
 choice
 	prompt "Lock APP ui project"
-	default RV_TARGET_LOCK_APP_UI_SAMPLE
+	default BR2_PACKAGE_LOCK_UI_SAMPLE
 	help
 	  Select a product type to use.
 
-config RV_TARGET_LOCK_APP_UI_PROJECT1
+config BR2_PACKAGE_LOCK_UI_PROJECT1
 	bool "project1"
 	help
 	  Product Type: project1.
 
-config RV_TARGET_LOCK_APP_UI_SAMPLE
+config BR2_PACKAGE_LOCK_UI_SAMPLE
 	bool "sample"
 	help
 	  Product Type: sample.
 endchoice
 
-config RV_TARGET_LOCK_PROJECT_TYPE
+config BR2_PACKAGE_LOCK_PROJECT_TYPE
 	string
-	default "PROJECT1"    if RV_TARGET_LOCK_APP_UI_PROJECT1
-	default "SAMPLE"      if RV_TARGET_LOCK_APP_UI_SAMPLE
+	default "PROJECT1"    if BR2_PACKAGE_LOCK_UI_PROJECT1
+	default "SAMPLE"      if BR2_PACKAGE_LOCK_UI_SAMPLE
 	help
 	  type: PROJECT1/SAMPLE
 
-config RV_TARGET_LOCK_ENABLE_SCREEN_CAPTURE
+config BR2_PACKAGE_LOCK_ENABLE_SCREEN_CAPTURE
 	bool "Enable screen capture"
 	default n
 	help
 	  enable the function of screen capture
 
-config RV_TARGET_LOCK_ENABLE_DISP_HOLD
+config BR2_PACKAGE_LOCK_ENABLE_DISP_HOLD
 	bool "Enable disp hold"
 	default y
 	help

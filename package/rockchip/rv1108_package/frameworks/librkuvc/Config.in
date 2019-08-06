@@ -10,27 +10,29 @@ config BR2_PACKAGE_LIBRKUVC
 if BR2_PACKAGE_LIBRKUVC
 menu "librkuvc setting options"
 
-config RV_TARGET_UVC_FORMAT_FILE
+config BR2_PACKAGE_LIBRKUVC_FORMAT_FILE
     string "use format file"
     default "other"
 
-config RV_TARGET_YUYV_AS_RAW
+config BR2_PACKAGE_LIBRKUVC_YUYV_AS_RAW
     bool "YUYV as raw data transfer"
     default n
 
-config RV_TARGET_CONFIG_UVC_RGA
+config BR2_PACKAGE_LIBRKUVC_CONFIG_UVC_RGA
     bool "config uvc rga camera buffer"
     default n
 
-config RV_TARGET_USE_ADB
+config BR2_PACKAGE_LIBRKUVC_USE_ADB
     bool "use ADB"
     default n
-config RV_TARGET_ISP_TO_UVC_SEQ
+
+config BR2_PACKAGE_LIBRKUVC_ISP_TO_UVC_SEQ
     int "ISP video to UVC seq"
     default 1
     help
       UVC seq 0 or 1
-config RV_TARGET_CIF_TO_UVC_SEQ
+
+config BR2_PACKAGE_LIBRKUVC_CIF_TO_UVC_SEQ
     int "CIF video to UVC seq"
     default 0
     help

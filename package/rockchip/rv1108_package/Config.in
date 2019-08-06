@@ -2,6 +2,11 @@ if BR2_PACKAGE_RV1108
 
 menu "rv1108 package"
 
+# Board config
+menu "Board options"
+source "package/rockchip/rv1108_package/board/Config.in"
+endmenu
+
 # BSP packages
 menu "apps"
 source "package/rockchip/rv1108_package/apps/Config.in"

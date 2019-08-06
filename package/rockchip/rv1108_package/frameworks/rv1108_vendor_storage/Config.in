@@ -7,7 +7,7 @@ config BR2_PACKAGE_RV1108_VENDOR_STORAGE
 if BR2_PACKAGE_RV1108_VENDOR_STORAGE
 menu "vendor storage setting options"
 
-    config RV_TARGET_VENDOR_STORAGE_TEST
+    config BR2_PACKAGE_RV1108_VENDOR_STORAGE_TEST
         bool "Rockchip vendor storage test"
         default n
 
