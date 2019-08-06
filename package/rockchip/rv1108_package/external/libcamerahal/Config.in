@@ -3,7 +3,7 @@ if BR2_PACKAGE_RV1108
 # BSP packages
 config BR2_PACKAGE_LIBCAMERAHAL
 	bool "rv1108 package libcamerahal"
-	help
+	select BR2_PACKAGE_LIBION
 
 if BR2_PACKAGE_LIBCAMERAHAL
 menu "libcamerahal options"

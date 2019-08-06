@@ -4,6 +4,8 @@ if BR2_PACKAGE_RV1108
 config BR2_PACKAGE_LOCK
 	bool "rv1108 package lock"
 	select BR2_PACKAGE_MESSENGER
+	select BR2_PACKAGE_LIBPNG12
+	select BR2_PACKAGE_RV1108_MINIGUI
 
 if BR2_PACKAGE_LOCK
 menu "lock app setting options"
