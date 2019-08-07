@@ -1,7 +1,7 @@
-From 648d87e371ebefc21ffcf52f5d17c238ecdff8f4 Mon Sep 17 00:00:00 2001
+From baf75386eba37b4dec929df0d7abe1060910467e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 29 Jul 2019 14:26:11 +0800
-Subject: [PATCH 42/43] modesetting: Support exa with rockchip rga 2d accel
+Subject: [PATCH 2/3] modesetting: Support exa with rockchip rga 2d accel
 
 Implementing neccessarily exa APIs for basic window moving and
 screen transforms.
@@ -10,15 +10,15 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  configure.ac                                     |  14 +
  hw/xfree86/drivers/modesetting/Makefile.am       |   4 +-
- hw/xfree86/drivers/modesetting/driver.c          |  46 ++
- hw/xfree86/drivers/modesetting/driver.h          |   4 +
+ hw/xfree86/drivers/modesetting/driver.c          |  48 ++
+ hw/xfree86/drivers/modesetting/driver.h          |   6 +
  hw/xfree86/drivers/modesetting/drmmode_display.c |   5 +-
  hw/xfree86/drivers/modesetting/drmmode_display.h |   3 +
  hw/xfree86/drivers/modesetting/dumb_bo.c         |  18 +
  hw/xfree86/drivers/modesetting/dumb_bo.h         |   1 +
  hw/xfree86/drivers/modesetting/exa.c             | 784 +++++++++++++++++++++++
  include/dix-config.h.in                          |   3 +
- 10 files changed, 880 insertions(+), 2 deletions(-)
+ 10 files changed, 884 insertions(+), 2 deletions(-)
  create mode 100644 hw/xfree86/drivers/modesetting/exa.c
 
 diff --git a/configure.ac b/configure.ac
@@ -76,7 +76,7 @@ index e0411ef51..c1e3ccb5a 100644
  
  drivermandir = $(DRIVER_MAN_DIR)
 diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
-index efa10fa6a..720c10833 100644
+index efa10fa6a..24ed742e9 100644
 --- a/hw/xfree86/drivers/modesetting/driver.c
 +++ b/hw/xfree86/drivers/modesetting/driver.c
 @@ -762,6 +762,37 @@ FreeRec(ScrnInfoPtr pScrn)
@@ -117,7 +117,20 @@ index efa10fa6a..720c10833 100644
  try_enable_glamor(ScrnInfoPtr pScrn)
  {
      modesettingPtr ms = modesettingPTR(pScrn);
-@@ -1391,6 +1422,8 @@ CreateScreenResources(ScreenPtr pScreen)
+@@ -1217,10 +1248,12 @@ msUpdatePacked(ScreenPtr pScreen, shadowBufPtr pBuf)
+         free(prect);
+     } while (0);
+ 
++    ms_prepare_access(pBuf->pPixmap, 0);
+     if (use_3224)
+         shadowUpdate32to24(pScreen, pBuf);
+     else
+         shadowUpdatePacked(pScreen, pBuf);
++    ms_finish_access(pBuf->pPixmap, 0);
+ }
+ 
+ static Bool
+@@ -1391,6 +1424,8 @@ CreateScreenResources(ScreenPtr pScreen)
          pixels = drmmode_map_front_bo(&ms->drmmode);
          if (!pixels)
              return FALSE;
@@ -126,7 +139,7 @@ index efa10fa6a..720c10833 100644
      }
  
      rootPixmap = pScreen->GetScreenPixmap(pScreen);
-@@ -1594,6 +1627,7 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
+@@ -1594,6 +1629,7 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
      ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
      modesettingPtr ms = modesettingPTR(pScrn);
      VisualPtr visual;
@@ -134,7 +147,7 @@ index efa10fa6a..720c10833 100644
  
      pScrn->pScreen = pScreen;
  
-@@ -1677,6 +1711,11 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
+@@ -1677,6 +1713,11 @@ ScreenInit(ScreenPtr pScreen, int argc, char **argv)
  
      xf86SetBlackWhitePixels(pScreen);
  
@@ -146,7 +159,7 @@ index efa10fa6a..720c10833 100644
      xf86SetBackingStore(pScreen);
      xf86SetSilkenMouse(pScreen);
      miDCInitialize(pScreen, xf86GetPointerScreenFuncs());
-@@ -1890,6 +1929,13 @@ CloseScreen(ScreenPtr pScreen)
+@@ -1890,6 +1931,13 @@ CloseScreen(ScreenPtr pScreen)
          LeaveVT(pScrn);
      }
  
@@ -161,10 +174,10 @@ index efa10fa6a..720c10833 100644
      pScreen->BlockHandler = ms->BlockHandler;
  
 diff --git a/hw/xfree86/drivers/modesetting/driver.h b/hw/xfree86/drivers/modesetting/driver.h
-index 9ceb92113..c443cfe21 100644
+index ac315700f..c84be720f 100644
 --- a/hw/xfree86/drivers/modesetting/driver.h
 +++ b/hw/xfree86/drivers/modesetting/driver.h
-@@ -190,3 +190,7 @@ Bool ms_do_pageflip(ScreenPtr screen,
+@@ -190,3 +190,9 @@ Bool ms_do_pageflip(ScreenPtr screen,
  #endif
  
  int ms_flush_drm_events(ScreenPtr screen);
@@ -172,11 +185,13 @@ index 9ceb92113..c443cfe21 100644
 +Bool ms_setup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
 +void ms_cleanup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
 +Bool ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap, struct dumb_bo *bo);
++Bool ms_prepare_access(PixmapPtr pPix, int index);
++void ms_finish_access(PixmapPtr pPix, int index);
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
-index a5607cfb2..a2695b2a0 100644
+index 74f0abc89..eb67955d7 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.c
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
-@@ -3101,9 +3101,12 @@ drmmode_clones_init(ScrnInfoPtr scrn, drmmode_ptr drmmode, drmModeResPtr mode_re
+@@ -3109,9 +3109,12 @@ drmmode_clones_init(ScrnInfoPtr scrn, drmmode_ptr drmmode, drmModeResPtr mode_re
  static Bool
  drmmode_set_pixmap_bo(drmmode_ptr drmmode, PixmapPtr pixmap, drmmode_bo *bo)
  {
@@ -191,7 +206,7 @@ index a5607cfb2..a2695b2a0 100644
          return TRUE;
  
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.h b/hw/xfree86/drivers/modesetting/drmmode_display.h
-index c043b802e..3aa10a42b 100644
+index 3060d8685..f1675cc42 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.h
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.h
 @@ -32,6 +32,7 @@
@@ -254,7 +269,7 @@ index 9235e61e2..50f334b2e 100644
  
 diff --git a/hw/xfree86/drivers/modesetting/exa.c b/hw/xfree86/drivers/modesetting/exa.c
 new file mode 100644
-index 000000000..b5e65f835
+index 000000000..12837d4b4
 --- /dev/null
 +++ b/hw/xfree86/drivers/modesetting/exa.c
 @@ -0,0 +1,784 @@
@@ -401,7 +416,7 @@ index 000000000..b5e65f835
 +
 +static void ms_exa_done(PixmapPtr pPixmap) {}
 +
-+static Bool
++Bool
 +ms_prepare_access(PixmapPtr pPix, int index)
 +{
 +    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPix);
@@ -417,7 +432,7 @@ index 000000000..b5e65f835
 +    return pPix->devPrivate.ptr != NULL;
 +}
 +
-+static void
++void
 +ms_finish_access(PixmapPtr pPix, int index)
 +{
 +    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPix);
