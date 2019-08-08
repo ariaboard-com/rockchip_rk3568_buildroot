@@ -7,6 +7,7 @@ config BR2_PACKAGE_LOCK
 	select BR2_PACKAGE_LIBPNG12
 	select BR2_PACKAGE_RV1108_MINIGUI
 	select BR2_PACKAGE_TSLIB
+	select BR2_PACKAGE_JPEG
 
 if BR2_PACKAGE_LOCK
 menu "lock app setting options"
