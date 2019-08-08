@@ -1,2 +1,5 @@
 #include "rv1108_arm.config"
 #include "rv1108_base.config"
+#include "rv1108_lock.config"
+#include "rv1108_face_service.config"
+#include "rv1108_system_manager.config"
