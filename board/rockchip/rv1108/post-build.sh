@@ -22,7 +22,7 @@ fi
 
 if [ -d  rv1108-$RK_TARGET_BOARD_VERSION ]; then
 	echo "copy rv1108-$RK_TARGET_BOARD_VERSION"
-	cp -fr rv1108-$RK_TARGET_BOARD_VERSION/* $TARGET_DIR/
+	rsync -av --exclude rv1108-$RK_TARGET_BOARD_VERSION/userdata rv1108-$RK_TARGET_BOARD_VERSION/* $TARGET_DIR/
 else
 	echo "rv1108-$RK_TARGET_BOARD_VERSION no exit"
 fi
