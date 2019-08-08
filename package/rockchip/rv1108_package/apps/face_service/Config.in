@@ -13,13 +13,16 @@ config BR2_PACKAGE_FACE_SERVICE
 	select BR2_PACKAGE_PROCESS_UNITS
 	select BR2_PACKAGE_LIBRKFB
 	select BR2_PACKAGE_LIBRKRGA
+	select BR2_PACKAGE_RKFACE
+	select BR2_PACKAGE_MODEL_LOADER
+	select BR2_PACKAGE_RV1108_VENDOR_STORAGE
 
 if BR2_PACKAGE_FACE_SERVICE
 menu "face_service setting options"
 
 	config BR2_PACKAGE_FACE_SERVICE_PRE_FACE_ROTATE
         int "Image rotation angle before face algorithm"
-        default 0
+        default 90
 
     config BR2_PACKAGE_FACE_SERVICE_DETECT_WIDTH
         int "Face downscale image width"
