@@ -22,21 +22,9 @@ config BR2_PACKAGE_LIBRKUVC_CONFIG_UVC_RGA
     bool "config uvc rga camera buffer"
     default n
 
-config BR2_PACKAGE_LIBRKUVC_USE_ADB
-    bool "use ADB"
-    default n
-
-config BR2_PACKAGE_LIBRKUVC_ISP_TO_UVC_SEQ
-    int "ISP video to UVC seq"
-    default 1
-    help
-      UVC seq 0 or 1
-
-config BR2_PACKAGE_LIBRKUVC_CIF_TO_UVC_SEQ
-    int "CIF video to UVC seq"
-    default 0
-    help
-      UVC seq 0 or 1
+config BR2_PACKAGE_LIBRKUVC_USB_UVC_FUNCTION
+    string "usb uvc function"
+    default "web_camera_rgb"
 
 endmenu
 
