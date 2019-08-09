@@ -1,0 +1,32 @@
+From bf3a2cae9dca55d9fa1db10c4e581c05f757f67e Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Fri, 9 Aug 2019 10:01:15 +0800
+Subject: [PATCH] client: X11: Disable complex regions by default
+
+Doing complex regions update is very slow with xserver 2d
+accels(exa/glamor), let's disable it by default.
+
+Use "XFREERDP_COMPLEX_REGIONS" environment to enable it.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ client/X11/xf_client.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/client/X11/xf_client.c b/client/X11/xf_client.c
+index 4a3e0d2..2467107 100644
+--- a/client/X11/xf_client.c
++++ b/client/X11/xf_client.c
+@@ -1840,6 +1840,9 @@ static BOOL xfreerdp_client_new(freerdp* instance, rdpContext* context)
+ 	xfc->_NET_SUPPORTED = XInternAtom(xfc->display, "_NET_SUPPORTED", True);
+ 	xfc->_NET_SUPPORTING_WM_CHECK = XInternAtom(xfc->display, "_NET_SUPPORTING_WM_CHECK", True);
+ 
++	if (!getenv("XFREERDP_COMPLEX_REGIONS"))
++		xfc->complex_regions = FALSE;
++
+ 	if ((xfc->_NET_SUPPORTED != None) && (xfc->_NET_SUPPORTING_WM_CHECK != None))
+ 	{
+ 		Atom actual_type;
+-- 
+2.11.0
+
