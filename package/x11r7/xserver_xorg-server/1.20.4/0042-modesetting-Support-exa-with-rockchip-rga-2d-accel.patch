@@ -1,7 +1,7 @@
-From baf75386eba37b4dec929df0d7abe1060910467e Mon Sep 17 00:00:00 2001
+From 965f31bc6981ade663a7e9d864be02717049ad28 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 29 Jul 2019 14:26:11 +0800
-Subject: [PATCH 2/3] modesetting: Support exa with rockchip rga 2d accel
+Subject: [PATCH 1/2] modesetting: Support exa with rockchip rga 2d accel
 
 Implementing neccessarily exa APIs for basic window moving and
 screen transforms.
@@ -16,9 +16,9 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  hw/xfree86/drivers/modesetting/drmmode_display.h |   3 +
  hw/xfree86/drivers/modesetting/dumb_bo.c         |  18 +
  hw/xfree86/drivers/modesetting/dumb_bo.h         |   1 +
- hw/xfree86/drivers/modesetting/exa.c             | 784 +++++++++++++++++++++++
+ hw/xfree86/drivers/modesetting/exa.c             | 810 +++++++++++++++++++++++
  include/dix-config.h.in                          |   3 +
- 10 files changed, 884 insertions(+), 2 deletions(-)
+ 10 files changed, 910 insertions(+), 2 deletions(-)
  create mode 100644 hw/xfree86/drivers/modesetting/exa.c
 
 diff --git a/configure.ac b/configure.ac
@@ -269,10 +269,10 @@ index 9235e61e2..50f334b2e 100644
  
 diff --git a/hw/xfree86/drivers/modesetting/exa.c b/hw/xfree86/drivers/modesetting/exa.c
 new file mode 100644
-index 000000000..12837d4b4
+index 000000000..daba88471
 --- /dev/null
 +++ b/hw/xfree86/drivers/modesetting/exa.c
-@@ -0,0 +1,784 @@
+@@ -0,0 +1,810 @@
 +/*
 + *  Copyright (c) 2019, Fuzhou Rockchip Electronics Co., Ltd
 + *
@@ -500,6 +500,14 @@ index 000000000..12837d4b4
 +{
 +#ifdef MODESETTING_WITH_RGA
 +    rga_info_t dst_info = {0};
++    int width = x2 - x1;
++    int height = y2 - y1;
++
++    if (width <= 2 || height <= 2)
++        goto bail;
++
++    if (width * height <= 4096)
++        goto bail;
 +
 +    rga_prepare_info(pPixmap, &dst_info, x1, y1, x2 - x1, y2 - y1);
 +
@@ -596,6 +604,9 @@ index 000000000..12837d4b4
 +    struct dumb_bo *tmp_bo = NULL;
 +
 +    if (width <= 2 || height <= 2)
++        goto bail;
++
++    if (width * height <= 4096)
 +        goto bail;
 +
 +    rga_prepare_info(pSrcPixmap, &src_info, srcX, srcY, width, height);
@@ -783,6 +794,9 @@ index 000000000..12837d4b4
 +    if (width <= 2 || height <= 2)
 +        goto bail;
 +
++    if (width * height <= 4096)
++        goto bail;
++
 +    pixman_transform_bounds(t, &box);
 +
 +    rga_prepare_info(pSrc, &src_info, box.x1, box.y1,
@@ -849,7 +863,13 @@ index 000000000..12837d4b4
 +    rga_info_t dst_info = {0};
 +    int bpp = pDst->drawable.bitsPerPixel;
 +
-+    if (!rga_check_pixmap(pDst) || (w <= 64 && h <= 64))
++    if (w <= 2 || h <= 2)
++        return FALSE;
++
++    if (w * h <= 4096)
++        return FALSE;
++
++    if (!rga_check_pixmap(pDst))
 +        return FALSE;
 +
 +    rga_prepare_info(pDst, &dst_info, x, y, w, h);
@@ -877,7 +897,13 @@ index 000000000..12837d4b4
 +    rga_info_t dst_info = {0};
 +    int bpp = pSrc->drawable.bitsPerPixel;
 +
-+    if (!rga_check_pixmap(pSrc) || (w <= 64 && h <= 64))
++    if (w <= 2 || h <= 2)
++        return FALSE;
++
++    if (w * h <= 4096)
++        return FALSE;
++
++    if (!rga_check_pixmap(pSrc))
 +        return FALSE;
 +
 +    rga_prepare_info(pSrc, &src_info, x, y, w, h);
