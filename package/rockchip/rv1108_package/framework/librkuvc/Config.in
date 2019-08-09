@@ -7,29 +7,5 @@ config BR2_PACKAGE_LIBRKUVC
 	select BR2_PACKAGE_MPP
 	select BR2_PACKAGE_JHEAD
 
-if BR2_PACKAGE_LIBRKUVC
-menu "librkuvc setting options"
-
-config BR2_PACKAGE_LIBRKUVC_FORMAT_FILE
-    string "use format file"
-    default "other"
-
-config BR2_PACKAGE_LIBRKUVC_YUYV_AS_RAW
-    bool "YUYV as raw data transfer"
-    default n
-
-config BR2_PACKAGE_LIBRKUVC_CONFIG_UVC_RGA
-    bool "config uvc rga camera buffer"
-    default n
-
-config BR2_PACKAGE_LIBRKUVC_USB_UVC_FUNCTION
-    string "usb uvc function"
-    default "web_camera_rgb"
-
-endmenu
-
-endif
-
-
 endif
 
