@@ -1,0 +1,23 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_CAMERAHAL
+	bool "RV1108 package camerahal"
+	select BR2_PACKAGE_LIBION
+
+if BR2_PACKAGE_CAMERAHAL
+menu "camerahal options"
+config BR2_PACKAGE_CAMERAHAL_USE_IQ_BIN
+	bool "use iq bin replace xml"
+	default n
+
+config BR2_PACKAGE_CAMERAHAL_IQ_BIN_NAME
+	string "iq bin name"
+	default "name_not_exist"
+	depends on BR2_PACKAGE_CAMERAHAL_USE_IQ_BIN
+
+endmenu
+endif
+
+endif
+

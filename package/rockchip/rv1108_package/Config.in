@@ -1,17 +1,17 @@
 if BR2_PACKAGE_RV1108
 
-menu "rv1108 package"
+menu "RV1108 Package"
 
 # BSP packages
-menu "apps"
-source "package/rockchip/rv1108_package/apps/Config.in"
+menu "Application packages"
+source "package/rockchip/rv1108_package/app/Config.in"
 endmenu
 
-menu "framework"
-source "package/rockchip/rv1108_package/frameworks/Config.in"
+menu "Framework packages"
+source "package/rockchip/rv1108_package/framework/Config.in"
 endmenu
 
-menu "external"
+menu "External packages"
 source "package/rockchip/rv1108_package/external/Config.in"
 endmenu
 

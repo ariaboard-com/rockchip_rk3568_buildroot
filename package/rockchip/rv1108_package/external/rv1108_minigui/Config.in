@@ -2,8 +2,8 @@ if BR2_PACKAGE_RV1108
 
 # BSP packages
 config BR2_PACKAGE_RV1108_MINIGUI
-	bool "rv1108 package minigui"
-	help
+	bool "RV1108 package minigui"
+	select BR2_PACKAGE_LIBION
 
 endif
 
