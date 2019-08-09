@@ -6,6 +6,6 @@ RKCAMERA_INSTALL_STAGING = YES
 RKCAMERA_DEPENDENCIES = libcamerahal adk libion cjson
 
 RKCAMERA_CONF_OPTS += \
-    -DBOARD_VERSION=rv1108-lock-evb-v10
+    -DBOARD_VERSION=rv1108-$(RK_TARGET_BOARD_VERSION)
 
 $(eval $(cmake-package))
