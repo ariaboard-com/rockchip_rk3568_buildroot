@@ -76,4 +76,9 @@ FACE_SERVICE_CONF_OPTS += \
     -DMAX_FEATURE_OF_USER=$(BR2_PACKAGE_FACE_SERVICE_MAX_FEATURE_OF_USER) \
     -DBOARD_VERSION=$(call qstrip,rv1108-$(RK_TARGET_BOARD_VERSION))
 
+define FACE_SERVICE_CONF_DEF
+    $(INSTALL) -m 0644 -D package/rockchip/rv1108_package/apps/face_service/face_service.conf \
+                    $(TARGET_DIR)/etc/face_service.conf
+endef
+
 $(eval $(cmake-package))
