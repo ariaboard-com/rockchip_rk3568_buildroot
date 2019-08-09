@@ -13,4 +13,8 @@ ifeq ($(BR2_PACKAGE_ADBD),y)
     RV1108_UVC_APP_CONF_OPTS += -DUSE_ADB=1
 endif
 
+define RV1108_UVC_APP_INSTALL_INIT_SYSV
+    $(INSTALL) -m 0755 -D package/rockchip/rv1108_package/apps/rv1108_uvc_app/S99_rv1108_uvc_app $(TARGET_DIR)/etc/init.d/S99_rv1108_uvc_app
+endef
+
 $(eval $(cmake-package))
