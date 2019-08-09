@@ -103,7 +103,6 @@ endchoice
 
 
 # BSP packages
-source "package/rockchip/rv1108-firmware/Config.in"
 source "package/rockchip/rv1108_package/Config.in"
 
 # Shared packages with all chips
