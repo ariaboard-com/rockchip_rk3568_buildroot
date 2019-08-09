@@ -11,15 +11,5 @@ config BR2_PACKAGE_RV1108_UVC_APP
 	select BR2_PACKAGE_RKRGA
 	select BR2_PACKAGE_SQLITE
 
-if BR2_PACKAGE_RV1108_UVC_APP
-menu "uvc app setting options"
-config BR2_PACKAGE_RV1108_UVC_APP_ISP_FORMAT
-    string "ISP video capture format"
-    default "HAL_FRMAE_FMT_NV12"
-config BR2_PACKAGE_RV1108_UVC_APP_CIF_FORMAT
-    string "CIF video capture format"
-    default "HAL_FRMAE_FMT_NV12"
-endmenu
-endif
 endif
 
