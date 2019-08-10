@@ -13,6 +13,10 @@ echo "RK_TARGET_PRODUCT        = $RK_TARGET_PRODUCT"
 echo "RK_TARGET_BOARD_VERSION  = $RK_TARGET_BOARD_VERSION"
 echo "======================================================="
 
+rm $TARGET_DIR/etc/init.d/S01logging
+rm $TARGET_DIR/etc/init.d/S20urandom
+rm $TARGET_DIR/etc/init.d/S40network
+
 if [ ! -d  $RV1108_DEVICES_BOARD_DIR ]; then
         echo "$RV1108_DEVICES_BOARD_DIR no exit"
 	return
