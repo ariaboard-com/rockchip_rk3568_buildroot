@@ -1,15 +1,15 @@
 PLUGINLIB_VERSION = 1.11.3
 ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
-PLUGINLIB_VERSION = 1.10.6
+PLUGINLIB_VERSION = 1.9.16
 endif
 
 PLUGINLIB_SOURCE = $(PLUGINLIB_VERSION).tar.gz
 PLUGINLIB_SITE = https://github.com/ros/pluginlib/archive
 
-PLUGINLIB_DEPENDENCIES = boost class-loader rosconsole roslib tinyxml
+PLUGINLIB_DEPENDENCIES = boost class-loader rosconsole roslib
 
 ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
-PLUGINLIB_DEPENDENCIES += tinyxml
+PLUGINLIB_DEPENDENCIES += tinyxml gtest
 endif
 
 ifeq ($(BR2_PACKAGE_ROS_KINETIC),y)
