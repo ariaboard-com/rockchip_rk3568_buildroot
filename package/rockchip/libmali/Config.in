@@ -18,6 +18,11 @@ config BR2_PACKAGE_LIBMALI_WITHOUT_CL
 	bool "Libmali configuration without cl"
 	help
 	  Show packages in menuconfig that cl is not used by libmali.
+
+config BR2_PACKAGE_LIBMALI_ONLY_CL
+	bool "Libmali configuration only cl(disable display fetaure)"
+	help
+	  Show packages in menuconfig that cl is not used by libmali.
 endif
 
 
