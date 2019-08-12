@@ -14,7 +14,7 @@ ifeq ($(BR2_PACKAGE_ADBD),y)
 endif
 
 define RV1108_UVC_APP_INSTALL_INIT_SYSV
-    $(INSTALL) -m 0755 -D package/rockchip/rv1108_package/apps/rv1108_uvc_app/S99_rv1108_uvc_app $(TARGET_DIR)/etc/init.d/S99_rv1108_uvc_app
+    $(INSTALL) -m 0755 -D package/rockchip/rv1108_package/app/rv1108_uvc_app/S99_rv1108_uvc_app $(TARGET_DIR)/etc/init.d/S99_rv1108_uvc_app
 endef
 
 $(eval $(cmake-package))
