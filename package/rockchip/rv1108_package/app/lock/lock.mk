@@ -3,7 +3,7 @@ LOCK_SITE_METHOD = local
 LOCK_INSTALL_STAGING = YES
 
 # add dependencies
-LOCK_DEPENDENCIES = camerahal rkfb rkrga
+LOCK_DEPENDENCIES = camerahal rkfb rkrga face_service
 
 COMPILE_PROJECT_TYPE=$(call qstrip,$(BR2_PACKAGE_LOCK_PROJECT_TYPE))
 
