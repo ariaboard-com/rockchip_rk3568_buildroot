@@ -29,6 +29,12 @@ CAMERA_ENGINE_RKISP_CONF_OPTS = \
 		IS_RKISP_v12=true
 endif
 
+ifneq ($(call qstrip,$(BR2_PACKAGE_CAMERA_ENGINE_RKISP_IQFILE)),)
+CAMERA_ENGINE_RKISP_IQFILE = $(call qstrip,$(BR2_PACKAGE_CAMERA_ENGINE_RKISP_IQFILE))
+else
+CAMERA_ENGINE_RKISP_IQFILE = *.xml
+endif
+
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
 CAMERA_ENGINE_RKISP_LIB = lib32
 CAMERA_ENGINE_RKISP_GLIB_H = glib-2.0-32
@@ -80,7 +86,7 @@ define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(TOPDIR)/package/rockchip/camera_engine_rkisp/S40rkisp_3A $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -D -m 755 $(@D)/build/bin/rkisp_demo $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 $(@D)/build/bin/rkisp_3A_server $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -D -m 644 $(@D)/iqfiles/*.xml $(TARGET_DIR)/etc/iqfiles/
+	$(INSTALL) -D -m 644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKISP_IQFILE) $(TARGET_DIR)/etc/iqfiles/
 	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 644 $(@D)/plugins/3a/rkiq/af/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_af.so $(RKafDir)/
 	$(INSTALL) -D -m 644 $(@D)/plugins/3a/rkiq/aec/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_aec.so $(RKaeDir)/
