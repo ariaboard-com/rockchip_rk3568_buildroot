@@ -7,6 +7,8 @@
 RKWIFIBT_VERSION = 1.0.0
 RKWIFIBT_SITE_METHOD = local
 RKWIFIBT_SITE = $(TOPDIR)/../external/rkwifibt
+RKWIFIBT_LICENSE = Apache V2.0
+RKWIFIBT_LICENSE_FILES = NOTICE
 
 RKWIFIBT_MODULES_PATH = $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan
 BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
