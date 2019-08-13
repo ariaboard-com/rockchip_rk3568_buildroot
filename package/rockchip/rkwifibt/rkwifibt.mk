@@ -14,42 +14,49 @@ BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6181),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6181
+WIFI_KO = bcmdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6255),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6255
 BT_FIRMWARE = BCM4345C0.hcd
+WIFI_KO = bcmdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6212A1),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6212A1
 BT_FIRMWARE = bcm43438a1.hcd
+WIFI_KO = bcmdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6354),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6354
 BT_FIRMWARE = bcm4354a1.hcd
+WIFI_KO = bcmdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AP6236),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AP6236
 BT_FIRMWARE = BCM4343B0.hcd
+WIFI_KO = bcmdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AWCM256),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AW-CM256
 BT_FIRMWARE = BCM4345C0.hcd
+WIFI_KO = cywdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_AWNB197),y)
 CHIP_VENDOR = BROADCOM
 CHIP_NAME = AW-NB197
 BT_FIRMWARE = BCM4343A1.hcd
+WIFI_KO = cywdhd.ko
 endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_RK912),y)
@@ -61,7 +68,6 @@ ifeq ($(BR2_PACKAGE_RKWIFIBT_RTL8723CS),y)
 CHIP_VENDOR = REALTEK
 CHIP_NAME = RTL8723DS
 #BT firmare is same to RKL8723DS
-WIFI_MODULE = ENABLE
 WIFI_KO = 8723cs.ko
 RTK_BT = ENABLE
 BT_FIRMWARE = y
@@ -97,6 +103,21 @@ ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 RKWIFIBT_BIN_DIR = $(@D)/bin/arm64
 TARGET_ARCH = arm64
 endif
+
+define RKWIFIBT_BUILD_MODULE
+    mkdir -p $(TARGET_DIR)/system/lib/modules/
+    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH) modules -j18
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(WIFI_KO) | \
+    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
+endef
+
+define RKWIFIBT_INSTALL_MODULE
+    $(SED) "/load wifi modules/a\\  \   insmod \/system\/lib\/modules\/$(WIFI_KO)" \
+        $(TARGET_DIR)/etc/init.d/S66load_wifi_modules
+endef
+
+RKWIFIBT_POST_BUILD_HOOKS += RKWIFIBT_BUILD_MODULE
+RKWIFIBT_POST_INSTALL_TARGET_HOOKS+=RKWIFIBT_INSTALL_MODULE
 
 ifeq ($(CHIP_VENDOR), REALTEK)
 ifeq ($(RTK_BT), ENABLE)
@@ -157,24 +178,6 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 endef
 endif #RTL8189FS
 
-ifeq ($(WIFI_MODULE), ENABLE)
-
-define RKWIFIBT_BUILD_MODULE
-    mkdir -p $(TARGET_DIR)/system/lib/modules/
-    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
-    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
-    xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
-endef
-
-define RKWIFIBT_INSTALL_MODULE
-	$(SED) "/load wifi modules/a\\	\	insmod \/system\/lib\/modules\/$(WIFI_KO)" \
-		$(TARGET_DIR)/etc/init.d/S66load_wifi_modules
-endef
-
-RKWIFIBT_POST_BUILD_HOOKS += RKWIFIBT_BUILD_MODULE
-RKWIFIBT_POST_INSTALL_TARGET_HOOKS+=RKWIFIBT_INSTALL_MODULE
-endif
-
 endif # CHIP_VENDOR
 
 ifeq ($(CHIP_VENDOR), BROADCOM)
@@ -211,7 +214,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     mkdir -p $(TARGET_DIR)/system/lib/modules/
     make -C $(TOPDIR)/../kernel ARCH=$(RK_ARCH)  modules -j18
-    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* $(WIFI_KO) | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
 
@@ -231,7 +234,7 @@ ifeq ($(CHIP_NAME), RK912)
 define RKWIFIBT_BUILD_CMDS
     mkdir -p $(TARGET_DIR)/system/lib/modules/
     make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
-    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/*  -name "*.ko" | \
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* $(WIFI_KO) | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
 
