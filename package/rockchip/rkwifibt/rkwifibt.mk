@@ -109,7 +109,7 @@ endif
 
 define RKWIFIBT_BUILD_MODULE
     mkdir -p $(TARGET_DIR)/system/lib/modules/
-    make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH) modules -j18
+    $(TOPDIR)/../build.sh modules
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(WIFI_KO) | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
