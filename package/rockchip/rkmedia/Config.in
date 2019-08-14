@@ -46,6 +46,12 @@ config BR2_PACKAGE_RKMEDIA_OGGVORBIS_MUXER
 
 endif # BR2_PACKAGE_RKMEDIA_OGG
 
+config BR2_PACKAGE_RKMEDIA_FFMPEG
+    bool "ffmpeg"
+    depends on BR2_PACKAGE_FFMPEG
+    help
+      wrapped function of ffmpeg
+
 if BR2_PACKAGE_ALSA_LIB
 
 config BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK
