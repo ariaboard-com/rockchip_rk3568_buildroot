@@ -95,6 +95,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_COMPATIBLE),y)
 CHIP_VENDOR = ROCKCHIP
+WIFI_KO = *.ko
 endif
 
 ifeq ($(call qstrip,$(BR2_ARCH)),arm)
@@ -216,7 +217,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     mkdir -p $(TARGET_DIR)/system/lib/modules/
     make -C $(TOPDIR)/../kernel ARCH=$(RK_ARCH)  modules -j18
-    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* $(WIFI_KO) | \
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(WIFI_KO) | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
 
@@ -236,7 +237,7 @@ ifeq ($(CHIP_NAME), RK912)
 define RKWIFIBT_BUILD_CMDS
     mkdir -p $(TARGET_DIR)/system/lib/modules/
     make -C $(TOPDIR)/../kernel ARCH=$(TARGET_ARCH)  modules -j18
-    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* $(WIFI_KO) | \
+    find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(WIFI_KO) | \
     xargs -n1 -i cp {} $(TARGET_DIR)/system/lib/modules/
 endef
 
