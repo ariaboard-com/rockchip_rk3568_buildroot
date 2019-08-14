@@ -16,6 +16,11 @@ config BR2_PACKAGE_RECOVERY
 
 if BR2_PACKAGE_RECOVERY
 
+config BR2_PACKAGE_RECOVERY_NO_UI
+	bool "No UI for recovery"
+	help
+	  No UI for recovery
+
 config BR2_PACKAGE_RECOVERY_BOOTCONTROL
     bool "Linux AB bool control"
 

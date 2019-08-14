@@ -20,7 +20,7 @@ RECOVERY_BUILD_OPTS+=-I$(PROJECT_DIR) -I$(STAGING_DIR)/usr/include/libdrm \
 	-lssl \
 	-lcrypto
 
-ifeq ($(BR2_PACKAGE_RK3308),y)
+ifeq ($(BR2_PACKAGE_RECOVERY_NO_UI),y)
 	TARGET_MAKE_ENV += RecoveryNoUi=true
 else
 	RECOVERY_BUILD_OPTS += -lz -lpng -ldrm
