@@ -70,6 +70,14 @@ RV1108_MINIGUI_CONF_OPTS += \
 RV1108_MINIGUI_DEPENDENCIES += freetype
 endif
 
+ifeq ($(BR2_PACKAGE_RV1108_MINIGUI_STATIC),y)
+RV1108_MINIGUI_CONF_OPTS += \
+    --disable-shared
+else
+RV1108_MINIGUI_CONF_OPTS += \
+    --disable-static
+endif
+
 INCLUDE_PATH=$(STAGING_DIR)/usr/include/
 define RV1108_MINIGUI_CONFIGURE_CMDS
     cd $(@D); $(TARGET_MAKE_ENV) ./configure $(RV1108_MINIGUI_CONF_OPTS) CFLAGS="$(CFLAGS) -I $(INCLUDE_PATH)"
@@ -84,7 +92,11 @@ define RV1108_MINIGUI_INSTALL_STAGING_CMDS
 endef
 
 define RV1108_MINIGUI_INSTALL_TARGET_CMDS
-    $(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install
+    $(TARGET_MAKE_ENV) $(MAKE) DESTDIR=$(TARGET_DIR) -C $(@D) install && \
+    rm -fr $(TARGET_DIR)/usr/local/include/ && \
+    rm -fr $(TARGET_DIR)/usr/local/share/minigui/cmake && \
+    rm $(TARGET_DIR)/usr/local/lib/*.a
+    rm -fr $(TARGET_DIR)/usr/local/lib/pkgconfig
 endef
 
 
