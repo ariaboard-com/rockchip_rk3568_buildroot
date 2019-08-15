@@ -17,13 +17,13 @@ echo "======================================================="
 echo "======================================================="
 echo "Remove unneeded files"
 echo "======================================================="
-rm $TARGET_DIR/etc/init.d/S01logging
-rm $TARGET_DIR/etc/init.d/S20urandom
-rm $TARGET_DIR/etc/init.d/S40network
-rm $TARGET_DIR/usr/bin/sqlite3
+rm $TARGET_DIR/etc/init.d/S01logging > /dev/null 2>&1
+rm $TARGET_DIR/etc/init.d/S20urandom > /dev/null 2>&1
+rm $TARGET_DIR/etc/init.d/S40network > /dev/null 2>&1
+rm $TARGET_DIR/usr/bin/sqlite3 > /dev/null 2>&1
 TEMP_DELETE_TARGET="ts_calibrate ts_finddev ts_harvest ts_print \
 		    ts_print_mt ts_print_raw ts_test ts_test_mt ts_uinput ts_verify"
-cd $TARGET_DIR/usr/bin/ && rm $TEMP_DELETE_TARGET && cd -
+cd $TARGET_DIR/usr/bin/ && rm $TEMP_DELETE_TARGET > /dev/null 2>&1 && cd -
 
 # copy target form device/rockchicp/rv1108/overlay-board
 echo "======================================================="
