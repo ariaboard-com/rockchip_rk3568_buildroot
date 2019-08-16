@@ -76,9 +76,6 @@ userdata:
 	$(MKDATAIMAGE)
 
 fw:
-	make loader
-	make kernel
-	make userdata
 	if [ ! -L $(RV_SDK_DIR)/output ]; then ln -s $(TOPDIR)/output $(RV_SDK_DIR)/output; fi
 	if [ -f $(RV_IMAGE_DIR)/dtb ]; then rm $(RV_IMAGE_DIR)/dtb; fi
 	cp $(RV_KERNEL_DIR)/arch/arm/boot/dts/$(RK_KERNEL_DTS).dtb $(RV_IMAGE_DIR)/dtb
@@ -89,6 +86,10 @@ fw:
 
 fww:
 	cd $(TOPDIR)/../tools/Linux_Upgrade_Tool_* && ./linux_upgrade.sh
+
+clean: loader-clean kernel-clean
+
+all: loader kernel userdata fw
 
 define RV1108_FIRMWARE_CONFIGURE_CMDS
 endef
