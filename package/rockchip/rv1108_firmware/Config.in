@@ -1,8 +1,0 @@
-if BR2_PACKAGE_RV1108
-
-menu "RV1108 Firmware"
-
-endmenu
-
-endif
-

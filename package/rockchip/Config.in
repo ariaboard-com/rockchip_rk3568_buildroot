@@ -1,15 +1,15 @@
 menuconfig BR2_PACKAGE_ROCKCHIP
-	bool "rockchip BSP packages"
+	bool "Rockchip BSP packages"
 	select BR2_PACKAGE_HOST_E2FSPROGS
 	select BR2_PACKAGE_HOST_NTFS_3G
 
 if BR2_PACKAGE_ROCKCHIP
 choice
 	default BR2_PACKAGE_RV1108
-	prompt "rockchip chip support"
+	prompt "Rockchip chip support"
 
 config BR2_PACKAGE_RV1108
-	bool "rv1108 chip"
+	bool "RV1108 chip"
 	help
 		Use rockchip's rv1108 chip
 
@@ -104,7 +104,6 @@ endchoice
 
 # BSP packages
 source "package/rockchip/rv1108_package/Config.in"
-source "package/rockchip/rv1108_firmware/Config.in"
 
 # Shared packages with all chips
 source "package/rockchip/ros/Config.in"
