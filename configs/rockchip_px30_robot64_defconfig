@@ -2,6 +2,7 @@
 #include "audio.config"
 #include "base.config"
 #include "wifi.config"
+BR2_CCACHE=y
 BR2_PACKAGE_PARTINIT=y
 BR2_PACKAGE_RKSCRIPT=y
 # partition init depends on udev
