@@ -5,13 +5,19 @@
 
 case "$1" in
   start)
+    i=0
     for MEDIA_DEV in $(ls -1 /dev/media*); do
-      start-stop-daemon -S -b --exec /usr/bin/rkisp_3A_server -- \
-        --mmedia=$MEDIA_DEV
+      start-stop-daemon -S -b -m -p /tmp/.rkisp_3A_$i --exec \
+        /usr/bin/rkisp_3A_server -- --mmedia=$MEDIA_DEV
+      let i++
     done
     ;;
   stop)
-    start-stop-daemon -K -n rkisp_3A_server
+    i=0
+    for MEDIA_DEV in $(ls -1 /dev/media*); do
+      start-stop-daemon -K -p /tmp/.rkisp_3A_$i
+      let i++
+    done
     ;;
   *)
     echo "Usage: $0 {start|stop}"
