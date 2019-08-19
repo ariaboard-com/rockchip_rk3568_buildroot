@@ -1,6 +1,6 @@
 ifeq ($(BR2_PACKAGE_RV1108),y)
+
 include package/rockchip/rv1108_package/.BoardConfig.mk
-endif
 include $(sort $(wildcard package/rockchip/rv1108_package/*/*.mk))
 
 RV_SDK_DIR=$(TOPDIR)/..
@@ -93,3 +93,4 @@ clean: loader-clean kernel-clean
 
 all: loader kernel userdata fw
 
+endif
