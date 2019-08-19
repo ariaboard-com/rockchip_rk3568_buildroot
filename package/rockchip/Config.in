@@ -13,6 +13,12 @@ config BR2_PACKAGE_RV1108
 	help
 		Use rockchip's rv1108 chip
 
+config BR2_PACKAGE_PUMA
+	bool "PUMA chip"
+	help
+		Use rockchip's puma chip, which the final name is uncertain.
+		Rename this in the future.
+
 config BR2_PACKAGE_RK312X
 	bool "rk312X chip"
 	help
