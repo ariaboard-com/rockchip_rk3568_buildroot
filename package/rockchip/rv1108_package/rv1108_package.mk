@@ -11,8 +11,11 @@ RV_TARGET_USB_BOOT_DIR=$(TOPDIR)/../tools/Windows_Upgrade_Tool/AndroidTool_Relea
 RV_KERNEL_DIR=$(TOPDIR)/../kernel
 RV_USERDATA_DIR=$(RV_OUTPUT_DIR)/userdata
 RV_BUILD_DIR=$(TOPDIR)/../build
-RV_BOARD_OVAERLAY_DIR=$(TOPDIR)/../device/rockchip/$(RK_TARGET_PRODUCT)
-RV_BOARD_USERDATA_DIR=$(RV_BOARD_OVAERLAY_DIR)/userdata
+RV_DEVICE_PRODUCT_DIR=$(TOPDIR)/../device/rockchip/$(RK_TARGET_PRODUCT)
+RV_COMMON_USERDATA_DIR=$(RV_DEVICE_PRODUCT_DIR)/userdata
+RV_DEVICE_PRODUCT_BOARD_DIR=$(RV_DEVICE_PRODUCT_DIR)/overlay-board/rv1108-$(RK_TARGET_BOARD_VERSION)
+RV_BOARD_USERDATA_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/userdata
+
 RV_USERDATA_JFFS2_BCSIZE=0x$(shell echo "obase=16;$(RK_USERDATA_FILESYSTEM_SIZE)" | cut -d 'M' -f1 | bc)00000
 
 
@@ -62,7 +65,6 @@ kernel-clean:
 	make -C $(RV_KERNEL_DIR) clean
 
 ### build userdata
-RK_USERDATA_FILESYSTEM_TYPE=jffs2
 ifeq ($(RK_USERDATA_FILESYSTEM_TYPE),ext4)
     MKDATAIMAGE = make_ext4fs -l $(RK_USERDATA_FILESYSTEM_SIZE) $(RV_IMAGE_DIR)/userdata.img $(RV_USERDATA_DIR)/
 else ifeq ($(RK_USERDATA_FILESYSTEM_TYPE),jffs2)
@@ -74,7 +76,8 @@ endif
 userdata:
 	if [ ! -d $(RV_USERDATA_DIR) ]; then mkdir -p $(RV_USERDATA_DIR); else rm -fr $(RV_USERDATA_DIR)/*; fi
 	if [ -f $(RV_IMAGE_DIR)/userdata.img ]; then rm $(RV_IMAGE_DIR)/userdata.img; fi
-	cp -fr $(RV_BOARD_USERDATA_DIR)/* $(RV_USERDATA_DIR)
+	if [ -d $(RV_COMMON_USERDATA_DIR) ]; then cp -fr $(RV_COMMON_USERDATA_DIR)/* $(RV_USERDATA_DIR) 2>&1; fi
+	if [ -d $(RV_BOARD_USERDATA_DIR) ]; then cp -fr $(RV_BOARD_USERDATA_DIR)/* $(RV_USERDATA_DIR) 2>&1; fi
 	$(MKDATAIMAGE)
 
 fw:

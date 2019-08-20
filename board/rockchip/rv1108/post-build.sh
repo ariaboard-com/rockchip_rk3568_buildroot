@@ -35,7 +35,7 @@ else
 	cd $RV1108_DEVICES_BOARD_DIR
 	if [ -d  rv1108-$RK_TARGET_BOARD_VERSION ]; then
 		echo "copy rv1108-$RK_TARGET_BOARD_VERSION"
-		rsync -av --exclude rv1108-$RK_TARGET_BOARD_VERSION/userdata rv1108-$RK_TARGET_BOARD_VERSION/* $TARGET_DIR/
+		rsync -av --exclude userdata rv1108-$RK_TARGET_BOARD_VERSION/* $TARGET_DIR/
 	else
 		echo "rv1108-$RK_TARGET_BOARD_VERSION no exit"
 	fi
