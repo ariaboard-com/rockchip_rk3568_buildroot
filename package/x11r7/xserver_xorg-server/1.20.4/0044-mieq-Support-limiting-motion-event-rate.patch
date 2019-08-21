@@ -1,0 +1,115 @@
+From 2738beb0a016d3db162fc589d7c619282565f443 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Wed, 21 Aug 2019 16:55:58 +0800
+Subject: [PATCH] mieq: Support limiting motion event rate
+
+High motion event rate would affect the performance of window
+moving/resizing.
+
+Let's set the default rate to 60 events per second, and use env
+"X_MAX_MOTION_RATE" to change it.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ include/inputstr.h |  6 ++++++
+ mi/mieq.c          | 29 +++++++++++++++++++++++++++--
+ 2 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/include/inputstr.h b/include/inputstr.h
+index bf35dbf4b..9b01aa67f 100644
+--- a/include/inputstr.h
++++ b/include/inputstr.h
+@@ -531,6 +531,9 @@ typedef struct _SpriteInfoRec {
+ #define KEYBOARD_OR_FLOAT       5       /* Keyboard master for this device or this device if floating */
+ #define POINTER_OR_FLOAT        6       /* Pointer master for this device or this device if floating */
+ 
++#include "events.h"
++#include "eventstr.h"
++
+ typedef struct _DeviceIntRec {
+     DeviceRec public;
+     DeviceIntPtr next;
+@@ -602,6 +605,9 @@ typedef struct _DeviceIntRec {
+     int xtest_master_id;
+ 
+     struct _SyncCounter *idle_counter;
++
++    InternalEvent lastMotionEvent;
++    CARD32 lastMotionTime;
+ } DeviceIntRec;
+ 
+ typedef struct {
+diff --git a/mi/mieq.c b/mi/mieq.c
+index 555f0ec7e..43acaf688 100644
+--- a/mi/mieq.c
++++ b/mi/mieq.c
+@@ -83,6 +83,7 @@ typedef struct _EventQueue {
+     size_t nevents;             /* the number of buckets in our queue */
+     size_t dropped;             /* counter for number of consecutive dropped events */
+     mieqHandler handlers[128];  /* custom event handler */
++    int maxMotionRate;          /* Max rate of motion events */
+ } EventQueueRec, *EventQueuePtr;
+ 
+ static EventQueueRec miEventQueue;
+@@ -160,9 +161,17 @@ mieqGrowQueue(EventQueuePtr eventQueue, size_t new_nevents)
+ Bool
+ mieqInit(void)
+ {
++    char *env;
++
+     memset(&miEventQueue, 0, sizeof(miEventQueue));
+     miEventQueue.lastEventTime = GetTimeInMillis();
+ 
++    env = getenv("X_MAX_MOTION_RATE");
++    if (env)
++        miEventQueue.maxMotionRate = atoi(env);
++    else
++        miEventQueue.maxMotionRate = 60;
++
+     input_lock();
+     if (!mieqGrowQueue(&miEventQueue, QUEUE_INITIAL_SIZE))
+         FatalError("Could not allocate event queue.\n");
+@@ -506,6 +515,8 @@ mieqProcessInputEvents(void)
+     InternalEvent event;
+     DeviceIntPtr dev = NULL, master = NULL;
+     static Bool inProcessInputEvents = FALSE;
++    unsigned int oldtail = miEventQueue.tail;
++    int motionLimitMs = 1000 / miEventQueue.maxMotionRate;
+ 
+     input_lock();
+ 
+@@ -525,7 +536,7 @@ mieqProcessInputEvents(void)
+         miEventQueue.dropped = 0;
+     }
+ 
+-    while (miEventQueue.head != miEventQueue.tail) {
++    while (miEventQueue.head != oldtail) {
+         e = &miEventQueue.events[miEventQueue.head];
+ 
+         event = *e->events;
+@@ -548,7 +559,21 @@ mieqProcessInputEvents(void)
+             DPMSSet(serverClient, DPMSModeOn);
+ #endif
+ 
+-        mieqProcessDeviceEvent(dev, &event, screen);
++        /*
++         * Simple hack to limit motion event rate.
++         * This might break the order of motion event and release event, but
++         * it works well so far.
++         */
++        if (event.any.type == ET_Motion &&
++            event.any.time - dev->lastMotionTime < motionLimitMs) {
++            event.any.time = GetTimeInMillis();
++            mieqEnqueue(dev, &event);
++        } else {
++            mieqProcessDeviceEvent(dev, &event, screen);
++
++            if (event.any.type == ET_Motion)
++                dev->lastMotionTime = event.any.time;
++        }
+ 
+         /* Update the sprite now. Next event may be from different device. */
+         if (master &&
+-- 
+2.11.0
+
