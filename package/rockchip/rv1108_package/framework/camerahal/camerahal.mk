@@ -73,13 +73,13 @@ fi;
 endef
 
 define CAMERAHAL_PRE_CONFIGURE_BIN_CMDS
-	$(call search_iq,$(call qstrip,$(TOPDIR)/../kernel/arch/arm/boot/dts/rv1108-$(RK_TARGET_BOARD_VERSION).dts),\
+	$(call search_iq,$(call qstrip,$(TOPDIR)/../kernel/arch/arm/boot/dts/$(RK_KERNEL_DTS).dts),\
 		$(@D)/camera_engine_cifisp/IQ/bin,bin)
 endef
 
 define CAMERAHAL_PRE_INSTALL_TARGET_XML_CMDS
 	mkdir -p $(TARGET_DIR)/etc/cam_iq/
-	$(call search_iq,$(call qstrip,$(TOPDIR)/../kernel/arch/arm/boot/dts/rv1108-$(RK_TARGET_BOARD_VERSION).dts),\
+	$(call search_iq,$(call qstrip,$(TOPDIR)/../kernel/arch/arm/boot/dts/$(RK_KERNEL_DTS).dts),\
 		$(@D)/camera_engine_cifisp/IQ,xml,$(TARGET_DIR)/etc/cam_iq/)
 endef
 
