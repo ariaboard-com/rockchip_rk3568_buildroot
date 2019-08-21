@@ -10,14 +10,13 @@ RV_LOADER_DIR=$(TOPDIR)/../loader
 RV_TARGET_USB_BOOT_DIR=$(TOPDIR)/../tools/Windows_Upgrade_Tool/AndroidTool_Release_v2.65/Image/
 RV_KERNEL_DIR=$(TOPDIR)/../kernel
 RV_USERDATA_DIR=$(RV_OUTPUT_DIR)/userdata
+RV_ROOT_DIR=$(RV_OUTPUT_DIR)/root
 RV_BUILD_DIR=$(TOPDIR)/../build
 RV_DEVICE_PRODUCT_DIR=$(TOPDIR)/../device/rockchip/$(RK_TARGET_PRODUCT)
 RV_COMMON_USERDATA_DIR=$(RV_DEVICE_PRODUCT_DIR)/userdata
 RV_DEVICE_PRODUCT_BOARD_DIR=$(RV_DEVICE_PRODUCT_DIR)/overlay-board/rv1108-$(RK_TARGET_BOARD_VERSION)
 RV_BOARD_USERDATA_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/userdata
-
-RV_USERDATA_JFFS2_BCSIZE=0x$(shell echo "obase=16;$(RK_USERDATA_FILESYSTEM_SIZE)" | cut -d 'M' -f1 | bc)00000
-
+RV_BOARD_ROOT_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/root
 
 ### build loader
 ifeq ($(RK_STORAGE_TYPE),emmc)
@@ -64,21 +63,42 @@ kernel:
 kernel-clean:
 	make -C $(RV_KERNEL_DIR) clean
 
-### build userdata
-ifeq ($(RK_USERDATA_FILESYSTEM_TYPE),ext4)
-    MKDATAIMAGE = make_ext4fs -l $(RK_USERDATA_FILESYSTEM_SIZE) $(RV_IMAGE_DIR)/userdata.img $(RV_USERDATA_DIR)/
-else ifeq ($(RK_USERDATA_FILESYSTEM_TYPE),jffs2)
-    MKDATAIMAGE = mkfs.jffs2 -d $(RV_OUTPUT_DIR)/userdata/ -o $(RV_IMAGE_DIR)/userdata.img -e 0x10000 --pad=$(RV_USERDATA_JFFS2_BCSIZE) -n
-else
-    MKDATAIMAGE = make_ext4fs -l $(RK_USERDATA_FILESYSTEM_SIZE) $(RV_IMAGE_DIR)/userdata.img $(RV_USERDATA_DIR)/
-endif
+define mk_parttion_image
+fstype=`echo $(1)`; \
+echo fstype=$$fstype; \
+fssize=`echo $(2)`; \
+echo fssize=$$fssize; \
+outputfile=`echo $(3)`; \
+echo outputfile=$$outputfile; \
+inputfile=`echo $(4)`; \
+echo inputfile=$$inputfile; \
+if [ $$fstype == "ext4" ]; then \
+	make_ext4fs -l $$fssize $$outputfile $$inputfile; \
+elif [ $$fstype == "jffs2" ]; then \
+	fssize=`echo "obase=16;$$fssize" | cut -d 'M' -f1 | bc`; \
+	jffs2_fssize=0x$${fssize}00000;\
+	echo jffs2_fssize=$$jffs2_fssize; \
+	mkfs.jffs2 -d $$inputfile -o $$outputfile -e 0x10000 --pad=$$jffs2_fssize -n; \
+else \
+	make_ext4fs -l $$fssize $$outputfile $$inputfile; \
+fi;
+endef
 
+### build userdata
 userdata:
 	if [ ! -d $(RV_USERDATA_DIR) ]; then mkdir -p $(RV_USERDATA_DIR); else rm -fr $(RV_USERDATA_DIR)/*; fi
 	if [ -f $(RV_IMAGE_DIR)/userdata.img ]; then rm $(RV_IMAGE_DIR)/userdata.img; fi
 	if [ -d $(RV_COMMON_USERDATA_DIR) ]; then cp -fr $(RV_COMMON_USERDATA_DIR)/* $(RV_USERDATA_DIR) 2>&1; fi
 	if [ -d $(RV_BOARD_USERDATA_DIR) ]; then cp -fr $(RV_BOARD_USERDATA_DIR)/* $(RV_USERDATA_DIR) 2>&1; fi
-	$(MKDATAIMAGE)
+	$(call mk_parttion_image,$(RK_USERDATA_FILESYSTEM_TYPE),$(RK_USERDATA_FILESYSTEM_SIZE),\
+		$(RV_IMAGE_DIR)/userdata.img, $(RV_USERDATA_DIR))
+
+### build root , is not rootfs
+root:
+	if [ -f $(RV_IMAGE_DIR)/root.img ]; then rm $(RV_IMAGE_DIR)/root.img; fi
+	if [ -d $(RV_BOARD_ROOT_DIR) ]; then cp -fr $(RV_BOARD_ROOT_DIR)/ $(RV_ROOT_DIR) 2>&1; fi
+	$(call mk_parttion_image,$(RK_ROOT_FILESYSTEM_TYPE),$(RK_ROOT_FILESYSTEM_SIZE),\
+                $(RV_IMAGE_DIR)/root.img, $(RV_ROOT_DIR))
 
 fw:
 	if [ ! -L $(RV_SDK_DIR)/output ]; then ln -s $(TOPDIR)/output $(RV_SDK_DIR)/output; fi
