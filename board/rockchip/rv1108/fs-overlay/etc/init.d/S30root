@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Start mount /root....
+#
+
+case "$1" in
+  start)
+	[ ! -d /root ] && mkdir /root
+        [ -r /dev/mmcblk0p8 ] && /bin/busybox mount -t ext4 /dev/mmcblk0p8 /root
+	[ -r /dev/mtdblock8 ] && /bin/busybox mount -t jffs2 /dev/mtdblock8 /root
+	str_value=`/bin/busybox df | grep root`
+	[ ! -z "$str_value" ] && echo "/root mount success" || echo "/root mount fail"
+	;;
+  stop)
+	umount /root
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
