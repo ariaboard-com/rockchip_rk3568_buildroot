@@ -100,6 +100,9 @@ root:
 	$(call mk_parttion_image,$(RK_ROOT_FILESYSTEM_TYPE),$(RK_ROOT_FILESYSTEM_SIZE),\
                 $(RV_IMAGE_DIR)/root.img, $(RV_ROOT_DIR))
 
+root-clean:
+	if [ -d $(RV_ROOT_DIR) ]; then rm -fr $(RV_ROOT_DIR); fi
+
 fw:
 	if [ ! -L $(RV_SDK_DIR)/output ]; then ln -s $(TOPDIR)/output $(RV_SDK_DIR)/output; fi
 	if [ -f $(RV_IMAGE_DIR)/dtb ]; then rm $(RV_IMAGE_DIR)/dtb; fi
@@ -112,8 +115,11 @@ fw:
 fww:
 	cd $(TOPDIR)/../tools/Linux_Upgrade_Tool_* && ./linux_upgrade.sh
 
-clean: loader-clean kernel-clean
+all: loader kernel userdata root fw
 
-all: loader kernel userdata fw
+
+clean: loader-clean kernel-clean root-clean
+
+reinstall: root-clean
 
 endif

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CMD=`realpath $0`
+CMD_DIR=`dirname $CMD`
 BUILDROOT_DIR=`pwd`
 SDK_DIR=`dirname $BUILDROOT_DIR`
 RV1108_DEVICES_BOARD_DIR=$SDK_DIR/device/rockchip/$RK_TARGET_PRODUCT/overlay-board
@@ -41,3 +42,6 @@ else
 	fi
 	cd -
 fi
+
+#pack root parttion target
+$CMD_DIR/pack-root.sh
