@@ -1,7 +1,7 @@
-From 965f31bc6981ade663a7e9d864be02717049ad28 Mon Sep 17 00:00:00 2001
+From c2bee5722bcf31effcd7e49c2baf55ae653b8433 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 29 Jul 2019 14:26:11 +0800
-Subject: [PATCH 1/2] modesetting: Support exa with rockchip rga 2d accel
+Subject: [PATCH 42/46] modesetting: Support exa with rockchip rga 2d accel
 
 Implementing neccessarily exa APIs for basic window moving and
 screen transforms.
@@ -11,14 +11,14 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  configure.ac                                     |  14 +
  hw/xfree86/drivers/modesetting/Makefile.am       |   4 +-
  hw/xfree86/drivers/modesetting/driver.c          |  48 ++
- hw/xfree86/drivers/modesetting/driver.h          |   6 +
+ hw/xfree86/drivers/modesetting/driver.h          |   7 +
  hw/xfree86/drivers/modesetting/drmmode_display.c |   5 +-
  hw/xfree86/drivers/modesetting/drmmode_display.h |   3 +
  hw/xfree86/drivers/modesetting/dumb_bo.c         |  18 +
  hw/xfree86/drivers/modesetting/dumb_bo.h         |   1 +
- hw/xfree86/drivers/modesetting/exa.c             | 810 +++++++++++++++++++++++
+ hw/xfree86/drivers/modesetting/exa.c             | 814 +++++++++++++++++++++++
  include/dix-config.h.in                          |   3 +
- 10 files changed, 910 insertions(+), 2 deletions(-)
+ 10 files changed, 915 insertions(+), 2 deletions(-)
  create mode 100644 hw/xfree86/drivers/modesetting/exa.c
 
 diff --git a/configure.ac b/configure.ac
@@ -174,21 +174,22 @@ index efa10fa6a..24ed742e9 100644
      pScreen->BlockHandler = ms->BlockHandler;
  
 diff --git a/hw/xfree86/drivers/modesetting/driver.h b/hw/xfree86/drivers/modesetting/driver.h
-index ac315700f..c84be720f 100644
+index ac315700f..5e6768b8b 100644
 --- a/hw/xfree86/drivers/modesetting/driver.h
 +++ b/hw/xfree86/drivers/modesetting/driver.h
-@@ -190,3 +190,9 @@ Bool ms_do_pageflip(ScreenPtr screen,
+@@ -190,3 +190,10 @@ Bool ms_do_pageflip(ScreenPtr screen,
  #endif
  
  int ms_flush_drm_events(ScreenPtr screen);
 +
 +Bool ms_setup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
 +void ms_cleanup_exa(ScrnInfoPtr scrn, ExaDriverPtr exa);
-+Bool ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap, struct dumb_bo *bo);
++Bool ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap,
++                      struct dumb_bo *bo, Bool owned);
 +Bool ms_prepare_access(PixmapPtr pPix, int index);
 +void ms_finish_access(PixmapPtr pPix, int index);
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
-index 74f0abc89..eb67955d7 100644
+index 54c46f3ee..b22cefdb6 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.c
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
 @@ -3109,9 +3109,12 @@ drmmode_clones_init(ScrnInfoPtr scrn, drmmode_ptr drmmode, drmModeResPtr mode_re
@@ -199,14 +200,14 @@ index 74f0abc89..eb67955d7 100644
      ScrnInfoPtr scrn = drmmode->scrn;
  
 +    if (drmmode->exa)
-+        return ms_set_pixmap_bo(scrn, pixmap, bo->dumb);
++        return ms_set_pixmap_bo(scrn, pixmap, bo->dumb, FALSE);
 +
 +#ifdef GLAMOR_HAS_GBM
      if (!drmmode->glamor)
          return TRUE;
  
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.h b/hw/xfree86/drivers/modesetting/drmmode_display.h
-index 3060d8685..f1675cc42 100644
+index 7f8a43a4e..a157d2f4c 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.h
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.h
 @@ -32,6 +32,7 @@
@@ -269,10 +270,10 @@ index 9235e61e2..50f334b2e 100644
  
 diff --git a/hw/xfree86/drivers/modesetting/exa.c b/hw/xfree86/drivers/modesetting/exa.c
 new file mode 100644
-index 000000000..daba88471
+index 000000000..e0c2fc82e
 --- /dev/null
 +++ b/hw/xfree86/drivers/modesetting/exa.c
-@@ -0,0 +1,810 @@
+@@ -0,0 +1,814 @@
 +/*
 + *  Copyright (c) 2019, Fuzhou Rockchip Electronics Co., Ltd
 + *
@@ -312,7 +313,7 @@ index 000000000..daba88471
 +    struct dumb_bo *bo;
 +    int fd;
 +    int pitch;
-+    Bool imported;
++    Bool owned;
 +};
 +
 +struct ms_exa_prepare_args {
@@ -363,6 +364,7 @@ index 000000000..daba88471
 +                 int x, int y, int w, int h)
 +{
 +    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
++    RgaSURF_FORMAT format;
 +    int pitch;
 +
 +    memset(info, 0, sizeof(rga_info_t));
@@ -370,12 +372,12 @@ index 000000000..daba88471
 +    info->fd = -1;
 +    info->mmuFlag = 1;
 +
-+    if (!priv) {
-+        info->virAddr = pPixmap->devPrivate.ptr;
-+        pitch = pPixmap->devKind;
-+    } else {
++    if (priv && priv->fd) {
 +        info->fd = priv->fd;
 +        pitch = priv->pitch;
++    } else {
++        info->virAddr = pPixmap->devPrivate.ptr;
++        pitch = pPixmap->devKind;
 +    }
 +
 +    rga_set_rect(&info->rect, x, y, w, h,
@@ -390,7 +392,7 @@ index 000000000..daba88471
 +    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
 +    RgaSURF_FORMAT format;
 +
-+    /* Skip small pixmaps */
++    /* rga requires image width/height larger than 2 */
 +    if (pPixmap->drawable.width <= 2 &&
 +        pPixmap->drawable.height <= 2)
 +        return FALSE;
@@ -399,17 +401,10 @@ index 000000000..daba88471
 +    if (format == RK_FORMAT_UNKNOWN)
 +        return FALSE;
 +
-+    if (!priv) {
-+        if (!pPixmap->devKind || !pPixmap->devPrivate.ptr)
-+            return FALSE;
-+
-+        return TRUE;
-+    }
-+
-+    if (priv->fd > 0)
++    if (pPixmap->devKind && pPixmap->devPrivate.ptr)
 +        return TRUE;
 +
-+    return FALSE;
++    return priv && priv->fd;
 +}
 +
 +#endif
@@ -503,9 +498,11 @@ index 000000000..daba88471
 +    int width = x2 - x1;
 +    int height = y2 - y1;
 +
++    /* rga requires image width/height larger than 2 */
 +    if (width <= 2 || height <= 2)
 +        goto bail;
 +
++    /* skip small images */
 +    if (width * height <= 4096)
 +        goto bail;
 +
@@ -539,9 +536,6 @@ index 000000000..daba88471
 +        return FALSE;
 +
 +    if (!rga_check_pixmap(pDstPixmap))
-+        return FALSE;
-+
-+    if (pSrcPixmap->drawable.bitsPerPixel != pDstPixmap->drawable.bitsPerPixel)
 +        return FALSE;
 +
 +    /* TODO: Support rop */
@@ -603,9 +597,11 @@ index 000000000..daba88471
 +    rga_info_t tmp_info = {0};
 +    struct dumb_bo *tmp_bo = NULL;
 +
++    /* rga requires image width/height larger than 2 */
 +    if (width <= 2 || height <= 2)
 +        goto bail;
 +
++    /* skip small images */
 +    if (width * height <= 4096)
 +        goto bail;
 +
@@ -791,9 +787,11 @@ index 000000000..daba88471
 +    Bool reflect_x = exa_prepare_args.composite.reflect_x;
 +    int rotate = exa_prepare_args.composite.rotate;
 +
++    /* rga requires image width/height larger than 2 */
 +    if (width <= 2 || height <= 2)
 +        goto bail;
 +
++    /* skip small images */
 +    if (width * height <= 4096)
 +        goto bail;
 +
@@ -863,9 +861,11 @@ index 000000000..daba88471
 +    rga_info_t dst_info = {0};
 +    int bpp = pDst->drawable.bitsPerPixel;
 +
++    /* rga requires image width/height larger than 2 */
 +    if (w <= 2 || h <= 2)
 +        return FALSE;
 +
++    /* skip small images */
 +    if (w * h <= 4096)
 +        return FALSE;
 +
@@ -897,9 +897,11 @@ index 000000000..daba88471
 +    rga_info_t dst_info = {0};
 +    int bpp = pSrc->drawable.bitsPerPixel;
 +
++    /* rga requires image width/height larger than 2 */
 +    if (w <= 2 || h <= 2)
 +        return FALSE;
 +
++    /* skip small images */
 +    if (w * h <= 4096)
 +        return FALSE;
 +
@@ -943,7 +945,7 @@ index 000000000..daba88471
 +    if (priv->fd > 0)
 +        close(priv->fd);
 +
-+    if (!priv->imported && priv->bo)
++    if (priv->owned && priv->bo)
 +        dumb_bo_destroy(ms->drmmode.fd, priv->bo);
 +
 +    free(priv);
@@ -968,6 +970,8 @@ index 000000000..daba88471
 +    priv->bo = dumb_bo_create(ms->drmmode.fd, width, height, bitsPerPixel);
 +    if (!priv->bo)
 +        goto fail;
++
++    priv->owned = TRUE;
 +
 +    priv->fd = dumb_bo_get_fd(ms->drmmode.fd, priv->bo, 0);
 +    priv->pitch = priv->bo->pitch;
@@ -1056,7 +1060,8 @@ index 000000000..daba88471
 +}
 +
 +Bool
-+ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap, struct dumb_bo *bo)
++ms_set_pixmap_bo(ScrnInfoPtr scrn, PixmapPtr pPixmap,
++                 struct dumb_bo *bo, Bool owned)
 +{
 +    struct ms_exa_pixmap_priv *priv = exaGetPixmapDriverPrivate(pPixmap);
 +    modesettingPtr ms = modesettingPTR(scrn);
@@ -1067,7 +1072,7 @@ index 000000000..daba88471
 +    if (priv->fd > 0)
 +        close(priv->fd);
 +
-+    if (!priv->imported && priv->bo)
++    if (priv->owned && priv->bo)
 +        dumb_bo_destroy(ms->drmmode.fd, priv->bo);
 +
 +    priv->bo = bo;
@@ -1076,7 +1081,7 @@ index 000000000..daba88471
 +
 +    dumb_bo_map(ms->drmmode.fd, priv->bo);
 +
-+    priv->imported = TRUE;
++    priv->owned = owned;
 +
 +    pPixmap->devPrivate.ptr = NULL;
 +    pPixmap->devKind = priv->pitch;

@@ -1,7 +1,7 @@
-From 118fb720709434c38756adb706039bd96ea0a663 Mon Sep 17 00:00:00 2001
+From 67a7a603e806155980f2233ba2263ea1eb7ca4be Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 17 Jul 2019 16:41:29 +0800
-Subject: [PATCH 38/41] HACK: glamor: xv: Support nv12 dma buffer rendering
+Subject: [PATCH 38/46] HACK: glamor: xv: Support nv12 dma buffer rendering
 
 Requires:
 1. Some hacks in xv client(set/get port attributes), e.g. gst xvimage.
@@ -74,7 +74,7 @@ index ab6e46f7b..1ecfd1cad 100644
      char                                *fs_defines;
      const char                          *vs_vars;
 diff --git a/glamor/glamor_xv.c b/glamor/glamor_xv.c
-index 1dc48a2d1..65645519c 100644
+index 1dc48a2d1..ff1bafc4a 100644
 --- a/glamor/glamor_xv.c
 +++ b/glamor/glamor_xv.c
 @@ -40,6 +40,12 @@
@@ -142,7 +142,7 @@ index 1dc48a2d1..65645519c 100644
  
  XvImageRec glamor_xv_images[] = {
      XVIMAGE_YV12,
-@@ -189,11 +219,67 @@ glamor_init_xv_shader(ScreenPtr screen, int id)
+@@ -189,11 +219,68 @@ glamor_init_xv_shader(ScreenPtr screen, int id)
  
  }
  
@@ -170,8 +170,9 @@ index 1dc48a2d1..65645519c 100644
 +{
 +    struct sockaddr_un addr;
 +
-+    if (port_priv->dma_client == dma_client)
-+        return;
++    // re-open socket to flush pending messages
++    if (port_priv->dma_client)
++        close(port_priv->dma_socket_fd);
 +
 +    port_priv->dma_client = dma_client;
 +
@@ -210,14 +211,6 @@ index 1dc48a2d1..65645519c 100644
  }
  
  static void
-@@ -209,6 +295,7 @@ glamor_xv_free_port_data(glamor_port_private *port_priv)
-     }
-     RegionUninit(&port_priv->clip);
-     RegionNull(&port_priv->clip);
-+    glamor_xv_set_dma_client(port_priv, 0);
- }
- 
- int
 @@ -227,6 +314,12 @@ glamor_xv_set_port_attribute(glamor_port_private *port_priv,
          port_priv->gamma = ClipValue(value, 100, 10000);
      else if (attribute == glamorColorspace)

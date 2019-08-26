@@ -1,7 +1,7 @@
-From 9b201726042e2579b18616e96b6b35b2b9d00cb2 Mon Sep 17 00:00:00 2001
+From 061487807247da121fe6142adeb3ee3303727929 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 24 Jul 2019 17:18:23 +0800
-Subject: [PATCH 1/3] modesetting: Support fb flipping mode
+Subject: [PATCH 41/46] modesetting: Support fb flipping mode
 
 Currently the modesetting only do page flipping for present and dri2.
 
@@ -16,10 +16,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  hw/xfree86/drivers/modesetting/driver.c          |  46 ++-
  hw/xfree86/drivers/modesetting/driver.h          |  13 +-
- hw/xfree86/drivers/modesetting/drmmode_display.c | 417 ++++++++++++++++++++++-
+ hw/xfree86/drivers/modesetting/drmmode_display.c | 424 ++++++++++++++++++++++-
  hw/xfree86/drivers/modesetting/drmmode_display.h |  29 ++
- hw/xfree86/drivers/modesetting/pageflip.c        | 123 ++++---
- 5 files changed, 581 insertions(+), 47 deletions(-)
+ hw/xfree86/drivers/modesetting/pageflip.c        | 123 +++++--
+ 5 files changed, 588 insertions(+), 47 deletions(-)
 
 diff --git a/hw/xfree86/drivers/modesetting/driver.c b/hw/xfree86/drivers/modesetting/driver.c
 index 8d29b130f..efa10fa6a 100644
@@ -152,7 +152,7 @@ index c8db4b8a4..ac315700f 100644
                      PixmapPtr new_front,
                      void *event,
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
-index 336f7686e..74f0abc89 100644
+index 336f7686e..54c46f3ee 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.c
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
 @@ -58,6 +58,11 @@ static PixmapPtr drmmode_create_pixmap_header(ScreenPtr pScreen, int width, int
@@ -284,7 +284,7 @@ index 336f7686e..74f0abc89 100644
      }
  }
  
-@@ -3910,3 +3940,380 @@ drmmode_get_default_bpp(ScrnInfoPtr pScrn, drmmode_ptr drmmode, int *depth,
+@@ -3910,3 +3940,387 @@ drmmode_get_default_bpp(ScrnInfoPtr pScrn, drmmode_ptr drmmode, int *depth,
      drmModeFreeResources(mode_res);
      return;
  }
@@ -517,7 +517,6 @@ index 336f7686e..74f0abc89 100644
 +        if (!src)
 +            goto out;
 +
-+
 +        dst = CreatePicture(None,
 +                            &dst_pixmap->drawable,
 +                            format, 0L, NULL, serverClient, &error);
@@ -610,7 +609,7 @@ index 336f7686e..74f0abc89 100644
 +    drmmode_ptr drmmode = drmmode_crtc->drmmode;
 +    ScreenPtr screen = xf86ScrnToScreen(drmmode->scrn);
 +    drmmode_fb *fb;
-+    uint64_t ust, msc;
++    struct timeval tv;
 +
 +    if (!drmmode_crtc || !crtc->enabled ||
 +        drmmode_crtc->dpms_mode != DPMSModeOn || drmmode_crtc->rotate_fb_id)
@@ -623,11 +622,17 @@ index 336f7686e..74f0abc89 100644
 +        return TRUE;
 +
 +    /* merge update requests when still flipping */
-+    ms_get_crtc_ust_msc(crtc, &ust, &msc);
-+    if (drmmode_crtc->flipping && drmmode_crtc->flipping_msc > (msc - 3)) {
-+        if (*timeout)
-+            *timeout = 3;
-+        return TRUE;
++    if (drmmode_crtc->flipping) {
++        uint64_t now_ms;
++
++        gettimeofday(&tv, NULL);
++        now_ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
++
++        if (now_ms - drmmode_crtc->flipping_time_ms < 50) {
++            if (*timeout)
++                *timeout = 3;
++            return TRUE;
++        }
 +    }
 +
 +    fb = &drmmode_crtc->flip_fb[drmmode_crtc->current_fb];
@@ -660,13 +665,15 @@ index 336f7686e..74f0abc89 100644
 +                           drmmode_flip_fb_handler, drmmode_flip_fb_abort))
 +        return FALSE;
 +
-+    ms_get_crtc_ust_msc(crtc, &ust, &drmmode_crtc->flipping_msc);
 +    drmmode_crtc->flipping = TRUE;
++
++    gettimeofday(&tv, NULL);
++    drmmode_crtc->flipping_time_ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 +
 +    return TRUE;
 +}
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.h b/hw/xfree86/drivers/modesetting/drmmode_display.h
-index cde661450..3060d8685 100644
+index cde661450..7f8a43a4e 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.h
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.h
 @@ -80,6 +80,12 @@ typedef struct {
@@ -716,7 +723,7 @@ index cde661450..3060d8685 100644
 +    unsigned fb_id;
 +    drmmode_fb flip_fb[2];
 +    unsigned current_fb;
-+    uint64_t flipping_msc; /* vblank count of the latest fb flipping */
++    uint64_t flipping_time_ms; /* time of the latest fb flipping */
 +    Bool can_flip_fb;
 +    Bool flip_fb_enabled;
 +    Bool flipping;
