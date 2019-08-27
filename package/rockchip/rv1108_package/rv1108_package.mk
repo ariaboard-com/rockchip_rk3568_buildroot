@@ -115,6 +115,9 @@ fw:
 fww:
 	cd $(TOPDIR)/../tools/Linux_Upgrade_Tool_* && ./linux_upgrade.sh
 
+sync:
+	$(TOPDIR)/../.repo/repo/repo sync
+
 all: loader kernel userdata root fw
 
 
