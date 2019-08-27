@@ -1,7 +1,7 @@
-From 40dbf4dbc38cf631a99b8d42e9508a623ab6681e Mon Sep 17 00:00:00 2001
+From 39f0dead163da94d8403901b37dca254617728ca Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 26 Aug 2019 09:51:43 +0800
-Subject: [PATCH 45/46] modetest: exa: Support xv for NV12
+Subject: [PATCH 45/47] modetest: exa: Support xv for NV12
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -63,7 +63,7 @@ index 5e6768b8b..92cb389f8 100644
 +
 +XF86VideoAdaptorPtr ms_xv_init(ScreenPtr screen, int num_texture_ports);
 diff --git a/hw/xfree86/drivers/modesetting/drmmode_display.c b/hw/xfree86/drivers/modesetting/drmmode_display.c
-index b22cefdb6..65b490505 100644
+index 9f09fdfa6..153382b38 100644
 --- a/hw/xfree86/drivers/modesetting/drmmode_display.c
 +++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
 @@ -54,9 +54,6 @@
@@ -199,7 +199,7 @@ index e0c2fc82e..76ea46109 100644
 +}
 diff --git a/hw/xfree86/drivers/modesetting/xv.c b/hw/xfree86/drivers/modesetting/xv.c
 new file mode 100644
-index 000000000..ea4760c5a
+index 000000000..bdddb1895
 --- /dev/null
 +++ b/hw/xfree86/drivers/modesetting/xv.c
 @@ -0,0 +1,256 @@
@@ -344,7 +344,7 @@ index 000000000..ea4760c5a
 +    return pixmap;
 +}
 +
-+    static int
++static int
 +ms_xv_put_image(ScrnInfoPtr pScrn,
 +                short src_x, short src_y,
 +                short drw_x, short drw_y,
