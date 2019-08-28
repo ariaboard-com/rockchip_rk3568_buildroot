@@ -73,7 +73,10 @@ function collect_necessary_target()
 		echo "Processing app: $target"
 		if [ ! -z $target ]; then
 			path=`find $TARGET_DIR/usr -name $target | sort`
-			if [ ! -z $path ]; then necessary_bin_array=(${necessary_bin_array[@]} $path); fi
+			if [ ! -z $path ]; then
+				necessary_bin_array=(${necessary_bin_array[@]} $path)
+				necessary_bins_string+=" "$path
+			fi
 		fi
 	done
 
@@ -87,7 +90,7 @@ function collect_necessary_target()
 
 	# lib
 	temp_necessary_lib_array=(
-		`($TOOLCHAINS_ARM_LINUX_READELF -d $app_targets) | \
+		`$TOOLCHAINS_ARM_LINUX_READELF -d $necessary_bins_string | \
 		grep NEEDED | cut -d '[' -f2 | cut -d ']' -f1 | cut -d '.' -f1 | sort -u`
 	)
 	temp_necessary_lib_array_len=${#temp_necessary_lib_array[@]}

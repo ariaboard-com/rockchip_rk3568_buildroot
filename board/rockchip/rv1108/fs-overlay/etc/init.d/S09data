@@ -6,10 +6,10 @@
 case "$1" in
   start)
 
-        target_part_name="root"
+        target_part_name="userdata"
         find_target_part=0
 	storage_type_emmc=1
-        mount_dir="/root"
+        mount_dir="/data"
 
         for block_path in /dev/mmcblk0p*;
         do
@@ -24,15 +24,16 @@ case "$1" in
         echo block_name=$block_name
 
 
-        if [ -e /dev/mtdblock8 -a $find_target_part -eq 0 ]; then
+        if [ -e /dev/mtdblock5 -a $find_target_part -eq 0 ]; then
                 find_target_part=1
 		storage_type_emmc=0
-                block_path=/dev/mtdblock8
+                block_path=/dev/mtdblock5
         fi
 
         echo block_name=$block_name
 
         if [ $find_target_part -eq 1 ]; then
+		if [ ! -d $mount_dir ]; then mkdir $mount_dir; fi
 		if [ $storage_type_emmc -eq 1 ]; then
 	                /bin/busybox mount -t ext4 $block_path $mount_dir
 		else
