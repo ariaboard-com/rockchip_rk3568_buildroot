@@ -12,11 +12,13 @@ define ROCKCHIP_TEST_INSTALL_TARGET_CMDS
 	cp -rf  $(@D)/rockchip_test  ${TARGET_DIR}/
 	cp -rf $(@D)/rockchip_test_${ARCH}/* ${TARGET_DIR}/rockchip_test/ || true
 	cp -rf $(@D)/npu ${TARGET_DIR}/rockchip_test/
+	$(INSTALL) -D -m 0755 $(@D)/rockchip_test/auto_reboot/S99_auto_reboot $(TARGET_DIR)/etc/init.d/
 endef
 else
 define ROCKCHIP_TEST_INSTALL_TARGET_CMDS
 	cp -rf  $(@D)/rockchip_test  ${TARGET_DIR}/
 	cp -rf $(@D)/rockchip_test_${ARCH}/* ${TARGET_DIR}/rockchip_test/ || true
+	$(INSTALL) -D -m 0755 $(@D)/rockchip_test/auto_reboot/S99_auto_reboot $(TARGET_DIR)/etc/init.d/
 endef
 endif
 

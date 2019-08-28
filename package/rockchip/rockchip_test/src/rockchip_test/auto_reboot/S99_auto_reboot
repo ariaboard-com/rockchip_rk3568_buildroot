@@ -1,0 +1,23 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		if [ -e "/data/cfg/rockchip_test/auto_reboot.sh" ]; then
+			echo "start auto-reboot"
+			source /data/cfg/rockchip_test/auto_reboot.sh `cat /data/cfg/rockchip_test/reboot_total_cnt`&
+		fi
+
+		;;
+	stop)
+		echo "stop auto-reboot finished"
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
+
+exit 0
