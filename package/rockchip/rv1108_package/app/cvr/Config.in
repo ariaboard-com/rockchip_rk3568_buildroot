@@ -1,0 +1,13 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_CVR
+	bool "RV1108 package CVR application"
+	select BR2_PACKAGE_RKCAMERA
+	select BR2_PACKAGE_PROCESS_UNITS
+	select BR2_PACKAGE_LIBPNG12
+	select BR2_PACKAGE_RV1108_MINIGUI
+	select BR2_PACKAGE_TSLIB
+	select BR2_PACKAGE_JPEG
+
+endif
