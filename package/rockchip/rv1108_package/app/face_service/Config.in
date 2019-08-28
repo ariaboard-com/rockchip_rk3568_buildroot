@@ -27,14 +27,18 @@ menu "face_service setting options"
     config BR2_PACKAGE_FACE_SERVICE_FACE_CAPTURE
         bool "Enable Face Capture"
         default n
-        select BR2_PACKAGE_RKMEDIA
         select BR2_PACKAGE_MPP
+        select BR2_PACKAGE_RKMEDIA
+        select BR2_PACKAGE_RKMEDIA_MPP
+        select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 
-    config BR2_PACKAGE_FACE_SERVICE_ENCODE_H264
+    config BR2_PACKAGE_FACE_SERVICE_H264_ENCODE
         bool "Enable h264 encoder"
         default n
-        select BR2_PACKAGE_RKMEDIA
         select BR2_PACKAGE_MPP
+        select BR2_PACKAGE_RKMEDIA
+        select BR2_PACKAGE_RKMEDIA_MPP
+        select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 
     config BR2_PACKAGE_FACE_SERVICE_USE_UVC
         bool "use UVC"
