@@ -2,6 +2,7 @@
 #include "audio.config"
 #include "base.config"
 #include "wifi.config"
+BR2_CCACHE=y
 # base tools
 BR2_PACKAGE_COREUTILS=y
 BR2_PACKAGE_UPDATE=y
