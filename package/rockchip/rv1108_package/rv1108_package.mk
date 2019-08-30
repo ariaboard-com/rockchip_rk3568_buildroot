@@ -14,6 +14,7 @@ RV_ROOT_DIR=$(RV_OUTPUT_DIR)/root
 RV_BUILD_DIR=$(TOPDIR)/../build
 RV_DEVICE_PRODUCT_DIR=$(TOPDIR)/../device/rockchip/$(RK_TARGET_PRODUCT)
 RV_COMMON_USERDATA_DIR=$(RV_DEVICE_PRODUCT_DIR)/userdata
+RV_COMMON_ROOT_DATA_DIR=$(RV_DEVICE_PRODUCT_DIR)/root
 RV_DEVICE_PRODUCT_BOARD_DIR=$(RV_DEVICE_PRODUCT_DIR)/overlay-board/rv1108-$(RK_TARGET_BOARD_VERSION)
 RV_BOARD_USERDATA_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/userdata
 RV_BOARD_ROOT_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/root
@@ -96,7 +97,8 @@ userdata:
 ### build root , is not rootfs
 root:
 	if [ -f $(RV_IMAGE_DIR)/root.img ]; then rm $(RV_IMAGE_DIR)/root.img; fi
-	if [ -d $(RV_BOARD_ROOT_DIR) ]; then cp -fr $(RV_BOARD_ROOT_DIR)/ $(RV_ROOT_DIR) 2>&1; fi
+	if [ -d $(RV_BOARD_ROOT_DIR) ]; then cp -fr $(RV_BOARD_ROOT_DIR)/* $(RV_ROOT_DIR) 2>&1; fi
+	if [ -d $(RV_COMMON_ROOT_DATA_DIR) ]; then cp -fr $(RV_COMMON_ROOT_DATA_DIR)/* $(RV_ROOT_DIR) 2>&1; fi
 	$(call mk_parttion_image,$(RK_ROOT_FILESYSTEM_TYPE),$(RK_ROOT_FILESYSTEM_SIZE),\
                 $(RV_IMAGE_DIR)/root.img, $(RV_ROOT_DIR))
 
