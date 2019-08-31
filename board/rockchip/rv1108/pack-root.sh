@@ -9,7 +9,7 @@ RV_IMAGE_DIR=$TARGET_OUTPUT_DIR/image
 
 TOOLCHAINS_ARM_LINUX_READELF=$HOST_DIR/bin/arm-linux-readelf
 
-NECESSARY_APP="lock_app system_manager face_service"
+NECESSARY_APP="lock_app system_manager face_service cvr"
 
 function list_usr_target()
 {
