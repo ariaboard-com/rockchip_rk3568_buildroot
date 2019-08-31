@@ -9,6 +9,7 @@ source "package/rockchip/rv1108_package/app/peephole/Config.in"
 source "package/rockchip/rv1108_package/app/updater/Config.in"
 source "package/rockchip/rv1108_package/app/rv1108_uvc_app/Config.in"
 source "package/rockchip/rv1108_package/app/system_manager/Config.in"
+source "package/rockchip/rv1108_package/app/cvr/Config.in"
 
 endif
 
