@@ -1531,6 +1531,7 @@ menu "Other"
 	source "package/libunwind/Config.in"
 	source "package/liburcu/Config.in"
 	source "package/libuv/Config.in"
+	source "package/librws/Config.in"
 	source "package/lightning/Config.in"
 	source "package/linux-pam/Config.in"
 if BR2_PACKAGE_LINUX_PAM
