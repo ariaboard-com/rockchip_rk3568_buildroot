@@ -10,6 +10,7 @@ RV_LOADER_DIR=$(TOPDIR)/../loader
 RV_TARGET_USB_BOOT_DIR=$(TOPDIR)/../tools/Windows_Upgrade_Tool/AndroidTool_Release_v2.65/Image/
 RV_KERNEL_DIR=$(TOPDIR)/../kernel
 RV_USERDATA_DIR=$(RV_OUTPUT_DIR)/userdata
+RV_MODULES_DIR=$(RV_OUTPUT_DIR)/modules
 RV_ROOT_DIR=$(RV_OUTPUT_DIR)/root
 RV_BUILD_DIR=$(TOPDIR)/../build
 RV_DEVICE_PRODUCT_DIR=$(TOPDIR)/../device/rockchip/$(RK_TARGET_PRODUCT)
@@ -99,6 +100,7 @@ root:
 	if [ -f $(RV_IMAGE_DIR)/root.img ]; then rm $(RV_IMAGE_DIR)/root.img; fi
 	if [ -d $(RV_BOARD_ROOT_DIR) ]; then cp -fr $(RV_BOARD_ROOT_DIR)/* $(RV_ROOT_DIR) 2>&1; fi
 	if [ -d $(RV_COMMON_ROOT_DATA_DIR) ]; then cp -fr $(RV_COMMON_ROOT_DATA_DIR)/* $(RV_ROOT_DIR) 2>&1; fi
+	if [ -d $(RV_MODULES_DIR) ]; then cp -fr  $(RV_MODULES_DIR) $(RV_ROOT_DIR)/lib 2>&1; fi
 	$(call mk_parttion_image,$(RK_ROOT_FILESYSTEM_TYPE),$(RK_ROOT_FILESYSTEM_SIZE),\
                 $(RV_IMAGE_DIR)/root.img, $(RV_ROOT_DIR))
 
