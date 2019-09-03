@@ -7,5 +7,11 @@ config BR2_PACKAGE_RKCAMERA
 	select BR2_PACKAGE_CAMERAHAL
 	select BR2_PACKAGE_CJSON
 
+if BR2_PACKAGE_RKCAMERA
+    config BR2_PACKAGE_RKCAMERA_TEST
+        bool "rv1108 rkcamera test"
+        default n
+endif
+
 endif
 

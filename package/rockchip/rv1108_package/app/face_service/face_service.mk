@@ -3,7 +3,7 @@ FACE_SERVICE_SITE_METHOD = local
 FACE_SERVICE_INSTALL_STAGING = YES
 
 # add dependencies
-FACE_SERVICE_DEPENDENCIES = hal adk messenger rkrga rkfb messenger adk camerahal rkcamera process_units
+FACE_SERVICE_DEPENDENCIES = hal adk messenger rkrga rkfb camerahal rkcamera process_units
 
 # add package dependencies & opts
 ifeq ($(BR2_PACKAGE_MODEL_LOADER),y)
