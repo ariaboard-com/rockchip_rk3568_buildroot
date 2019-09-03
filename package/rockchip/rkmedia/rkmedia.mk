@@ -1,4 +1,9 @@
+ifeq ($(BR2_PACKAGE_RV1108),y)
+RKMEDIA_SITE = $(TOPDIR)/../framework/media
+else
 RKMEDIA_SITE = $(TOPDIR)/../external/rkmedia
+endif
+
 RKMEDIA_SITE_METHOD = local
 
 RKMEDIA_INSTALL_STAGING = YES
