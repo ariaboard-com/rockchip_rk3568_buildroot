@@ -9,8 +9,6 @@ RV_IMAGE_DIR=$TARGET_OUTPUT_DIR/image
 
 TOOLCHAINS_ARM_LINUX_READELF=$HOST_DIR/bin/arm-linux-readelf
 
-NECESSARY_APP="lock_app system_manager face_service cvr"
-
 function list_usr_target()
 {
 	echo "#######################################"
@@ -219,7 +217,8 @@ function pack_root()
 	done
 }
 
+echo RK_FIRST_START_APP=$RK_FIRST_START_APP
 list_usr_target
-collect_necessary_target $NECESSARY_APP
+collect_necessary_target $RK_FIRST_START_APP
 collect_unnecessary_target
 pack_root
