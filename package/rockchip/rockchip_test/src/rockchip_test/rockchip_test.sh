@@ -38,6 +38,7 @@ module_choice()
     echo "camera test           13 (use rkisp_demo)"
     echo "video test            14 (use gstreamer-wayland and app_demo)"
     echo "gpu test              15 (use glmark2)"
+    echo "chromium test         16 (chromium with video hardware acceleration)"
     echo "*****************************************************"
 
     echo  "please input your test moudle: "
@@ -123,6 +124,11 @@ gpu_test()
     sh /rockchip_test/gpu/gpu_test.sh
 }
 
+chromium_test()
+{
+    sh /rockchip_test/chromium/chromium_test.sh
+}
+
 module_test()
 {
     case ${MODULE_CHOICE} in
@@ -170,6 +176,9 @@ module_test()
 	    ;;
 	15)
 	    gpu_test
+	    ;;
+	16)
+	    chromium_test
 	    ;;
     esac
 }
