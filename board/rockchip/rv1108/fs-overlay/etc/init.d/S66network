@@ -20,7 +20,7 @@ case "$1" in
 	if [ ! -z $ap_chip ]; then
 		modules_name=bcmdhd.ko
 	else
-		modules_name=`echo $wifi_chip | tr [A-Z] [a-z]`.ko
+		modules_name=`echo $wifi_chip | tr [A-Z] [a-z] | sed 's/rtl//g'`.ko
 	fi
 	busybox insmod /root/lib/modules/${modules_name}
 	[ $? = 0 ] && echo "insmod OK" || echo "insmod FAIL"
