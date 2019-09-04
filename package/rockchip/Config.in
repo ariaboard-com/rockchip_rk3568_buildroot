@@ -208,4 +208,5 @@ source "package/rockchip/sensor-daemon/Config.in"
 source "package/rockchip/rtc_demo/Config.in"
 source "package/rockchip/rk_webui/Config.in"
 source "package/rockchip/rkffplay/Config.in"
+source "package/rockchip/chromium/Config.in"
 endif
