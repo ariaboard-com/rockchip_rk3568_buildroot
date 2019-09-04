@@ -22,6 +22,7 @@ rm $TARGET_DIR/etc/init.d/S01logging > /dev/null 2>&1
 rm $TARGET_DIR/etc/init.d/S20urandom > /dev/null 2>&1
 rm $TARGET_DIR/etc/init.d/S40network > /dev/null 2>&1
 rm $TARGET_DIR/etc/init.d/S41dhcpcd  > /dev/null 2>&1
+rm $TARGET_DIR/etc/init.d/S50sshd    > /dev/null 2>&1
 rm $TARGET_DIR/etc/init.d/S80dnsmasq > /dev/null 2>&1
 rm $TARGET_DIR/usr/bin/sqlite3 > /dev/null 2>&1
 TEMP_DELETE_TARGET="ts_calibrate ts_finddev ts_harvest ts_print \
