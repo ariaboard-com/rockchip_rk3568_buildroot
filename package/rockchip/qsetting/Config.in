@@ -1,0 +1,5 @@
+config BR2_PACKAGE_QSETTING
+	bool "qsetting"
+	depends on BR2_PACKAGE_QT5
+	help
+	  Rockchip setting application based on QT
