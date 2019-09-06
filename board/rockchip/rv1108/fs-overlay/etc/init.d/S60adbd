@@ -5,6 +5,10 @@
 
 case "$1" in
   start)
+	if [ -z "`df | grep root`" ]; then
+		exit 1
+	fi
+
 	echo "Configuring ADB USB gadget driver..."
 	echo rockchip > /sys/class/android_usb/android0/iManufacturer
 	echo rk1108 > /sys/class/android_usb/android0/iProduct 

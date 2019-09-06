@@ -9,6 +9,10 @@ case "$1" in
 	export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/root/bin:/root/sbin
 	export LD_LIBRARY_PATH=/lib/:/usr/lib/:/usr/local/lib/:/root/lib
 
+	if [ -z "`df | grep root`" ]; then
+		exit 1
+	fi
+
 	busybox insmod /root/lib/modules/rfkill-wlan.ko
 	busybox insmod /root/lib/modules/rfkill-bt.ko
 	busybox insmod /root/lib/modules/cfg80211.ko
