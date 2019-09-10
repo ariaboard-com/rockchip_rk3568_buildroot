@@ -54,7 +54,6 @@ loader-clean:
 kernel:
 	$(info RK_KERNEL_DEFCONFIG=$(RK_KERNEL_DEFCONFIG))
 	$(info RK_ARCH=$(RK_ARCH))
-	make -C $(RV_KERNEL_DIR) ARCH=$(RK_ARCH) $(RK_KERNEL_DEFCONFIG)
 	make -C $(RV_KERNEL_DIR) ARCH=$(RK_ARCH) $(RK_KERNEL_DTS).img -j$(RK_JOBS)
 	make -C $(RV_KERNEL_DIR) modules -j$(RK_JOBS)
 	make -C $(RV_KERNEL_DIR) INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=$(RV_OUTPUT_DIR)/tmp_modules modules_install
