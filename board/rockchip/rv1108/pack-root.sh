@@ -111,7 +111,43 @@ function collect_necessary_target()
 	done
 
 	necessary_lib_array_len=${#necessary_lib_array[@]}
-	echo necessary_lib_array_len=$necessary_lib_array_len
+	echo first necessary_lib_array_len=$necessary_lib_array_len
+
+	#lib depends on lib
+	for element in ${necessary_lib_array[@]}
+	do
+		if [ ! -z `echo $element | grep .py` ]; then continue; fi
+		temp_necessary_lib_depend_array=(
+			`$TOOLCHAINS_ARM_LINUX_READELF -d ${element} | \
+			grep NEEDED | cut -d '[' -f2 | cut -d ']' -f1 | cut -d '.' -f1 | sort -u`)
+		if [ 0 == ${#temp_necessary_lib_depend_array[@]} ]; then continue; fi
+
+		for depend_element in ${temp_necessary_lib_depend_array[@]}
+		do
+			depend_path=(`find $TARGET_DIR/usr/lib -name ${depend_element}.so* | sort -u`)
+			if [ 0 == ${#depend_path[@]} ]; then continue; fi
+			for depend_path_element in ${depend_path[@]}
+			do
+				no_find_new_lib=0
+				for path_element in ${necessary_lib_array[@]}
+				do
+					if [ $depend_path_element == $path_element ]; then
+						no_find_new_lib=1
+					fi
+				done
+				if [ $no_find_new_lib == 0 ]; then
+					echo depend_path_element=$depend_path_element
+					necessary_lib_array[$i]=$depend_path_element
+					i=`expr $i + 1`
+				else
+					no_find_new_lib=0
+				fi
+			done
+		done
+	done
+
+	necessary_lib_array_len=${#necessary_lib_array[@]}
+	echo second necessary_lib_array_len=$necessary_lib_array_len
 }
 
 function collect_unnecessary_target()
