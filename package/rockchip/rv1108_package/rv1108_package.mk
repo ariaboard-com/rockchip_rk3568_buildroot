@@ -128,4 +128,27 @@ clean: loader-clean kernel-clean root-clean
 
 reinstall: root-clean
 
+# prepare for gdb debug env
+RV_GDBDEBUG_DIR=$(RV_OUTPUT_DIR)/gdbdebug
+
+prepare-gdb:
+	if [ ! -d $(RV_GDBDEBUG_DIR) ]; then mkdir $(RV_GDBDEBUG_DIR); fi
+	echo "add-auto-load-safe-path $(RV_GDBDEBUG_DIR)" > ~/.gdbinit;
+	echo "set sysroot $(STAGING_DIR)" > $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "set solib-absolute-prefix $(STAGING_DIR)" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "set solib-search-path $(STAGING_DIR)" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "define enter_non_stop" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "  set pagination off" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "  set target-async on" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "  set non-stop on" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "end" >> $(RV_GDBDEBUG_DIR)/.gdbinit;
+	echo "#!/bin/bash" > $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	echo "#./rv_gdb.bash corefile lock_app" >> $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	echo "LD_LIB_DIR=$(STAGING_DIR)/lib" >> $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	echo "GDB_LOAD_FILE=\`find $(STAGING_DIR)/usr -name \$$2\`" >> $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	echo "export LD_LIBRARY_PATH=${LD_LIB_DIR}" >> $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	echo "$(TARGET_CROSS)gdb --init-command=$(RV_GDBDEBUG_DIR)/.gdbinit --init-command=${GDB_LOAD_FILE} --core=\$$1" >> $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+	chmod +x $(RV_GDBDEBUG_DIR)/rv_gdb.bash;
+
+
 endif
