@@ -58,9 +58,43 @@ RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_MTP_CONFIG
 endif
 
 ifeq ($(BR2_PACKAGE_USB_MASS_STORAGE),y)
+UMS_BLOCK_PATH = $(call qstrip,$(BR2_PACKAGE_USB_MASS_STORAGE_BLOCK))
+UMS_BLOCK_SIZE = $(call qstrip,$(BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_SIZE))
+UMS_BLOCK_TYPE = $(call qstrip,$(BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_TYPE))
+
+ifeq ($(BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_RO),y)
+UMS_BLOCK_RO = y
+else
+UMS_BLOCK_RO = n
+endif
+
+ifeq ($(BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_AUTO_MOUNT),y)
+UMS_BLOCK_AUTO_MOUNT = y
+else
+UMS_BLOCK_AUTO_MOUNT = n
+endif
+
 define RKSCRIPT_ADD_UMS_CONFIG
 	if test ! `grep usb_ums_en $(RKSCRIPT_USB_CONFIG_FILE)` ; then \
 		echo usb_ums_en >> $(RKSCRIPT_USB_CONFIG_FILE) ; \
+	fi
+
+	if test ! `grep "ums_block=" $(RKSCRIPT_USB_CONFIG_FILE)` ; then \
+		echo "ums_block=$(UMS_BLOCK_PATH)" >> $(RKSCRIPT_USB_CONFIG_FILE) ; \
+	fi
+
+	if test ! `grep ums_block_size $(RKSCRIPT_USB_CONFIG_FILE)` ; then \
+		echo "ums_block_size=$(UMS_BLOCK_SIZE)" >> $(RKSCRIPT_USB_CONFIG_FILE) ; \
+	fi
+
+	[[ ! `grep ums_block_ro $(RKSCRIPT_USB_CONFIG_FILE)` && $(UMS_BLOCK_RO) = y ]] && \
+		echo "ums_block_ro=on" >> $(RKSCRIPT_USB_CONFIG_FILE) || echo "ums is not read-only"
+
+	[[ ! `grep ums_block_auto_mount $(RKSCRIPT_USB_CONFIG_FILE)` && $(UMS_BLOCK_AUTO_MOUNT) = y ]] && \
+		echo "ums_block_auto_mount=on" >> $(RKSCRIPT_USB_CONFIG_FILE) || echo "disabled ums auto mount"
+
+	if test ! `grep ums_block_type $(RKSCRIPT_USB_CONFIG_FILE)` ; then \
+		echo "ums_block_type=$(UMS_BLOCK_TYPE)" >> $(RKSCRIPT_USB_CONFIG_FILE) ; \
 	fi
 endef
 RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_UMS_CONFIG
