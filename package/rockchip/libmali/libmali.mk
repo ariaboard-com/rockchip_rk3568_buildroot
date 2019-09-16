@@ -89,6 +89,7 @@ define LIBMALI_CREATE_LINKS
 	ln -sf libGLESv1_CM.so.1 $(TARGET_DIR)/usr/lib/libGLESv1_CM.so
 	ln -sf libmali.so $(TARGET_DIR)/usr/lib/libGLESv2.so.2
 	ln -sf libGLESv2.so.2 $(TARGET_DIR)/usr/lib/libGLESv2.so
+	ln -sf libmali.so $(TARGET_DIR)/usr/lib/libMali.so.1
 endef
 LIBMALI_POST_INSTALL_TARGET_HOOKS += LIBMALI_CREATE_LINKS
 
