@@ -29,7 +29,7 @@ config BR2_PACKAGE_USB_MASS_STORAGE_BLOCK
 	  Fill a block or image file to shared with ums
 
 config BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_SIZE
-	string "rockchip usb mass storage block SIZE"
+	string "rockchip usb mass storage block SIZE (uint M)"
 	default "8"
 	depends on BR2_PACKAGE_USB_MASS_STORAGE
 	help
