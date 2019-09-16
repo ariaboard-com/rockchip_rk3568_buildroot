@@ -21,6 +21,7 @@ endef
 
 define QLAUNCHER_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/QLauncher	$(TARGET_DIR)/usr/bin/QLauncher
+	$(INSTALL) -D -m 0755 $(@D)/S50launcher	$(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
