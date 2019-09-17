@@ -14,6 +14,7 @@
 #include "debug.config"
 #include "benchmark.config"
 #include "wifi.config"
+#include "network.config"
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"

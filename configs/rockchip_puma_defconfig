@@ -4,6 +4,7 @@
 #include "debug.config"
 #include "audio.config"
 #include "wifi.config"
+#include "network.config"
 #include "bt.config"
 #include "video_mpp.config"
 #include "gdb.config"

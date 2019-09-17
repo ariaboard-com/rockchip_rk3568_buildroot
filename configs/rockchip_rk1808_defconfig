@@ -4,6 +4,7 @@
 #include "debug.config"
 #include "audio.config"
 #include "wifi.config"
+#include "network.config"
 #include "bt.config"
 #include "video_mpp.config"
 BR2_ROOTFS_OVERLAY="board/rockchip/rk1808/fs-overlay-64/ board/rockchip/common/qt"

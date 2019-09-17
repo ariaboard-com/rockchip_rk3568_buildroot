@@ -2,6 +2,7 @@
 #include "base.config"
 #include "base_extra.config"
 #include "wifi.config"
+#include "network.config"
 #include "bt.config"
 #include "audio.config"
 #include "debug.config"
