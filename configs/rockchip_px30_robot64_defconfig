@@ -1,4 +1,4 @@
-#include "px30_arm64.config"
+#include "rk3326_arm64.config"
 #include "audio.config"
 #include "base.config"
 #include "wifi.config"
