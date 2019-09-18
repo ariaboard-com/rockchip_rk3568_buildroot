@@ -10,6 +10,9 @@ GST1_PLUGINS_GOOD_SITE = https://gstreamer.freedesktop.org/src/gst-plugins-good
 GST1_PLUGINS_GOOD_LICENSE_FILES = COPYING
 GST1_PLUGINS_GOOD_LICENSE = LGPL-2.1+
 
+GST1_PLUGINS_GOOD_AUTORECONF := YES
+GST1_PLUGINS_GOOD_GETTEXTIZE := YES
+
 GST1_PLUGINS_GOOD_CONF_OPTS = \
 	--disable-valgrind \
 	--disable-examples \
