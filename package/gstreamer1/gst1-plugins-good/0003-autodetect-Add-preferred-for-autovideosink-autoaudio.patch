@@ -1,21 +1,30 @@
-From 4dda1e0eb42a9f578217dd0dec52fbe1fe515ebe Mon Sep 17 00:00:00 2001
+From 82b5a6376781f88f1dafb5579c9c5ee9922745af Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 11 Jun 2019 10:19:22 +0800
 Subject: [PATCH] autodetect: Add preferred for autovideosink/autoaudiosink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- gst/autodetect/gstautoaudiosink.c |  1 +
+ gst/autodetect/gstautoaudiosink.c |  3 +++
  gst/autodetect/gstautodetect.c    | 14 ++++++++++++++
  gst/autodetect/gstautodetect.h    |  1 +
  gst/autodetect/gstautovideosink.c |  3 +++
- 4 files changed, 19 insertions(+)
+ 4 files changed, 21 insertions(+)
 
 diff --git a/gst/autodetect/gstautoaudiosink.c b/gst/autodetect/gstautoaudiosink.c
-index 1edf6d8..b58073c 100644
+index 1edf6d8..e71c348 100644
 --- a/gst/autodetect/gstautoaudiosink.c
 +++ b/gst/autodetect/gstautoaudiosink.c
-@@ -95,6 +95,7 @@ gst_auto_audio_sink_init (GstAutoAudioSink * sink)
+@@ -39,6 +39,8 @@
+ #include "config.h"
+ #endif
+ 
++#include <stdlib.h>
++
+ #include "gstautoaudiosink.h"
+ 
+ #define DEFAULT_TS_OFFSET           0
+@@ -95,6 +97,7 @@ gst_auto_audio_sink_init (GstAutoAudioSink * sink)
  
    autodetect->media_klass = "Audio";
    autodetect->flag = GST_ELEMENT_FLAG_SINK;
