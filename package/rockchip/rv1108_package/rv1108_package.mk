@@ -107,7 +107,7 @@ root-clean:
 	if [ -d $(RV_ROOT_DIR) ]; then rm -fr $(RV_ROOT_DIR); fi
 
 fw:
-	if [ ! -L $(RV_SDK_DIR)/output ]; then ln -s $(TOPDIR)/output $(RV_SDK_DIR)/output; fi
+	if [ ! -L $(RV_SDK_DIR)/output ]; then ln -s buildroot/output $(RV_SDK_DIR)/output; fi
 	if [ -f $(RV_IMAGE_DIR)/dtb ]; then rm $(RV_IMAGE_DIR)/dtb; fi
 	cp $(RV_KERNEL_DIR)/arch/arm/boot/dts/$(RK_KERNEL_DTS).dtb $(RV_IMAGE_DIR)/dtb
 	if [ -f $(RV_IMAGE_DIR)/kernel.img ]; then rm $(RV_IMAGE_DIR)/kernel.img; fi
