@@ -113,6 +113,7 @@ fw:
 	if [ -f $(RV_IMAGE_DIR)/kernel.img ]; then rm $(RV_IMAGE_DIR)/kernel.img; fi
 	$(RV_BUILD_DIR)/kernelimage --pack --kernel $(RV_KERNEL_DIR)/arch/arm/boot/Image $(RV_IMAGE_DIR)/kernel.img 0x60308000 > /dev/null
 	if [ -f $(RV_IMAGE_DIR)/Firmware.img ]; then rm $(RV_IMAGE_DIR)/Firmware.img; fi
+	if [ -f $(RV_BOARD_USERDATA_DIR)/firmware/preisp.rkl ]; then cp $(RV_BOARD_USERDATA_DIR)/firmware/preisp.rkl $(RV_IMAGE_DIR);fi
 	$(RV_BUILD_DIR)/firmwareMerger -p $(RV_BUILD_DIR)/setting_ini/$(RK_SETTING_INI) $(RV_IMAGE_DIR)
 
 fww:
