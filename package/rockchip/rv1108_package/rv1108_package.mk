@@ -29,6 +29,13 @@ else
     ALL_SUPPORT=1
 endif
 
+PREISP_RKL_DTS=$(TOPDIR)/../kernel/arch/arm/boot/dts/$(RK_KERNEL_DTS).dts
+PREISP_RKL_NODE=preisp_reserved
+PREISP_RKL_ADDR_VALUE := $(shell grep ${PREISP_RKL_NODE} -A 6 ${PREISP_RKL_DTS} | \
+                  sed ':a;N;ba;s/\n/ /g' | grep reg | cut -d '{' -f2 | cut -d '}' -f1 | cut -d '<' -f2 | cut -d ' ' -f1)
+PREISP_RKL_ADDR := $(shell if [ -z ${PREISP_RKL_ADDR_VALUE} ]; then \
+		  echo "none"; else echo "${PREISP_RKL_ADDR_VALUE}"; fi)
+
 LOADER_BUILD_MAKE_ENV += \
     POWER_HOLD_GPIO_GROUP=$(RK_LOADER_POWER_HOLD_GPIO_GROUP) \
     POWER_HOLD_GPIO_INDEX=$(RK_LOADER_POWER_HOLD_GPIO_INDEX) \
@@ -36,7 +43,8 @@ LOADER_BUILD_MAKE_ENV += \
     BOOTPART_SELECT=$(RK_LOADER_BOOTPART_SELECT) \
     EMMC_ONLY=$(EMMC_ONLY) \
     NOR_ONLY=$(NOR_ONLY) \
-    ALL_SUPPORT=$(ALL_SUPPORT)
+    ALL_SUPPORT=$(ALL_SUPPORT) \
+    PREISP_RKL_ADDR=$(PREISP_RKL_ADDR)
 
 loader:
 	make -C $(RV_LOADER_DIR) PLAT=rv1108usbplug
