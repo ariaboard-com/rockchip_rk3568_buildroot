@@ -39,7 +39,7 @@ for i in $$cam_id; do \
 		cam_name=`grep "$$i:" -A 15 $$dts_dir/$$cam_dts | \
 				grep "compatible" | \
 				cut -d ',' -f2 | cut -d '-' -f1`; \
-        echo cam_name=$$cam_name; \
+		echo cam_name=$$cam_name; \
 	else \
 		cam_iq=`grep "$$i:" -A 35 $(1) | \
 				sed ':a;N;$$!ba;s/\n/ /g' | \
@@ -50,13 +50,13 @@ for i in $$cam_id; do \
 		cam_name=`grep "$$i:" -A 15 $(1) | \
 				grep "compatible" | \
 				cut -d ',' -f2 | cut -d '-' -f1`; \
-        echo cam_name=$$cam_name; \
+		echo cam_name=$$cam_name; \
 	fi; \
 	cam_xml_array+="$${cam_name}_$${cam_iq}.xml "; \
 done; \
 echo cam_xml_array=$$cam_xml_array; \
 if [[ "bin" == $$target_use_bin ]]; then \
-	echo "use xml to bin"; \
+	echo "Use bin IQ data"; \
 	for i in $$cam_xml_array; do \
 		echo xml:$$i; \
 		cam_xml_name=`echo $$i | cut -d '.' -f1`; \
@@ -64,7 +64,7 @@ if [[ "bin" == $$target_use_bin ]]; then \
 		break; \
 	done; \
 else \
-	echo "use xml"; \
+	echo "Use xml IQ data"; \
 	for i in $$cam_xml_array; do \
 		echo xml:$$i; \
 		cp $$build_camiq_dir/$$i $$target_camiq_dir/; \
@@ -91,6 +91,7 @@ CAMERAHAL_PRE_INSTALL_TARGET_HOOKS += CAMERAHAL_PRE_INSTALL_TARGET_XML_CMDS
 endif
 
 define CAMERAHAL_BUILD_CMDS
+	-rm -rf $(TARGET_DIR)/etc/cam_iq
 	cd $(@D) && \
         $(TARGET_MAKE_ENV) CROSS_COMPILE=$(TARGET_CROSS) $(MAKE) $(CAMERAHAL_MAKE_OPTS)
 endef
@@ -113,7 +114,5 @@ define CAMERAHAL_INSTALL_STAGING_CMDS
 	cp -fr $(@D)/camera_engine_cifisp/include/linux/* $(STAGING_DIR)/usr/include/CameraHal/linux
 	cp -fr $(@D)/camera_engine_cifisp/include/* $(STAGING_DIR)/usr/include/
 endef
-
-
 
 $(eval $(generic-package))
