@@ -6,10 +6,10 @@
 case "$1" in
   start)
 
-        target_part_name="userdata"
-        find_target_part=0
+	target_part_name="userdata"
+	find_target_part=0
 	storage_type_emmc=1
-        mount_dir="/data"
+	mount_dir="/data"
 	nor_block_path=/dev/mtdblock5
 
 	if [ -e /dev/mmcblk0p1 ]; then
@@ -41,11 +41,11 @@ case "$1" in
 		else
 			/bin/busybox mount -t jffs2 $block_path $mount_dir
 		fi
-                str_value=`/bin/busybox df | grep $mount_dir`
-                [ ! -z "$str_value" ] && echo "$mount_dir mount success" || echo "$mount_dir mount fail"
-        else
-                echo "no found $target_part_name"
-        fi
+			str_value=`/bin/busybox df | grep $mount_dir`
+			[ ! -z "$str_value" ] && echo "$mount_dir mount success" || echo "$mount_dir mount fail"
+		else
+			echo "no found $target_part_name"
+		fi
 	;;
   stop)
 	umount /data
