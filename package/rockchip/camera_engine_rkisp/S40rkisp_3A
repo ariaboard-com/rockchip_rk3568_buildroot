@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Start 3A daemon for each /dev/mediaX device
 #
