@@ -1,0 +1,8 @@
+config BR2_PACKAGE_INTEL_WDS
+	bool "intel-wds"
+    select BR2_PACKAGE_LIBGLIB2
+	select BR2_PACKAGE_GSTREAMER1
+	help
+	  Wireless Display Software For Linux OS (WDS).
+
+	  https://github.com/intel/wds
