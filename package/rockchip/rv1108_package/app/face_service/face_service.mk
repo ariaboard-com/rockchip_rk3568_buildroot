@@ -6,11 +6,6 @@ FACE_SERVICE_INSTALL_STAGING = YES
 FACE_SERVICE_DEPENDENCIES = hal adk messenger rkrga rkfb camerahal rkcamera process_units
 
 # add package dependencies & opts
-ifeq ($(BR2_PACKAGE_MODEL_LOADER),y)
-    FACE_SERVICE_DEPENDENCIES += model_loader
-    FACE_SERVICE_CONF_OPTS += -DUSE_MODEL_LOAD=1
-endif
-
 ifeq ($(BR2_PACKAGE_SQLITE),y)
     FACE_SERVICE_DEPENDENCIES += sqlite
     FACE_SERVICE_CONF_OPTS += -DUSE_SQLITE=1
