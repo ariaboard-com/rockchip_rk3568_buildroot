@@ -99,6 +99,7 @@ endef
 define CAMERAHAL_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m  644 $(@D)/camera_engine_cifisp/build/lib/libcam_engine_cifisp.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m  644 $(@D)/camera_engine_cifisp/build/lib/libcam_ia.so $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -D -m  755 $(@D)/camera_engine_cifisp/build/bin/cnvIQ $(TARGET_DIR)/usr/bin/
 	mkdir -p $(TARGET_DIR)/usr/include/CameraHal/linux
 	$(foreach header,$(wildcard $(@D)/camera_engine_cifisp/HAL/include/*.h),$(INSTALL) -D -m 644 $(header) $(TARGET_DIR)/usr/include/CameraHal;)
 	cp -fr $(@D)/camera_engine_cifisp/include/linux/* $(TARGET_DIR)/usr/include/CameraHal/linux
