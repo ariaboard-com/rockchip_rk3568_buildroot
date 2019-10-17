@@ -21,7 +21,7 @@ config BR2_PACKAGE_RKFACE_RECOGNITION
 
 config BR2_PACKAGE_RKLIVE_DETECTION_2D
     bool "Enable rk live detection 2d"
-    default y
+    default n
 
 endmenu
 endif
