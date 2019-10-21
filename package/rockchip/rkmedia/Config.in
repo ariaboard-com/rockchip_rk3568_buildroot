@@ -109,6 +109,11 @@ config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H264
     help
       live555 rtsp server h264 session
 
+config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H265
+    bool "rtsp server h265 session"
+    help
+      live555 rtsp server h265 session
+
 endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
 
 endif # BR2_PACKAGE_RKMEDIA_LIVE555
