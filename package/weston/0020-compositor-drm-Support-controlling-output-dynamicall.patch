@@ -1,9 +1,10 @@
-From a9388d851402836995bdeee5a93b8c3d67045817 Mon Sep 17 00:00:00 2001
+From 1bdde66bc0b7b0242b6a632652bb356a1a6dbee3 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 8 Aug 2019 09:46:17 +0800
-Subject: [PATCH 20/22] compositor-drm: Support controlling output dynamically
+Subject: [PATCH] compositor-drm: Support controlling output dynamically
 
-Use config file to control output's rotation/freezen/display rectangle.
+Use config file to control output's rotation/mode/freezen/display
+rectangle.
 
 Default config file is "/tmp/.weston_drm.conf", can override with
 "WESTON_DRM_CONFIG" environment.
@@ -13,14 +14,17 @@ example:
 echo "output:eDP-1:freeze" >> /tmp/.weston_drm.conf
 echo "output:all:rotate90" >> /tmp/.weston_drm.conf
 echo "output:all:rect=<100,20,1636,2068>" >> /tmp/.weston_drm.conf
+echo "output:HDMI-A-1:mode=800x600" >> /tmp/.weston_drm.conf
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+
+mode
 ---
  clients/desktop-shell.c    |  19 ++++++
- desktop-shell/shell.c      |  39 ++++++++++++
- libweston/compositor-drm.c | 146 +++++++++++++++++++++++++++++++++++++++++++++
- libweston/compositor.c     |  46 +++++++++++---
- 4 files changed, 243 insertions(+), 7 deletions(-)
+ desktop-shell/shell.c      |  39 +++++++++++
+ libweston/compositor-drm.c | 167 +++++++++++++++++++++++++++++++++++++++++++++
+ libweston/compositor.c     |  46 +++++++++++--
+ 4 files changed, 264 insertions(+), 7 deletions(-)
 
 diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
 index 599295e..acc0a41 100644
@@ -128,7 +132,7 @@ index 0bea96a..2849839 100644
  
  static void
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 5b26878..4435dd2 100644
+index 5b26878..86c0af6 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -37,6 +37,7 @@
@@ -228,7 +232,7 @@ index 5b26878..4435dd2 100644
  	return 0;
  
  err_free:
-@@ -4151,6 +4192,107 @@ static const struct weston_drm_output_api api = {
+@@ -4151,6 +4192,128 @@ static const struct weston_drm_output_api api = {
  	drm_output_set_seat,
  };
  
@@ -254,6 +258,25 @@ index 5b26878..4435dd2 100644
 +}
 +
 +static void
++drm_output_modeset(struct drm_output *output, const char *modeline)
++{
++	struct drm_backend *b = to_drm_backend(output->base.compositor);
++	drmModeModeInfo crtc_mode;
++	struct drm_mode *mode;
++
++	if (connector_get_current_mode(output->connector,
++				       b->drm.fd, &crtc_mode) < 0)
++		return;
++
++	mode = drm_output_choose_initial_mode(b, output,
++					      WESTON_DRM_BACKEND_OUTPUT_PREFERRED,
++					      modeline, &crtc_mode);
++
++	weston_output_mode_set_native(&output->base, &mode->base,
++				      output->base.scale);
++}
++
++static void
 +config_handle_output(struct drm_backend *b, const char *name,
 +		     const char *config)
 +{
@@ -267,6 +290,8 @@ index 5b26878..4435dd2 100644
 +		if (!strncmp(config, "rotate", strlen("rotate"))) {
 +			int rotate = atoi(config + strlen("rotate")) / 90;
 +			drm_output_rotate(output, rotate);
++		} else if (!strncmp(config, "mode=", strlen("mode="))) {
++			drm_output_modeset(output, config + strlen("mode="));
 +		} else if (!strcmp(config, "freeze")) {
 +			output->freezing |= DRM_OUTPUT_FREEZE_USER;
 +		} else if (!strcmp(config, "unfreeze")) {
@@ -336,7 +361,7 @@ index 5b26878..4435dd2 100644
  static struct drm_backend *
  drm_backend_create(struct weston_compositor *compositor,
  		   struct weston_drm_backend_config *config)
-@@ -4314,6 +4456,10 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -4314,6 +4477,10 @@ drm_backend_create(struct weston_compositor *compositor,
  		goto err_udev_monitor;
  	}
  
