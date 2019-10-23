@@ -2,6 +2,7 @@
 #include "base.config"
 #include "base_extra.config"
 #include "debug.config"
+#include "video_mpp.config"
 BR2_ROOTFS_OVERLAY="board/rockchip/rk1808/fs-overlay-64/"
 BR2_TARGET_GENERIC_HOSTNAME="rk1808"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK1808 Buildroot"
@@ -11,5 +12,4 @@ BR2_PACKAGE_UVC_APP=y
 BR2_PACKAGE_APP_DEMO=y
 BR2_PACKAGE_APP_DEMO_NPU_UVC_CONNECTION=y
 BR2_PACKAGE_ROCKX=y
-BR2_PACKAGE_MPP=y
-
+BR2_PACKAGE_LIBV4L=y
