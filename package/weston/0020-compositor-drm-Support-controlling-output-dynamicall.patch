@@ -1,4 +1,4 @@
-From 1bdde66bc0b7b0242b6a632652bb356a1a6dbee3 Mon Sep 17 00:00:00 2001
+From 9faa6905a1ad6e6d1b11b271edc761c34dab6499 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 8 Aug 2019 09:46:17 +0800
 Subject: [PATCH] compositor-drm: Support controlling output dynamically
@@ -20,11 +20,11 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 
 mode
 ---
- clients/desktop-shell.c    |  19 ++++++
- desktop-shell/shell.c      |  39 +++++++++++
- libweston/compositor-drm.c | 167 +++++++++++++++++++++++++++++++++++++++++++++
- libweston/compositor.c     |  46 +++++++++++--
- 4 files changed, 264 insertions(+), 7 deletions(-)
+ clients/desktop-shell.c    |  19 +++++
+ desktop-shell/shell.c      |  39 ++++++++++
+ libweston/compositor-drm.c | 174 +++++++++++++++++++++++++++++++++++++++++++++
+ libweston/compositor.c     |  46 ++++++++++--
+ 4 files changed, 271 insertions(+), 7 deletions(-)
 
 diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
 index 599295e..acc0a41 100644
@@ -132,7 +132,7 @@ index 0bea96a..2849839 100644
  
  static void
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 5b26878..86c0af6 100644
+index 5b26878..0db93b4 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -37,6 +37,7 @@
@@ -232,7 +232,7 @@ index 5b26878..86c0af6 100644
  	return 0;
  
  err_free:
-@@ -4151,6 +4192,128 @@ static const struct weston_drm_output_api api = {
+@@ -4151,6 +4192,135 @@ static const struct weston_drm_output_api api = {
  	drm_output_set_seat,
  };
  
@@ -268,12 +268,19 @@ index 5b26878..86c0af6 100644
 +				       b->drm.fd, &crtc_mode) < 0)
 +		return;
 +
++	// Unable to switch mode, let's retry later
++	if (output->fb_last || output->fb_pending) {
++		b->config_mtime = 0;
++		return;
++	}
++
 +	mode = drm_output_choose_initial_mode(b, output,
 +					      WESTON_DRM_BACKEND_OUTPUT_PREFERRED,
 +					      modeline, &crtc_mode);
 +
 +	weston_output_mode_set_native(&output->base, &mode->base,
 +				      output->base.scale);
++	weston_output_schedule_repaint(&output->base);
 +}
 +
 +static void
@@ -361,7 +368,7 @@ index 5b26878..86c0af6 100644
  static struct drm_backend *
  drm_backend_create(struct weston_compositor *compositor,
  		   struct weston_drm_backend_config *config)
-@@ -4314,6 +4477,10 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -4314,6 +4484,10 @@ drm_backend_create(struct weston_compositor *compositor,
  		goto err_udev_monitor;
  	}
  
