@@ -24,6 +24,7 @@ define QSETTING_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(@D)/icon_qsetting.png $(TARGET_DIR)/usr/share/icon/
 	$(INSTALL) -D -m 0755 $(@D)/qsetting $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 0755 $(@D)/qsetting.desktop $(TARGET_DIR)/usr/share/applications/
+	$(INSTALL) -D -m 0755 $(@D)/S80wifireconnect $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
