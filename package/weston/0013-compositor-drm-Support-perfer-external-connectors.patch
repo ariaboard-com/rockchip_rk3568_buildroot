@@ -1,7 +1,7 @@
-From 084ea4aaee0a004ec543a2f28e811dfefd202df4 Mon Sep 17 00:00:00 2001
+From 200f4dca24b9c465ffa3d19948ed6bcc990d8cae Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 28 Jan 2019 18:22:18 +0800
-Subject: [PATCH 1/3] compositor-drm: Support perfer external connectors
+Subject: [PATCH] compositor-drm: Support perfer external connectors
 
 Using internal connector as main output by default.
 
@@ -117,7 +117,7 @@ index 0ebb556..0bea96a 100644
  	wl_list_remove(&output_listener->link);
  	free(output_listener);
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index cf10153..cc6503d 100644
+index cf10153..82a2cfa 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -79,6 +79,9 @@
@@ -242,7 +242,7 @@ index cf10153..cc6503d 100644
  			if (create_output_for_connector(b, resources,
  							connector, drm_device) < 0)
  				continue;
-@@ -2994,22 +3067,53 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2994,22 +3067,44 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  		}
  	}
  
@@ -264,14 +264,7 @@ index cf10153..cc6503d 100644
  static void
 +destroy_outputs(struct drm_backend *b, struct udev_device *drm_device)
 +{
-+	drmModeRes *resources;
 +	struct drm_output *output, *next;
-+
-+	resources = drmModeGetResources(b->drm.fd);
-+	if (!resources) {
-+		weston_log("drmModeGetResources failed\n");
-+		return;
-+	}
 +
 +	wl_list_for_each_reverse_safe(output, next,
 +				      &b->compositor->output_list, base.link)
@@ -281,8 +274,6 @@ index cf10153..cc6503d 100644
 +				      &b->compositor->pending_output_list,
 +				      base.link)
 +		drm_output_destroy(&output->base);
-+
-+	drmModeFreeResources(resources);
 +}
 +
 +static void
@@ -296,7 +287,7 @@ index cf10153..cc6503d 100644
  	int i;
  
  	resources = drmModeGetResources(b->drm.fd);
-@@ -3049,9 +3153,8 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3049,9 +3144,8 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  		}
  
@@ -307,7 +298,7 @@ index cf10153..cc6503d 100644
  	}
  
  	wl_list_for_each_safe(output, next, &b->compositor->output_list,
-@@ -3069,7 +3172,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3069,7 +3163,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
@@ -316,7 +307,7 @@ index cf10153..cc6503d 100644
  	}
  
  	wl_list_for_each_safe(output, next, &b->compositor->pending_output_list,
-@@ -3087,11 +3190,61 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3087,11 +3181,70 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
@@ -330,6 +321,15 @@ index cf10153..cc6503d 100644
 +	// Nothing changed, no need to refresh
 +	if (!changed)
 +		return;
++
++	// Flush flip events
++	wl_list_for_each_reverse_safe(output, next,
++				      &b->compositor->output_list, base.link) {
++		while (output->page_flip_pending) {
++			usleep(1000);
++			on_drm_input(b->drm.fd, 0, NULL);
++		}
++	}
 +
 +	// Refresh outputs
 +	destroy_outputs(b, drm_device);
