@@ -3,6 +3,6 @@ MESSENGER_SITE_METHOD = local
 MESSENGER_INSTALL_STAGING = YES
 
 # add dependencies
-MESSENGER_DEPENDENCIES = libnanomsg cjson adk
+MESSENGER_DEPENDENCIES = nanomsg cjson adk
 
 $(eval $(cmake-package))
