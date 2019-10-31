@@ -12,4 +12,20 @@ config BR2_PACKAGE_CVR
 	select BR2_PACKAGE_JPEG
 	select BR2_PACKAGE_RKNR
 
+if BR2_PACKAGE_CVR
+menu "cvr setting options"
+
+	config BR2_PACKAGE_CVR_H264_ENCODE
+		bool "support h264 encode."
+		default y
+		select BR2_PACKAGE_MPP
+		select BR2_PACKAGE_RKMEDIA
+		select BR2_PACKAGE_RKMEDIA_MPP
+		select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
+		select BR2_PACKAGE_FFMPEG
+		select BR2_PACKAGE_FFMPEG_SWSCALE
+		select BR2_PACKAGE_RKMEDIA_FFMPEG
+endmenu
+endif
+
 endif
