@@ -72,7 +72,7 @@ function collect_necessary_target()
 	for target in ${app_targets}; do
 		echo "Processing app: $target"
 		if [ ! -z $target ]; then
-			path=`find $TARGET_DIR/usr -name $target | sort`
+			path=`find $TARGET_DIR -name $target | sort`
 			if [ ! -z $path ]; then
 				necessary_bin_array=(${necessary_bin_array[@]} $path)
 				necessary_bins_string+=" "$path

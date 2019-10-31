@@ -29,7 +29,7 @@ case "$1" in
 		if [ -e $nor_block_path -a $find_target_part -eq 0 ]; then
 			find_target_part=1
 			storage_type_emmc=0
-			block_path=$nor_block_path 
+			block_path=$nor_block_path
 		fi
 		echo block_name=$block_name
 	fi

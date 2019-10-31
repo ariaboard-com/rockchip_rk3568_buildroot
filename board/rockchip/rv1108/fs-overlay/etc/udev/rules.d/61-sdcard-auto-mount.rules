@@ -1,0 +1,11 @@
+KERNEL!="mmcblk*[0-9]", GOTO="sdcard_auto_mount_end"
+SUBSYSTEM!="block", GOTO="sdcard_auto_mount_end"
+ACTION=="add", PROGRAM!="/sbin/blkid %N", GOTO="sdcard_auto_mount_end"
+ATTRS{type}!="SD", GOTO="sdcard_auto_mount_end"
+
+IMPORT{program}="/sbin/blkid -o udev -p %N"
+
+ACTION=="add", RUN+="/bin/mount -t vfat /dev/%k '/mnt'"
+ACTION=="remove", RUN+="/bin/umount '/mnt'"
+
+LABEL="sdcard_auto_mount_end"
