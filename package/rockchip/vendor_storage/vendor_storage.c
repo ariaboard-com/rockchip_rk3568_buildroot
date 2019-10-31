@@ -425,6 +425,11 @@ int main(int argc, char **argv)
 		pr_type = VENDOR_PR_HEX;
 	}
 
+	if (!vendor_hex) {
+		ERROR("No input\n");
+		goto error;
+	}
+
 	if (flag_rw == OPTION_FLAG_R) {
 		vendor_storage_read(id, pr_type,
 				    flag_file ? vendor_hex: NULL);
@@ -450,10 +455,6 @@ int main(int argc, char **argv)
 			}
 		}
 
-		if (!vendor_hex) {
-			ERROR("No input\n");
-			goto error;
-		}
 		vendor_storage_write(id, vendor_hex, pr_type);
 	}
 
