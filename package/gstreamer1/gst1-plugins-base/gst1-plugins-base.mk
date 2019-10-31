@@ -28,6 +28,10 @@ GST1_PLUGINS_BASE_CONF_OPTS += \
 
 GST1_PLUGINS_BASE_DEPENDENCIES = gstreamer1
 
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+GST1_PLUGINS_BASE_DEPENDENCIES += linux-rga
+endif
+
 # These plugins are listed in the order from ./configure --help
 ifeq ($(BR2_PACKAGE_ORC),y)
 GST1_PLUGINS_BASE_DEPENDENCIES += orc
