@@ -14,6 +14,10 @@ PIXMAN_INSTALL_STAGING = YES
 PIXMAN_DEPENDENCIES = host-pkgconf
 HOST_PIXMAN_DEPENDENCIES = host-pkgconf
 
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+PIXMAN_DEPENDENCIES += linux-rga
+endif
+
 # For 0001-Disable-tests.patch
 PIXMAN_AUTORECONF = YES
 
