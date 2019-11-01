@@ -13,5 +13,11 @@ choice
 		bool "AP6212A1"
 	config BR2_PACKAGE_BROADCOM_BSA_AP6354
 		bool "AP6354"
+	config BR2_PACKAGE_BROADCOM_BSA_AP6236
+		bool "AP6236"
+	config BR2_PACKAGE_BROADCOM_BSA_AP6256
+		bool "AP6256"
+	config BR2_PACKAGE_BROADCOM_BSA_AP6356
+		bool "AP6356"
 endchoice
 endif
