@@ -1,0 +1,2 @@
+#include "rockchip_rk3399pro_defconfig"
+BR2_PACKAGE_RKNPU_PCIE=y
