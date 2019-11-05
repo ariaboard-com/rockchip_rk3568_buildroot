@@ -9,7 +9,10 @@ case "$1" in
     killall bsa_server
     check_not_exist.sh bsa_server
 
+    echo 0 > /sys/class/rfkill/rfkill0/state
+    sleep 1
     echo 1 > /sys/class/rfkill/rfkill0/state
+    sleep 1
 
     mkdir -p /data/bsa/config/test_files/av
     cp /etc/bsa_file/* /data/bsa/config/test_files/av/
