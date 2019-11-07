@@ -8,6 +8,8 @@ BROADCOM_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 		   app_hl app_hs app_tm app_tm app_socket \
 		   app_hd app_hh app_ble_wifi_introducer
 
+BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
+
 ifeq ($(BR2_PACKAGE_BROADCOM_BSA)$(BR2_PACKAGE_CYPRESS_BSA),yy)
 $(error "You can only choose one type of BSA module (Broadcom or Cypress).")
 endif
@@ -84,6 +86,7 @@ define BROADCOM_BSA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 package/rockchip/broadcom_bsa/$(BROADCOM_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_hfp.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
+	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
