@@ -1,4 +1,4 @@
-From 7318e3024a7e1bd9c95ba4e803c37deaa66ca147 Mon Sep 17 00:00:00 2001
+From 96df2bb2c4394330b39dc5534000dee1dfcf0ff2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 8 Nov 2019 17:36:20 +0800
 Subject: [PATCH] video-flip: Support rockchip RGA 2D accel
@@ -8,8 +8,8 @@ Disabled by default, set env GST_VIDEO_FLIP_USE_RGA=1 to enable.
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  configure.ac                   |  12 +++
- gst/videofilter/gstvideoflip.c | 194 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 206 insertions(+)
+ gst/videofilter/gstvideoflip.c | 197 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 209 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
 index bb49f336b..9b33267dd 100644
@@ -35,7 +35,7 @@ index bb49f336b..9b33267dd 100644
  HAVE_GTK=no
  GTK_REQ=3.0.0
 diff --git a/gst/videofilter/gstvideoflip.c b/gst/videofilter/gstvideoflip.c
-index c6132f587..ce6c788b4 100644
+index c6132f587..71ddaf6a8 100644
 --- a/gst/videofilter/gstvideoflip.c
 +++ b/gst/videofilter/gstvideoflip.c
 @@ -48,6 +48,11 @@
@@ -50,7 +50,7 @@ index c6132f587..ce6c788b4 100644
  /* GstVideoFlip properties */
  enum
  {
-@@ -1118,6 +1123,186 @@ gst_video_flip_before_transform (GstBaseTransform * trans, GstBuffer * in)
+@@ -1118,6 +1123,189 @@ gst_video_flip_before_transform (GstBaseTransform * trans, GstBuffer * in)
      gst_object_sync_values (GST_OBJECT (videoflip), stream_time);
  }
  
@@ -104,6 +104,9 @@ index c6132f587..ce6c788b4 100644
 +  guint8 *ptr;
 +
 +  memset (info, 0, sizeof (rga_info_t));
++
++  if (!meta)
++    return FALSE;
 +
 +  hstride = meta->stride[0];
 +  vstride0 = meta->n_planes == 1 ? meta->height : meta->offset[1] / hstride;
@@ -237,7 +240,7 @@ index c6132f587..ce6c788b4 100644
  static GstFlowReturn
  gst_video_flip_transform_frame (GstVideoFilter * vfilter,
      GstVideoFrame * in_frame, GstVideoFrame * out_frame)
-@@ -1136,6 +1321,15 @@ gst_video_flip_transform_frame (GstVideoFilter * vfilter,
+@@ -1136,6 +1324,15 @@ gst_video_flip_transform_frame (GstVideoFilter * vfilter,
    g_type_class_unref (enum_class);
  
    GST_OBJECT_LOCK (videoflip);
