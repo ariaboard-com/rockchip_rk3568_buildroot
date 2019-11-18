@@ -1,5 +1,7 @@
 config BR2_PACKAGE_QSETTING
 	bool "qsetting"
 	depends on BR2_PACKAGE_QT5
+	select BR2_PACKAGE_DEVICEIO_RELEASE
+	select BR2_PACKAGE_BROADCOM_BSA
 	help
 	  Rockchip setting application based on QT
