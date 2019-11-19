@@ -400,6 +400,7 @@ unexport CPP
 unexport RANLIB
 unexport CFLAGS
 unexport CXXFLAGS
+unexport UNZIP
 unexport GREP_OPTIONS
 unexport TAR_OPTIONS
 unexport CONFIG_SITE
