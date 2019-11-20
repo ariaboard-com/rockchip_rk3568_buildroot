@@ -10,13 +10,13 @@ QSETTING_SITE_METHOD = local
 
 QSETTING_LICENSE = Apache V2.0
 QSETTING_LICENSE_FILES = NOTICE
-
+QSETTING_DEPENDENCIES += deviceio_release
 define QSETTING_CONFIGURE_CMDS
 	cd $(@D); $(TARGET_MAKE_ENV) $(HOST_DIR)/bin/qmake
 endef
 
 define QSETTING_BUILD_CMDS
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
+	$(TARGET_MAKE_ENV) $(MAKE) CXXFLAGS+="-DRKDEVICEIO -I$(TOPDIR)/../external/deviceio_release/DeviceIO/include" LFLAGS+=" -lDeviceIo -lasound" -C $(@D)
 endef
 
 define QSETTING_INSTALL_TARGET_CMDS
