@@ -9,7 +9,7 @@ DEVICEIO_RELEASE_INSTALL_STAGING = YES
 
 ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), REALTEK)
 	LIBDEVICEIOSO = libDeviceIo_bluez.so
-	DEVICEIO_RELEASE_DEPENDENCIES += readline bluez5_utils libglib2
+	DEVICEIO_RELEASE_DEPENDENCIES += readline bluez5_utils libglib2 bluez-alsa
 else ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), BROADCOM)
 	LIBDEVICEIOSO = libDeviceIo_broadcom.so
 	DEVICEIO_RELEASE_DEPENDENCIES += broadcom_bsa
@@ -28,6 +28,7 @@ endif
 
 define DEVICEIO_RELEASE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(TARGET_DIR)/usr/lib/libDeviceIo.so
+	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(STAGING_DIR)/usr/lib/libDeviceIo.so
 endef
 
 $(eval $(generic-package))
