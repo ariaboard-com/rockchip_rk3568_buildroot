@@ -74,8 +74,10 @@ RKawbDir = $(TARGET_DIR)/usr/lib/rkisp/awb
 
 define CAMERA_ENGINE_RKISP_INSTALL_STAGING_CMDS
 	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(STAGING_DIR)/usr/lib/
+	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp_api.so $(STAGING_DIR)/usr/lib/
 	mkdir -p $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface
 	$(foreach header,$(wildcard $($(PKG)_BUILDDIR)/interface/*.h),$(INSTALL) -D -m 644 $(header) $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface;)
+	$(INSTALL) -D -m 644 $(@D)/apps/rkisp_api/rkisp_api.h $(STAGING_DIR)/usr/include/camera_engine_rkisp/interface
 endef
 
 define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
@@ -89,6 +91,7 @@ define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/build/bin/rkisp_3A_server $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKISP_IQFILE) $(TARGET_DIR)/etc/iqfiles/
 	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp.so $(TARGET_DIR)/usr/lib/
+	$(INSTALL) -D -m 644 $(@D)/build/lib/librkisp_api.so $(TARGET_DIR)/usr/lib/
 	$(INSTALL) -D -m 644 $(@D)/plugins/3a/rkiq/af/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_af.so $(RKafDir)/
 	$(INSTALL) -D -m 644 $(@D)/plugins/3a/rkiq/aec/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_aec.so $(RKaeDir)/
 	$(INSTALL) -D -m 644 $(@D)/plugins/3a/rkiq/awb/$(CAMERA_ENGINE_RKISP_LIB)/librkisp_awb.so $(RKawbDir)/
