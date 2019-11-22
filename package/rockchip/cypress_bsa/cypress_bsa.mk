@@ -57,10 +57,10 @@ define CYPRESS_BSA_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/etc/bsa_file
 	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/$(CYPRESS_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
-        $(INSTALL) -D -m 755 package/rockchip/cypress_bsa/$(CYPRESS_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/$(CYPRESS_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
+        $(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/$(CYPRESS_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
