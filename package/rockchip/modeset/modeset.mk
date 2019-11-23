@@ -3,6 +3,6 @@ MODESET_SITE = $(TOPDIR)/package/rockchip/modeset/src
 MODESET_VERSION = release
 MODESET_SITE_METHOD = local
 
-MODESET_CONF_DEPENDENCIES += libdrm
+MODESET_CONF_DEPENDENCIES += libdrm jpeg
 
 $(eval $(cmake-package))
