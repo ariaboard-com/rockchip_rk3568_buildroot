@@ -5,5 +5,19 @@ config BR2_PACKAGE_ADK
 	bool "RV1108 package adk"
 	select BR2_PACKAGE_LIBION
 
+if BR2_PACKAGE_ADK
+menu "adk setting options"
+
+    config BR2_PACKAGE_ADK_MEDIA
+        bool "enable adk media."
+        default n
+        select BR2_PACKAGE_ALSA_LIB
+        select BR2_PACKAGE_RKMEDIA
+        select BR2_PACKAGE_RKMEDIA_OGG
+        select BR2_PACKAGE_RKMEDIA_OGGVORBIS_DEMUXER
+        select BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK
+endmenu
+endif
+
 endif
 
