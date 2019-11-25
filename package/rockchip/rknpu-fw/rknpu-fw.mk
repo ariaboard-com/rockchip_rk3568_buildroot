@@ -20,7 +20,7 @@ endef
 else
 define RKNPU_FW_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/usr/share/npu_fw
-    $(INSTALL) -m 0755 -D $(@D)/npu_fw_n4/* $(TARGET_DIR)/usr/share/npu_fw/
+    $(INSTALL) -m 0755 -D $(@D)/npu_fw/* $(TARGET_DIR)/usr/share/npu_fw/
     $(INSTALL) -m 0755 -D $(@D)/bin/npu-image.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -m 0755 -D $(@D)/bin/npu_transfer_proxy $(TARGET_DIR)/usr/bin/
     $(INSTALL) -m 0755 -D $(@D)/bin/npu_upgrade $(TARGET_DIR)/usr/bin/
