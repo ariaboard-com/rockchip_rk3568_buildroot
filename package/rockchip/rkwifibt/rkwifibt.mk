@@ -12,10 +12,10 @@ RKWIFIBT_LICENSE_FILES = NOTICE
 
 BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
 
-ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
+ifeq ($(call qstrip,$(RK_ARCH)),arm64)
 RKARCH = arm64
 RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-else ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+else ifeq ($(call qstrip,$(RK_ARCH)),arm)
 RKARCH = arm
 RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 endif
