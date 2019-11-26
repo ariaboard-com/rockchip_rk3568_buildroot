@@ -16,9 +16,8 @@ define RKTOOLKIT_BUILD_CMDS
 endef
 
 define RKTOOLKIT_INSTALL_TARGET_CMDS
-	[ -n "$(BR2_PACKAGE_IO)" ] && $(INSTALL) -D -m 755 $(@D)/io $(TARGET_DIR)/usr/bin/io
-	[ -z "$(BR2_PACKAGE_UPDATE)" ] || $(INSTALL) -D -m 755 $(@D)/update $(TARGET_DIR)/usr/bin/update
-	
+	[ -n "$(BR2_PACKAGE_IO)" ] && $(INSTALL) -D -m 755 $(@D)/io $(TARGET_DIR)/usr/bin/io || true
+	[ -n "$(BR2_PACKAGE_UPDATE)" ] && $(INSTALL) -D -m 755 $(@D)/update $(TARGET_DIR)/usr/bin/update || true
 endef
 
 $(eval $(generic-package))
