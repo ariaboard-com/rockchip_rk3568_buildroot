@@ -1,3 +1,4 @@
 config BR2_PACKAGE_UVC_APP
     bool "uvc app"
     select BR2_PACKAGE_LIBDRM
+    select BR2_PACKAGE_MPP
