@@ -5,9 +5,14 @@ ADK_INSTALL_STAGING = YES
 # add dependencies
 ADK_DEPENDENCIES = libion
 
-ifeq ($(BR2_PACKAGE_ADK_MEDIA),y)
+ifeq ($(BR2_PACKAGE_ADK_MEDIA_OGG_PLAYBACK),y)
     ADK_DEPENDENCIES += alsa-lib rkmedia
-    ADK_CONF_OPTS += -DENABLE_ADK_MEDIA=1
+    ADK_CONF_OPTS += -DENABLE_OGG_PLAYBACK=1
+endif
+
+ifeq ($(BR2_PACKAGE_ADK_MEDIA_WAV_PLAYBACK),y)
+    ADK_DEPENDENCIES += alsa-lib
+    ADK_CONF_OPTS += -DENABLE_WAV_PLAYBACK=1
 endif
 
 $(eval $(cmake-package))
