@@ -37,6 +37,7 @@ define DEVICEIO_RELEASE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/app_manager $(TARGET_DIR)/usr/bin/app_manager
 	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/bsa_server $(TARGET_DIR)/usr/bin/bsa_server
 	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/libbsa.so $(TARGET_DIR)/usr/lib/libbsa.so
+	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/libbsa.so $(STAGING_DIR)/usr/lib/libbsa.so
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
