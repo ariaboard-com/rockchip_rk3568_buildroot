@@ -5,7 +5,7 @@
 ################################################################################
 
 MULTICAMERA_VERSION = 1.0
-MULTICAMERA_SITE = $(TOPDIR)/../app/qcamera
+MULTICAMERA_SITE = $(TOPDIR)/../app/multicamera
 MULTICAMERA_SITE_METHOD = local
 
 MULTICAMERA_LICENSE = Apache V2.0
