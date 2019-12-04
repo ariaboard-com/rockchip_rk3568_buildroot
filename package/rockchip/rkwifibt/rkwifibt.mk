@@ -17,7 +17,12 @@ RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3
 else ifeq ($(call qstrip,$(RK_ARCH)),arm)
 RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 endif
-RKARCH=$(RK_ARCH)
+
+ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
+RKARCH=arm64
+else ifeq ($(call qstrip,$(BR2_ARCH)),arm)
+RKARCH=arm
+endif
 
 define RKWIFIBT_INSTALL_COMMON
     mkdir -p $(TARGET_DIR)/lib/firmware $(TARGET_DIR)/usr/lib/modules $(TARGET_DIR)/system/etc/firmware $(TARGET_DIR)/lib/firmware/rtlbt
