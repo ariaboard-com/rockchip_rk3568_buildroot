@@ -3,5 +3,7 @@
 #include "rv1108_lock.config"
 #include "rv1108_face_service.config"
 #include "rv1108_system_manager.config"
-#include "adbd.config"
 #include "network.config"
+#include "adbd.config"
+BR2_PACKAGE_ADK_MEDIA=y
+BR2_PACKAGE_ADK_MEDIA_WAV_PLAYBACK=y
