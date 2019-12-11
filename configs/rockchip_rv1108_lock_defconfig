@@ -5,6 +5,7 @@
 #include "rv1108_system_manager.config"
 #include "network.config"
 #include "adbd.config"
+BR2_PACKAGE_DROPBEAR=n
 BR2_PACKAGE_ADK_MEDIA=y
 BR2_PACKAGE_ADK_MEDIA_WAV_PLAYBACK=y
 BR2_PACKAGE_RV1108_MINIGUI_ENABLE_FREETYPE=y
