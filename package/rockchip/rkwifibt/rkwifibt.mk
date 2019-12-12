@@ -33,7 +33,6 @@ define RKWIFIBT_INSTALL_COMMON
 endef
 
 define RKWIFIBT_BROADCOM_INSTALL
-    $(SED) "/load wifi modules/a\\  \   insmod \/system\/lib\/modules\/$(BR2_PACKAGE_RKWIFIBT_WIFI_KO)" $(@D)/S66load_wifi_modules
     $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/S66load_wifi_modules
     $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/system/etc/firmware/
