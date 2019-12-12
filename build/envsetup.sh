@@ -23,6 +23,7 @@ function choose_board()
 		if [ "$INDEX" -eq -1 ]; then
 			echo "Lunching for non-rockchip boards..."
 			unset TARGET_OUTPUT_DIR
+			unset RK_BUILD_CONFIG
 			break;
 		fi
 
