@@ -3,17 +3,12 @@ FACE_SERVICE_SITE_METHOD = local
 FACE_SERVICE_INSTALL_STAGING = YES
 
 # add dependencies
-FACE_SERVICE_DEPENDENCIES = hal adk messenger linux-rga rkfb camerahal rkcamera process_units
+FACE_SERVICE_DEPENDENCIES = hal adk messenger linux-rga rkfb camerahal rkcamera process_units database
 
 # add package dependencies & opts
 ifeq ($(BR2_PACKAGE_SQLITE),y)
     FACE_SERVICE_DEPENDENCIES += sqlite
     FACE_SERVICE_CONF_OPTS += -DUSE_SQLITE=1
-endif
-
-ifeq ($(BR2_PACKAGE_DATABASE),y)
-    FACE_SERVICE_DEPENDENCIES += database
-    FACE_SERVICE_CONF_OPTS += -DUSE_DATABASE=1
 endif
 
 ifeq ($(BR2_PACKAGE_RKFACE),y)
