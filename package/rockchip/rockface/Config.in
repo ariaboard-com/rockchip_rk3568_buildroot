@@ -1,0 +1,3 @@
+config BR2_PACKAGE_ROCKFACE
+    bool "rockface"
+    select BR2_PACKAGE_RKNPU
