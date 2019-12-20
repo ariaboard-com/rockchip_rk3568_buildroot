@@ -42,6 +42,10 @@ QT5BASE_CFLAGS += -O0
 QT5BASE_CXXFLAGS += -O0
 endif
 
+ifeq ($(BR2_ARM_CPU_HAS_NEON),y)
+QT5BASE_CFLAGS += -mfpu=neon
+endif
+
 ifeq ($(BR2_PACKAGE_QT5_VERSION_5_6),y)
 QT5BASE_DEPENDENCIES += pcre
 else
