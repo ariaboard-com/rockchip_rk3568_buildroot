@@ -54,7 +54,8 @@ FFMPEG_CONF_OPTS = \
 	--disable-libilbc \
 	--disable-libvo-amrwbenc \
 	--disable-symver \
-	--disable-doc
+	--disable-doc \
+	--enable-librga
 
 FFMPEG_DEPENDENCIES += host-pkgconf
 
