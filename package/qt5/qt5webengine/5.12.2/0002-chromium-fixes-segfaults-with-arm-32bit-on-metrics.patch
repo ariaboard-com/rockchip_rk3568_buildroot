@@ -1,0 +1,29 @@
+From 35fce33516830ada38c557dd5d819b209c9447c9 Mon Sep 17 00:00:00 2001
+From: Caesar Wang <wxt@rock-chips.com>
+Date: Fri, 20 Dec 2019 17:56:54 +0800
+Subject: [PATCH] chromium: fixes segfaults with arm 32bit on metrics
+
+That had fixed with newer chromium, or fixes the qtwebengine version
+5.12.5+. Maybe can fix this issue if you gcc upgrade to gcc 8.x+.
+
+Signed-off-by: Caesar Wang <wxt@rock-chips.com>
+---
+ .../chromium/services/metrics/public/cpp/ukm_entry_builder_base.cc      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/chromium/services/metrics/public/cpp/ukm_entry_builder_base.cc b/src/3rdparty/chromium/services/metrics/public/cpp/ukm_entry_builder_base.cc
+index 6685a58..5c5380e 100644
+--- a/src/3rdparty/chromium/services/metrics/public/cpp/ukm_entry_builder_base.cc
++++ b/src/3rdparty/chromium/services/metrics/public/cpp/ukm_entry_builder_base.cc
+@@ -23,7 +23,7 @@ UkmEntryBuilderBase::~UkmEntryBuilderBase() = default;
+ 
+ void UkmEntryBuilderBase::SetMetricInternal(uint64_t metric_hash,
+                                             int64_t value) {
+-  entry_->metrics.emplace(metric_hash, value);
++  entry_->metrics.emplace(std::make_pair(metric_hash, value));
+ }
+ 
+ void UkmEntryBuilderBase::Record(UkmRecorder* recorder) {
+-- 
+2.7.4
+
