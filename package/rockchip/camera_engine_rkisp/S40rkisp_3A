@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Start 3A daemon for each /dev/mediaX device
 #
@@ -8,7 +8,7 @@ case "$1" in
     i=0
     for MEDIA_DEV in $(ls -1 /dev/media*); do
       start-stop-daemon -S -m -b -p /tmp/.rkisp_3A_$i --startas \
-        /bin/bash -- -c "/usr/bin/rkisp_3A_server --mmedia=$MEDIA_DEV 2>&1 | logger -t rkisp_3A-$i"
+        /bin/sh -- -c "/usr/bin/rkisp_3A_server --mmedia=$MEDIA_DEV 2>&1 | logger -t rkisp_3A-$i"
       let i++
     done
     ;;
