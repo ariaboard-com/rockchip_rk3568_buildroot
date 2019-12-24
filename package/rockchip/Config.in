@@ -109,6 +109,11 @@ config BR2_PACKAGE_RK3036
     help
         Use rockchip's rk3036 chip
 
+config BR2_PACKAGE_RK3032
+    bool "rk3032 chip"
+    help
+        Use rockchip's rk3032 chip
+
 endchoice
 
 
