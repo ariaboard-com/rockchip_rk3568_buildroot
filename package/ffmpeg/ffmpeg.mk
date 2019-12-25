@@ -54,8 +54,7 @@ FFMPEG_CONF_OPTS = \
 	--disable-libilbc \
 	--disable-libvo-amrwbenc \
 	--disable-symver \
-	--disable-doc \
-	--enable-librga
+	--disable-doc
 
 FFMPEG_DEPENDENCIES += host-pkgconf
 
@@ -107,6 +106,13 @@ ifeq ($(BR2_PACKAGE_FFMPEG_SWSCALE),y)
 FFMPEG_CONF_OPTS += --enable-swscale
 else
 FFMPEG_CONF_OPTS += --disable-swscale
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+FFMPEG_CONF_OPTS += --enable-librga
+FFMPEG_DEPENDENCIES += linux-rga
+else
+FFMPEG_CONF_OPTS += --disable-librga
 endif
 
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_ENCODERS)),all)
