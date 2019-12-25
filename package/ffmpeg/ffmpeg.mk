@@ -241,6 +241,11 @@ FFMPEG_CONF_OPTS += --enable-libdrm
 FFMPEG_DEPENDENCIES += libdrm
 else
 FFMPEG_CONF_OPTS += --disable-libdrm
+
+ifeq ($(BR2_PACKAGE_LIBION),y)
+FFMPEG_CONF_OPTS += --enable-libion
+FFMPEG_DEPENDENCIES += libion
+endif
 endif
 
 ifeq ($(BR2_PACKAGE_LIBOPENH264),y)
