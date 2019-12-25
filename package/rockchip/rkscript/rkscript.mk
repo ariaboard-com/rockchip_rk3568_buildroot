@@ -39,6 +39,15 @@ define RKSCRIPT_INSTALL_TARGET_CMDS
 	touch $(RKSCRIPT_USB_CONFIG_FILE)
 endef
 
+ifneq ($(call qstrip,$(BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM)),none)
+PCM_ID=$(call qstrip,$(BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM))
+define RKSCRIPT_INSTALL_TARGET_PCM_HOOK
+	$(SED) "s#\#PCM_ID#${PCM_ID}#g" $(@D)/asound.conf.in
+	$(INSTALL) -m 0644 -D $(@D)/asound.conf.in $(TARGET_DIR)/etc/asound.conf
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_INSTALL_TARGET_PCM_HOOK
+endif
+
 ifeq ($(BR2_PACKAGE_ANDROID_TOOLS_ADBD),y)
 define RKSCRIPT_ADD_ADBD_CONFIG
 	if test ! `grep usb_adb_en $(RKSCRIPT_USB_CONFIG_FILE)` ; then \

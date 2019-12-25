@@ -57,3 +57,11 @@ config BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_AUTO_MOUNT
 	  Warning that umount ums shared block may be failed, because
 	  usb is unabled to manage other applications which used ums
 	  shared block when usb was going to umount block.
+
+config BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM
+	string "default PCM"
+	default "none"
+	depends on BR2_PACKAGE_RKSCRIPT
+
+	help
+	  Change alsa default PCM to you selected
