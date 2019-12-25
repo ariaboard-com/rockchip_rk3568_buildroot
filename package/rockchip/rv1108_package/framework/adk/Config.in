@@ -26,6 +26,17 @@ menu "adk setting options"
             bool "support adk wav playback"
             default n
             select BR2_PACKAGE_ALSA_LIB
+
+        config BR2_PACKAGE_ADK_MEDIA_VIDEO_RECORD
+            bool "support video record for h264 encoder."
+            default n
+            select BR2_PACKAGE_MPP
+            select BR2_PACKAGE_RKMEDIA
+            select BR2_PACKAGE_RKMEDIA_MPP
+            select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
+            select BR2_PACKAGE_FFMPEG
+            select BR2_PACKAGE_RKMEDIA_FFMPEG
+
     endif
 endmenu
 endif

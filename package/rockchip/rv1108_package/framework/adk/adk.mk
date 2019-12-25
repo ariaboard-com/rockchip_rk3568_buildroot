@@ -15,4 +15,9 @@ ifeq ($(BR2_PACKAGE_ADK_MEDIA_WAV_PLAYBACK),y)
     ADK_CONF_OPTS += -DENABLE_WAV_PLAYBACK=1
 endif
 
+ifeq ($(BR2_PACKAGE_ADK_MEDIA_VIDEO_RECORD),y)
+    ADK_DEPENDENCIES += mpp rkmedia ffmpeg
+    ADK_CONF_OPTS += -DENABLE_VIDEO_RECORD=1
+endif
+
 $(eval $(cmake-package))
