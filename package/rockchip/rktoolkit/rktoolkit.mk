@@ -13,7 +13,7 @@ RKTOOLKIT_LICENSE = Apache V2.0
 define RKTOOLKIT_BUILD_CMDS
 	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(@D)/io.c -o $(@D)/io
 	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(@D)/update.c $(@D)/update_recv/update_recv.c -I$(@D)/update_recv/ -o $(@D)/update
-	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(@D)/vendor_storage.c $(@D)/vendor_storage
+	$(TARGET_CC) $(TARGET_CFLAGS) $(TARGET_LDFLAGS) $(@D)/vendor_storage.c -o $(@D)/vendor_storage
 endef
 
 define RKTOOLKIT_INSTALL_TARGET_CMDS
