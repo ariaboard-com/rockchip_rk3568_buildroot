@@ -1,0 +1,17 @@
+config BR2_PACKAGE_COMMON_ALGORITHM
+	bool "rockchip common algorithm"
+	help
+	  rockchip common algorithm library
+
+if BR2_PACKAGE_COMMON_ALGORITHM
+
+config BR2_PACKAGE_COMMON_ALGORITHM_AEC_ANR_AGC
+	bool "audio 3a"
+
+config BR2_PACKAGE_COMMON_ALGORITHM_TWO_MIC_BEAMFORM
+	bool "beamforming(two mic)"
+
+config BR2_PACKAGE_COMMON_ALGORITHM_MOVE_DETECT
+	bool "move detection"
+
+endif
