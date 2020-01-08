@@ -1,0 +1,8 @@
+config BR2_PACKAGE_MEDIASERVER
+	bool "rockchip mediaserver"
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_DBUS_CPP
+	select BR2_PACKAGE_LIBRKDB
+	select BR2_PACKAGE_CJSON
+	help
+	  rockchip mediaserver

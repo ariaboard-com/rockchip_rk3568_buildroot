@@ -219,4 +219,5 @@ source "package/rockchip/librkdb/Config.in"
 source "package/rockchip/dbserver/Config.in"
 source "package/rockchip/netserver/Config.in"
 source "package/rockchip/storage_manager/Config.in"
+source "package/rockchip/mediaserver/Config.in"
 endif
