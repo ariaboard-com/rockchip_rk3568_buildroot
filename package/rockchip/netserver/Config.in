@@ -1,0 +1,6 @@
+config BR2_PACKAGE_NETSERVER
+	bool "rockchip netserver"
+	select BR2_PACKAGE_LIBGDBUS
+	select BR2_PACKAGE_LIBRKDB
+	help
+	  rockchip netserver

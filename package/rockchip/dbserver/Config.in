@@ -1,0 +1,6 @@
+config BR2_PACKAGE_DBSERVER
+	bool "rockchip dbserver"
+	select BR2_PACKAGE_LIBGDBUS
+	select BR2_PACKAGE_LIBRKDB
+	help
+	  rockchip dbserver
