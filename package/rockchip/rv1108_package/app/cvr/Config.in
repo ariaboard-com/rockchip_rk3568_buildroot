@@ -21,7 +21,7 @@ menu "cvr setting options"
 		default y
 		select BR2_PACKAGE_ADK_RKMEDIA
 		select BR2_PACKAGE_ADK_RKMEDIA_H264_ENCODE
-		select BR2_PACKAGE_ADK_RKMEDIA_VIDEO_RECORD
+		select BR2_PACKAGE_ADK_RKMEDIA_MP4_MUXER
 endmenu
 endif
 

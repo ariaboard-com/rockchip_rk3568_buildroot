@@ -35,8 +35,8 @@ menu "adk setting options"
             select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 
             if BR2_PACKAGE_ADK_RKMEDIA_H264_ENCODE
-                config BR2_PACKAGE_ADK_RKMEDIA_VIDEO_RECORD
-                    bool "support video record"
+                config BR2_PACKAGE_ADK_RKMEDIA_MP4_MUXER
+                    bool "support mp4 muxer"
                     default y
                     select BR2_PACKAGE_FFMPEG
                     select BR2_PACKAGE_RKMEDIA_FFMPEG
