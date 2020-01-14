@@ -2,7 +2,6 @@
 #include "base.config"
 #include "base_extra.config"
 #include "chromium.config"
-#include "demo.config
 #include "gpu.config"
 #include "display.config"
 #include "video_ffmpeg.config"
