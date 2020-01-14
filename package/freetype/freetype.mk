@@ -35,8 +35,14 @@ else
 FREETYPE_CONF_OPTS += --without-bzip2
 endif
 
+ifneq ($(BR2_PACKAGE_LIBPNG)$(BR2_PACKAGE_LIBPNG12),)
+
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 FREETYPE_DEPENDENCIES += libpng
+else
+FREETYPE_DEPENDENCIES += libpng12
+endif
+
 FREETYPE_CONF_OPTS += LIBPNG_CFLAGS="`$(STAGING_DIR)/usr/bin/libpng-config --cflags`" \
 	LIBPNG_LDFLAGS="`$(STAGING_DIR)/usr/bin/libpng-config --ldflags`"
 FREETYPE_LIBPNG_LIBS = "`$(STAGING_DIR)/usr/bin/libpng-config --libs`"
