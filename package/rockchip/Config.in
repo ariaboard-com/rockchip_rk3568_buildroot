@@ -238,4 +238,5 @@ source "package/rockchip/mediaserver/Config.in"
 source "package/rockchip/rk_oem/Config.in"
 source "package/rockchip/rkbar/Config.in"
 source "package/rockchip/minilogger/Config.in"
+source "package/rockchip/ipc-daemon/Config.in"
 endif
