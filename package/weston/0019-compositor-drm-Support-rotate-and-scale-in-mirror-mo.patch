@@ -1,7 +1,7 @@
-From 0d2684ae707942c9736b90ba5b2e3d51e3b97a9c Mon Sep 17 00:00:00 2001
+From 32e0581f016c80bc5425dfec2e5a34d9d4aff58b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 1 Aug 2019 20:51:22 +0800
-Subject: [PATCH 19/22] compositor-drm: Support rotate and scale in mirror mode
+Subject: [PATCH 19/26] compositor-drm: Support rotate and scale in mirror mode
 
 Use rockchip rga for mirror mode.
 
@@ -64,7 +64,7 @@ index 0961ca8..01a18de 100644
  PKG_CHECK_MODULES(LIBINPUT_BACKEND, [libinput >= 0.8.0])
  PKG_CHECK_MODULES(COMPOSITOR, [$COMPOSITOR_MODULES])
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index d593c04..5b26878 100644
+index 238227e..c9291f8 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -63,6 +63,11 @@
@@ -382,7 +382,7 @@ index d593c04..5b26878 100644
  		drm_output_fini_pixman(output);
  		if (drm_output_init_pixman(output, b) < 0) {
  			weston_log("failed to init output pixman state with "
-@@ -1989,7 +2164,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+@@ -1991,7 +2166,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
  	mode->base.width = info->hdisplay;
  	mode->base.height = info->vdisplay;
  
@@ -392,7 +392,7 @@ index d593c04..5b26878 100644
  		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
  			   output->base.name, drm_virtual_width,
  			   drm_virtual_height, mode->base.width,
-@@ -2181,6 +2357,55 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
+@@ -2183,6 +2359,55 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
  	return type == DRM_PLANE_TYPE_PRIMARY;
  }
  
@@ -405,7 +405,7 @@ index d593c04..5b26878 100644
 +	unsigned i;
 +	bool ret = false;
 +
-+	if (!getenv("WESTON_DRM_ALLOW_SCALE"))
++	if (!getenv("WESTON_DRM_NO_SCALE"))
 +		return false;
 +
 +	props = drmModeObjectGetProperties(b->drm.fd, plane_id,
@@ -448,7 +448,7 @@ index d593c04..5b26878 100644
  static int
  find_plane_for_crtc(struct drm_backend *b, int pipe)
  {
-@@ -2840,18 +3065,17 @@ drm_output_enable(struct weston_output *base)
+@@ -2842,18 +3067,17 @@ drm_output_enable(struct weston_output *base)
  	if (b->pageflip_timeout)
  		drm_output_pageflip_timer_create(output);
  
@@ -476,7 +476,7 @@ index d593c04..5b26878 100644
  		wl_list_insert(&b->mirror_list, &output->link);
  
  		// HACK: Make it unavailable for views?
-@@ -2933,14 +3157,13 @@ drm_output_deinit(struct weston_output *base)
+@@ -2935,14 +3159,13 @@ drm_output_deinit(struct weston_output *base)
  	drm_fb_unref(output->fb_current);
  	output->fb_current = NULL;
  
@@ -497,7 +497,7 @@ index d593c04..5b26878 100644
  
  	weston_plane_release(&output->fb_plane);
  	weston_plane_release(&output->cursor_plane);
-@@ -3068,6 +3291,7 @@ create_output_for_connector(struct drm_backend *b,
+@@ -3070,6 +3293,7 @@ create_output_for_connector(struct drm_backend *b,
  	output->pipe = i;
  	output->connector_id = connector->connector_id;
  	output->plane_id = plane_id;
