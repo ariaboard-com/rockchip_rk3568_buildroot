@@ -1,4 +1,4 @@
-config BR2_PACKAGE_MEDIASERVER
+menuconfig BR2_PACKAGE_MEDIASERVER
 	bool "rockchip mediaserver"
 	select BR2_PACKAGE_DBUS
 	select BR2_PACKAGE_DBUS_CPP
@@ -7,3 +7,14 @@ config BR2_PACKAGE_MEDIASERVER
 	select BR2_PACKAGE_RKMEDIA
 	help
 	  rockchip mediaserver
+
+if BR2_PACKAGE_MEDIASERVER
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI
+	bool "Enable link api features"
+	select BR2_PACKAGE_CJSON
+	default n
+	help
+	  rockchip mediaserver options
+
+endif
