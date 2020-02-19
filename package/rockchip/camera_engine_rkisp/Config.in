@@ -3,6 +3,13 @@ config BR2_PACKAGE_CAMERA_ENGINE_RKISP
 	help
 	  Rockchip camera engine for linux.
 
+config BR2_PACKAGE_CAMERA_ENGINE_RKISP_3A_SERVICE
+	depends on BR2_PACKAGE_CAMERA_ENGINE_RKISP
+	bool "Rockchip Camera Engine 3A service run in booting"
+	default y
+	help
+	  Rockchip camera engine 3A service run in booting.
+
 config BR2_PACKAGE_CAMERA_ENGINE_RKISP_IQFILE
 	depends on BR2_PACKAGE_CAMERA_ENGINE_RKISP
 	string "Rockchip Camera Engine IQ xml file"

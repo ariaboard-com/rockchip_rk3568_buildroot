@@ -51,6 +51,10 @@ CAMERA_ENGINE_RKISP_CONF_OPTS = \
 CAMERA_ENGINE_RKISP_DEPENDENCIES = tinyxml2
 endif
 
+ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKISP_3A_SERVICE), y)
+CAMERA_ENGINE_RKISP_INSTALL_3A_SCRIPT=y
+endif
+
 export BUILD_OUPUT_GSTREAMER_LIBS:=$(@D)/ext/rkisp/usr/$(CAMERA_ENGINE_RKISP_LIB)/gstreamer-1.0
 export BUILD_OUPUT_EXTERNAL_LIBS:=$(@D)/ext/rkisp/usr/$(CAMERA_ENGINE_RKISP_LIB)
 
@@ -86,7 +90,11 @@ define CAMERA_ENGINE_RKISP_INSTALL_TARGET_CMDS
 	mkdir -p $(RKaeDir)
 	mkdir -p $(RKawbDir)
 	mkdir -p $(TARGET_DIR)/etc/iqfiles
-	$(INSTALL) -D -m 755 $(TOPDIR)/package/rockchip/camera_engine_rkisp/S40rkisp_3A $(TARGET_DIR)/etc/init.d/
+
+	if [ x${CAMERA_ENGINE_RKISP_INSTALL_3A_SCRIPT} != x ]; then \
+		$(INSTALL) -D -m 755 $(TOPDIR)/package/rockchip/camera_engine_rkisp/S40rkisp_3A $(TARGET_DIR)/etc/init.d/; \
+	fi
+
 	$(INSTALL) -D -m 755 $(@D)/build/bin/rkisp_demo $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 $(@D)/build/bin/rkisp_3A_server $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKISP_IQFILE) $(TARGET_DIR)/etc/iqfiles/
