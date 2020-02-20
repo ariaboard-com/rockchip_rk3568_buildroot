@@ -28,12 +28,23 @@ ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)
 BUILD_PYTHON_RKNN=y
 endif
 
+ifeq ($(BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER), y)
+BUILD_NOT_START_RKNN_SCRIPT=y
+endif
+
 define RKNPU_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/lib/modules/
     mkdir -p $(TARGET_DIR)/usr/share/npu/
     $(INSTALL) -D -m 0644 $(@D)/drivers/npu_ko/$(NPU_KO_FILE) $(TARGET_DIR)/lib/modules/galcore.ko
     cp -r $(@D)/drivers/common/* $(TARGET_DIR)/
     cp -r $(@D)/drivers/common/* $(STAGING_DIR)/
+
+    if [ x${BUILD_NOT_START_RKNN_SCRIPT} != x ]; then \
+        rm $(TARGET_DIR)/etc/init.d/S60NPU_init; \
+    else \
+        rm $(TARGET_DIR)/etc/init.d/S05NPU_init; \
+    fi
+
     cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(TARGET_DIR)/
     cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(STAGING_DIR)/
 
