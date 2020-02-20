@@ -3,6 +3,12 @@ config BR2_PACKAGE_RKNPU
 	help
 	  "Copy rknpu driver and test case"
 
+config BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER
+	bool "rknpu not run start_rknn"
+        depends on BR2_PACKAGE_RKNPU
+	help
+	  "rknpu not run start_rknn.sh"
+
 config BR2_PACKAGE_RKNPU_NTB
 	bool "rknpu ntb"
         depends on BR2_PACKAGE_RKNPU
