@@ -3,6 +3,8 @@
 # Start 3A daemon for each /dev/mediaX device
 #
 
+export CAMERA_ENGINE_RKISP_XML_DB=/etc/iqfiles-db
+
 case "$1" in
   start)
     i=0
