@@ -19,9 +19,15 @@ NPU_KO_FILE = galcore.ko
 endif
 
 ifeq ($(BR2_arm),y)
-NPU_PLATFORM = linux-armhf
+NPU_PLATFORM_ARCH = linux-armhf
 else
-NPU_PLATFORM = linux-aarch64
+NPU_PLATFORM_ARCH = linux-aarch64
+endif
+
+ifeq ($(BR2_PACKAGE_RKNPU_USE_MINI_DRIVER), y)
+NPU_PLATFORM = $(NPU_PLATFORM_ARCH)-mini
+else
+NPU_PLATFORM = $(NPU_PLATFORM_ARCH)
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)

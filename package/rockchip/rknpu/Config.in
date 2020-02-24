@@ -9,6 +9,12 @@ config BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER
 	help
 	  "rknpu not run start_rknn.sh"
 
+config BR2_PACKAGE_RKNPU_USE_MINI_DRIVER
+	bool "use npu mini driver"
+        depends on BR2_PACKAGE_RKNPU
+	help
+	  "use npu mini driver to reduce npu driver size"
+
 config BR2_PACKAGE_RKNPU_NTB
 	bool "rknpu ntb"
         depends on BR2_PACKAGE_RKNPU
