@@ -1,8 +1,8 @@
-From 93e2cea82f44f5b0486d3d97ea703e959585fd00 Mon Sep 17 00:00:00 2001
+From 370b56f5ff9a295c7825a69434a3e583c76dfd15 Mon Sep 17 00:00:00 2001
 From: Quentin Glidic <sardemff7+git@sardemff7.net>
 Date: Mon, 28 Aug 2017 20:12:01 +0200
-Subject: [PATCH] libweston-desktop/xdg-shell-v6: Ensure first configure is
- sent
+Subject: [PATCH 04/25] libweston-desktop/xdg-shell-v6: Ensure first configure
+ is sent
 
 The old code for scheduling configure events on idle looked like:
 if (configure_scheduled) {
@@ -26,7 +26,7 @@ Reviewed-by: Daniel Stone <daniels@collabora.com>
  1 file changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/libweston-desktop/xdg-shell-v6.c b/libweston-desktop/xdg-shell-v6.c
-index 82e058ed..d2ffc64c 100644
+index 10274e0..d82a507 100644
 --- a/libweston-desktop/xdg-shell-v6.c
 +++ b/libweston-desktop/xdg-shell-v6.c
 @@ -303,8 +303,7 @@ static const struct zxdg_positioner_v6_interface weston_desktop_xdg_positioner_i

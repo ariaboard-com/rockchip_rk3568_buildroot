@@ -1,7 +1,7 @@
-From 62c973ea4d7e7ca88cd2423a6b315e92f550044c Mon Sep 17 00:00:00 2001
+From b263d649f1968364dd0f5da4b6b6c9ccf720eb60 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 6 Dec 2018 18:53:05 +0800
-Subject: [PATCH] gl-renderer: Workaround dmabuf import/attach for mali
+Subject: [PATCH 11/25] gl-renderer: Workaround dmabuf import/attach for mali
 
 Tested on px3se with libmali-utgard-400-r7p0-r3p0-wayland.so, the
 mpp + waylandsink works.
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
-index da29b07..68b8429 100644
+index 1b0c463..8e4ca6f 100644
 --- a/libweston/gl-renderer.c
 +++ b/libweston/gl-renderer.c
 @@ -231,6 +231,8 @@ struct gl_renderer {

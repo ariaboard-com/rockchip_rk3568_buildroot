@@ -1,7 +1,7 @@
-From 1ce5bd21dee90aa656fa829685ca1dba92921d4e Mon Sep 17 00:00:00 2001
+From 52082531dceed493cdce0a77017a7ff4f240c3be Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 14 May 2018 09:38:11 +0800
-Subject: [PATCH 11/26] compositor-drm: Create gl-render with alpha support
+Subject: [PATCH 13/25] compositor-drm: Create gl-render with alpha support
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

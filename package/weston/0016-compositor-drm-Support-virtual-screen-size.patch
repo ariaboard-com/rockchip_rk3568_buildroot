@@ -1,29 +1,32 @@
-From d25bf9ebe3bc97391ebf2007c1d2920897b0f99f Mon Sep 17 00:00:00 2001
+From 420430af2e45b91183354e0cd2015048feb87af1 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 21 Feb 2019 14:48:01 +0800
-Subject: [PATCH] compositor-drm: Support virtual screen size
+Subject: [PATCH 16/25] compositor-drm: Support virtual screen size
 
 Support setting virtual screen size, for example:
     export WESTON_DRM_VIRTUAL_SIZE=1024x768
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/compositor-drm.c | 153 ++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 145 insertions(+), 8 deletions(-)
+ libweston/compositor-drm.c | 213 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 203 insertions(+), 10 deletions(-)
 
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index cc6503d..e8aed3c 100644
+index e5ac715..527b766 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
-@@ -219,6 +219,7 @@ struct drm_output {
+@@ -218,7 +218,10 @@ struct drm_output {
+ 	struct weston_output base;
  	drmModeConnector *connector;
  
++	bool can_scale;
++
  	uint32_t crtc_id; /* object ID to pass to DRM functions */
 +	uint32_t plane_id; /* object ID to pass to DRM functions */
  	int pipe; /* index of CRTC in resource array / bitmasks */
  	uint32_t connector_id;
  	drmModeCrtcPtr original_crtc;
-@@ -253,6 +254,8 @@ struct drm_output {
+@@ -253,6 +256,8 @@ struct drm_output {
  	/* Framebuffer we are going to submit to the kernel when the current
  	 * repaint is flushed. */
  	struct drm_fb *fb_pending;
@@ -32,7 +35,7 @@ index cc6503d..e8aed3c 100644
  
  	struct drm_fb *dumb[2];
  	pixman_image_t *image[2];
-@@ -267,6 +270,9 @@ struct drm_output {
+@@ -267,6 +272,9 @@ struct drm_output {
  
  static struct gl_renderer_interface *gl_renderer;
  
@@ -42,14 +45,14 @@ index cc6503d..e8aed3c 100644
  static const char default_seat[] = "seat0";
  
  static inline struct drm_output *
-@@ -890,21 +896,50 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -890,10 +898,22 @@ drm_output_repaint(struct weston_output *output_base,
  		return -1;
  
  	mode = container_of(output->base.current_mode, struct drm_mode, base);
 -	if (output->state_invalid || !output->fb_current ||
 -	    output->fb_current->stride != output->fb_pending->stride) {
-+
 +	if (output->state_invalid || !output->fb_current) {
++		// Use a dummy fb for initial mode setting
 +		if (!output->fb_dummy) {
 +			output->fb_dummy =
 +				drm_fb_create_dumb(backend,
@@ -57,7 +60,7 @@ index cc6503d..e8aed3c 100644
 +						   mode->mode_info.vdisplay,
 +						   backend->gbm_format);
 +			if (!output->fb_dummy) {
-+				weston_log("Failed to create fb_dummy\n");
++				weston_log("failed to create fb_dummy\n");
 +				goto err_pageflip;
 +			}
 +		}
@@ -68,16 +71,10 @@ index cc6503d..e8aed3c 100644
  				     &output->connector_id, 1,
  				     &mode->mode_info);
  		if (ret) {
- 			weston_log("set mode failed: %m\n");
- 			goto err_pageflip;
- 		}
-+
- 		output_base->set_dpms(output_base, WESTON_DPMS_ON);
- 
+@@ -905,6 +925,21 @@ drm_output_repaint(struct weston_output *output_base,
  		output->state_invalid = false;
  	}
  
-+
 +	ret = drmModeSetPlane(backend->drm.fd,
 +			      output->plane_id,
 +			      output->crtc_id,
@@ -137,24 +134,29 @@ index cc6503d..e8aed3c 100644
  	if (b->use_pixman) {
  		drm_output_fini_pixman(output);
  		if (drm_output_init_pixman(output, b) < 0) {
-@@ -1881,6 +1925,16 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+@@ -1883,6 +1927,21 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
  	mode->base.width = info->hdisplay;
  	mode->base.height = info->vdisplay;
  
 +	if (drm_virtual_width && drm_virtual_height) {
-+		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
-+			   output->base.name, drm_virtual_width,
-+			   drm_virtual_height, mode->base.width,
-+			   mode->base.height);
++		if (output->can_scale) {
++			weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
++				   output->base.name, drm_virtual_width,
++				   drm_virtual_height, mode->base.width,
++				   mode->base.height);
 +
-+		mode->base.width = drm_virtual_width;
-+		mode->base.height = drm_virtual_height;
++			mode->base.width = drm_virtual_width;
++			mode->base.height = drm_virtual_height;
++		} else {
++			weston_log("Output %s: cannot scale for virtual size\n",
++				   output->base.name);
++		}
 +	}
 +
  	/* Calculate higher precision (mHz) refresh rate */
  	refresh = (info->clock * 1000000LL / info->htotal +
  		   info->vtotal / 2) / info->vtotal;
-@@ -2041,6 +2095,64 @@ make_connector_name(const drmModeConnector *con)
+@@ -2043,6 +2102,113 @@ make_connector_name(const drmModeConnector *con)
  }
  
  static int
@@ -178,6 +180,55 @@ index cc6503d..e8aed3c 100644
 +
 +	drmModeFreeObjectProperties(props);
 +	return type == DRM_PLANE_TYPE_PRIMARY;
++}
++
++static bool
++drm_plane_can_scale(struct drm_backend *b, int plane_id)
++{
++	drmModeObjectPropertiesPtr props;
++	drmModePropertyPtr prop = NULL;
++	uint64_t value;
++	unsigned i;
++	bool ret = false;
++
++	if (getenv("WESTON_DRM_NO_SCALE"))
++		return false;
++
++	props = drmModeObjectGetProperties(b->drm.fd, plane_id,
++					   DRM_MODE_OBJECT_PLANE);
++	if (!props)
++		return false;
++
++	for (i = 0; i < props->count_props; i++) {
++		prop = drmModeGetProperty(b->drm.fd, props->props[i]);
++		if (!prop)
++			continue;
++
++		if(drm_property_type_is(prop, DRM_MODE_PROP_BITMASK) &&
++		   !strcmp(prop->name, "FEATURE"))
++			break;
++
++		drmModeFreeProperty(prop);
++	}
++
++	if (i == props->count_props)
++		goto out;
++
++	value = props->prop_values[i];
++
++	for (i = 0; i < (unsigned) prop->count_enums; i++) {
++		if (strcmp(prop->enums[i].name, "scale"))
++			continue;
++
++		ret = value & (1LL << prop->enums[i].value);
++		break;
++	}
++
++	drmModeFreeProperty(prop);
++
++out:
++	drmModeFreeObjectProperties(props);
++	return ret;
 +}
 +
 +static int
@@ -219,7 +270,7 @@ index cc6503d..e8aed3c 100644
  find_crtc_for_connector(struct drm_backend *b,
  			drmModeRes *resources, drmModeConnector *connector)
  {
-@@ -2531,8 +2643,8 @@ drm_output_choose_initial_mode(struct drm_backend *backend,
+@@ -2533,8 +2699,8 @@ drm_output_choose_initial_mode(struct drm_backend *backend,
  	}
  
  	wl_list_for_each_reverse(drm_mode, &output->base.mode_list, base.link) {
@@ -230,7 +281,19 @@ index cc6503d..e8aed3c 100644
  		    (refresh == 0 || refresh == drm_mode->mode_info.vrefresh))
  			configured = drm_mode;
  
-@@ -2750,6 +2862,9 @@ drm_output_deinit(struct weston_output *base)
+@@ -2709,8 +2875,9 @@ drm_output_enable(struct weston_output *base)
+ 	weston_compositor_stack_plane(b->compositor, &output->fb_plane,
+ 				      &b->compositor->primary_plane);
+ 
+-	weston_log("Output %s, (connector %d, crtc %d)\n",
+-		   output->base.name, output->connector_id, output->crtc_id);
++	weston_log("Output %s, (connector %d, crtc %d), can scale: %d\n",
++		   output->base.name, output->connector_id, output->crtc_id,
++		   output->can_scale);
+ 	wl_list_for_each(m, &output->base.mode_list, link)
+ 		weston_log_continue(STAMP_SPACE "mode %dx%d@%.1f%s%s%s\n",
+ 				    m->width, m->height, m->refresh / 1000.0,
+@@ -2752,6 +2919,9 @@ drm_output_deinit(struct weston_output *base)
  	weston_plane_release(&output->fb_plane);
  	weston_plane_release(&output->cursor_plane);
  
@@ -240,7 +303,7 @@ index cc6503d..e8aed3c 100644
  	drmModeFreeProperty(output->dpms_prop);
  
  	/* Turn off hardware cursor */
-@@ -2844,7 +2959,7 @@ create_output_for_connector(struct drm_backend *b,
+@@ -2846,7 +3016,7 @@ create_output_for_connector(struct drm_backend *b,
  {
  	struct drm_output *output;
  	struct drm_mode *drm_mode;
@@ -249,7 +312,7 @@ index cc6503d..e8aed3c 100644
  
  	i = find_crtc_for_connector(b, resources, connector);
  	if (i < 0) {
-@@ -2852,6 +2967,12 @@ create_output_for_connector(struct drm_backend *b,
+@@ -2854,6 +3024,12 @@ create_output_for_connector(struct drm_backend *b,
  		goto err;
  	}
  
@@ -262,15 +325,16 @@ index cc6503d..e8aed3c 100644
  	output = zalloc(sizeof *output);
  	if (output == NULL)
  		goto err;
-@@ -2860,6 +2981,7 @@ create_output_for_connector(struct drm_backend *b,
+@@ -2862,6 +3038,8 @@ create_output_for_connector(struct drm_backend *b,
  	output->crtc_id = resources->crtcs[i];
  	output->pipe = i;
  	output->connector_id = connector->connector_id;
 +	output->plane_id = plane_id;
++	output->can_scale = drm_plane_can_scale(b, plane_id);
  
  	output->backlight = backlight_init(drm_device,
  					   connector->connector_type);
-@@ -3377,6 +3499,8 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
+@@ -3379,6 +3557,8 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
  	if (fd < 0)
  		return false;
  
@@ -279,7 +343,7 @@ index cc6503d..e8aed3c 100644
  	res = drmModeGetResources(fd);
  	if (!res)
  		goto out_fd;
-@@ -3890,6 +4014,7 @@ weston_backend_init(struct weston_compositor *compositor,
+@@ -3892,6 +4072,7 @@ weston_backend_init(struct weston_compositor *compositor,
  {
  	struct drm_backend *b;
  	struct weston_drm_backend_config config = {{ 0, }};
@@ -287,7 +351,7 @@ index cc6503d..e8aed3c 100644
  
  	if (config_base == NULL ||
  	    config_base->struct_version != WESTON_DRM_BACKEND_CONFIG_VERSION ||
-@@ -3901,6 +4026,18 @@ weston_backend_init(struct weston_compositor *compositor,
+@@ -3903,6 +4084,18 @@ weston_backend_init(struct weston_compositor *compositor,
  	config_init_to_defaults(&config);
  	memcpy(&config, config_base, config_base->struct_size);
  

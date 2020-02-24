@@ -1,7 +1,7 @@
-From 8b9882fac8efe03d2548830c83732501754d6dc6 Mon Sep 17 00:00:00 2001
+From d7fb13e3ca0242ca6bcaad6c2f4057092f77e4cb Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 27 Feb 2019 17:06:58 +0800
-Subject: [PATCH] xdg-shell-v6: Support setting window position
+Subject: [PATCH 08/25] xdg-shell-v6: Support setting window position
 
 Set window position when .set_window_geometry() called with size 0x0.
 
@@ -70,7 +70,7 @@ index d3be936..d166957 100644
  				 const char *title)
  {
 diff --git a/libweston-desktop/xdg-shell-v6.c b/libweston-desktop/xdg-shell-v6.c
-index 10274e0..82e058e 100644
+index d82a507..d2ffc64 100644
 --- a/libweston-desktop/xdg-shell-v6.c
 +++ b/libweston-desktop/xdg-shell-v6.c
 @@ -1074,6 +1074,12 @@ weston_desktop_xdg_surface_protocol_set_window_geometry(struct wl_client *wl_cli

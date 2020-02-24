@@ -1,7 +1,7 @@
-From 200f4dca24b9c465ffa3d19948ed6bcc990d8cae Mon Sep 17 00:00:00 2001
+From cf69cef23985ea08b80d0cc4de4abaaf2681076c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 28 Jan 2019 18:22:18 +0800
-Subject: [PATCH] compositor-drm: Support perfer external connectors
+Subject: [PATCH 15/25] compositor-drm: Support perfer external connectors
 
 Using internal connector as main output by default.
 
@@ -117,7 +117,7 @@ index 0ebb556..0bea96a 100644
  	wl_list_remove(&output_listener->link);
  	free(output_listener);
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index cf10153..82a2cfa 100644
+index e21e1c4..e5ac715 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -79,6 +79,9 @@
@@ -149,7 +149,7 @@ index cf10153..82a2cfa 100644
  };
  
  struct drm_mode {
-@@ -2959,11 +2967,67 @@ destroy_sprites(struct drm_backend *backend)
+@@ -2961,11 +2969,67 @@ destroy_sprites(struct drm_backend *backend)
  	}
  }
  
@@ -217,7 +217,7 @@ index cf10153..82a2cfa 100644
  	int i;
  
  	resources = drmModeGetResources(b->drm.fd);
-@@ -2977,6 +3041,14 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2979,6 +3043,14 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  	b->min_height = resources->min_height;
  	b->max_height = resources->max_height;
  
@@ -232,7 +232,7 @@ index cf10153..82a2cfa 100644
  	for (i = 0; i < resources->count_connectors; i++) {
  		connector = drmModeGetConnector(b->drm.fd,
  						resources->connectors[i]);
-@@ -2985,7 +3057,8 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2987,7 +3059,8 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  
  		if (connector->connection == DRM_MODE_CONNECTED &&
  		    (b->connector == 0 ||
@@ -242,7 +242,7 @@ index cf10153..82a2cfa 100644
  			if (create_output_for_connector(b, resources,
  							connector, drm_device) < 0)
  				continue;
-@@ -2994,22 +3067,44 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2996,22 +3069,44 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  		}
  	}
  
@@ -287,7 +287,7 @@ index cf10153..82a2cfa 100644
  	int i;
  
  	resources = drmModeGetResources(b->drm.fd);
-@@ -3049,9 +3144,8 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3051,9 +3146,8 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  		}
  
@@ -298,7 +298,7 @@ index cf10153..82a2cfa 100644
  	}
  
  	wl_list_for_each_safe(output, next, &b->compositor->output_list,
-@@ -3069,7 +3163,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3071,7 +3165,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
@@ -307,7 +307,7 @@ index cf10153..82a2cfa 100644
  	}
  
  	wl_list_for_each_safe(output, next, &b->compositor->pending_output_list,
-@@ -3087,11 +3181,70 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -3089,11 +3183,70 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  			continue;
  
  		weston_log("connector %d disconnected\n", output->connector_id);
@@ -379,7 +379,7 @@ index cf10153..82a2cfa 100644
  }
  
  static int
-@@ -3120,7 +3273,7 @@ udev_drm_event(int fd, uint32_t mask, void *data)
+@@ -3122,7 +3275,7 @@ udev_drm_event(int fd, uint32_t mask, void *data)
  	event = udev_monitor_receive_device(b->udev_monitor);
  
  	if (udev_event_is_hotplug(b, event))
@@ -388,7 +388,7 @@ index cf10153..82a2cfa 100644
  
  	udev_device_unref(event);
  
-@@ -3153,6 +3306,8 @@ drm_destroy(struct weston_compositor *ec)
+@@ -3155,6 +3308,8 @@ drm_destroy(struct weston_compositor *ec)
  	weston_launcher_destroy(ec->launcher);
  
  	close(b->drm.fd);
@@ -397,7 +397,7 @@ index cf10153..82a2cfa 100644
  	free(b);
  }
  
-@@ -3242,10 +3397,12 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
+@@ -3244,10 +3399,12 @@ drm_device_is_kms(struct drm_backend *b, struct udev_device *device)
  	if (b->drm.fd >= 0)
  		weston_launcher_close(b->compositor->launcher, b->drm.fd);
  	free(b->drm.filename);
@@ -410,7 +410,7 @@ index cf10153..82a2cfa 100644
  
  	drmModeFreeResources(res);
  
-@@ -3667,6 +3824,9 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -3669,6 +3826,9 @@ drm_backend_create(struct weston_compositor *compositor,
  
  	udev_device_unref(drm_device);
  

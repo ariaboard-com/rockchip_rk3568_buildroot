@@ -1,18 +1,18 @@
-From 099c97af824c5e0a36e8fffb4fc9c3ecb1281860 Mon Sep 17 00:00:00 2001
+From dc0efddf6a082ae03891c1ec16027242600475db Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Wed, 20 Mar 2019 20:05:27 +0800
-Subject: [PATCH 3/3] compositor-drm: Support mirror mode
+Date: Mon, 24 Feb 2020 16:07:43 +0800
+Subject: [PATCH 18/25] compositor-drm: Support mirror mode
 
 Set env "WESTON_DRM_MIRROR" to enable mirror mode, and set env
 "WESTON_DRM_KEEP_RATIO" to keep the aspect ratio.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/compositor-drm.c | 130 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 111 insertions(+), 19 deletions(-)
+ libweston/compositor-drm.c | 132 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 112 insertions(+), 20 deletions(-)
 
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 2c20aac..e5e71d2 100644
+index b14e88e..c260896 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -116,6 +116,8 @@ struct drm_backend {
@@ -31,10 +31,10 @@ index 2c20aac..e5e71d2 100644
 +	struct wl_list link;
 +	bool is_mirror;
 +
+ 	bool can_scale;
+ 
  	uint32_t crtc_id; /* object ID to pass to DRM functions */
- 	uint32_t plane_id; /* object ID to pass to DRM functions */
- 	int pipe; /* index of CRTC in resource array / bitmasks */
-@@ -864,6 +869,39 @@ drm_waitvblank_pipe(struct drm_output *output)
+@@ -866,6 +871,39 @@ drm_waitvblank_pipe(struct drm_output *output)
  		return 0;
  }
  
@@ -74,7 +74,7 @@ index 2c20aac..e5e71d2 100644
  static int
  drm_output_repaint(struct weston_output *output_base,
  		   pixman_region32_t *damage,
-@@ -874,6 +912,7 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -876,6 +914,7 @@ drm_output_repaint(struct weston_output *output_base,
  		to_drm_backend(output->base.compositor);
  	struct drm_plane *s;
  	struct drm_mode *mode;
@@ -82,7 +82,7 @@ index 2c20aac..e5e71d2 100644
  	int ret = 0;
  
  	if (output->disable_pending || output->destroy_pending)
-@@ -891,7 +930,7 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -893,7 +932,7 @@ drm_output_repaint(struct weston_output *output_base,
  		output->cursor_plane.y = INT32_MIN;
  	}
  
@@ -91,7 +91,7 @@ index 2c20aac..e5e71d2 100644
  	if (!output->fb_pending)
  		return -1;
  
-@@ -924,17 +963,33 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -925,16 +964,33 @@ drm_output_repaint(struct weston_output *output_base,
  		output->state_invalid = false;
  	}
  
@@ -116,7 +116,7 @@ index 2c20aac..e5e71d2 100644
 +			dw -= offset;
 +		}
 +	}
- 
++
  	ret = drmModeSetPlane(backend->drm.fd,
  			      output->plane_id,
  			      output->crtc_id,
@@ -131,7 +131,7 @@ index 2c20aac..e5e71d2 100644
  	if (ret) {
  		weston_log("set plane failed: %m\n");
  		goto err_pageflip;
-@@ -1590,6 +1645,11 @@ drm_assign_planes(struct weston_output *output_base, void *repaint_data)
+@@ -1590,6 +1646,11 @@ drm_assign_planes(struct weston_output *output_base, void *repaint_data)
  					  &ev->transform.boundingbox);
  
  		next_plane = NULL;
@@ -143,7 +143,7 @@ index 2c20aac..e5e71d2 100644
  		if (pixman_region32_not_empty(&surface_overlap))
  			next_plane = primary;
  		if (next_plane == NULL)
-@@ -1717,6 +1777,10 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+@@ -1717,6 +1778,10 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
  	drm_fb_unref(output->fb_dummy);
  	output->fb_dummy = NULL;
  
@@ -154,7 +154,7 @@ index 2c20aac..e5e71d2 100644
  	if (b->use_pixman) {
  		drm_output_fini_pixman(output);
  		if (drm_output_init_pixman(output, b) < 0) {
-@@ -2776,14 +2840,28 @@ drm_output_enable(struct weston_output *base)
+@@ -2832,14 +2897,28 @@ drm_output_enable(struct weston_output *base)
  	if (b->pageflip_timeout)
  		drm_output_pageflip_timer_create(output);
  
@@ -189,19 +189,20 @@ index 2c20aac..e5e71d2 100644
  	}
  
  	if (output->backlight) {
-@@ -2819,8 +2897,9 @@ drm_output_enable(struct weston_output *base)
+@@ -2875,9 +2954,9 @@ drm_output_enable(struct weston_output *base)
  	weston_compositor_stack_plane(b->compositor, &output->fb_plane,
  				      &b->compositor->primary_plane);
  
--	weston_log("Output %s, (connector %d, crtc %d)\n",
--		   output->base.name, output->connector_id, output->crtc_id);
-+	weston_log("Output %s%s, (connector %d, crtc %d)\n",
+-	weston_log("Output %s, (connector %d, crtc %d), can scale: %d\n",
+-		   output->base.name, output->connector_id, output->crtc_id,
+-		   output->can_scale);
++	weston_log("Output %s%s, (connector %d, crtc %d), can scale: %d\n",
 +		   output->base.name, output->is_mirror ? " (mirror)" : "",
-+		   output->connector_id, output->crtc_id);
++		   output->connector_id, output->crtc_id, output->can_scale);
  	wl_list_for_each(m, &output->base.mode_list, link)
  		weston_log_continue(STAMP_SPACE "mode %dx%d@%.1f%s%s%s\n",
  				    m->width, m->height, m->refresh / 1000.0,
-@@ -2854,10 +2933,14 @@ drm_output_deinit(struct weston_output *base)
+@@ -2911,10 +2990,14 @@ drm_output_deinit(struct weston_output *base)
  	drm_fb_unref(output->fb_current);
  	output->fb_current = NULL;
  
@@ -220,7 +221,7 @@ index 2c20aac..e5e71d2 100644
  
  	weston_plane_release(&output->fb_plane);
  	weston_plane_release(&output->cursor_plane);
-@@ -3008,6 +3091,13 @@ create_output_for_connector(struct drm_backend *b,
+@@ -3069,6 +3152,13 @@ create_output_for_connector(struct drm_backend *b,
  		}
  	}
  
@@ -234,7 +235,7 @@ index 2c20aac..e5e71d2 100644
  	weston_compositor_add_pending_output(&output->base, b->compositor);
  
  	return 0;
-@@ -3905,6 +3995,8 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -3983,6 +4073,8 @@ drm_backend_create(struct weston_compositor *compositor,
  	wl_list_init(&b->sprite_list);
  	create_sprites(b);
  

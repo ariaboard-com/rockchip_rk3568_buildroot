@@ -1,8 +1,8 @@
-From 4c2a1609b3faf075a0b721181af16da157795c81 Mon Sep 17 00:00:00 2001
+From fcfa40106d579c8aeaee5d2b1f326bb6cc049385 Mon Sep 17 00:00:00 2001
 From: Eddie Cai <eddie.cai.linux@gmail.com>
 Date: Tue, 27 Aug 2019 16:35:49 +0800
-Subject: [PATCH] accept ZWP_LINUX_BUFFER_PARAMS_V1_FLAGS_Y_INVERT to support
- interlace video
+Subject: [PATCH 06/25] accept ZWP_LINUX_BUFFER_PARAMS_V1_FLAGS_Y_INVERT to
+ support interlace video
 
 Signed-off-by: Eddie Cai <eddie.cai.linux@gmail.com>
 ---
@@ -10,10 +10,10 @@ Signed-off-by: Eddie Cai <eddie.cai.linux@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
-index f1a7e78..3aa121f 100644
+index 12ca7ee..1b0c463 100644
 --- a/libweston/gl-renderer.c
 +++ b/libweston/gl-renderer.c
-@@ -2067,8 +2067,8 @@ gl_renderer_import_dmabuf(struct weston_compositor *ec,
+@@ -1988,8 +1988,8 @@ gl_renderer_import_dmabuf(struct weston_compositor *ec,
  	}
  
  	/* reject all flags we do not recognize or handle */
@@ -25,5 +25,5 @@ index f1a7e78..3aa121f 100644
  	image = import_dmabuf(gr, dmabuf);
  	if (!image)
 -- 
-2.17.1
+2.11.0
 

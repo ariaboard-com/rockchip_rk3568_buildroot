@@ -1,8 +1,8 @@
-From 1490e6a8f1587c14aec9603134f4e5980f48aa6f Mon Sep 17 00:00:00 2001
+From 07e08390c2c264817e5fa9b4415a7a505b4264c4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 10 Dec 2018 19:19:53 +0800
-Subject: [PATCH] HACK: compositor/gl-renderer: Make holes for lower overlay
- layers
+Subject: [PATCH 14/25] HACK: compositor/gl-renderer: Make holes for lower
+ overlay layers
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  3 files changed, 102 insertions(+)
 
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 8701f1a..141c424 100644
+index 8feb05c..0065dda 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -475,6 +475,7 @@ weston_surface_create(struct weston_compositor *compositor)
@@ -23,7 +23,7 @@ index 8701f1a..141c424 100644
  
  	wl_list_init(&surface->views);
  
-@@ -1866,6 +1867,7 @@ weston_surface_destroy(struct weston_surface *surface)
+@@ -1868,6 +1869,7 @@ weston_surface_destroy(struct weston_surface *surface)
  	pixman_region32_fini(&surface->damage);
  	pixman_region32_fini(&surface->opaque);
  	pixman_region32_fini(&surface->input);
@@ -31,7 +31,7 @@ index 8701f1a..141c424 100644
  
  	wl_list_for_each_safe(cb, next, &surface->frame_callback_list, link)
  		wl_resource_destroy(cb->resource);
-@@ -2782,6 +2784,34 @@ surface_set_opaque_region(struct wl_client *client,
+@@ -2784,6 +2786,34 @@ surface_set_opaque_region(struct wl_client *client,
  
  	if (region_resource) {
  		region = wl_resource_get_user_data(region_resource);
@@ -67,10 +67,10 @@ index 8701f1a..141c424 100644
  				     &region->region);
  	} else {
 diff --git a/libweston/compositor.h b/libweston/compositor.h
-index 769203a..7ac3f69 100644
+index 9104fbc..faa8680 100644
 --- a/libweston/compositor.h
 +++ b/libweston/compositor.h
-@@ -1263,6 +1263,9 @@ struct weston_surface {
+@@ -1265,6 +1265,9 @@ struct weston_surface {
  
  	/* An list of per seat pointer constraints. */
  	struct wl_list pointer_constraints;
@@ -81,7 +81,7 @@ index 769203a..7ac3f69 100644
  
  struct weston_subsurface {
 diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
-index 68b8429..43524ce 100644
+index 8e4ca6f..3aa121f 100644
 --- a/libweston/gl-renderer.c
 +++ b/libweston/gl-renderer.c
 @@ -739,6 +739,68 @@ shader_uniforms(struct gl_shader *shader,

@@ -1,7 +1,8 @@
-From 1d8a0a1590de2eff79c407b25afa0a5cee0adbf7 Mon Sep 17 00:00:00 2001
+From 24c07f86f8f6307f02eeb1ceef52f328e26b9b80 Mon Sep 17 00:00:00 2001
 From: Emre Ucan <eucan@de.adit-jv.com>
 Date: Tue, 9 Jan 2018 14:00:30 +0100
-Subject: [PATCH] dmabuf: set modifier to invalid for not supporting clients
+Subject: [PATCH 03/25] dmabuf: set modifier to invalid for not supporting
+ clients
 
 modifier_hi and modifier_lo are set to 0 by clients,
 which are not supporting modifiers. Modifier attributes
@@ -29,10 +30,10 @@ Tested-by: Tomohito Esaki <etom@igel.co.jp>
  2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/libweston/gl-renderer.c b/libweston/gl-renderer.c
-index 43524ce..f1a7e78 100644
+index da29b07..12ca7ee 100644
 --- a/libweston/gl-renderer.c
 +++ b/libweston/gl-renderer.c
-@@ -2056,7 +2056,7 @@ gl_renderer_import_dmabuf(struct weston_compositor *ec,
+@@ -1977,7 +1977,7 @@ gl_renderer_import_dmabuf(struct weston_compositor *ec,
  
  	for (i = 0; i < dmabuf->attributes.n_planes; i++) {
  		/* return if EGL doesn't support import modifiers */
@@ -42,7 +43,7 @@ index 43524ce..f1a7e78 100644
  				return false;
  
 diff --git a/libweston/linux-dmabuf.c b/libweston/linux-dmabuf.c
-index ccdcfb0..148c61f 100644
+index d81b63d..5970584 100644
 --- a/libweston/linux-dmabuf.c
 +++ b/libweston/linux-dmabuf.c
 @@ -111,8 +111,13 @@ params_add(struct wl_client *client,

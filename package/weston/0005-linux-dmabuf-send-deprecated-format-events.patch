@@ -1,7 +1,7 @@
-From b0a749dcb312b3da124b5c19e090ca325e497b2c Mon Sep 17 00:00:00 2001
+From 85968f411d76bbb2d628db59548feb0f74174712 Mon Sep 17 00:00:00 2001
 From: Michael Tretter <m.tretter@pengutronix.de>
 Date: Wed, 17 Jan 2018 17:54:31 +0100
-Subject: [PATCH] linux-dmabuf: send deprecated format events
+Subject: [PATCH 05/25] linux-dmabuf: send deprecated format events
 
 Although the format event is deprecated, some clients, especially the
 GStreamer waylandsink, only support zwp_linux_dmabuf_v1 version 1 and
@@ -20,7 +20,7 @@ Reviewed-by: Daniel Stone <daniels@collabora.com>
  2 files changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/libweston/linux-dmabuf.c b/libweston/linux-dmabuf.c
-index 59705845..148c61fb 100644
+index 5970584..148c61f 100644
 --- a/libweston/linux-dmabuf.c
 +++ b/libweston/linux-dmabuf.c
 @@ -488,8 +488,6 @@ bind_linux_dmabuf(struct wl_client *client,
@@ -57,7 +57,7 @@ index 59705845..148c61fb 100644
  		if (modifiers != &modifier_invalid)
  			free(modifiers);
 diff --git a/libweston/linux-dmabuf.h b/libweston/linux-dmabuf.h
-index f4ab52cb..dbeda660 100644
+index f4ab52c..dbeda66 100644
 --- a/libweston/linux-dmabuf.h
 +++ b/libweston/linux-dmabuf.h
 @@ -32,6 +32,9 @@
