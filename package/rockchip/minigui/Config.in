@@ -1,9 +1,14 @@
 config BR2_PACKAGE_MINIGUI
 	bool "Minigui core lib"
 	select BR2_PACKAGE_JPEG
-	select BR2_PACKAGE_PIXMAN if BR2_PACKAGE_LIBDRM
 	help
           http://www.minigui.org
+
+config BR2_PACKAGE_MINIGUI_SOFTWARE_SCALE
+	bool "Minigui use software scale"
+	depends on BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_PIXMAN
+	default y
 
 config BR2_PACKAGE_MINIGUI_ENABLE_RGA
 	bool "Minigui use rga"
