@@ -11,6 +11,7 @@ case "$1" in
 		fi
 		;;
 	stop)
+		[ -f /oem/RkLunch-stop.sh ] && source /oem/RkLunch-stop.sh
 		printf "stop finished\n"
 		;;
 	*)
