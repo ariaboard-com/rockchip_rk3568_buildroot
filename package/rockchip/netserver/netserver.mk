@@ -3,4 +3,9 @@ NETSERVER_SITE_METHOD = local
 
 NETSERVER_DEPENDENCIES = libgdbus librkdb
 
+ifeq ($(BR2_PACKAGE_RK_OEM), y)
+NETSERVER_INSTALL_TARGET_OPTS = DESTDIR=$(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR) install/fast
+NETSERVER_DEPENDENCIES += rk_oem
+endif
+
 $(eval $(cmake-package))
