@@ -45,6 +45,7 @@
 #define SD_UPDATE_FILE "/sdcard/update.img"
 #define DATA_UPDATE_FILE "/userdata/update.img"
 #define MISC_FILE_PATH "/dev/block/by-name/misc"
+//#define MISC_FILE_PATH "/misc"
 #define MISC_MSG_OFFSET 16 * 1024
 
 /* Bootloader Message (2-KiB)
@@ -229,12 +230,27 @@ int rebootUpdate(char *path){
 	return 0;
 }
 
+void help(void)
+{
+	printf(
+			"Usage: update <option>\n"
+			"\n"
+			"Options are:\n"
+			"	ota | update [path]:\n"
+			"		update firmware, if no path, use default path\n"
+			"		\"/userdata/update.img\"\n"
+			"		\"/sdcard/update.img\"\n"
+			"	factory | reset:\n"
+			"		reset to factory\n"
+		  );
+}
+
 int main(int argc, char** argv){
 	char* partition_name = "recovery";
 	printf("update: Rockchip Update Tool\n");
 
 	if(argc == 1) {
-		rebootWipeUserData();
+		help();
 	} else if(argc == 2){
 		if(!strcmp(argv[1], "ota") || !strcmp(argv[1], "update"))
 			rebootUpdate(0);
