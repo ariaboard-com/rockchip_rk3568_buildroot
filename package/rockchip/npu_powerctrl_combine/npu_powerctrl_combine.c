@@ -18,9 +18,9 @@
 #define GPIO_UNEXPORT_PATH GPIO_BASE_PATH "/unexport"
 #define CLKEN_24M_PATH "/sys/kernel/debug/clk/clk_wifi_pmu/clk_enable_count"
 #define CLKEN_32k_PATH "/sys/kernel/debug/clk/rk808-clkout2/clk_enable_count"
-#define PCIE_RESET_EP "sys/devices/platform/f8000000.pcie/pcie_reset_ep"
-#define ACM_HIGHSPEED_ID "/sys/bus/platform/devices/fe380000.usb/usb*/idProduct"
-#define ACM_FULLSPEED_ID "/sys/bus/platform/devices/fe3a0000.usb/usb*/idProduct"
+#define PCIE_RESET_EP "/sys/devices/platform/f8000000.pcie/pcie_reset_ep"
+#define ACM_HIGHSPEED_ID "/sys/bus/platform/devices/fe380000.usb/usb*/*/idProduct"
+#define ACM_FULLSPEED_ID "/sys/bus/platform/devices/fe3a0000.usb/usb*/*/idProduct"
 
 #define CPU_RESET_NPU_GPIO 	"32" //GPIO1_PA0
 #define NPU_PMU_SLEEP_GPIO 	"35" //GPIO1_A3
