@@ -8,16 +8,10 @@ RKNPU_FW_SITE_METHOD = local
 RKNPU_FW_SITE = $(TOPDIR)/../external/rknpu-fw
 
 ifeq ($(BR2_PACKAGE_NPU_POWERCTRL_COMBINE),y)
-RKNPU_FW_PCIE_TYPE = npu_fw_pvtm-32k/pcie/*
-else
 RKNPU_FW_PCIE_TYPE = npu_fw_pcie/*
 endif
 
-ifeq ($(BR2_PACKAGE_NPU_POWERCTRL_COMBINE),y)
-RKNPU_FW_USB_TYPE = npu_fw_pvtm-32k/usb/*
-else
 RKNPU_FW_USB_TYPE = npu_fw/*
-endif
 
 ifeq ($(BR2_PACKAGE_RKNPU_PCIE),y)
 define RKNPU_FW_INSTALL_TARGET_CMDS
