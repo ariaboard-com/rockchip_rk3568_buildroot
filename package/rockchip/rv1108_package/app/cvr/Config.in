@@ -12,6 +12,7 @@ config BR2_PACKAGE_CVR
 	select BR2_PACKAGE_TSLIB
 	select BR2_PACKAGE_JPEG
 	select BR2_PACKAGE_RKNR
+	select BR2_PACKAGE_HAL
 
 if BR2_PACKAGE_CVR
 menu "cvr setting options"

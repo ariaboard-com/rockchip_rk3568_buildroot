@@ -3,7 +3,8 @@ CVR_SITE_METHOD = local
 CVR_INSTALL_STAGING = YES
 
 # add dependencies
-CVR_DEPENDENCIES = rkcamera messenger process_units libpng12 rv1108_minigui rknr ffmpeg mpp rkmedia
+CVR_DEPENDENCIES = rkcamera messenger process_units libpng12 rv1108_minigui \
+				   hal rknr ffmpeg mpp rkmedia
 
 CVR_CONF_OPTS += -DUI_RESOLUTION=$(call qstrip,$(RK_UI_RESOLUTION))
 
