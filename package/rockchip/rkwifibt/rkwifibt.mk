@@ -15,12 +15,6 @@ RKWIFIBT_DEPENDENCIES = wpa_supplicant
 BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
 FIRMWARE_DIR = "system"
 
-ifeq ($(call qstrip,$(RK_ARCH)),arm64)
-RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
-else ifeq ($(call qstrip,$(RK_ARCH)),arm)
-RKWIFIBT_TOOLCHAIN = $(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
-endif
-
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 RKARCH=arm64
 else ifeq ($(call qstrip,$(BR2_ARCH)),arm)
@@ -77,13 +71,13 @@ endef
 
 define RKWIFIBT_BUILD_CMDS
     mkdir -p $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
-    $(TOPDIR)/../build.sh modules
+    -$(TOPDIR)/../build.sh modules
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(BR2_PACKAGE_RKWIFIBT_WIFI_KO) | xargs -n1 -i cp {} $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     $(TARGET_CC) -o $(@D)/brcm_tools/dhd_priv $(@D)/brcm_tools/dhd_priv.c
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
     $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
-    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RK_ARCH) CROSS_COMPILE=$(RKWIFIBT_TOOLCHAIN)
+    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RK_ARCH)
 endef
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "BROADCOM")
