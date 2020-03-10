@@ -3,7 +3,7 @@ Description=irqbalance daemon
 After=syslog.target
 
 [Service]
-ExecStart=/usr/sbin/irqbalance --foreground
+ExecStart=/usr/sbin/irqbalance --foreground --policyscript=/etc/irqbalance.d
 
 [Install]
 WantedBy=multi-user.target
