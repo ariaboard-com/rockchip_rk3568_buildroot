@@ -128,4 +128,11 @@ endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
 
 endif # BR2_PACKAGE_RKMEDIA_LIVE555
 
+config BR2_PACKAGE_RKMEDIA_MOVE_DETECTION
+    bool "rk movedetection wrapper"
+    select BR2_PACKAGE_COMMON_ALGORITHM
+    select BR2_PACKAGE_COMMON_ALGORITHM_MOVE_DETECT
+    help
+      wrapped function of rk movedetection algorithm
+
 endif # BR2_PACKAGE_RKMEDIA
