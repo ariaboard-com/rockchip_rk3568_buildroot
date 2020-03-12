@@ -236,5 +236,6 @@ source "package/rockchip/netserver/Config.in"
 source "package/rockchip/storage_manager/Config.in"
 source "package/rockchip/mediaserver/Config.in"
 source "package/rockchip/rk_oem/Config.in"
+source "package/rockchip/rkbar/Config.in"
 source "package/rockchip/minilogger/Config.in"
 endif
