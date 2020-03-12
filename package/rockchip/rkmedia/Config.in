@@ -17,6 +17,16 @@ config BR2_PACKAGE_RKMEDIA_MPP_ENCODER
     help
       wrapped function of rk mpp encoder
 
+if BR2_PACKAGE_RKMEDIA_MPP_ENCODER
+config BR2_PACKAGE_RKMEDIA_MPP_ENCODER_OSD
+    bool "rk mpp encoder osd"
+    select BR2_PACKAGE_FREETYPE
+    default n
+    help
+     enable encoder osd function
+
+endif #BR2_PACKAGE_RKMEDIA_MPP_ENCODER
+
 config BR2_PACKAGE_RKMEDIA_MPP_DECODER
     bool "rk mpp decoder"
     default y
