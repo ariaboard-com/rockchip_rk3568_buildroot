@@ -33,6 +33,7 @@ restart() {
 
 case "$1" in
 	start)
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/oem/usr/lib
 		start
 		;;
 	stop)
