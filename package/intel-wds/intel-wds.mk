@@ -13,4 +13,8 @@ INTEL_WDS_DEPENDENCIES = \
 	libglib2 \
 	gstreamer1 \
 
+define INTEL_WDS_INSTALL_TARGET_CMDS
+	cp -f $(@D)/sink/sink-test $(TARGET_DIR)/usr/bin/
+endef
+
 $(eval $(cmake-package))
