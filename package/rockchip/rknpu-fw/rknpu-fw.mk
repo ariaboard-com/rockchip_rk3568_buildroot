@@ -7,10 +7,7 @@ RKNPU_FW_VERSION = 1.0.0
 RKNPU_FW_SITE_METHOD = local
 RKNPU_FW_SITE = $(TOPDIR)/../external/rknpu-fw
 
-ifeq ($(BR2_PACKAGE_NPU_POWERCTRL_COMBINE),y)
 RKNPU_FW_PCIE_TYPE = npu_fw_pcie/*
-endif
-
 RKNPU_FW_USB_TYPE = npu_fw/*
 
 ifeq ($(BR2_PACKAGE_RKNPU_PCIE),y)
