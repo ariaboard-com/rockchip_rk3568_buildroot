@@ -1,7 +1,7 @@
-From 824f341baa2e3b5c540c199670ffe54b90d3c333 Mon Sep 17 00:00:00 2001
+From 0046e0e4b7407013a2bf9fd2fca05f15231e6905 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 20 Nov 2018 14:51:36 +0800
-Subject: [PATCH] playbin3: Fix qt videoplayer cannot change video state
+Subject: [PATCH 40/45] playbin3: Fix qt videoplayer cannot change video state
 
 Change-Id: I765bbe0caebe333855bd16fdd0843e0257491246
 Signed-off-by: shine.liu <shine.liu@rock-chips.com>
@@ -11,7 +11,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 247 insertions(+), 4 deletions(-)
 
 diff --git a/gst/playback/gstplaybin3.c b/gst/playback/gstplaybin3.c
-index 027766b..ed47120 100644
+index 027766bb32..ed47120442 100644
 --- a/gst/playback/gstplaybin3.c
 +++ b/gst/playback/gstplaybin3.c
 @@ -515,6 +515,16 @@ struct _GstPlayBin3Class

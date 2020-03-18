@@ -1,7 +1,7 @@
-From b045b0b3f567be952227faf817386a9c95b4ae50 Mon Sep 17 00:00:00 2001
+From 2208866a3a48f98ca08a447aa12ceaeb04c05ea5 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 31 Oct 2019 18:45:19 +0800
-Subject: [PATCH 2/2] video-converter: Support rockchip RGA 2D accel
+Subject: [PATCH 43/45] video-converter: Support rockchip RGA 2D accel
 
 Disabled by default, set env GST_VIDEO_CONVERT_USE_RGA=1 to enable.
 

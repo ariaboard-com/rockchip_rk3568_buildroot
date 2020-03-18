@@ -1,7 +1,7 @@
-From ab375009b4298773e6bfd4c57dcd8e5e25b476aa Mon Sep 17 00:00:00 2001
+From cd110a340efed4891254d5258b3b0c90334b2818 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 14 Jun 2019 12:02:05 +0800
-Subject: [PATCH] playbin2: Add preferred audio/video sink
+Subject: [PATCH 41/45] playbin2: Add preferred audio/video sink
 
 Using env "PLAYBIN2_PREFERRED_VIDEOSINK" and
 "PLAYBIN2_PREFERRED_AUDIOSINK".
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 31 insertions(+)
 
 diff --git a/gst/playback/gstplaybin2.c b/gst/playback/gstplaybin2.c
-index a2e9ed4..5a95c9f 100644
+index a2e9ed4453..5a95c9f129 100644
 --- a/gst/playback/gstplaybin2.c
 +++ b/gst/playback/gstplaybin2.c
 @@ -200,6 +200,7 @@
