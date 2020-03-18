@@ -34,8 +34,7 @@ define DEVICEIO_RELEASE_INSTALL_COMMON
 	$(INSTALL) -D -m 0755 $(@D)/bsa_bt_sink.sh $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	$(INSTALL) -D -m 0755 $(@D)/bsa_server.sh $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
-	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(TARGET_DIR)/usr/lib/libDeviceIo.so
-	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(STAGING_DIR)/usr/lib/libDeviceIo.so
+	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/deviceio_test $(TARGET_DIR)/usr/bin/deviceio_test
 endef
 
 define DEVICEIO_RELEASE_INSTALL_BSA
@@ -56,4 +55,13 @@ define DEVICEIO_RELEASE_INSTALL_TARGET_CMDS
 endef
 endif
 
-$(eval $(generic-package))
+define DEVICEIO_PRE_BUILD_HOOK
+	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(TARGET_DIR)/usr/lib/libDeviceIo.so
+	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(STAGING_DIR)/usr/lib/libDeviceIo.so
+endef
+
+DEVICEIO_RELEASE_PRE_BUILD_HOOKS += DEVICEIO_PRE_BUILD_HOOK
+
+DEVICEIO_RELEASE_CONF_OPTS += -DCMAKE_INSTALL_STAGING=$(STAGING_DIR)
+
+$(eval $(cmake-package))
