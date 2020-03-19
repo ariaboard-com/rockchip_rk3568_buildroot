@@ -20,7 +20,6 @@ config BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 if BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 config BR2_PACKAGE_RKMEDIA_MPP_ENCODER_OSD
     bool "rk mpp encoder osd"
-    select BR2_PACKAGE_FREETYPE
     default n
     help
      enable encoder osd function
