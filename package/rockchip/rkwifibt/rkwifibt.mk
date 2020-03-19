@@ -33,8 +33,8 @@ define RKWIFIBT_INSTALL_COMMON
 endef
 
 define RKWIFIBT_BROADCOM_INSTALL
-    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/S66load_wifi_modules
-    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d/
+    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/S36load_wifi_modules
+    $(INSTALL) -D -m 0755 $(@D)/S36load_wifi_modules $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/system/etc/firmware/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
@@ -49,7 +49,7 @@ endef
 
 define RKWIFIBT_REALTEK_INSTALL
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/rtwpriv $(TARGET_DIR)/usr/bin/
-    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_modules $(TARGET_DIR)/etc/init.d/
+    $(INSTALL) -D -m 0755 $(@D)/S36load_wifi_modules $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
@@ -65,7 +65,7 @@ endef
 
 define RKWIFIBT_ROCKCHIP_INSTALL
     $(INSTALL) -D -m 0644 $(@D)/firmware/rockchip/WIFI_FIRMWARE/rk912* $(TARGET_DIR)/lib/firmware/
-    $(INSTALL) -D -m 0755 $(@D)/S66load_wifi_rk912_modules $(TARGET_DIR)/etc/init.d/
+    $(INSTALL) -D -m 0755 $(@D)/S36load_wifi_rk912_modules $(TARGET_DIR)/etc/init.d/
 endef
 
 define RKWIFIBT_BUILD_CMDS
