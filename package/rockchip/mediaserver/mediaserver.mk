@@ -1,7 +1,7 @@
 MEDIASERVER_SITE = $(TOPDIR)/../app/mediaserver
 MEDIASERVER_SITE_METHOD = local
 
-MEDIASERVER_DEPENDENCIES = rkmedia dbus dbus-cpp librkdb json-for-modern-cpp minilogger
+MEDIASERVER_DEPENDENCIES = rkmedia dbus dbus-cpp librkdb json-for-modern-cpp
 
 MEDIASERVER_CONF_OPTS += -DBR2_SDK_PATH=$(HOST_DIR)
 
@@ -13,6 +13,16 @@ endif
 ifeq ($(BR2_PACKAGE_MEDIASERVE_LINKAPI), y)
     MEDIASERVER_CONF_OPTS += -DENABLE_LINK_SUPPORT=ON
     MEDIASERVER_DEPENDENCIES += cjson
+endif
+
+ifeq ($(BR2_PACKAGE_MEDIASERVE_MINILOGGER), y)
+    MEDIASERVER_CONF_OPTS += -DENABLE_MINILOGGER=ON
+    MEDIASERVER_DEPENDENCIES += minilogger
+endif
+
+ifeq ($(BR2_PACKAGE_MEDIASERVE_OSD_SERVER), y)
+    MEDIASERVER_CONF_OPTS += -DENABLE_OSD_SERVER=ON
+    MEDIASERVER_DEPENDENCIES += freetype
 endif
 
 $(eval $(cmake-package))

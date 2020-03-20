@@ -18,4 +18,18 @@ config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	help
 	  rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_MINILOGGER
+        bool "Enable miniloger print"
+        select BR2_PACKAGE_MINILOGGER
+        default n
+        help
+          rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_OSD_SERVER
+        bool "Enable osd server"
+        select BR2_PACKAGE_FREETYPE
+        default n
+        help
+          rockchip mediaserver options
+
 endif
