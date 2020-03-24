@@ -1,0 +1,4 @@
+config BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
+	bool "Rockchip Camera Engine Rkaiq for linux"
+	help
+	  Rockchip camera engine rkaiq for linux.
