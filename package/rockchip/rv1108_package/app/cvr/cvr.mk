@@ -4,9 +4,13 @@ CVR_INSTALL_STAGING = YES
 
 # add dependencies
 CVR_DEPENDENCIES = rkcamera messenger process_units libpng12 rv1108_minigui \
-				   hal rknr ffmpeg mpp rkmedia
+				   hal rknr ffmpeg mpp rkmedia adk
 
 CVR_CONF_OPTS += -DUI_RESOLUTION=$(call qstrip,$(RK_UI_RESOLUTION))
+
+ifeq ($(BR2_PACKAGE_CVR_RTSP_STREAM),y)
+    CVR_CONF_OPTS += -DUSE_RTSP_STREAM=1
+endif
 
 define CVR_INSTALL_INIT_SYSV
 	[ -z "$(BR2_PACKAGE_SYSTEM_MANAGER)" ] && $(INSTALL) -m 0755 -D \

@@ -23,6 +23,13 @@ menu "cvr setting options"
 		select BR2_PACKAGE_ADK_RKMEDIA
 		select BR2_PACKAGE_ADK_RKMEDIA_H264_ENCODE
 		select BR2_PACKAGE_ADK_RKMEDIA_MP4_MUXER
+
+	config BR2_PACKAGE_CVR_RTSP_STREAM
+		bool "support rtsp stream."
+		default n
+		select BR2_PACKAGE_ADK_RKMEDIA
+		select BR2_PACKAGE_ADK_RKMEDIA_H264_ENCODE
+		select BR2_PACKAGE_ADK_RKMEDIA_RTSP_STREAM
 endmenu
 endif
 
