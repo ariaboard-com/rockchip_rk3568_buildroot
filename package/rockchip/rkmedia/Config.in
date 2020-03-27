@@ -134,4 +134,9 @@ config BR2_PACKAGE_RKMEDIA_MOVE_DETECTION
     help
       wrapped function of rk movedetection algorithm
 
+config BR2_PACKAGE_RKMEDIA_EXAMPLES
+    bool "enable rkmedia examples"
+    help
+      provide examples to show the usage of rkmedia
+
 endif # BR2_PACKAGE_RKMEDIA
