@@ -7,14 +7,13 @@ MINIGUI_DESKTOP_LICENSE_FILES = NOTICE
 CC="$(TARGET_CC)"
 PROJECT_DIR="$(@D)"
 
+MINIGUI_DESKTOP_DEPENDENCIES = minigui deviceio rtc_demo
+
 MINIGUI_MAKE_ENV=$(TARGET_MAKE_ENV)
 
 ifeq ($(BR2_PACKAGE_FFMPEG_SWSCALE),y)
 MINIGUI_MAKE_ENV += ENABLE_VIDEO=1
 endif
-
-MINIGUI_MAKE_ENV += ENABLE_BATT=1 \
-                    ENABLE_WIFI=1
 
 define MINIGUI_DESKTOP_IMAGE_COPY
         mkdir -p $(TARGET_DIR)/usr/local/share/
@@ -22,6 +21,8 @@ define MINIGUI_DESKTOP_IMAGE_COPY
         cp -r $(PROJECT_DIR)/S99minigui_app $(TARGET_DIR)/etc/init.d/S99minigui_app
         cp -r $(PROJECT_DIR)/minigui/MiniGUI.cfg.$(MINIGUI_TARGET) \
 			  $(TARGET_DIR)/etc/MiniGUI.cfg
+	$(SED) "s/event0/$(call qstrip,$(BR2_PACKAGE_MINIGUI_RKKEYBOARD_EVENT))/" \
+		$(TARGET_DIR)/etc/MiniGUI.cfg
 endef
 
 define MINIGUI_DESKTOP_BUILD_CMDS

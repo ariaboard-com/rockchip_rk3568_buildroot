@@ -1,4 +1,4 @@
-CHROMIUM_LICENSE_FILES = \
+QT5WEBENGINE_CHROMIUM_LICENSE_FILES = \
 	src/3rdparty/chromium/base/third_party/dmg_fp/LICENSE \
 	src/3rdparty/chromium/base/third_party/dynamic_annotations/LICENSE \
 	src/3rdparty/chromium/base/third_party/icu/LICENSE \

@@ -2,7 +2,7 @@
 // Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
 
 #define LOG_TAG "NPU_POWER"
-#include "npu_powerctrl.h"
+#include <npu_powerctrl.h>
 #include <iostream>
 #include <unistd.h>
 

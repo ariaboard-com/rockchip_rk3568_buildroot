@@ -61,7 +61,7 @@ LIBV4L_DEPENDENCIES += $(TARGET_NLS_DEPENDENCIES)
 # libelf and clang support
 LIBV4L_CONF_OPTS += --disable-bpf
 
-ifeq ($(BR2_PACKAGE_QT5BASE)$(BR2_PACKAGE_QT5BASE_GUI)$(BR2_PACKAGE_QT5BASE_WIDGETS),yyy)
+ifeq ($(BR2_PACKAGE_QT5BASE)$(BR2_PACKAGE_QT5BASE_GUI)$(BR2_PACKAGE_QT5BASE_WIDGETS)$(BR2_PACKAGE_LIBV4L_QV4L2),yyyy)
 LIBV4L_CONF_OPTS += --enable-qv4l2
 LIBV4L_DEPENDENCIES += qt5base
 # protect against host version detection of moc-qt5/rcc-qt5/uic-qt5

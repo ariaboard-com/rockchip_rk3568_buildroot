@@ -1,0 +1,4 @@
+config BR2_PACKAGE_HOST_MAKEME
+	bool "host makeme"
+	help
+		"Embedthis MakeMe https://embedthis.com/makeme"

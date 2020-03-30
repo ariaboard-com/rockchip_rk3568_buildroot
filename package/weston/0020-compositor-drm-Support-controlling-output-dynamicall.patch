@@ -1,0 +1,455 @@
+From 9faa6905a1ad6e6d1b11b271edc761c34dab6499 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 8 Aug 2019 09:46:17 +0800
+Subject: [PATCH] compositor-drm: Support controlling output dynamically
+
+Use config file to control output's rotation/mode/freezen/display
+rectangle.
+
+Default config file is "/tmp/.weston_drm.conf", can override with
+"WESTON_DRM_CONFIG" environment.
+
+Supported configs format is "output:<output name>:<config>", for
+example:
+echo "output:eDP-1:freeze" >> /tmp/.weston_drm.conf
+echo "output:all:rotate90" >> /tmp/.weston_drm.conf
+echo "output:all:rect=<100,20,1636,2068>" >> /tmp/.weston_drm.conf
+echo "output:HDMI-A-1:mode=800x600" >> /tmp/.weston_drm.conf
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+
+mode
+---
+ clients/desktop-shell.c    |  19 +++++
+ desktop-shell/shell.c      |  39 ++++++++++
+ libweston/compositor-drm.c | 174 +++++++++++++++++++++++++++++++++++++++++++++
+ libweston/compositor.c     |  46 ++++++++++--
+ 4 files changed, 271 insertions(+), 7 deletions(-)
+
+diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
+index 599295e..acc0a41 100644
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -144,6 +144,7 @@ struct panel_clock {
+ };
+ 
+ struct unlock_dialog {
++	struct surface base;
+ 	struct window *window;
+ 	struct widget *widget;
+ 	struct widget *button;
+@@ -939,6 +940,22 @@ unlock_dialog_widget_leave_handler(struct widget *widget,
+ 	widget_schedule_redraw(widget);
+ }
+ 
++static void
++unlock_dialog_configure(void *data,
++			struct weston_desktop_shell *desktop_shell,
++			uint32_t edges, struct window *window,
++			int32_t width, int32_t height)
++{
++	struct unlock_dialog *dialog =
++		(struct unlock_dialog *) window_get_user_data(window);
++	struct rectangle allocation;
++
++	widget_get_allocation(dialog->widget, &allocation);
++
++	widget_schedule_resize(dialog->widget, allocation.width,
++			       allocation.height);
++}
++
+ static struct unlock_dialog *
+ unlock_dialog_create(struct desktop *desktop)
+ {
+@@ -948,8 +965,10 @@ unlock_dialog_create(struct desktop *desktop)
+ 
+ 	dialog = xzalloc(sizeof *dialog);
+ 
++	dialog->base.configure = unlock_dialog_configure;
+ 	dialog->window = window_create_custom(display);
+ 	dialog->widget = window_frame_create(dialog->window, dialog);
++	window_set_user_data(dialog->window, dialog);
+ 	window_set_title(dialog->window, "Unlock your desktop");
+ 
+ 	window_set_user_data(dialog->window, dialog);
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 0bea96a..2849839 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -4715,6 +4715,42 @@ shell_resize_surface_to_output(struct desktop_shell *shell,
+ 					output->height);
+ }
+ 
++static void
++handle_output_resize_layer(struct desktop_shell *shell,
++			   struct weston_layer *layer,
++			   void *data)
++{
++	struct weston_output *output = data;
++	struct weston_view *view;
++
++	wl_list_for_each(view, &layer->view_list.link, layer_link.link) {
++		struct weston_desktop_surface *desktop_surface;
++		struct shell_surface *shsurf;
++		bool dirty = false;
++
++		if (view->output != output)
++			continue;
++
++		shsurf = get_shell_surface(view->surface);
++		if (!shsurf)
++			return;
++
++		desktop_surface = shsurf->desktop_surface;
++		if (weston_desktop_surface_get_fullscreen(desktop_surface)) {
++			set_fullscreen(shsurf, true, NULL);
++			dirty = true;
++		}
++		if (weston_desktop_surface_get_maximized(desktop_surface)) {
++			set_maximized(shsurf, true);
++			dirty = true;
++		}
++
++		if (dirty) {
++			weston_view_geometry_dirty(view);
++			weston_surface_damage(view->surface);
++		}
++	}
++}
+ 
+ static void
+ handle_output_resized(struct wl_listener *listener, void *data)
+@@ -4724,8 +4760,11 @@ handle_output_resized(struct wl_listener *listener, void *data)
+ 	struct weston_output *output = (struct weston_output *)data;
+ 	struct shell_output *sh_output = find_shell_output_from_weston_output(shell, output);
+ 
++	shell_resize_surface_to_output(shell, shell->lock_surface, output);
+ 	shell_resize_surface_to_output(shell, sh_output->background_surface, output);
+ 	shell_resize_surface_to_output(shell, sh_output->panel_surface, output);
++
++	shell_for_each_layer(shell, handle_output_resize_layer, data);
+ }
+ 
+ static void
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 5b26878..0db93b4 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -37,6 +37,7 @@
+ #include <linux/vt.h>
+ #include <assert.h>
+ #include <sys/mman.h>
++#include <sys/stat.h>
+ #include <dlfcn.h>
+ #include <time.h>
+ 
+@@ -87,6 +88,10 @@
+ // Min duration between drm outputs update requests, to avoid glith
+ #define DRM_MIN_UPDATE_MS 2000
+ 
++#define WESTON_DRM_CONFIG_FILE "/tmp/.weston_drm.conf"
++#define DRM_CONFIG_UPDATE_MS 300
++#define DRM_ROTATE_FREEZE_MS 400
++
+ struct drm_backend {
+ 	struct weston_backend base;
+ 	struct weston_compositor *compositor;
+@@ -136,6 +141,9 @@ struct drm_backend {
+ 	struct wl_event_source *hotplug_timer;
+ 	bool pending_update;
+ 	int64_t last_update_ms;
++
++	struct wl_event_source *config_timer;
++	time_t config_mtime;
+ };
+ 
+ struct drm_mode {
+@@ -221,6 +229,11 @@ struct drm_plane {
+ 	uint32_t formats[];
+ };
+ 
++enum drm_output_freeze_reason {
++	DRM_OUTPUT_FREEZE_USER = 1 << 0,
++	DRM_OUTPUT_FREEZE_ROTATING = 1 << 1,
++};
++
+ struct drm_output {
+ 	struct weston_output base;
+ 	drmModeConnector *connector;
+@@ -230,6 +243,11 @@ struct drm_output {
+ 	pixman_box32_t plane_bounds;
+ 	bool can_scale;
+ 
++	int freezing;
++
++	uint32_t original_transform;
++	int64_t last_rotate_ms;
++
+ 	uint32_t crtc_id; /* object ID to pass to DRM functions */
+ 	uint32_t plane_id; /* object ID to pass to DRM functions */
+ 	int pipe; /* index of CRTC in resource array / bitmasks */
+@@ -1102,6 +1120,24 @@ drm_output_repaint(struct weston_output *output_base,
+ 	int dx, dy, dw, dh, sw, sh;
+ 	int ret = 0;
+ 
++	if (output->freezing & DRM_OUTPUT_FREEZE_ROTATING) {
++		struct timespec now;
++		int64_t now_ms;
++
++		weston_compositor_read_presentation_clock(backend->compositor,
++							  &now);
++		now_ms = timespec_to_msec(&now);
++
++		if (now_ms > (output->last_rotate_ms + DRM_ROTATE_FREEZE_MS))
++			output->freezing &= ~DRM_OUTPUT_FREEZE_ROTATING;
++	}
++
++	if (output->freezing) {
++		weston_output_damage(&output->base);
++		weston_output_schedule_repaint(&output->base);
++		return -1;
++	}
++
+ 	if (output->disable_pending || output->destroy_pending)
+ 		return -1;
+ 
+@@ -3088,6 +3124,8 @@ drm_output_enable(struct weston_output *base)
+ 					  output->base.height);
+ 	}
+ 
++	output->original_transform = output->base.transform;
++
+ 	if (output->backlight) {
+ 		weston_log("Initialized backlight, device %s\n",
+ 			   output->backlight->path);
+@@ -3136,6 +3174,9 @@ drm_output_enable(struct weston_output *base)
+ 
+ 	output->state_invalid = true;
+ 
++	// Force reload config
++	b->config_mtime = 0;
++
+ 	return 0;
+ 
+ err_free:
+@@ -4151,6 +4192,135 @@ static const struct weston_drm_output_api api = {
+ 	drm_output_set_seat,
+ };
+ 
++static void
++drm_output_rotate(struct drm_output *output, int rotate)
++{
++	struct drm_backend *b = to_drm_backend(output->base.compositor);
++	uint32_t transform = output->original_transform;
++	struct timespec now;
++
++	// Hacky way to rotate transform
++	transform = (transform / 4) * 4 + (transform + rotate) % 4;
++
++	if (output->base.transform == transform)
++		return;
++
++	// Freeze output when rotating
++	weston_compositor_read_presentation_clock(b->compositor, &now);
++	output->last_rotate_ms = timespec_to_msec(&now);
++	output->freezing |= DRM_OUTPUT_FREEZE_ROTATING;
++
++	weston_output_set_transform(&output->base, transform);
++}
++
++static void
++drm_output_modeset(struct drm_output *output, const char *modeline)
++{
++	struct drm_backend *b = to_drm_backend(output->base.compositor);
++	drmModeModeInfo crtc_mode;
++	struct drm_mode *mode;
++
++	if (connector_get_current_mode(output->connector,
++				       b->drm.fd, &crtc_mode) < 0)
++		return;
++
++	// Unable to switch mode, let's retry later
++	if (output->fb_last || output->fb_pending) {
++		b->config_mtime = 0;
++		return;
++	}
++
++	mode = drm_output_choose_initial_mode(b, output,
++					      WESTON_DRM_BACKEND_OUTPUT_PREFERRED,
++					      modeline, &crtc_mode);
++
++	weston_output_mode_set_native(&output->base, &mode->base,
++				      output->base.scale);
++	weston_output_schedule_repaint(&output->base);
++}
++
++static void
++config_handle_output(struct drm_backend *b, const char *name,
++		     const char *config)
++{
++	struct drm_output *output;
++	bool is_all = !strcmp(name, "all");
++
++	wl_list_for_each(output, &b->compositor->output_list, base.link) {
++		if (!is_all && strcmp(name, output->base.name))
++			continue;
++
++		if (!strncmp(config, "rotate", strlen("rotate"))) {
++			int rotate = atoi(config + strlen("rotate")) / 90;
++			drm_output_rotate(output, rotate);
++		} else if (!strncmp(config, "mode=", strlen("mode="))) {
++			drm_output_modeset(output, config + strlen("mode="));
++		} else if (!strcmp(config, "freeze")) {
++			output->freezing |= DRM_OUTPUT_FREEZE_USER;
++		} else if (!strcmp(config, "unfreeze")) {
++			output->freezing &= ~DRM_OUTPUT_FREEZE_USER;
++		} else if (!strncmp(config, "rect", strlen("rect"))) {
++			int x1, y1, x2, y2, ret;
++
++			ret = sscanf(config, "rect=<%d,%d,%d,%d>",
++				     &x1, &y1, &x2, &y2);
++			if (ret != 4)
++				continue;
++
++			output->plane_bounds.x1 = x1;
++			output->plane_bounds.y1 = y1;
++			output->plane_bounds.x2 = x2;
++			output->plane_bounds.y2 = y2;
++			weston_output_schedule_repaint(&output->base);
++		}
++	}
++}
++
++static int
++config_timer_handler(void *data)
++{
++#define MAX_CONF_LEN 32
++#define _STR(x) #x
++#define STR(x) _STR(x)
++
++	struct drm_backend *b = data;
++	struct stat st;
++	char type[MAX_CONF_LEN], key[MAX_CONF_LEN], value[MAX_CONF_LEN];
++	const char *config_file;
++	FILE *conf_fp;
++
++	wl_event_source_timer_update(b->config_timer, DRM_CONFIG_UPDATE_MS);
++
++	config_file = getenv("WESTON_DRM_CONFIG");
++	if (!config_file)
++		config_file = WESTON_DRM_CONFIG_FILE;
++
++	if (stat(config_file, &st) < 0)
++		return 0;
++
++	if (st.st_mtime && st.st_mtime == b->config_mtime)
++		return 0;
++
++	b->config_mtime = st.st_mtime;
++
++	conf_fp = fopen(config_file, "r");
++	if (!conf_fp)
++		return 0;
++
++	// Parse configs, formated with <type>:<key>:<value>
++	// For example: "output:all:rotate90"
++	while (3 == fscanf(conf_fp,
++			   "%" STR(MAX_CONF_LEN) "[^:]:"
++			   "%" STR(MAX_CONF_LEN) "[^:]:"
++			   "%" STR(MAX_CONF_LEN) "s ", type, key, value)) {
++		if (!strcmp(type, "output"))
++			config_handle_output(b, key, value);
++	}
++
++	fclose(conf_fp);
++	return 0;
++}
++
+ static struct drm_backend *
+ drm_backend_create(struct weston_compositor *compositor,
+ 		   struct weston_drm_backend_config *config)
+@@ -4314,6 +4484,10 @@ drm_backend_create(struct weston_compositor *compositor,
+ 		goto err_udev_monitor;
+ 	}
+ 
++	b->config_timer =
++		wl_event_loop_add_timer(loop, config_timer_handler, b);
++	config_timer_handler(b);
++
+ 	return b;
+ 
+ err_udev_monitor:
+diff --git a/libweston/compositor.c b/libweston/compositor.c
+index 0065dda..e5d69b7 100644
+--- a/libweston/compositor.c
++++ b/libweston/compositor.c
+@@ -2313,13 +2313,17 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
+ 	if (output->dirty)
+ 		weston_output_update_matrix(output);
+ 
++	output->repaint_needed = false;
+ 	r = output->repaint(output, &output_damage, repaint_data);
+ 
+ 	pixman_region32_fini(&output_damage);
+ 
+-	output->repaint_needed = false;
+-	if (r == 0)
++	if (r == 0) {
+ 		output->repaint_status = REPAINT_AWAITING_COMPLETION;
++	} else if (output->repaint_needed) {
++		output->repaint_status = REPAINT_SCHEDULED;
++		r = 0;
++	}
+ 
+ 	weston_compositor_repick(ec);
+ 
+@@ -4705,13 +4709,41 @@ WL_EXPORT void
+ weston_output_set_transform(struct weston_output *output,
+ 			    uint32_t transform)
+ {
+-	/* We can only set transform on a disabled output */
+-	assert(!output->enabled);
+-
+-	/* We only want to set transform once */
+-	assert(output->transform == UINT32_MAX);
++	struct wl_resource *resource;
++	int old_width;
+ 
+ 	output->transform = transform;
++
++	if (!output->enabled)
++		return;
++
++	old_width = output->width;
++
++	weston_output_transform_scale_init(output, output->transform, output->current_scale);
++	weston_output_init_geometry(output, output->x, output->y);
++
++    weston_compositor_reflow_outputs(output->compositor, output,
++                                     output->width - old_width);
++    wl_signal_emit(&output->compositor->output_resized_signal,
++                   output);
++
++    output->dirty = 1;
++
++	/* Notify clients of the change for output transform. */
++	wl_resource_for_each(resource, &output->resource_list) {
++		wl_output_send_geometry(resource,
++					output->x,
++					output->y,
++					output->mm_width,
++					output->mm_height,
++					output->subpixel,
++					output->make,
++					output->model,
++					output->transform);
++
++		if (wl_resource_get_version(resource) >= WL_OUTPUT_DONE_SINCE_VERSION)
++			wl_output_send_done(resource);
++	}
+ }
+ 
+ /** Initializes a weston_output object with enough data so
+-- 
+2.11.0
+

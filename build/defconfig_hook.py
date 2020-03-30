@@ -118,12 +118,18 @@ def merge_base(config):
                 overlay = (overlay + " " + m.group(1)).strip()
             else:
                 result += line
-
     return result, overlay
 
 def merge_cfgs(config, output):
     with open(output, "w+") as f:
         result, overlay = merge_base(config)
+
+        for line in open(config):
+            # override ROOTS_OVERLAY
+            m = re.match('BR2_ROOTFS_OVERLAY:="(.*)"$', line)
+            if m:
+                overlay = m.group(1)
+
         f.write(result)
         f.write('BR2_ROOTFS_OVERLAY="' + overlay + '"\n')
 

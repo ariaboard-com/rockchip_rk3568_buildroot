@@ -7,6 +7,7 @@
 #include "camera.config"
 #include "debug.config"
 #include "wifi.config"
+#include "network.config"
 BR2_TARGET_GENERIC_HOSTNAME="PX30_robot"
 BR2_TARGET_GENERIC_ISSUE="Welcome to PX30 Buildroot"
 BR2_ROOTFS_OVERLAY="board/rockchip/px30/fs-overlay-32/"

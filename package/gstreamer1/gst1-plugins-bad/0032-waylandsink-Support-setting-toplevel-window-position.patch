@@ -1,4 +1,4 @@
-From d1990582f6c93f4248975b759ff90245b36279a2 Mon Sep 17 00:00:00 2001
+From 15ee5178f3ee5e4d4a51a94b2ab84f411b33276c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 27 May 2019 16:04:24 +0800
 Subject: [PATCH 32/32] waylandsink: Support setting toplevel window position
@@ -16,7 +16,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 49 insertions(+), 22 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index df3b8c7e3..c8be4d7ec 100644
+index 0f9bcf5..eef52d6 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -62,7 +62,8 @@ enum
@@ -48,7 +48,7 @@ index df3b8c7e3..c8be4d7ec 100644
        break;
    }
  }
-@@ -697,7 +701,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+@@ -698,7 +702,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
      if (!sink->window) {
        /* if we were not provided a window, create one ourselves */
        sink->window = gst_wl_window_new_toplevel (sink->display,
@@ -58,7 +58,7 @@ index df3b8c7e3..c8be4d7ec 100644
        g_signal_connect_object (sink->window, "closed",
            G_CALLBACK (on_window_closed), sink, 0);
      }
-@@ -958,16 +963,19 @@ gst_wayland_sink_set_render_rectangle (GstVideoOverlay * overlay,
+@@ -965,16 +970,19 @@ gst_wayland_sink_set_render_rectangle (GstVideoOverlay * overlay,
    g_return_if_fail (sink != NULL);
  
    g_mutex_lock (&sink->render_lock);
@@ -88,10 +88,10 @@ index df3b8c7e3..c8be4d7ec 100644
    g_mutex_unlock (&sink->render_lock);
  }
 diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
-index be92fe7f2..9dbe4ebbc 100644
+index 31d4644..e59610b 100644
 --- a/ext/wayland/gstwaylandsink.h
 +++ b/ext/wayland/gstwaylandsink.h
-@@ -67,6 +67,8 @@ struct _GstWaylandSink
+@@ -68,6 +68,8 @@ struct _GstWaylandSink
    gboolean redraw_pending;
    GMutex render_lock;
    GstBuffer *last_buffer;
@@ -101,7 +101,7 @@ index be92fe7f2..9dbe4ebbc 100644
  
  struct _GstWaylandSinkClass
 diff --git a/ext/wayland/wldisplay.h b/ext/wayland/wldisplay.h
-index 7d9881f53..04af1d4d2 100644
+index 7d9881f..04af1d4 100644
 --- a/ext/wayland/wldisplay.h
 +++ b/ext/wayland/wldisplay.h
 @@ -55,8 +55,8 @@ struct _GstWlDisplay
@@ -115,7 +115,7 @@ index 7d9881f53..04af1d4d2 100644
    struct wp_viewporter *viewporter;
    struct zwp_linux_dmabuf_v1 *dmabuf;
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index 011ac9e0e..2f7708dec 100644
+index 011ac9e..2f7708d 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -78,7 +78,7 @@ handle_xdg_toplevel_configure (void *data,
@@ -192,7 +192,7 @@ index 011ac9e0e..2f7708dec 100644
    if (window->area_subsurface)
      wl_subsurface_set_position (window->area_subsurface, x, y);
 diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
-index 7f31a549a..4938cea11 100644
+index 7f31a54..4938cea 100644
 --- a/ext/wayland/wlwindow.h
 +++ b/ext/wayland/wlwindow.h
 @@ -84,7 +84,8 @@ GType gst_wl_window_get_type (void);

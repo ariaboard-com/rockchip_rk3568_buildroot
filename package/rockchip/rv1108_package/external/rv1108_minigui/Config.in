@@ -1,0 +1,20 @@
+if BR2_PACKAGE_RV1108
+
+# BSP packages
+config BR2_PACKAGE_RV1108_MINIGUI
+	bool "RV1108 package minigui"
+	select BR2_PACKAGE_LIBION
+	select BR2_PACKAGE_LINUX_RGA
+
+if BR2_PACKAGE_RV1108_MINIGUI
+menu "RV1108 package minigui options"
+
+config BR2_PACKAGE_RV1108_MINIGUI_STATIC
+	bool "enabled static lib"
+	default y
+
+endmenu
+endif
+
+endif
+

@@ -1,4 +1,4 @@
-From ffb290694bfdd28f2b8d34d3925b96df06101fad Mon Sep 17 00:00:00 2001
+From cd90ac4ca3e7b9739673a3f6b8df6d329b8d0b37 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 27 May 2019 15:56:32 +0800
 Subject: [PATCH 31/32] waylandsink: Convert xdg shell to unstable zxdg shell
@@ -15,7 +15,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  6 files changed, 45 insertions(+), 43 deletions(-)
 
 diff --git a/ext/wayland/Makefile.am b/ext/wayland/Makefile.am
-index 95bb97e7f..97fdd81f9 100644
+index 95bb97e..97fdd81 100644
 --- a/ext/wayland/Makefile.am
 +++ b/ext/wayland/Makefile.am
 @@ -7,8 +7,8 @@ BUILT_SOURCES = \
@@ -39,7 +39,7 @@ index 95bb97e7f..97fdd81f9 100644
  libgstwaylandsink_la_CFLAGS = \
  	$(GST_PLUGINS_BAD_CFLAGS) \
 diff --git a/ext/wayland/meson.build b/ext/wayland/meson.build
-index 598536b29..db06f9d61 100644
+index 598536b..db06f9d 100644
 --- a/ext/wayland/meson.build
 +++ b/ext/wayland/meson.build
 @@ -17,7 +17,8 @@ if use_wayland
@@ -53,7 +53,7 @@ index 598536b29..db06f9d61 100644
      protocols_files = []
  
 diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
-index 16654bdef..9197bf58e 100644
+index 16654bd..9197bf5 100644
 --- a/ext/wayland/wldisplay.c
 +++ b/ext/wayland/wldisplay.c
 @@ -90,8 +90,8 @@ gst_wl_display_finalize (GObject * gobject)
@@ -117,7 +117,7 @@ index 16654bdef..9197bf58e 100644
    }
  
 diff --git a/ext/wayland/wldisplay.h b/ext/wayland/wldisplay.h
-index 4ecc0d659..7d9881f53 100644
+index 4ecc0d6..7d9881f 100644
 --- a/ext/wayland/wldisplay.h
 +++ b/ext/wayland/wldisplay.h
 @@ -24,7 +24,7 @@
@@ -139,7 +139,7 @@ index 4ecc0d659..7d9881f53 100644
    struct wl_shm *shm;
    struct wp_viewporter *viewporter;
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index 71c1784c9..011ac9e0e 100644
+index 71c1784..011ac9e 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -46,7 +46,7 @@ G_DEFINE_TYPE (GstWlWindow, gst_wl_window, G_TYPE_OBJECT);
@@ -284,7 +284,7 @@ index 71c1784c9..011ac9e0e 100644
    else
      return (window->wl_shell_surface != NULL);
 diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
-index c3f017216..7f31a549a 100644
+index c3f0172..7f31a54 100644
 --- a/ext/wayland/wlwindow.h
 +++ b/ext/wayland/wlwindow.h
 @@ -53,8 +53,8 @@ struct _GstWlWindow

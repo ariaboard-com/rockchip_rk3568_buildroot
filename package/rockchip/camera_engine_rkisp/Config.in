@@ -2,3 +2,10 @@ config BR2_PACKAGE_CAMERA_ENGINE_RKISP
 	bool "Rockchip Camera Engine for linux"
 	help
 	  Rockchip camera engine for linux.
+
+config BR2_PACKAGE_CAMERA_ENGINE_RKISP_IQFILE
+	depends on BR2_PACKAGE_CAMERA_ENGINE_RKISP
+	string "Rockchip Camera Engine IQ xml file"
+	default ""
+	help
+	  Rockchip camera engine for linux.

@@ -23,6 +23,7 @@ stop() {
 
 case "$1" in
   start)
+	cat /etc/os-release
 	start
 	;;
   stop)

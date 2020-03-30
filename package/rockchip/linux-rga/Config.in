@@ -1,5 +1,5 @@
 config BR2_PACKAGE_LINUX_RGA
 	bool "Rockchip RGA lib for linux"
-        select BR2_PACKAGE_LIBDRM
+	select BR2_PACKAGE_LIBDRM if !BR2_PACKAGE_RV1108
 	help
 	  Rockchip RGA lib for linux.

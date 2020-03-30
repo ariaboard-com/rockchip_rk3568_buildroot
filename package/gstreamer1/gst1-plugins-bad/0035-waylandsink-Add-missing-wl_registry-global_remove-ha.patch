@@ -1,0 +1,39 @@
+From 10e3af1d17949ba706f3efbeec9e5aee1d156b92 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 29 Oct 2019 14:56:54 +0800
+Subject: [PATCH] waylandsink: Add missing wl_registry global_remove handler
+
+Fix crash when getting global_remove event:
+[1780138.337] wl_registry@2.global_remove(22)
+listener function for opcode 1 of wl_registry is NULL
+Aborted
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ ext/wayland/wldisplay.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
+index 9197bf58e..cd5c2255e 100644
+--- a/ext/wayland/wldisplay.c
++++ b/ext/wayland/wldisplay.c
+@@ -238,8 +238,15 @@ registry_handle_global (void *data, struct wl_registry *registry,
+   }
+ }
+ 
++static void
++registry_handle_global_remove(void *data, struct wl_registry *registry,
++    uint32_t name)
++{
++}
++
+ static const struct wl_registry_listener registry_listener = {
+-  registry_handle_global
++  registry_handle_global,
++  registry_handle_global_remove
+ };
+ 
+ static gpointer
+-- 
+2.11.0
+

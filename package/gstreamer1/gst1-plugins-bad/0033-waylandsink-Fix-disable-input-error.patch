@@ -1,0 +1,41 @@
+From dcb7b3273086f9a22913b6e428aa8771cc7074d3 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Fri, 26 Jul 2019 20:49:30 +0800
+Subject: [PATCH] waylandsink: Fix disable input error
+
+Weston only consider empty region as disabling input.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ ext/wayland/wlwindow.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
+index 2f7708d..5a11237 100644
+--- a/ext/wayland/wlwindow.c
++++ b/ext/wayland/wlwindow.c
+@@ -193,6 +193,7 @@ static GstWlWindow *
+ gst_wl_window_new_internal (GstWlDisplay * display, GMutex * render_lock)
+ {
+   GstWlWindow *window;
++  struct wl_region *region;
+ 
+   window = g_object_new (GST_TYPE_WL_WINDOW, NULL);
+   window->display = g_object_ref (display);
+@@ -225,8 +226,11 @@ gst_wl_window_new_internal (GstWlDisplay * display, GMutex * render_lock)
+   }
+ 
+   /* do not accept input */
+-  wl_surface_set_input_region (window->area_surface, NULL);
+-  wl_surface_set_input_region (window->video_surface, NULL);
++  region = wl_compositor_create_region (window->display->compositor);
++  wl_region_add (region, 0, 0, 0, 0);
++  wl_surface_set_input_region (window->area_surface, region);
++  wl_surface_set_input_region (window->video_surface, region);
++  wl_region_destroy (region);
+ 
+   return window;
+ }
+-- 
+2.11.0
+

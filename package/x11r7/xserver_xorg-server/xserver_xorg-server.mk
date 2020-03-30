@@ -4,15 +4,29 @@
 #
 ################################################################################
 
+ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_V_1_19),y)
+XSERVER_XORG_SERVER_VERSION = eca4d098cedac245f89110920cf99c3a920a9eff
+XSERVER_XORG_SERVER_SITE = $(call github,rockchip-linux,xserver,$(XSERVER_XORG_SERVER_VERSION))
+else ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_V_1_20),y)
+XSERVER_XORG_SERVER_VERSION = 1.20.4_2019_11_18
+XSERVER_XORG_SERVER_SITE = $(call github,JeffyCN,xorg-xserver,$(XSERVER_XORG_SERVER_VERSION))
+XSERVER_XORG_SERVER_PATCH_DIRS += $($(PKG)_PKGDIR)/1.20.4
+
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+XSERVER_XORG_SERVER_DEPENDENCIES += linux-rga
+endif
+
+else
 XSERVER_XORG_SERVER_VERSION = $(call qstrip,$(BR2_PACKAGE_XSERVER_XORG_SERVER_VERSION))
 XSERVER_XORG_SERVER_SOURCE = xorg-server-$(XSERVER_XORG_SERVER_VERSION).tar.bz2
 XSERVER_XORG_SERVER_SITE = https://xorg.freedesktop.org/archive/individual/xserver
+endif
 XSERVER_XORG_SERVER_LICENSE = MIT
 XSERVER_XORG_SERVER_LICENSE_FILES = COPYING
 XSERVER_XORG_SERVER_INSTALL_STAGING = YES
 # xfont_font-util is needed only for autoreconf
 XSERVER_XORG_SERVER_AUTORECONF = YES
-XSERVER_XORG_SERVER_DEPENDENCIES = \
+XSERVER_XORG_SERVER_DEPENDENCIES += \
 	xfont_font-util \
 	xutil_util-macros \
 	xlib_libX11 \
@@ -227,6 +241,9 @@ endif
 define XSERVER_XORG_SERVER_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 755 package/x11r7/xserver_xorg-server/S40xorg \
 		$(TARGET_DIR)/etc/init.d/S40xorg
+
+	$(INSTALL) -D -m 755 package/x11r7/xserver_xorg-server/20-modesetting.conf \
+		$(TARGET_DIR)/usr/share/X11/xorg.conf.d
 endef
 
 $(eval $(autotools-package))

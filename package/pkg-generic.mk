@@ -94,8 +94,8 @@ define step_pkg_size_end
 
 	if [ -z "$(3)" ]; then \
 		grep "^$(1)," $(BUILD_DIR)/packages-file-list$(3).txt | \
-			cut -d',' -f 2 | \
-			tar --no-recursion -cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T -; \
+			cut -d',' -f 2 | uniq | \
+			tar --no-recursion --ignore-failed-read -cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T -; true; \
 	fi
 
 	rm -f $($(PKG)_DIR)/.br_filelist_before $($(PKG)_DIR)/.br_filelist_after
@@ -212,7 +212,7 @@ $(BUILD_DIR)/%/.stamp_rsynced:
 # prefix of the patches
 #
 # For BR2_GLOBAL_PATCH_DIR, only generate if it is defined
-$(BUILD_DIR)/%/.stamp_patched: PATCH_BASE_DIRS =  $(PKGDIR)
+$(BUILD_DIR)/%/.stamp_patched: PATCH_BASE_DIRS =  $(PKGDIR) $($(PKG)_PATCH_DIRS)
 $(BUILD_DIR)/%/.stamp_patched: PATCH_BASE_DIRS += $(addsuffix /$(RAWNAME),$(call qstrip,$(BR2_GLOBAL_PATCH_DIR)))
 $(BUILD_DIR)/%/.stamp_patched:
 	@$(call step_start,patch)

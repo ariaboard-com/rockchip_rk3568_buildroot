@@ -1,0 +1,62 @@
+From 140be17f6ce0ded2a0c1f3546b70525276999075 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 2 Sep 2019 18:24:02 +0800
+Subject: [PATCH] compositor-drm: Clear the rest areas after copied fb
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 01ab0b1..a2a337a 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -994,6 +994,44 @@ drm_copy_fb(struct drm_fb *src, struct drm_fb *dst,
+ 
+ 	ret = c_RkRgaBlit(&src_info, &dst_info, NULL);
+ 
++	/**
++	 * Fill the rest with black.
++	 * Rga can only handle w > 1 and h > 1.
++	 */
++	if (dy > 1) {
++		rga_set_rect(&dst_info.rect, 0, 0, dst->width, dy,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dy + dh < dst->height - 1) {
++		rga_set_rect(&dst_info.rect, 0, dy + dh,
++			     dst->width, dst->height - dy - dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dx > 1) {
++		rga_set_rect(&dst_info.rect, 0, dy, dx, dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dx + dw < dst->width - 1) {
++		rga_set_rect(&dst_info.rect, dx + dw, dy,
++			     dst->width - dx - dw, dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
+ 	close(dst_fd);
+ close_src:
+ 	close(src_fd);
+-- 
+2.11.0
+

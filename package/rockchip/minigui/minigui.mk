@@ -16,15 +16,12 @@ endif
 ##    --host=arm-linux
 ##    --target=arm-linux
 MINIGUI_CONF_OPTS = \
-    --with-sysroot=$(STAGING_DIR) \
     --build=i386-linux \
     --with-osname=linux \
-    --with-targetname=drmcon \
     --disable-videopcxvfb \
     --with-ttfsupport=none \
     --disable-autoial \
     --disable-vbfsupport \
-    --enable-tslibial \
     --disable-textmode \
     --enable-vbfsupport \
     --disable-pcxvfb \
@@ -33,13 +30,12 @@ MINIGUI_CONF_OPTS = \
     --disable-jpgsupport \
     --disable-fontcourier \
     --disable-screensaver \
-    --enable-RKKeybroad_ial \
+    --enable-RKKeyboard_ial \
     --enable-jpgsupport \
     --disable-fontsserif \
     --disable-fontsystem \
     --disable-flatlf \
     --disable-skinlfi \
-    --disable-mousecalibrate \
     --disable-dblclk \
     --disable-consoleps2 \
     --disable-consolems \
@@ -52,12 +48,27 @@ MINIGUI_CONF_OPTS = \
     --disable-static \
     --enable-shared \
     --disable-procs \
-    --disable-cursor \
     --with-runmode=ths \
-    --disable-videofbcon \
-    --enable-videodrmcon \
     --disable-incoreres \
+    --disable-cursor \
+    --enable-mousecalibrate \
     --with-pic
+
+ifeq ($(BR2_PACKAGE_LIBDRM),y)
+MINIGUI_TARGET=drmcon
+MINIGUI_CONF_OPTS += \
+    --enable-videodrmcon \
+    --disable-videofbcon
+
+MINIGUI_DEPENDENCIES += pixman
+else
+MINIGUI_TARGET=fbcon
+MINIGUI_CONF_OPTS += \
+    --enable-videofbcon
+endif
+
+MINIGUI_CONF_OPTS += \
+    --with-targetname=$(MINIGUI_TARGET)
 
 ifeq ($(BR2_PACKAGE_MINIGUI_ENABLE_FREETYPE),y)
 MINIGUI_DEPENDENCIES += freetype
@@ -72,5 +83,12 @@ MINIGUI_DEPENDENCIES += libpng12
 MINIGUI_CONF_OPTS += \
     --enable-pngsupport
 endif
+
+ifeq ($(BR2_PACKAGE_TSLIB),y)
+MINIGUI_DEPENDENCIES += tslib
+MINIGUI_CONF_OPTS += \
+    --enable-tslibial
+endif
+
 
 $(eval $(autotools-package))

@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "libdrm_macros.h"
 #include "drm_common.h"
 #include "bootanimation.h"
 #ifdef HW_JPEG
@@ -52,8 +53,9 @@ bool exit_;
 int bufCnt;
 int mImageCount;
 char mBootAnimPath[128];
+int mFps = 15; // default 15fps
 void* mDecoder=NULL;
-static int mfps = 6000;
+//static int mfps = 6000;
 static int vsync_cnt=0;
 static int last_win1_state=0;
 
@@ -168,6 +170,7 @@ static int ctx_drm_display(int drm_fd, struct armsoc_bo* bo, int x, int y)
         res = g_drm_resources;
     }
     if (g_drm_encoder == NULL) {
+        printf("g_drm_encoder nil\n");
         return 0;
     }
     /*
@@ -383,9 +386,9 @@ int bo_map(struct armsoc_bo *bo)
     if (ret)
         return ret;
 
-    /*map = drm_mmap(0, bo->size, PROT_READ | PROT_WRITE, MAP_SHARED,
-      bo->fd, arg.offset);*/
-    drmMap(bo->fd, arg.offset, bo->size, &map);
+    map = drm_mmap(0, bo->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+      bo->fd, arg.offset);
+    //drmMap(bo->fd, arg.offset, bo->size, &map);
     if (map == MAP_FAILED)
         return -EINVAL;
 
@@ -666,12 +669,16 @@ void bootAnimation(int mDrmFd)
     for (int j=0;j<mImageCount;j++) {
         memset(picPath, 0, pathSize);
         displayWidth=displayHeight=0;
-        sprintf(picPath, "%s/%d.jpg",mBootAnimPath,j);		
+        sprintf(picPath, "%s/%d.jpg",mBootAnimPath,j);
         if (access(picPath, R_OK) != 0)
             sprintf(picPath, "%s/%d.jpeg",mBootAnimPath,j);
-        if (access(picPath, R_OK) != 0)
+        if (access(picPath, R_OK) != 0) {
+            printf("%s: can't access file %s \n", __func__, picPath);
             continue;
+        }
         jpeg_get_displayinfo(picPath, &displayWidth, &displayHeight);
+
+	printf("picPath: %s \n", picPath);
 
         if (displayWidth !=0 && displayHeight != 0) {
             struct armsoc_bo* bo=NULL;
@@ -682,13 +689,15 @@ void bootAnimation(int mDrmFd)
                 bo_unmap(mBufSlotInfo[slot].bo);
                 bo_destroy(mBufSlotInfo[slot].bo);
                 free(mBufSlotInfo[slot].bo);
-                //printf("free: mSfJpegBufInfo[0].mPath %s \n", mBufSlotInfo[slot].mPath);
+                printf("free: mSfJpegBufInfo[0].mPath %s \n", mBufSlotInfo[slot].mPath);
                 mBufSlotInfo[slot].bo = NULL;			
                 memset(mBufSlotInfo[slot].mPath, 0, sizeof(mBufSlotInfo[slot].mPath));
             }
             bo = bo_create(drm_fd, DRM_FORMAT_RGB888, displayWidth, displayHeight);
-            if (bo == NULL)
+            if (bo == NULL) {
+                printf( "failed to bo_create fb: %s\n", strerror(errno));
                 return;
+            }
             jpeg_sf_decode(picPath, (char*)bo->ptr);
             offsets[0] = 0;
             handles[0] = bo->handle;
@@ -699,6 +708,7 @@ void bootAnimation(int mDrmFd)
                 continue;
             }
             ctx_drm_display(drm_fd, bo, 0, 0);
+            usleep(1000000 / mFps);
             mBufSlotInfo[0].bo = bo;
             sprintf(mBufSlotInfo[0].mPath, "%s", picPath);
             for (int tmp=MAX_OUTPUT_RSV_CNT-1;tmp>0;tmp--) {
@@ -809,13 +819,13 @@ void Routine()
         drmModeFreeCrtc(crtc);
     gettimeofday(&cur, NULL);
     usleep(10*1000);
-	bool mCur_win1_state = 0;
-	mCur_win1_state = drm_check_video(mDrmFd);
-    //printf("Routine usetime=%d************4\n", (1000000 *(cur.tv_sec - last.tv_sec) + (cur.tv_usec-last.tv_usec))/1000);
+    bool mCur_win1_state = 0;
+    mCur_win1_state = drm_check_video(mDrmFd);
+    //printf("Routine %d %d,usetime=%d************4\n", mCur_win1_state, vsync_cnt, (1000000 *(cur.tv_sec - last.tv_sec) + (cur.tv_usec-last.tv_usec))/1000);
     if (!mCur_win1_state &&  vsync_cnt == 0) {
         bootAnimation(mDrmFd);
-        if (vsync_cnt == mfps)
-            vsync_cnt = 0;
+        //if (vsync_cnt == mfps)
+            //vsync_cnt = 0;
     }
 	last_win1_state = mCur_win1_state;
     vsync_cnt ++;
@@ -826,7 +836,7 @@ void* vsyncThread(void* param)
     while (true) {
         int ret =  pthread_mutex_lock(&lock_);
         if (ret) {
-            printf("Failed to lock %s thread %d\n", ret);
+            printf("Failed to lock %s thread %d\n", __func__, ret);
             continue;
         }
 
@@ -834,7 +844,7 @@ void* vsyncThread(void* param)
 
         ret = pthread_mutex_unlock(&lock_);
         if (ret) {
-            printf("Failed to unlock %s thread %d\n",  ret);
+            printf("Failed to unlock %s thread %d\n",  __func__, ret);
             break;
         }
         if (exit)
@@ -907,7 +917,9 @@ int start_boot_thread(int mDrmFd)
     exit_ = false;
     enabled_ = false;
     if (ret) {
-        printf("Failed to int thread %s condition %d\n", ret);
+        printf("Failed to int thread %s condition %d\n", __func__, ret);
+        if (cfg_file)
+            fclose(cfg_file);
         return ret;
     }
 
@@ -915,6 +927,8 @@ int start_boot_thread(int mDrmFd)
     if (ret) {
         printf("Failed to init thread  lock %d\n", ret);
         pthread_cond_destroy(&cond_);
+        if (cfg_file)
+            fclose(cfg_file);
         return ret;
     }
 
@@ -924,16 +938,16 @@ int start_boot_thread(int mDrmFd)
     if (cfg_file) {
         char imageCnt[32];
         char path[128];
-        char mFps[32];
+        char fps[32];
         if (!feof(cfg_file)) {
             fgets(imageCnt,32,cfg_file);
             fgets(path,128,cfg_file);
-            fgets(mFps,32,cfg_file);
+            fgets(fps,32,cfg_file);
         }
         sscanf(imageCnt, "cnt=%d", &mImageCount);
         sscanf(path, "path=%s", mBootAnimPath);
-        printf("cfg: imageCnt=%s path=%s mImageCount=%d mBootAnimPath=%s", imageCnt, path, mImageCount, mBootAnimPath);
-        sprintf(mBootAnimPath, "%s", path);
+        sscanf(fps, "fps=%d", &mFps);
+        printf("cfg:  mImageCount=%d mBootAnimPath=%s mFps %d\n", mImageCount, mBootAnimPath, mFps);
         fclose(cfg_file);
         if (mImageCount <= 0)
             mImageCount = 4;

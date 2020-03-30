@@ -11,6 +11,9 @@ GST1_PLUGINS_BASE_INSTALL_STAGING = YES
 GST1_PLUGINS_BASE_LICENSE_FILES = COPYING.LIB
 GST1_PLUGINS_BASE_LICENSE = LGPL-2.0+, LGPL-2.1+
 
+GST1_PLUGINS_BASE_AUTORECONF := YES
+GST1_PLUGINS_BASE_GETTEXTIZE := YES
+
 # gio_unix_2_0 is only used for tests
 GST1_PLUGINS_BASE_CONF_OPTS = \
 	--disable-examples \
@@ -24,6 +27,10 @@ GST1_PLUGINS_BASE_CONF_OPTS += \
 	--disable-iso-codes
 
 GST1_PLUGINS_BASE_DEPENDENCIES = gstreamer1
+
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+GST1_PLUGINS_BASE_DEPENDENCIES += linux-rga
+endif
 
 # These plugins are listed in the order from ./configure --help
 ifeq ($(BR2_PACKAGE_ORC),y)

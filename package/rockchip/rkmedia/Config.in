@@ -46,6 +46,12 @@ config BR2_PACKAGE_RKMEDIA_OGGVORBIS_MUXER
 
 endif # BR2_PACKAGE_RKMEDIA_OGG
 
+config BR2_PACKAGE_RKMEDIA_FFMPEG
+    bool "ffmpeg"
+    depends on BR2_PACKAGE_FFMPEG
+    help
+      wrapped function of ffmpeg
+
 if BR2_PACKAGE_ALSA_LIB
 
 config BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK
@@ -70,6 +76,12 @@ config BR2_PACKAGE_RKMEDIA_RKRGA
     select BR2_PACKAGE_LINUX_RGA
     help
       wrapped function of librga
+
+config BR2_PACKAGE_RKMEDIA_RKNN
+    bool "rknn"
+    select BR2_PACKAGE_RKNPU
+    help
+      wrapped function of rknn
 
 config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
     bool "drm output"
@@ -96,6 +108,11 @@ config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H264
     bool "rtsp server h264 session"
     help
       live555 rtsp server h264 session
+
+config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H265
+    bool "rtsp server h265 session"
+    help
+      live555 rtsp server h265 session
 
 endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
 

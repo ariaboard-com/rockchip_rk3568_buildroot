@@ -1,0 +1,510 @@
+From 0d2684ae707942c9736b90ba5b2e3d51e3b97a9c Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 1 Aug 2019 20:51:22 +0800
+Subject: [PATCH 19/22] compositor-drm: Support rotate and scale in mirror mode
+
+Use rockchip rga for mirror mode.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ Makefile.am                |   1 +
+ config.h.in                |   6 +
+ configure.ac               |  10 ++
+ libweston/compositor-drm.c | 342 +++++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 300 insertions(+), 59 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index e9679e6..7686e7b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -372,6 +372,7 @@ drm_backend_la_LDFLAGS = -module -avoid-version
+ drm_backend_la_LIBADD =				\
+ 	libsession-helper.la			\
+ 	libweston-@LIBWESTON_MAJOR@.la		\
++	$(RGA_LIBS)				\
+ 	$(COMPOSITOR_LIBS)			\
+ 	$(DRM_COMPOSITOR_LIBS)			\
+ 	$(INPUT_BACKEND_LIBS)			\
+diff --git a/config.h.in b/config.h.in
+index 2a828ab..7321c60 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -84,6 +84,12 @@
+ /* Define to 1 if you have the `posix_fallocate' function. */
+ #undef HAVE_POSIX_FALLOCATE
+ 
++/* Have rockchip rga */
++#undef HAVE_RGA
++
++/* Define to 1 if you have the <rga/RgaApi.h> header file. */
++#undef HAVE_RGA_RGAAPI_H
++
+ /* Define to 1 if you have the <stdint.h> header file. */
+ #undef HAVE_STDINT_H
+ 
+diff --git a/configure.ac b/configure.ac
+index 0961ca8..01a18de 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -204,6 +204,16 @@ if test x$enable_drm_compositor = xyes; then
+ 		    [AC_MSG_WARN([gbm does not support dmabuf import, will omit that capability])])
+ fi
+ 
++RGA_LIBS=
++RGA_HEADER=
++
++AC_CHECK_LIB([rga], [c_RkRgaInit], RGA_LIBS="-lrga")
++AC_CHECK_HEADERS([rga/RgaApi.h], RGA_HEADER="yes")
++
++if test "x$RGA_LIBS" != "x" && test "x$RGA_HEADER" = "xyes"; then
++	AC_SUBST(RGA_LIBS)
++	AC_DEFINE(HAVE_RGA, 1, [Have rockchip rga])
++fi
+ 
+ PKG_CHECK_MODULES(LIBINPUT_BACKEND, [libinput >= 0.8.0])
+ PKG_CHECK_MODULES(COMPOSITOR, [$COMPOSITOR_MODULES])
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index d593c04..5b26878 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -63,6 +63,11 @@
+ #include "linux-dmabuf.h"
+ #include "linux-dmabuf-unstable-v1-server-protocol.h"
+ 
++#ifdef HAVE_RGA
++#include <rga/rga.h>
++#include <rga/RgaApi.h>
++#endif
++
+ #ifndef DRM_CAP_TIMESTAMP_MONOTONIC
+ #define DRM_CAP_TIMESTAMP_MONOTONIC 0x6
+ #endif
+@@ -222,6 +227,8 @@ struct drm_output {
+ 
+ 	struct wl_list link;
+ 	bool is_mirror;
++	pixman_box32_t plane_bounds;
++	bool can_scale;
+ 
+ 	uint32_t crtc_id; /* object ID to pass to DRM functions */
+ 	uint32_t plane_id; /* object ID to pass to DRM functions */
+@@ -869,37 +876,217 @@ drm_waitvblank_pipe(struct drm_output *output)
+ 		return 0;
+ }
+ 
++static int
++drm_output_get_rotation(struct drm_output *output)
++{
++	switch (output->base.transform) {
++	case WL_OUTPUT_TRANSFORM_90:
++	case WL_OUTPUT_TRANSFORM_FLIPPED_90:
++		return 90;
++	case WL_OUTPUT_TRANSFORM_180:
++	case WL_OUTPUT_TRANSFORM_FLIPPED_180:
++		return 180;
++	case WL_OUTPUT_TRANSFORM_270:
++	case WL_OUTPUT_TRANSFORM_FLIPPED_270:
++		return 270;
++	default:
++		return 0;
++	}
++}
++
++#ifdef HAVE_RGA
++static inline RgaSURF_FORMAT
++rga_get_format(const struct pixel_format_info *format)
++{
++	switch (format->bpp) {
++	case 32:
++		return RK_FORMAT_RGBA_8888;
++	case 16:
++		return RK_FORMAT_RGB_565;
++	default:
++		return RK_FORMAT_UNKNOWN;
++	}
++}
++#endif
++
++static int
++drm_copy_fb(struct drm_fb *src, struct drm_fb *dst,
++	    int rotation, int dx, int dy, int dw, int dh)
++{
++#ifndef HAVE_RGA
++	/* TODO: Use pixman to do the copy */
++	return -1;
++#else
++	RgaSURF_FORMAT src_format, dst_format;
++	rga_info_t src_info = {0};
++	rga_info_t dst_info = {0};
++	int src_fd, dst_fd;
++	int ret;
++
++	static bool rga_supported = true;
++	static bool rga_inited = false;
++
++	if (!rga_supported)
++		return -1;
++
++	if (!rga_inited) {
++		ret = c_RkRgaInit();
++		if (ret < 0) {
++			rga_supported = false;
++			return ret;
++		}
++		rga_inited = true;
++	}
++
++	src_format = rga_get_format(src->format);
++	dst_format = rga_get_format(dst->format);
++
++	if (src_format == RK_FORMAT_UNKNOWN ||
++	    dst_format == RK_FORMAT_UNKNOWN)
++		return -1;
++
++	ret = drmPrimeHandleToFD(src->fd, src->handle,
++				 DRM_CLOEXEC, &src_fd);
++	if (ret < 0)
++		return ret;
++
++	ret = drmPrimeHandleToFD(dst->fd, dst->handle,
++				 DRM_CLOEXEC, &dst_fd);
++	if (ret < 0)
++		goto close_src;
++
++	src_info.fd = src_fd;
++	src_info.mmuFlag = 1;
++
++	rga_set_rect(&src_info.rect, 0, 0, src->width, src->height,
++		     src->stride * 8 / src->format->bpp, src->height,
++		     src_format);
++
++	if (rotation == 90)
++		src_info.rotation = HAL_TRANSFORM_ROT_90;
++	else if (rotation == 180)
++		src_info.rotation = HAL_TRANSFORM_ROT_180;
++	else if (rotation == 270)
++		src_info.rotation = HAL_TRANSFORM_ROT_270;
++
++	dst_info.fd = dst_fd;
++	dst_info.mmuFlag = 1;
++
++	rga_set_rect(&dst_info.rect, dx, dy, dw, dh,
++		     dst->stride * 8 / dst->format->bpp, dst->height,
++		     dst_format);
++
++	ret = c_RkRgaBlit(&src_info, &dst_info, NULL);
++
++	close(dst_fd);
++close_src:
++	close(src_fd);
++	return ret;
++#endif
++}
++
+ static void
+-drm_output_prepare_fb(struct drm_output *output, pixman_region32_t *damage)
++drm_output_prepare_mirror_fb(struct drm_output *output)
+ {
+ 	struct weston_compositor *c = output->base.compositor;
+-	struct drm_backend *b = to_drm_backend(c);
++	struct drm_mode *mode;
++	struct drm_fb *fb;
++	int rotation, sw, sh, dx, dy, dw, dh;
++	bool scale = false;
+ 
+-	// The first output is default output
+-	struct weston_output *def_output_base =
++	// The first output is primary output
++	struct weston_output *output_base =
+ 		container_of(c->output_list.next, struct weston_output, link);
+-	struct drm_output *default_output = to_drm_output(def_output_base);
++	struct drm_output *primary_output = to_drm_output(output_base);
+ 
+-	if (!output->is_mirror) {
+-		drm_output_render(output, damage);
++	assert(output != primary_output);
+ 
+-		// Repaint all mirrors
+-		wl_list_for_each(output, &b->mirror_list, link)
+-			weston_output_schedule_repaint(&output->base);
++	// Mirroring primary output's current fb
++	fb = primary_output->fb_current;
++	if (!fb)
+ 		return;
+-	}
+-
+-	assert(output != default_output);
+ 
++	/* TODO: Is it safe to do this? */
+ 	if (output->fb_pending)
+ 		drm_fb_unref(output->fb_pending);
+ 
+-	// Reusing default output's current fb
+-	output->fb_pending = default_output->fb_current;
+-	if (!output->fb_pending)
++	rotation = drm_output_get_rotation(output);
++	rotation -= drm_output_get_rotation(primary_output);
++	if (rotation < 0)
++		rotation += 360;
++
++	mode = container_of(output->base.current_mode, struct drm_mode, base);
++
++	dx = dy = 0;
++	dw = mode->mode_info.hdisplay;
++	dh = mode->mode_info.vdisplay;
++
++	if (rotation % 180) {
++		sw = fb->height;
++		sh = fb->width;
++	} else {
++		sw = fb->width;
++		sh = fb->height;
++	}
++
++	if (getenv("WESTON_DRM_KEEP_RATIO")) {
++		float src_ratio = (float) sw / sh;
++		float dst_ratio = (float) dw / dh;
++		int offset;
++
++		if (src_ratio > dst_ratio) {
++			offset = dh - dw / src_ratio;
++			dy = offset / 2;
++			dh -= offset;
++		} else {
++			offset = dw - dh * src_ratio;
++			dx = offset / 2;
++			dw -= offset;
++		}
++	}
++
++	if (dw != mode->mode_info.hdisplay ||
++	    dh != mode->mode_info.vdisplay)
++		scale = true;
++
++	if (!rotation && (!scale || output->can_scale)) {
++		/* Use the priamry output fb directly */
++		output->plane_bounds.x1 = dx;
++		output->plane_bounds.y1 = dy;
++		output->plane_bounds.x2 = dx + dw;
++		output->plane_bounds.y2 = dy + dh;
++
++		output->fb_pending = fb;
++		drm_fb_ref(output->fb_pending);
++		return;
++	}
++
++	memset(&output->plane_bounds, 0, sizeof(pixman_box32_t));
++
++	/* Mirroring to dumb fb */
++	output->current_image ^= 1;
++	output->fb_pending = drm_fb_ref(output->dumb[output->current_image]);
++
++	/* TODO: Honor flips? */
++	drm_copy_fb(fb, output->fb_pending, rotation, dx, dy, dw, dh);
++}
++
++static void
++drm_output_prepare_fb(struct drm_output *output, pixman_region32_t *damage)
++{
++	struct weston_compositor *c = output->base.compositor;
++	struct drm_backend *b = to_drm_backend(c);
++
++	if (output->is_mirror) {
++		drm_output_prepare_mirror_fb(output);
+ 		return;
++	}
++
++	drm_output_render(output, damage);
+ 
+-	drm_fb_ref(output->fb_pending);
++	// Repaint all mirrors
++	wl_list_for_each(output, &b->mirror_list, link)
++		weston_output_schedule_repaint(&output->base);
+ }
+ 
+ static int
+@@ -963,34 +1150,26 @@ drm_output_repaint(struct weston_output *output_base,
+ 		output->state_invalid = false;
+ 	}
+ 
+-	dx = dy = 0;
+-	dw = mode->mode_info.hdisplay;
+-	dh = mode->mode_info.vdisplay;
+-	sw = output->fb_pending->width;
+-	sh = output->fb_pending->height;
+-
+-	if (output->is_mirror && getenv("WESTON_DRM_KEEP_RATIO")) {
+-		float src_ratio = (float) sw / sh;
+-		float dst_ratio = (float) dw / dh;
+-		int offset;
++	dx = output->plane_bounds.x1;
++	dy = output->plane_bounds.y1;
++	dw = output->plane_bounds.x2 - output->plane_bounds.x1;
++	dh = output->plane_bounds.y2 - output->plane_bounds.y1;
+ 
+-		if (src_ratio > dst_ratio) {
+-			offset = dh - dw / src_ratio;
+-			dy = offset / 2;
+-			dh -= offset;
+-		} else {
+-			offset = dw - dh * src_ratio;
+-			dx = offset / 2;
+-			dw -= offset;
+-		}
++	if (!dw || !dh) {
++		dw = mode->mode_info.hdisplay;
++		dh = mode->mode_info.vdisplay;
+ 	}
+ 
++	sw = output->fb_pending->width;
++	sh = output->fb_pending->height;
++
+ 	ret = drmModeSetPlane(backend->drm.fd,
+ 			      output->plane_id,
+ 			      output->crtc_id,
+ 			      output->fb_pending->fb_id, 0,
+ 			      dx, dy, dw, dh, 0, 0, sw << 16, sh << 16);
+ 	if (ret) {
++		output->can_scale = false;
+ 		weston_log("set plane failed: %m\n");
+ 		goto err_pageflip;
+ 	}
+@@ -1777,11 +1956,7 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+ 	drm_fb_unref(output->fb_dummy);
+ 	output->fb_dummy = NULL;
+ 
+-	// No renderer for mirrors
+-	if (output->is_mirror)
+-		return 0;
+-
+-	if (b->use_pixman) {
++	if (b->use_pixman || output->is_mirror) {
+ 		drm_output_fini_pixman(output);
+ 		if (drm_output_init_pixman(output, b) < 0) {
+ 			weston_log("failed to init output pixman state with "
+@@ -1989,7 +2164,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+ 	mode->base.width = info->hdisplay;
+ 	mode->base.height = info->vdisplay;
+ 
+-	if (drm_virtual_width && drm_virtual_height) {
++	if (!output->is_mirror && output->can_scale &&
++	    drm_virtual_width && drm_virtual_height) {
+ 		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
+ 			   output->base.name, drm_virtual_width,
+ 			   drm_virtual_height, mode->base.width,
+@@ -2181,6 +2357,55 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
+ 	return type == DRM_PLANE_TYPE_PRIMARY;
+ }
+ 
++static bool
++drm_plane_can_scale(struct drm_backend *b, int plane_id)
++{
++	drmModeObjectPropertiesPtr props;
++	drmModePropertyPtr prop = NULL;
++	uint64_t value;
++	unsigned i;
++	bool ret = false;
++
++	if (!getenv("WESTON_DRM_ALLOW_SCALE"))
++		return false;
++
++	props = drmModeObjectGetProperties(b->drm.fd, plane_id,
++					   DRM_MODE_OBJECT_PLANE);
++	if (!props)
++		return false;
++
++	for (i = 0; i < props->count_props; i++) {
++		prop = drmModeGetProperty(b->drm.fd, props->props[i]);
++		if (!prop)
++			continue;
++
++		if(drm_property_type_is(prop, DRM_MODE_PROP_BITMASK) &&
++		   !strcmp(prop->name, "FEATURE"))
++			break;
++
++		drmModeFreeProperty(prop);
++	}
++
++	if (i == props->count_props)
++		goto out;
++
++	value = props->prop_values[i];
++
++	for (i = 0; i < (unsigned) prop->count_enums; i++) {
++		if (strcmp(prop->enums[i].name, "scale"))
++			continue;
++
++		ret = value & (1LL << prop->enums[i].value);
++		break;
++	}
++
++	drmModeFreeProperty(prop);
++
++out:
++	drmModeFreeObjectProperties(props);
++	return ret;
++}
++
+ static int
+ find_plane_for_crtc(struct drm_backend *b, int pipe)
+ {
+@@ -2840,18 +3065,17 @@ drm_output_enable(struct weston_output *base)
+ 	if (b->pageflip_timeout)
+ 		drm_output_pageflip_timer_create(output);
+ 
+-	// No renderer for mirrors
+-	if (!output->is_mirror) {
+-		if (b->use_pixman) {
+-			if (drm_output_init_pixman(output, b) < 0) {
+-				weston_log("Failed to init output pixman state\n");
+-				goto err_free;
+-			}
+-		} else if (drm_output_init_egl(output, b) < 0) {
+-			weston_log("Failed to init output gl state\n");
++	if (b->use_pixman || output->is_mirror) {
++		if (drm_output_init_pixman(output, b) < 0) {
++			weston_log("Failed to init output pixman state\n");
+ 			goto err_free;
+ 		}
+-	} else {
++	} else if (drm_output_init_egl(output, b) < 0) {
++		weston_log("Failed to init output gl state\n");
++		goto err_free;
++	}
++
++	if (output->is_mirror) {
+ 		wl_list_insert(&b->mirror_list, &output->link);
+ 
+ 		// HACK: Make it unavailable for views?
+@@ -2933,14 +3157,13 @@ drm_output_deinit(struct weston_output *base)
+ 	drm_fb_unref(output->fb_current);
+ 	output->fb_current = NULL;
+ 
+-	if (!output->is_mirror) {
+-		if (b->use_pixman)
+-			drm_output_fini_pixman(output);
+-		else
+-			drm_output_fini_egl(output);
+-	} else {
++	if (output->is_mirror)
+ 		wl_list_remove(&output->link);
+-	}
++
++	if (b->use_pixman || output->is_mirror)
++		drm_output_fini_pixman(output);
++	else
++		drm_output_fini_egl(output);
+ 
+ 	weston_plane_release(&output->fb_plane);
+ 	weston_plane_release(&output->cursor_plane);
+@@ -3068,6 +3291,7 @@ create_output_for_connector(struct drm_backend *b,
+ 	output->pipe = i;
+ 	output->connector_id = connector->connector_id;
+ 	output->plane_id = plane_id;
++	output->can_scale = drm_plane_can_scale(b, plane_id);
+ 
+ 	output->backlight = backlight_init(drm_device,
+ 					   connector->connector_type);
+-- 
+2.11.0
+

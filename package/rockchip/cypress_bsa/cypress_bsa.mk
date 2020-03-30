@@ -8,6 +8,8 @@ CYPRESS_BSA_APP = app_manager app_av app_avk app_ble app_dg \
 				 app_hl app_hs app_tm app_tm app_socket \
 				 app_hd app_hh app_ble_wifi_introducer
 
+BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
+
 ifeq ($(BR2_PACKAGE_BROADCOM_BSA)$(BR2_PACKAGE_CYPRESS_BSA),yy)
 $(error "You can only choose one type of BSA module (Broadcom or Cypress).")
 endif
@@ -19,13 +21,7 @@ ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
 CYPRESS_BSA_BUILD_TYPE = arm64
 endif
 
-ifeq ($(BR2_PACKAGE_CYPRESS_BSA_AWCM256),y)
-	BTFIRMWARE = BCM4345C0.hcd
-endif
-
-ifeq ($(BR2_PACKAGE_CYPRESS_BSA_AWNB197),y)
-	BTFIRMWARE = BCM4343A1.hcd
-endif
+BTFIRMWARE = $(BR2_PACKAGE_RKWIFIBT_BT_FW)
 
 ifeq ($(BR2_PACKAGE_DUERCLIENTSDK),y)
         CYPRESS_BSA_DATA_INTERACTION = y
@@ -61,11 +57,12 @@ define CYPRESS_BSA_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/etc/bsa_file
 	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k8bpsMono.wav $(TARGET_DIR)/etc/bsa_file/
 	$(INSTALL) -D -m 644 $(TOPDIR)/../external/bluetooth_bsa/test_files/av/8k16bpsStereo.wav $(TARGET_DIR)/etc/bsa_file/
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/$(CYPRESS_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
-	$(INSTALL) -D -m 755 package/rockchip/cypress_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
-        $(INSTALL) -D -m 755 package/rockchip/cypress_bsa/$(CYPRESS_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/bsa_server.sh $(TARGET_DIR)/usr/bin/
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/$(CYPRESS_BSA_BT_SINK_FILE) $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
+	$(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
+        $(INSTALL) -D -m 755 $(TOPDIR)/../external/bluetooth_bsa/$(CYPRESS_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
+	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
         sed -i 's/BTFIRMWARE_PATH/\/system\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh

@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-FFMPEG_VERSION = 4.1
-FFMPEG_SITE = $(TOPDIR)/../external/ffmpeg
-FFMPEG_SITE_METHOD = local
+FFMPEG_VERSION = 4.1.3
+FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.xz
+FFMPEG_SITE = http://ffmpeg.org/releases
 FFMPEG_INSTALL_STAGING = YES
 
 FFMPEG_LICENSE = LGPL-2.1+, libjpeg license
@@ -108,9 +108,20 @@ else
 FFMPEG_CONF_OPTS += --disable-swscale
 endif
 
+ifeq ($(BR2_PACKAGE_LINUX_RGA),y)
+FFMPEG_CONF_OPTS += --enable-librga
+FFMPEG_DEPENDENCIES += linux-rga
+else
+FFMPEG_CONF_OPTS += --disable-librga
+endif
+
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_ENCODERS)),all)
 FFMPEG_CONF_OPTS += --disable-encoders \
 	$(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_ENCODERS)),--enable-encoder=$(x))
+endif
+
+ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_DISABLE_DECODERS)),)
+FFMPEG_CONF_OPTS += $(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_DISABLE_DECODERS)),--disable-encoder=$(x))
 endif
 
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_DECODERS)),all)
@@ -262,8 +273,13 @@ FFMPEG_CONF_OPTS += --disable-vdpau
 endif
 
 ifeq ($(BR2_PACKAGE_MPP),y)
+ifeq ($(BR2_PACKAGE_RV1108),y)
+FFMPEG_DEPENDENCIES += mpp libion
+FFMPEG_CONF_OPTS += --enable-rkmpp --extra-cflags="-D CONFIG_ION"
+else
 FFMPEG_DEPENDENCIES += mpp libdrm
 FFMPEG_CONF_OPTS += --enable-rkmpp --enable-libdrm
+endif
 # --disable-v4l2-m2m seems no effect, disable each v4l2m2m
 FFMPEG_CONF_OPTS += \
 	--disable-decoder=h264_v4l2m2m \
