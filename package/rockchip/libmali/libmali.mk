@@ -66,7 +66,7 @@ define LIBMALI_INSTALL_CMDS
 		$(INSTALL) -D -m 644 $(LIBMALI_LIBS) $(1)/usr/lib/
 
 	for l in $(LIBMALI_LIBS); do \
-		patchelf --set-soname libmali.so.1 $(1)/usr/lib/$$l ; \
+		$(HOST_DIR)/bin/patchelf --set-soname libmali.so.1 $(1)/usr/lib/$$l ; \
 	done
 
 	echo $(LIBMALI_LIBS) | xargs -n 1 | head -n 1 | \
