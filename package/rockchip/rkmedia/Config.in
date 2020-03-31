@@ -80,6 +80,12 @@ config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
     help
       wrapped function of v4l2 capture
 
+config BR2_PACKAGE_RKMEDIA_RKGUARD
+    bool "rkguard"
+    default y
+    help
+      wrapped function of through guard
+
 config BR2_PACKAGE_RKMEDIA_RKRGA
     bool "rkrga"
     select BR2_PACKAGE_LINUX_RGA
