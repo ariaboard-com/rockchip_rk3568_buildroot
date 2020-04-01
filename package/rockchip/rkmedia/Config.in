@@ -9,6 +9,13 @@ config BR2_PACKAGE_RKMEDIA_MPP
     help
       wrapped function of rk mpp
 
+config BR2_PACKAGE_RKMEDIA_UVC
+    bool "rk uvc enable"
+    depends on BR2_PACKAGE_UVC_APP
+    help
+      enable uvc function
+
+
 if BR2_PACKAGE_RKMEDIA_MPP
 
 config BR2_PACKAGE_RKMEDIA_MPP_ENCODER
