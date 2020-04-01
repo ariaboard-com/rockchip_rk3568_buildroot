@@ -14,6 +14,8 @@ else ifeq ($(BR2_PACKAGE_RK3399PRO_NPU),y)
 NPU_KO_FILE = galcore_rk3399pro-npu.ko
 else ifeq ($(BR2_PACKAGE_RK1806),y)
 NPU_KO_FILE = galcore_rk1806.ko
+else ifeq ($(BR2_PACKAGE_PUMA),y)
+NPU_KO_FILE = galcore_puma.ko
 else
 NPU_KO_FILE = galcore.ko
 endif
@@ -28,6 +30,10 @@ ifeq ($(BR2_PACKAGE_RKNPU_USE_MINI_DRIVER), y)
 NPU_PLATFORM = $(NPU_PLATFORM_ARCH)-mini
 else
 NPU_PLATFORM = $(NPU_PLATFORM_ARCH)
+endif
+
+ifeq ($(BR2_PACKAGE_PUMA),y)
+NPU_PLATFORM = linux-armhf-puma
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)
