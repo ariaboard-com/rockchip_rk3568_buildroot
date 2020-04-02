@@ -240,4 +240,5 @@ source "package/rockchip/rkbar/Config.in"
 source "package/rockchip/minilogger/Config.in"
 source "package/rockchip/camera_engine_rkaiq/Config.in"
 source "package/rockchip/ipc-daemon/Config.in"
+source "package/rockchip/isp2-ipc/Config.in"
 endif
