@@ -40,6 +40,7 @@ define CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_CMDS
 	mkdir -p $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/
 	$(INSTALL) -D -m  644 $(@D)/all_lib/Release/librkaiq.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
 	$(INSTALL) -D -m  755 $(@D)/exe/Release/rkaiq_3A_server $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/
+	$(INSTALL) -D -m  755 $(TOPDIR)/package/rockchip/camera_engine_rkaiq/S40rkaiq_3A  $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -D -m  644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKAIQ_IQFILE) $(TARGET_DIR)/etc/iqfiles/
 endef
 
