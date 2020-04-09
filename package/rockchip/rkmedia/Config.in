@@ -105,6 +105,20 @@ config BR2_PACKAGE_RKMEDIA_RKNN
     help
       wrapped function of rknn
 
+config BR2_PACKAGE_RKMEDIA_ROCKFACE
+    bool "rockface"
+    select BR2_PACKAGE_RKNPU
+    select BR2_PACKAGE_ROCKFACE
+    help
+      wrapped function of rockface
+
+config BR2_PACKAGE_RKMEDIA_ROCKX
+    bool "rockx"
+    select BR2_PACKAGE_RKNPU
+    select BR2_PACKAGE_ROCKX
+    help
+      wrapped function of rockx
+
 config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
     bool "drm output"
     select BR2_PACKAGE_LIBDRM
