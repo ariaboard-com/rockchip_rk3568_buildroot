@@ -140,4 +140,11 @@ endef
 RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_USB_MODULE_SUPPORT
 endif
 
+ifeq ($(BR2_PACKAGE_RKSCRIPT_USE_BUSYBOX_MOUNT),y)
+define RKSCRIPT_FIXED_SD_MOUNT
+	$(SED) "s#users\,##g" $(TARGET_DIR)/lib/udev/rules.d/61-sd-cards-auto-mount.rules
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_FIXED_SD_MOUNT
+endif
+
 $(eval $(generic-package))
