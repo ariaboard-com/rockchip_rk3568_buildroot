@@ -38,4 +38,9 @@ endif
 
 endif
 
+ifeq ($(BR2_PACKAGE_APP_DEMO_RKTOF),y)
+APP_DEMO_DEPENDENCIES += camera_engine_rkisp linux-rga mpp
+APP_DEMO_CONF_OPTS += "-DMODULE_RK_RKTOF_DEMO=ON"
+endif
+
 $(eval $(cmake-package))
