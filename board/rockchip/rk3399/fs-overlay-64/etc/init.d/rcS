@@ -25,11 +25,4 @@ for i in /etc/init.d/S??* ;do
     esac
 done
 
-/usr/bin/enable_bt
-
-aplay -l | grep "card 0.*hdmi"
-if [ $? = 0 ] ; then
-        alsactl restore 1 -f /var/lib/alsa/asound.state
-else
-        alsactl restore 0 -f /var/lib/alsa/asound.state
-fi 
+alsactl restore rockchiprt5640c -f /var/lib/alsa/asound.state
