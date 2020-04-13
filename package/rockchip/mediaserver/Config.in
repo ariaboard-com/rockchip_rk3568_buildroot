@@ -32,4 +32,11 @@ config BR2_PACKAGE_MEDIASERVE_OSD_SERVER
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_EXIV2_FEATURE
+        bool "Enable exiv2 feature"
+        select BR2_PACKAGE_EXIV2
+        default n
+        help
+          rockchip mediaserver options
+
 endif
