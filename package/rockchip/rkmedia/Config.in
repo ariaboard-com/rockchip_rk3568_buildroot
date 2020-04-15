@@ -161,6 +161,13 @@ config BR2_PACKAGE_RKMEDIA_MOVE_DETECTION
     help
       wrapped function of rk movedetection algorithm
 
+config BR2_PACKAGE_RKMEDIA_ANR
+    bool "audio automatic noise reduction algorithm"
+    select BR2_PACKAGE_COMMON_ALGORITHM
+    select BR2_PACKAGE_COMMON_ALGORITHM_ANR
+    help
+      wrapped function of automatic noise reduction algorithm
+
 config BR2_PACKAGE_RKMEDIA_EXAMPLES
     bool "enable rkmedia examples"
     help
