@@ -39,4 +39,10 @@ config BR2_PACKAGE_MEDIASERVE_EXIV2_FEATURE
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
+        bool "Enable rockface"
+        default y if BR2_PACKAGE_RKMEDIA_ROCKFACE
+        help
+          rockchip mediaserver options
+
 endif
