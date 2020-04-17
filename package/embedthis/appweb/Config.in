@@ -1,6 +1,0 @@
-config BR2_PACKAGE_APPWEB
-	bool "appweb"
-	select BR2_PACKAGE_HOST_MAKEME
-	default n
-	help
-		"Appweb Community Edition Embedded Web Server https://www.embedthis.com/"
