@@ -94,7 +94,7 @@ define step_pkg_size_end
 
 	if [ -z "$(3)" ]; then \
 		grep "^$(1)," $(BUILD_DIR)/packages-file-list$(3).txt | \
-			cut -d',' -f 2 | uniq | \
+			cut -d',' -f 2 | sort | uniq | \
 			tar --no-recursion --ignore-failed-read -cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T -; true; \
 	fi
 
