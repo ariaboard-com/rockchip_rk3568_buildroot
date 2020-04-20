@@ -23,6 +23,7 @@ Commit-Queue: Thomas Anderson <thomasanderson@chromium.org>
 Cr-Original-Commit-Position: refs/heads/master@{#580030}
 Cr-Mirrored-From: https://chromium.googlesource.com/chromium/src
 Cr-Mirrored-Commit: a8c8396fd20d98666d517c45b358c63736e345ef
+Signed-off-by: Bartosz Bilas <b.bilas@grinn-global.com>
 ---
  src/3rdparty/chromium/build/config/linux/pkg_config.gni | 12 ++++++++----
  1 file changed, 8 insertions(+), 4 deletions(-)

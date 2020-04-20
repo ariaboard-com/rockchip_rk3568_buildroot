@@ -4,15 +4,16 @@
 #
 ################################################################################
 
-QT5WEBENGINE_VERSION = $(QT5_VERSION)
-QT5WEBENGINE_SITE = $(QT5_SITE)
+QT5WEBENGINE_VERSION = $(call qstrip,$(BR2_PACKAGE_QT5WEBENGINE_VERSION))
+QT5WEBENGINE_MAJOR_VERSION = $(call qstrip,$(basename $(QT5WEBENGINE_VERSION)))
+QT5WEBENGINE_SITE = https://download.qt.io/official_releases/qt/$(QT5WEBENGINE_MAJOR_VERSION)/$(QT5WEBENGINE_VERSION)/submodules
 QT5WEBENGINE_SOURCE = qtwebengine-$(QT5_SOURCE_TARBALL_PREFIX)-$(QT5WEBENGINE_VERSION).tar.xz
 QT5WEBENGINE_DEPENDENCIES = ffmpeg libglib2 libvpx opus webp qt5base \
 	qt5declarative qt5webchannel host-bison host-flex host-gperf \
 	host-pkgconf host-python
 QT5WEBENGINE_INSTALL_STAGING = YES
 
-include package/qt5/qt5webengine/chromium-latest.inc
+include package/qt5/qt5webengine/chromium-$(QT5WEBENGINE_VERSION).inc
 
 QT5WEBENGINE_LICENSE = GPL-2.0 or LGPL-3.0 or GPL-3.0 or GPL-3.0 with exception
 QT5WEBENGINE_LICENSE_FILES = LICENSE.GPL2 LICENSE.GPL3 LICENSE.GPL3-EXCEPT \
