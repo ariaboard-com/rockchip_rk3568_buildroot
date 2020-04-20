@@ -13,7 +13,9 @@ QT5WEBENGINE_DEPENDENCIES = ffmpeg libglib2 libvpx opus webp qt5base \
 	host-pkgconf host-python
 QT5WEBENGINE_INSTALL_STAGING = YES
 
+ifneq ($(QT5WEBENGINE_VERSION),)
 include package/qt5/qt5webengine/chromium-$(QT5WEBENGINE_VERSION).inc
+endif
 
 QT5WEBENGINE_LICENSE = GPL-2.0 or LGPL-3.0 or GPL-3.0 or GPL-3.0 with exception
 QT5WEBENGINE_LICENSE_FILES = LICENSE.GPL2 LICENSE.GPL3 LICENSE.GPL3-EXCEPT \
