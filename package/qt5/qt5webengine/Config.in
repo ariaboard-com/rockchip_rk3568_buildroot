@@ -77,6 +77,10 @@ config BR2_PACKAGE_QT5WEBENGINE
 
 if BR2_PACKAGE_QT5WEBENGINE
 
+config BR2_PACKAGE_QT5WEBENGINE_WEBRTC
+	bool "webrtc"
+	default y
+
 config BR2_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS
 	bool "proprietary codecs"
 	help

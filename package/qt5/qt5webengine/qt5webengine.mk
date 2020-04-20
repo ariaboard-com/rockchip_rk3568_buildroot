@@ -27,6 +27,10 @@ QT5WEBENGINE_DEPENDENCIES += host-libpng host-libnss libnss
 
 QT5WEBENGINE_CONFIG += -webengine-ffmpeg
 
+ifeq ($(BR2_PACKAGE_QT5WEBENGINE_WEBRTC),y)
+QT5WEBENGINE_CONFIG += -webengine-webrtc
+endif
+
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS),y)
 QT5WEBENGINE_CONFIG += -proprietary-codecs
 endif
