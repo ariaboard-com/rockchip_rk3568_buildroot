@@ -7,6 +7,7 @@ RKNPU_VERSION = 1.2.1
 RKNPU_SITE_METHOD = local
 RKNPU_SITE = $(TOPDIR)/../external/rknpu
 NPU_TEST_FILE = $(@D)/test
+RKNPU_INSTALL_STAGING = YES
 
 ifeq ($(BR2_PACKAGE_RKNPU_PCIE),y)
 NPU_KO_FILE = galcore_rk3399pro-npu-pcie.ko
@@ -43,6 +44,11 @@ endif
 ifeq ($(BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER), y)
 BUILD_NOT_START_RKNN_SCRIPT=y
 endif
+
+define RKNPU_INSTALL_STAGING_CMDS
+    mkdir -p $(STAGING_DIR)/usr/include/rknn
+    $(INSTALL) -D -m 0644 $(@D)/rknn/include/rknn_runtime.h $(STAGING_DIR)/usr/include/rknn/rknn_runtime.h
+endef
 
 define RKNPU_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/lib/modules/
