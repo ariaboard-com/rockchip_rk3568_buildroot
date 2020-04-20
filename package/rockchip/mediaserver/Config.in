@@ -25,6 +25,13 @@ config BR2_PACKAGE_MEDIASERVE_MINILOGGER
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_SHM_SERVER
+        bool "Enable shm server"
+        select BR2_PACKAGE_SHM_TOOLS
+        default n
+        help
+          rockchip mediaserver options
+
 config BR2_PACKAGE_MEDIASERVE_OSD_SERVER
         bool "Enable osd server"
         select BR2_PACKAGE_FREETYPE
@@ -42,6 +49,12 @@ config BR2_PACKAGE_MEDIASERVE_EXIV2_FEATURE
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
         bool "Enable rockface"
         default y if BR2_PACKAGE_RKMEDIA_ROCKFACE
+        help
+          rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
+        bool "Enable rockx"
+        default y if BR2_PACKAGE_RKMEDIA_ROCKX
         help
           rockchip mediaserver options
 
