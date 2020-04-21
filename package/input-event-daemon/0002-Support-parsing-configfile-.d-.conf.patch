@@ -76,13 +76,13 @@ index 2a7b527..a324382 100644
  
 +//Base on triggerhappy's trigger.c
 +static int accept_configure_file(const struct dirent *entry) {
-+	const char *suffix = ".conf";
-+	const char *name = entry->d_name;
-+	char *end = strstr( name, suffix );
-+	if ( end && end[ strlen(suffix) ] == '\0' ) {
-+		return 1;
-+	} else {
-+		return 0;
++    const char *suffix = ".conf";
++    const char *name = entry->d_name;
++    char *end = strstr( name, suffix );
++    if ( end && end[ strlen(suffix) ] == '\0' ) {
++        return 1;
++    } else {
++        return 0;
 +    }
 +}
 +
