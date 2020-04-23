@@ -1,0 +1,21 @@
+config BR2_PACKAGE_CHROMIUM_WAYLAND
+	bool "chromium-ozone-wayland"
+	depends on (BR2_arm && BR2_GCC_TARGET_FLOAT_ABI = "hard") || BR2_aarch64
+	depends on BR2_PACKAGE_WAYLAND
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_FFMPEG
+	select BR2_PACKAGE_FLAC
+	select BR2_PACKAGE_LIBERATION
+	select BR2_PACKAGE_LIBGLIB2
+	select BR2_PACKAGE_LIBNSS
+	select BR2_PACKAGE_LIBXSLT
+	select BR2_PACKAGE_LIBVPX
+	select BR2_PACKAGE_OPUS
+	select BR2_PACKAGE_WEBP
+	select BR2_PACKAGE_WEBP_DEMUX
+	select BR2_PACKAGE_WEBP_MUX
+	help
+	  Chromium browser for wayland
+
+	  Prebuilt from yocto's chromium-ozone-wayland:
+	  https://github.com/JeffyCN/meta-rockchip/blob/master/dynamic-layers/recipes-browser/chromium/chromium-ozone-wayland_%25.bbappend
