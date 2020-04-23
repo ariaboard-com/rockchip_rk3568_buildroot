@@ -1,0 +1,177 @@
+#!/bin/sh
+
+OVERLAYFS_NEED_MOUNT_REMOVE="/dev /sys /tmp /run"
+OVLFS_FLAG_TMPFS_UPPER=1
+
+OVERLAYFS_ROOTFS_LOWER="/" # Default lower rootfs is root
+OVLFS_MOUNT_OPTS="lowerdir=$OVERLAYFS_ROOTFS_LOWER"
+
+OVERLAYFS_MOUNT_DIR=/overlayfs
+OVERLAYFS_ROOT_DIR=$OVERLAYFS_MOUNT_DIR/new_root_dir
+RO_ROOTFS_MOUNT_MOVE=$OVERLAYFS_MOUNT_DIR/ro
+RO_ROOTFS=$OVERLAYFS_ROOT_DIR/$RO_ROOTFS_MOUNT_MOVE
+RW_ROOTFS=$OVERLAYFS_MOUNT_DIR/rw
+RW_ROOTFS_UPPER=$RW_ROOTFS/upper
+RW_ROOTFS_WORK=$RW_ROOTFS/work
+RW_ROOTFS_MOUNT_MOVE=$RO_ROOTFS_MOUNT_MOVE/$RW_ROOTFS
+
+OVERLAYFS_ROOTFS_LOWER_1="/dev/block/by-name/rootfs"
+OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT="$OVERLAYFS_MOUNT_DIR/ovlfs"
+
+msg(){
+	if [ $? -ne 0 ]; then
+		echo -e "error: $1"
+		PS1="[debug]# " /bin/sh
+	fi
+}
+
+add_rootfs2lower(){
+	OVERLAYFS_ROOTFS_LOWER=$1":"${OVERLAYFS_ROOTFS_LOWER}
+}
+
+mount_tmpfs_for_overlayfs_upper(){
+	mount_tmpfs_for_overlayfs_data
+	mkdir -p $RW_ROOTFS_UPPER
+	mkdir -p $RW_ROOTFS_WORK
+	OVLFS_MOUNT_OPTS="$OVLFS_MOUNT_OPTS,upperdir=$RW_ROOTFS_UPPER,workdir=$RW_ROOTFS_WORK"
+}
+
+mount_tmpfs_for_overlayfs_data(){
+	mount -t tmpfs overlayfs_data $RW_ROOTFS
+	msg "fail to create tempfs for overlayfs data filesystem"
+}
+
+# $1 - old filesystem path
+mount_remove_sys_tmpfs(){
+	for item in `echo $OVERLAYFS_NEED_MOUNT_REMOVE`
+	do
+		mount -o noatime,move $1/$item /$item
+		msg "fail to move $1/$item to $item"
+	done
+}
+
+start_mount_overlayfs(){
+
+if [ ! -d /sys/module/mmc_block ]; then
+	modprobe mmc_block
+	modprobe dw_mmc-rockchip
+	msg "missing mmc_block dw_mmc-rockchip module"
+fi
+
+# insmod overlayfs
+cat /proc/filesystems|grep -w overlay 1>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	modprobe overlay
+	msg "missing overlay module"
+fi
+
+# Test mount /proc
+mount 1>/dev/null 2>&1
+if [ $? -ne 0 ]; then
+	mount -t proc proc /proc
+	msg "fail to mount /proc"
+fi
+
+# Mount writeable mountpoint, default tmpfs
+mount -t tmpfs tmpfs $OVERLAYFS_MOUNT_DIR
+msg "fail to create tmpfs for overlayfs"
+
+
+# Mount the overlay filesystem
+mkdir -p $OVERLAYFS_ROOT_DIR
+
+FLAG_WITH_LOWER_1_ROOTFS=`grep -w "^$OVERLAYFS_ROOTFS_LOWER_1" /etc/fstab`
+if [ -n "$FLAG_WITH_LOWER_1_ROOTFS" ]; then
+	count=100000
+	while [ 1 ]
+	do
+		if [ -L $OVERLAYFS_ROOTFS_LOWER_1 -o $count -lt 1 ]; then
+			break
+		fi
+		usleep 10
+		count=$(( count - 1 ))
+	done
+	for imnt in `grep -w "^$OVERLAYFS_ROOTFS_LOWER_1" /etc/fstab | awk '{print $3}' -F' '`
+	do
+		mkdir -p $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt
+		mount $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt 1>/dev/null 2>&1
+		mnt_ok=`grep -w "$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt" /proc/mounts | awk '{print $2}' -F' '`
+		if [ -n "$mnt_ok" ]; then
+			break
+		else
+			rmdir $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt
+		fi
+	done
+	mkdir -p $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+	mount -o noatime,move $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+	[ -d $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt ] && rmdir $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT.$imnt
+	ovl_lower1=`cat /proc/mounts|grep -w "$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT" | awk '{print $2}' -F' '`
+	if [ -z "$ovl_lower1" ]; then
+		echo -e "info: $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT is not mounted, mount tmpfs for overlayfs"
+		OVLFS_FLAG_TMPFS_UPPER=0
+	else
+		add_rootfs2lower $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+		OVLFS_MOUNT_OPTS="lowerdir=$OVERLAYFS_ROOTFS_LOWER"
+	fi
+else
+	echo -e "info: not found second lower rootfs, mount tmpfs"
+	OVLFS_FLAG_TMPFS_UPPER=0
+fi
+
+# Mount overlayfs upperdir
+mkdir $RW_ROOTFS
+mount_tmpfs_for_overlayfs_upper
+
+mkdir -p $RO_ROOTFS
+
+# The working directory (workdir) needs to be an empty directory on the same filesystem mount as the upper directory.
+mount -t overlay -o $OVLFS_MOUNT_OPTS overlayfs $OVERLAYFS_ROOT_DIR
+msg "fail to mount overlayfs [$OVLFS_MOUNT_OPTS on $OVERLAYFS_ROOT_DIR]"
+
+# Goto the new overlay rootfs
+cd $OVERLAYFS_ROOT_DIR
+
+mount -o noatime,move /proc $OVERLAYFS_ROOT_DIR/proc
+msg "fail to mount move /proc to $OVERLAYFS_ROOT_DIR/proc"
+
+pivot_root . $RO_ROOTFS
+msg "fail to pivot_root $PWD $RO_ROOTFS"
+
+mount_remove_sys_tmpfs $RO_ROOTFS_MOUNT_MOVE
+
+if [ -n "$FLAG_WITH_LOWER_1_ROOTFS" -a $OVLFS_FLAG_TMPFS_UPPER -eq 1 ]; then
+	mount -o noatime,move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+	msg "fail to move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT"
+fi
+
+mount -o noatime,move $RO_ROOTFS_MOUNT_MOVE/$RW_ROOTFS $RW_ROOTFS
+msg "fail to move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT"
+
+exec chroot . sh -c "$(cat << END
+
+	umount $OVERLAYFS_MOUNT_DIR/ro/$OVERLAYFS_MOUNT_DIR
+	/etc/preinit.d/S10udev stop
+
+	if [ -f /etc/init.d/rcS ]; then
+		exec /etc/init.d/rcS
+	else
+		echo -e "rootfs mount fail, enter debug mode!!!"
+	fi
+
+END
+)"
+}
+
+case "$1" in
+	start)
+		start_mount_overlayfs
+		;;
+	stop)
+		printf "$0 stop finished\n"
+		;;
+	*)
+		echo "Usage: $0 {start|stop}"
+		exit 1
+		;;
+esac
+exit 0
