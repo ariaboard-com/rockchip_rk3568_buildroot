@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 # dmesg | egrep 'isp|camera|5695|v4l2'
+echo "Start init ispp"
+
 #enable bypass
 media-ctl -d /dev/media1 -l '"rkispp-subdev":2->"rkispp_m_bypass":0[0]'
 #enable scal0

@@ -18,7 +18,7 @@ soc_configure()
 lunch_start()
 {
 	soc_configure
-	sh ispp_init.sh
+	sh /etc/preinit.d/ispp_init.sh
 	echo "Now we are ready to start your first application"
 	mediaserver -c /etc/mediaserver_tiny.conf
 }
