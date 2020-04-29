@@ -242,4 +242,5 @@ source "package/rockchip/ipc-daemon/Config.in"
 source "package/rockchip/CallFunIpc/Config.in"
 source "package/rockchip/isp2-ipc/Config.in"
 source "package/rockchip/smart_display_service/Config.in"
+source "package/rockchip/onvif_server/Config.in"
 endif
