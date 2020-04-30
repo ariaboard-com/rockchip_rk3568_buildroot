@@ -17,6 +17,7 @@ endef
 define NOTO_SERIF_KR_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/fonts/noto-serif-kr/
 	cp -r $(@D)/*.otf $(TARGET_DIR)/usr/share/fonts/noto-serif-kr/
+	$(NOTO_INSTALL_FONTCONFIG_CONF)
 endef
 
 $(eval $(generic-package))

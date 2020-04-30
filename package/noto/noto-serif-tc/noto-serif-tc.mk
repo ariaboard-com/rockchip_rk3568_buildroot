@@ -17,6 +17,7 @@ endef
 define NOTO_SERIF_TC_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/share/fonts/noto-serif-tc/
 	cp -r $(@D)/*.otf $(TARGET_DIR)/usr/share/fonts/noto-serif-tc/
+	$(NOTO_INSTALL_FONTCONFIG_CONF)
 endef
 
 $(eval $(generic-package))
