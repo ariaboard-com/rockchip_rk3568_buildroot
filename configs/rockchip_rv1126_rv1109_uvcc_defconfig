@@ -3,9 +3,9 @@
 #include "debug.config"
 #include "network.config"
 #include "video_mpp.config"
-#include "puma_arm.config"
+#include "rv1126_rv1109_arm.config"
 BR2_TARGET_TZ_INFO=y
-BR2_ROOTFS_OVERLAY="board/rockchip/puma/fs-overlay-sysv/"
+BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-sysv/"
 #BR2_PACKAGE_GDB=y
 #BR2_PACKAGE_GDB_DEBUGGER=y
 BR2_PACKAGE_RKMEDIA_MPP=y

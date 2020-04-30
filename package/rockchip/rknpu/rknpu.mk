@@ -15,7 +15,7 @@ else ifeq ($(BR2_PACKAGE_RK3399PRO_NPU),y)
 NPU_KO_FILE = galcore_rk3399pro-npu.ko
 else ifeq ($(BR2_PACKAGE_RK1806),y)
 NPU_KO_FILE = galcore_rk1806.ko
-else ifeq ($(BR2_PACKAGE_PUMA),y)
+else ifeq ($(BR2_PACKAGE_RV1126_RV1109),y)
 NPU_KO_FILE = galcore_puma.ko
 else
 NPU_KO_FILE = galcore.ko
@@ -27,7 +27,7 @@ else
 NPU_PLATFORM_ARCH = linux-aarch64
 endif
 
-ifeq ($(BR2_PACKAGE_PUMA),y)
+ifeq ($(BR2_PACKAGE_RV1126_RV1109),y)
 NPU_PLATFORM_ARCH = linux-armhf-puma
 endif
 
