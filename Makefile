@@ -488,9 +488,9 @@ include Makefile.legacy
 
 include system/system.mk
 include package/Makefile.in
-# arch/arch.mk.* must be after package/Makefile.in because it may need to
+# arch/arch.mk must be after package/Makefile.in because it may need to
 # complement variables defined therein, like BR_NO_CHECK_HASH_FOR.
--include $(sort $(wildcard arch/arch.mk.*))
+include arch/arch.mk
 include support/dependencies/dependencies.mk
 
 PACKAGES += $(DEPENDENCIES_HOST_PREREQ)
