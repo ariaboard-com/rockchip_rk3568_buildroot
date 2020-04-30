@@ -1,11 +1,11 @@
 # Noto Fonts
 
 menu "Noto Fonts"
-	source "package/noto/noto-sans-jc/Config.in"
+	source "package/noto/noto-sans-jp/Config.in"
 	source "package/noto/noto-sans-kr/Config.in"
 	source "package/noto/noto-sans-sc/Config.in"
 	source "package/noto/noto-sans-tc/Config.in"
-	source "package/noto/noto-serif-jc/Config.in"
+	source "package/noto/noto-serif-jp/Config.in"
 	source "package/noto/noto-serif-kr/Config.in"
 	source "package/noto/noto-serif-sc/Config.in"
 	source "package/noto/noto-serif-tc/Config.in"
