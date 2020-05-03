@@ -20,3 +20,9 @@ config BR2_PACKAGE_VENDOR_STORAGE
 	select BR2_PACKAGE_RKTOOLKIT
 	help
 	  vendor storage tool for linux. used to read/write vendor storage.
+
+config BR2_PACKAGE_VENDOR_STORAGE_LIBRARY
+	bool "Build vendor storage library for linux application"
+	select BR2_PACKAGE_RKTOOLKIT
+	help
+	  Build vendor storage library for linux application. Used to read/write vendor storage.
