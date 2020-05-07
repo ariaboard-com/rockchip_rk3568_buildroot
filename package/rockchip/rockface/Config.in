@@ -1,3 +1,43 @@
-config BR2_PACKAGE_ROCKFACE
+menuconfig BR2_PACKAGE_ROCKFACE
     bool "rockface"
     select BR2_PACKAGE_RKNPU
+
+if BR2_PACKAGE_ROCKFACE
+
+config BR2_PACKAGE_ROCKFACE_FACE_DETECTION
+    bool "Face detection support"
+    default y
+    help
+        Face detection support
+
+config BR2_PACKAGE_ROCKFACE_FACE_RECOGNITION
+    bool "Face recognition support"
+    default y
+    help
+        Face recognition support
+
+config BR2_PACKAGE_ROCKFACE_FACE_LANDMARK
+    bool "Face landmark support"
+    default y
+    help
+        Face landmark support
+
+config BR2_PACKAGE_ROCKFACE_FACE_ATTRIBUTE
+    bool "Face attribute support"
+    default y
+    help
+        Face attribute support
+
+config BR2_PACKAGE_ROCKFACE_LIVING_DETECTION
+    bool "Living detection support"
+    default n
+    help
+        Living detection support
+
+config BR2_PACKAGE_ROCKFACE_OBJECT_DETECTION
+    bool "Object detection support"
+    default y
+    help
+        Object detection support
+
+endif # BR2_PACKAGE_ROCKFACE
