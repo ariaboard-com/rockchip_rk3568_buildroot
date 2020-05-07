@@ -31,6 +31,22 @@ define RK_OEM_INSTALL_TARGET_CMDS
 	rm -fv $(RK_OEM_INSTALL_TARGET_DIR)/rk_oem.tar
 endef
 
+define RK_OEM_TARGET_FINALIZE_HOOK_CMDS
+	rm -rf $(RK_OEM_INSTALL_TARGET_DIR)/usr/include $(RK_OEM_INSTALL_TARGET_DIR)/usr/share/aclocal \
+		$(RK_OEM_INSTALL_TARGET_DIR)/usr/lib/pkgconfig $(RK_OEM_INSTALL_TARGET_DIR)/usr/share/pkgconfig \
+		$(RK_OEM_INSTALL_TARGET_DIR)/usr/lib/cmake $(RK_OEM_INSTALL_TARGET_DIR)/usr/share/cmake
+	find $(RK_OEM_INSTALL_TARGET_DIR)/usr/{lib,share}/ -name '*.cmake' -print0 | xargs -0 rm -f
+	find $(RK_OEM_INSTALL_TARGET_DIR)/lib/ $(RK_OEM_INSTALL_TARGET_DIR)/usr/lib/ $(RK_OEM_INSTALL_TARGET_DIR)/usr/libexec/ \
+		\( -name '*.a' -o -name '*.la' \) -print0 | xargs -0 rm -f
+	find $(RK_OEM_INSTALL_TARGET_DIR) -type f \( -perm /111 -o -name '*.so*' \) \
+		-not \( -name 'libpthread*.so*' -o -name 'ld-*.so*' -o -name '*.ko' \) -print0 | \
+		xargs -0 $(STRIPCMD) 2>/dev/null || true
+endef
+
+ifneq ($(BR2_ENABLE_DEBUG), y)
+RK_OEM_TARGET_FINALIZE_HOOKS += RK_OEM_TARGET_FINALIZE_HOOK_CMDS
+endif
+
 endif
 
 $(eval $(generic-package))
