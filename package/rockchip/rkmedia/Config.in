@@ -168,6 +168,12 @@ config BR2_PACKAGE_RKMEDIA_ANR
     help
       wrapped function of automatic noise reduction algorithm
 
+config BR2_PACKAGE_RKMEDIA_MINILOGGER
+    bool "Output log by minilogger"
+    select BR2_PACKAGE_MINILOGGER
+    help
+      Output log by minilogger interface
+
 config BR2_PACKAGE_RKMEDIA_EXAMPLES
     bool "enable rkmedia examples"
     help
