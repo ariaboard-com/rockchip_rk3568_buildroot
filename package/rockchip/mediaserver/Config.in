@@ -11,6 +11,10 @@ menuconfig BR2_PACKAGE_MEDIASERVER
 
 if BR2_PACKAGE_MEDIASERVER
 
+config BR2_PACKAGE_MEDIASERVE_CONIFG
+	string "mediaserver config"
+	default "none"
+
 config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	bool "Enable link api features"
 	select BR2_PACKAGE_CJSON
@@ -21,7 +25,7 @@ config BR2_PACKAGE_MEDIASERVE_LINKAPI
 config BR2_PACKAGE_MEDIASERVE_MINILOGGER
         bool "Enable miniloger print"
         select BR2_PACKAGE_MINILOGGER
-        default n
+        default y
         help
           rockchip mediaserver options
 
