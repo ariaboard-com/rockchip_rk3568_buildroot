@@ -37,6 +37,7 @@ rm -f $TARGET/lib/udev/rules.d/50-udev-default.rules
 rm -f $TARGET/lib/udev/rules.d/60-input-id.rules
 
 rm -rf $TARGET/lib/udev/scsi_id
+rm -rf $TARGET/lib/udev/rc_keymaps
 rm -rf $TARGET/lib/udev/ata_id
 rm -rf $TARGET/lib/udev/collect
 rm -rf $TARGET/lib/udev/cdrom_id
