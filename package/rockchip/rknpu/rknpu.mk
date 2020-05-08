@@ -16,7 +16,11 @@ NPU_KO_FILE = galcore_rk3399pro-npu.ko
 else ifeq ($(BR2_PACKAGE_RK1806),y)
 NPU_KO_FILE = galcore_rk1806.ko
 else ifeq ($(BR2_PACKAGE_RV1126_RV1109),y)
+ifeq ($(BR2_PACKAGE_RKNPU_USE_MINI_DRIVER),y)
+NPU_KO_FILE = galcore_puma_tb.ko
+else
 NPU_KO_FILE = galcore_puma.ko
+endif
 else
 NPU_KO_FILE = galcore.ko
 endif
