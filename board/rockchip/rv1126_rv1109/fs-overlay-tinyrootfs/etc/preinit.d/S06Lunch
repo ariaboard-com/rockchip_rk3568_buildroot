@@ -21,7 +21,7 @@ lunch_start()
 	sh /etc/preinit.d/ispp_init.sh
 	echo "Now we are ready to start your first application"
 	export enable_minilog=1
-	mediaserver -d -a -c /etc/mediaserver_tiny.conf &
+	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf &
 }
 
 lunch_stop()
