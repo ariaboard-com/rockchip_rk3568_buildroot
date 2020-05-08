@@ -4,3 +4,9 @@ config BR2_PACKAGE_LIBIPCPROTOCOL
 	select BR2_PACKAGE_LIBRKDB
 	help
 	  rockchip libIPCProtocol
+
+config BR2_PACKAGE_LIBIPCPROTOCOL_DEMO
+	bool "rockchip libIPCProtocol demo"
+	select BR2_PACKAGE_LIBIPCPROTOCOL
+	help
+	  provide demo to show the usage of libIPCProtocol
