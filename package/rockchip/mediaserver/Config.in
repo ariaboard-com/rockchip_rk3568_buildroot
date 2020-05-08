@@ -5,7 +5,6 @@ menuconfig BR2_PACKAGE_MEDIASERVER
 	select BR2_PACKAGE_LIBRKDB
 	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
 	select BR2_PACKAGE_RKMEDIA
-	select BR2_PACKAGE_MINILOGGER
 	help
 	  rockchip mediaserver
 
