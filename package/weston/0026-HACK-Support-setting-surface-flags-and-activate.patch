@@ -1,19 +1,22 @@
-From bb42c8aa82b7c6c6321c6eab8d5deb64e2fd9149 Mon Sep 17 00:00:00 2001
+From cea9a040c92a4b7bc27ae48f1157c27285a14d26 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
-Subject: [PATCH] HACK: Support setting surface flags
+Subject: [PATCH] HACK: Support setting surface flags and activate
 
 Support setting surface flags through app_id, for example:
 app_id = "flags=stay-on-top|no-focus"
 
+Support setting surface activate through app_id, for example:
+app_id = "requests=activate"
+
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- desktop-shell/shell.c       | 10 +++++++
- desktop-shell/shell.h       |  1 +
- libweston-desktop/surface.c | 55 +++++++++++++++++++++++++++++++++++++
- libweston/compositor.h      |  8 ++++++
- libweston/input.c           |  3 ++
- 5 files changed, 77 insertions(+)
+ desktop-shell/shell.c       |  10 ++++
+ desktop-shell/shell.h       |   1 +
+ libweston-desktop/surface.c | 106 ++++++++++++++++++++++++++++++++++++
+ libweston/compositor.h      |   8 +++
+ libweston/input.c           |   3 +
+ 5 files changed, 128 insertions(+)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 2849839..a393201 100644
@@ -84,10 +87,10 @@ index 063641d..ae9a60c 100644
  	struct wl_listener pointer_focus_listener;
  	struct weston_surface *grab_surface;
 diff --git a/libweston-desktop/surface.c b/libweston-desktop/surface.c
-index d166957..54c35f3 100644
+index d166957..f9f3666 100644
 --- a/libweston-desktop/surface.c
 +++ b/libweston-desktop/surface.c
-@@ -699,6 +699,58 @@ weston_desktop_surface_set_title(struct weston_desktop_surface *surface,
+@@ -699,18 +699,124 @@ weston_desktop_surface_set_title(struct weston_desktop_surface *surface,
  	surface->title = tmp;
  }
  
@@ -143,19 +146,75 @@ index d166957..54c35f3 100644
 +	return true;
 +}
 +
++static bool
++weston_desktop_surface_set_requests(struct weston_desktop_surface *surface,
++				    char *s)
++{
++	struct weston_surface *wsurface = surface->surface;
++	char *p;
++
++#define SURFACE_REQUEST_PREFIX "requests="
++	s = strstr(s, SURFACE_REQUEST_PREFIX);
++	if (!s)
++		return false;
++
++	s += strlen(SURFACE_REQUEST_PREFIX);
++
++	p = strtok(s, "|");
++	while (p) {
++		switch (p[0]) {
++		case ';':
++			/* fall through */
++		case '&':
++			return true;
++		default:
++			break;
++		}
++
++		if (!strcmp(p, "activate")) {
++			if (weston_surface_is_mapped(wsurface))
++				weston_surface_unmap(wsurface);
++
++			weston_desktop_api_committed(surface->desktop,
++						     surface, 0, 0);
++		} else {
++			weston_log("%s: warning: unsupported flag: %s\n",
++				   __func__, p);
++		}
++
++		p = strtok(NULL, "|");
++	};
++
++	return true;
++}
++
  void
  weston_desktop_surface_set_app_id(struct weston_desktop_surface *surface,
  				  const char *app_id)
-@@ -709,6 +761,9 @@ weston_desktop_surface_set_app_id(struct weston_desktop_surface *surface,
+ {
+ 	char *tmp;
++	bool handled = false;
+ 
+ 	tmp = strdup(app_id);
  	if (tmp == NULL)
  		return;
  
-+	if (weston_desktop_surface_set_flags(surface, tmp))
-+		return;
++	handled |= weston_desktop_surface_set_flags(surface, tmp);
++
++	strcpy(tmp, app_id);
++	handled |= weston_desktop_surface_set_requests(surface, tmp);
++
++	if (handled)
++		goto handled;
 +
  	free(surface->app_id);
  	surface->app_id = tmp;
++	return;
++handled:
++	free(tmp);
  }
+ 
+ void
 diff --git a/libweston/compositor.h b/libweston/compositor.h
 index faa8680..650f15b 100644
 --- a/libweston/compositor.h
