@@ -168,6 +168,13 @@ config BR2_PACKAGE_RKMEDIA_ANR
     help
       wrapped function of automatic noise reduction algorithm
 
+config BR2_PACKAGE_RKMEDIA_AEC
+    bool "audio echo cancellation algorithm"
+    select BR2_PACKAGE_COMMON_ALGORITHM
+    select BR2_PACKAGE_COMMON_ALGORITHM_AEC_ANR_AGC
+    help
+      wrapped function of echo cancellation algorithm
+
 config BR2_PACKAGE_RKMEDIA_MINILOGGER
     bool "Output log by minilogger"
     select BR2_PACKAGE_MINILOGGER
