@@ -18,7 +18,6 @@ soc_configure()
 lunch_start()
 {
 	#soc_configure
-	sh /etc/preinit.d/ispp_init.sh
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
 }
