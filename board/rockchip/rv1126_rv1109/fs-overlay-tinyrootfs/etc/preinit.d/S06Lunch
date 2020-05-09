@@ -19,9 +19,8 @@ lunch_start()
 {
 	#soc_configure
 	sh /etc/preinit.d/ispp_init.sh
-	echo "Now we are ready to start your first application"
-	export enable_minilog=1
-	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf &
+	echo "Now we are ready to start your first application" > /dev/kmsg
+	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
 }
 
 lunch_stop()
@@ -32,7 +31,7 @@ lunch_stop()
 
 case "$1" in
 	start)
-		lunch_start 2>&1 | logger &
+		lunch_start
 		;;
 	stop)
 		lunch_stop
