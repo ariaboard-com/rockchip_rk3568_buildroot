@@ -2,7 +2,7 @@
 
 case "$1" in
 	start)
-		printf "insmod NPU modules: "
+		echo "Start init rknpu" > /dev/kmsg
 		cp /usr/lib/cl_*.h /tmp/
 		insmod /lib/modules/galcore.ko contiguousSize=0x400000 gpuProfiler=1
 		unset MAX_FREQ
