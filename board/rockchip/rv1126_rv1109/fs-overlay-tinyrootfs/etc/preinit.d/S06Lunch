@@ -19,6 +19,8 @@ lunch_start()
 {
 	#soc_configure
 	echo "Now we are ready to start your first application" > /dev/kmsg
+	export mediaserver_log_level=2
+	export HDR_MODE=0
 	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
 }
 
