@@ -111,6 +111,11 @@ define QT5VIRTUALKEYBOARD_INSTALL_TARGET_LIBS
 endef
 endif
 
+define QT5VIRTUALKEYBOARD_INSTALL_TARGET_ENV
+	$(INSTALL) -D -m 644 $(QT5VIRTUALKEYBOARD_PKGDIR)/qtvirtualkeyboard.sh \
+		$(TARGET_DIR)/etc/profile.d/qtvirtualkeyboard.sh
+endef
+
 define QT5VIRTUALKEYBOARD_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/usr/lib/qt/plugins/platforminputcontexts
 	cp -dpfr $(STAGING_DIR)/usr/lib/qt/plugins/platforminputcontexts/libqtvirtualkeyboardplugin.so \
@@ -119,6 +124,7 @@ define QT5VIRTUALKEYBOARD_INSTALL_TARGET_CMDS
 	$(QT5VIRTUALKEYBOARD_INSTALL_TARGET_QML)
 	$(QT5VIRTUALKEYBOARD_INSTALL_TARGET_3RDPARTY_PARTS)
 	$(QT5VIRTUALKEYBOARD_INSTALL_TARGET_EXAMPLES)
+	$(QT5VIRTUALKEYBOARD_INSTALL_TARGET_ENV)
 endef
 
 $(eval $(generic-package))
