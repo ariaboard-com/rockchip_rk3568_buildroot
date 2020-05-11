@@ -15,7 +15,7 @@ RW_ROOTFS_UPPER=$RW_ROOTFS/upper
 RW_ROOTFS_WORK=$RW_ROOTFS/work
 RW_ROOTFS_MOUNT_MOVE=$RO_ROOTFS_MOUNT_MOVE/$RW_ROOTFS
 
-OVERLAYFS_ROOTFS_LOWER_1="/dev/block/by-name/rootfs"
+OVERLAYFS_ROOTFS_LOWER_1="/dev/mmcblk0p7"
 OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT="$OVERLAYFS_MOUNT_DIR/ovlfs"
 
 msg(){
@@ -79,12 +79,48 @@ msg "fail to create tmpfs for overlayfs"
 # Mount the overlay filesystem
 mkdir -p $OVERLAYFS_ROOT_DIR
 
+OVERLAY_ROOT2ND=`cat /proc/cmdline |awk -F'rk.root2nd=' '{print $2}' |awk -F' ' '{print $1}'`
+ovlfs_root2nd_dev=${OVERLAY_ROOT2ND%%.*}
+ovlfs_root2nd_type=${OVERLAY_ROOT2ND##*.}
+if [ -n "${ovlfs_root2nd_dev}" -a -b ${ovlfs_root2nd_dev} ]; then
+	FLAG_WITH_LOWER_1_ROOTFS=$OVERLAY_ROOT2ND
+	mkdir -p $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+	case $ovlfs_root2nd_type in
+	squashfs|ext[24]|cramfs|jffs2)
+		mount -o ro -t ${ovlfs_root2nd_type} ${ovlfs_root2nd_dev} $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT 1>/dev/null 2>&1
+		ovl_lower1=`cat /proc/mounts|grep -w "$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT" | awk '{print $2}' -F' '`
+		if [ -z "$ovl_lower1" ]; then
+			echo -e "info: $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT is not mounted, mount tmpfs for overlayfs"
+			OVLFS_FLAG_TMPFS_UPPER=0
+		else
+			add_rootfs2lower $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+			OVLFS_MOUNT_OPTS="lowerdir=$OVERLAYFS_ROOTFS_LOWER"
+		fi
+		;;
+	*)
+		for itype in `echo squashfs ext4 cramfs jffs2 ext2`
+		do
+			mount -o ro -t ${itype} ${ovlfs_root2nd_dev} $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT 1>/dev/null 2>&1
+			ovl_lower1=`cat /proc/mounts|grep -w "$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT" | awk '{print $2}' -F' '`
+			if [ -z "$ovl_lower1" ]; then
+				OVLFS_FLAG_TMPFS_UPPER=0
+			else
+				add_rootfs2lower $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT
+				OVLFS_MOUNT_OPTS="lowerdir=$OVERLAYFS_ROOTFS_LOWER"
+				OVLFS_FLAG_TMPFS_UPPER=1
+				break;
+			fi
+		done
+		;;
+	esac
+else
+
 FLAG_WITH_LOWER_1_ROOTFS=`grep -w "^$OVERLAYFS_ROOTFS_LOWER_1" /etc/fstab`
 if [ -n "$FLAG_WITH_LOWER_1_ROOTFS" ]; then
-	count=100000
+	count=10000
 	while [ 1 ]
 	do
-		if [ -L $OVERLAYFS_ROOTFS_LOWER_1 -o $count -lt 1 ]; then
+		if [ -L $OVERLAYFS_ROOTFS_LOWER_1 -o -b $OVERLAYFS_ROOTFS_LOWER_1 -o $count -lt 1 ]; then
 			break
 		fi
 		usleep 10
@@ -115,6 +151,8 @@ if [ -n "$FLAG_WITH_LOWER_1_ROOTFS" ]; then
 else
 	echo -e "info: not found second lower rootfs, mount tmpfs"
 	OVLFS_FLAG_TMPFS_UPPER=0
+fi
+
 fi
 
 # Mount overlayfs upperdir
