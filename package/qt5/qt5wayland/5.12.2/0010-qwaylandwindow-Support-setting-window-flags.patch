@@ -1,23 +1,23 @@
-From 310c7870d994757320d0ee3772641820d2f59b9d Mon Sep 17 00:00:00 2001
+From 43dd0f3c0cf3e0cf74b376e8c029d5702bfb0d2a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 09:12:08 +0800
 Subject: [PATCH] qwaylandwindow: Support setting window flags
 
 Support setting window flags through app_id, for example:
-app_id = "flags=stay-on-top|no-focus"
+app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
 
 Also stop freeing wl surface in reset(), since libmali doesn't like that.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylandwindow.cpp | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ src/client/qwaylandwindow.cpp | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index aabaa7e..33739ef 100644
+index 0eb9234..19e74ea 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -203,6 +203,19 @@ void QWaylandWindow::initWindow()
+@@ -203,6 +203,21 @@ void QWaylandWindow::initWindow()
          mShellSurface->requestWindowStates(window()->windowStates());
      handleContentOrientationChange(window()->contentOrientation());
      mFlags = window()->flags();
@@ -28,6 +28,8 @@ index aabaa7e..33739ef 100644
 +
 +        if (mFlags & Qt::WindowStaysOnTopHint)
 +            strcat(s, "stay-on-top|");
++        else if (mFlags & Qt::WindowStaysOnBottomHint)
++            strcat(s, "stay-on-bottom|");
 +        if (mFlags & Qt::WindowDoesNotAcceptFocus)
 +            strcat(s, "no-focus|");
 +
@@ -37,7 +39,7 @@ index aabaa7e..33739ef 100644
  }
  
  void QWaylandWindow::initializeWlSurface()
-@@ -247,7 +260,8 @@ void QWaylandWindow::reset(bool sendDestroyEvent)
+@@ -247,7 +262,8 @@ void QWaylandWindow::reset(bool sendDestroyEvent)
  #endif
          invalidateSurface();
  
