@@ -28,7 +28,7 @@ index 2849839..0f5818e 100644
  
 +	if (surface->flags & SURFACE_STAY_ON_TOP)
 +		new_layer_link = &shsurf->shell->top_layer.view_list;
-+    else if (surface->flags & SURFACE_STAY_ON_BOTTOM)
++	else if (surface->flags & SURFACE_STAY_ON_BOTTOM)
 +		new_layer_link = &shsurf->shell->bottom_layer.view_list;
 +
  	if (new_layer_link == NULL)
@@ -236,8 +236,8 @@ index faa8680..7f99d12 100644
  };
  
 +enum weston_surface_flags {
-+	SURFACE_NO_FOCUS	    = 1 << 0,
-+	SURFACE_STAY_ON_TOP	    = 1 << 1,
++	SURFACE_NO_FOCUS	= 1 << 0,
++	SURFACE_STAY_ON_TOP	= 1 << 1,
 +	SURFACE_STAY_ON_BOTTOM	= 1 << 2,
 +};
 +
