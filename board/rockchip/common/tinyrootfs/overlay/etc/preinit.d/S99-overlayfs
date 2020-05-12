@@ -53,7 +53,6 @@ mount_remove_sys_tmpfs(){
 start_mount_overlayfs(){
 
 if [ ! -d /sys/module/mmc_block ]; then
-	modprobe mmc_block
 	modprobe dw_mmc-rockchip
 	msg "missing mmc_block dw_mmc-rockchip module"
 fi
@@ -150,7 +149,10 @@ msg "fail to move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OV
 exec chroot . sh -c "$(cat << END
 
 	umount $OVERLAYFS_MOUNT_DIR/ro/$OVERLAYFS_MOUNT_DIR
-	/etc/preinit.d/S10udev stop
+
+	if [ -f /etc/preinit.d/S10udev ]; then
+		/etc/preinit.d/S10udev stop
+	fi
 
 	if [ -f /etc/init.d/rcS ]; then
 		exec /etc/init.d/rcS
