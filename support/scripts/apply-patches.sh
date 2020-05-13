@@ -144,6 +144,7 @@ function apply_patch {
 
         git add -f *
         git commit --allow-empty --amend --no-edit
+        rm -rf .git/rebase-apply/
     fi
 }
 
