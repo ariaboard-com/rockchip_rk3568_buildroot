@@ -75,6 +75,14 @@ config BR2_PACKAGE_ANDROID_TOOLS_ADBD
 	  target, which can be used to interact with a host machine
 	  implementing the ADB protocol.
 
+if BR2_PACKAGE_ANDROID_TOOLS_ADBD
+
+config BR2_PACKAGE_ANDROID_TOOLS_AUTH_PASSWORD
+	string "adb auth password"
+	default ""
+
+endif
+
 endif
 
 comment "android-tools needs a toolchain w/ threads"

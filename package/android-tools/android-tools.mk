@@ -76,9 +76,20 @@ define HOST_ANDROID_TOOLS_INSTALL_CMDS
 		$(INSTALL) -D -m 0755 $(@D)/build-$(t)/$(t) $(HOST_DIR)/bin/$(t)$(sep))
 endef
 
+ADBD_AUTH_PASSWORD = $(call qstrip,$(BR2_PACKAGE_ANDROID_TOOLS_AUTH_PASSWORD))
+ifneq ($(ADBD_AUTH_PASSWORD),)
+define ANDROID_TOOLS_INSTALL_AUTH
+	$(INSTALL) -D -m 0755 $(ANDROID_TOOLS_PKGDIR)/adb_auth.sh \
+		$(TARGET_DIR)/usr/bin/adb_auth.sh
+	sed -i "s/AUTH_PASSWORD/${ADBD_AUTH_PASSWORD}/g" \
+		$(TARGET_DIR)/usr/bin/adb_auth.sh
+endef
+endif
+
 define ANDROID_TOOLS_INSTALL_TARGET_CMDS
 	$(foreach t,$(ANDROID_TOOLS_TARGETS),\
 		$(INSTALL) -D -m 0755 $(@D)/build-$(t)/$(t) $(TARGET_DIR)/usr/bin/$(t)$(sep))
+	$(ANDROID_TOOLS_INSTALL_AUTH)
 endef
 
 $(eval $(host-generic-package))
