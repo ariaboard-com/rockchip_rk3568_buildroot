@@ -4,20 +4,20 @@
 soc_configure()
 {
 	#vpu 600M
-	echo 600 >/sys/kernel/debug/mpp_service/rkvenc/clk_core
+#	echo 600 >/sys/kernel/debug/mpp_service/rkvenc/clk_core
 
 	#cpu x2
 	echo 0 > /sys/devices/system/cpu/cpu2/online
 	echo 0 > /sys/devices/system/cpu/cpu3/online
 
 	#npu 600M
-	echo userspace > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/governor
-	echo 600000000 > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/userspace/set_freq
+	echo 600000000 > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/min_freq
+	echo 600000000 > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/max_freq
 }
 
 lunch_start()
 {
-	#soc_configure
+	soc_configure
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
 	export HDR_MODE=0
