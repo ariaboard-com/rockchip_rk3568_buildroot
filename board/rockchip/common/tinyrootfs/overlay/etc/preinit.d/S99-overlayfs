@@ -157,7 +157,7 @@ exec chroot . sh -c "$(cat << END
 	if [ -f /etc/init.d/rcS ]; then
 		exec /etc/init.d/rcS
 	else
-		echo -e "rootfs mount fail, enter debug mode!!!"
+		echo -e "No found Second Rootfs, ignore !!!"
 	fi
 
 END
