@@ -10,6 +10,18 @@ menuconfig BR2_PACKAGE_MEDIASERVER
 
 if BR2_PACKAGE_MEDIASERVER
 
+config BR2_PACKAGE_MEDIASERVER_SANITIZER_DYNAMIC
+	bool "enable mediaserver sanitizer tools with dynamic linker"
+	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	help
+	  Enable mediaserver debug on sanitizer with dynamic linker.
+
+config BR2_PACKAGE_MEDIASERVER_SANITIZER_STATIC
+	bool "enable mediaserver sanitizer tools with static linker"
+	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	help
+	  Enable mediaserver debug on sanitizer with static linker.
+
 config BR2_PACKAGE_MEDIASERVE_CONIFG
 	string "mediaserver config"
 	default "none"

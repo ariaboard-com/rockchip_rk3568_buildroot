@@ -3,6 +3,18 @@ menuconfig BR2_PACKAGE_RKMEDIA
 
 if BR2_PACKAGE_RKMEDIA
 
+config BR2_PACKAGE_RKMEDIA_SANITIZER_DYNAMIC
+	bool "enable rkmedia sanitizer tools with dynamic linker"
+	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	help
+	  Enable rkmedia debug on sanitizer with dynamic linker.
+
+config BR2_PACKAGE_RKMEDIA_SANITIZER_STATIC
+	bool "enable rkmedia sanitizer tools with static linker"
+	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	help
+	  Enable rkmedia debug on sanitizer with static linker.
+
 config BR2_PACKAGE_RKMEDIA_MPP
     bool "rk mpp wrapper"
     select BR2_PACKAGE_MPP
