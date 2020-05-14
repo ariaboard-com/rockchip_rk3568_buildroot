@@ -61,7 +61,7 @@ fi
 # Remove any rejects present BEFORE patching - Because if there are
 # any, even if patches are well applied, at the end it will complain
 # about rejects in builddir.
-find ${builddir}/ '(' -name '*.rej' -o -name '.*.rej' ')' -print0 | \
+find ${builddir}/* '(' -name '*.rej' -o -name '.*.rej' ')' -print0 | \
     xargs -0 -r rm -f
 
 function apply_patch {
