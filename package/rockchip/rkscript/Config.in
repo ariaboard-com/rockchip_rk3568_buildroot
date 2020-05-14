@@ -23,10 +23,23 @@ config BR2_PACKAGE_USB_MODULE_NAME
 	depends on BR2_PACKAGE_USB_MODULE
 	help
 		rockchip usb module name
+config BR2_PACKAGE_USB_USER_CONFIG
+	bool "rockchip usb user config"
+	depends on BR2_PACKAGE_RKSCRIPT
+	help
+	  rockchip usb user config
+
+config BR2_PACKAGE_USB_USER_CONFIG_STRING
+	string "usb config"
+	depends on BR2_PACKAGE_USB_USER_CONFIG
+	help
+	  rockchip usb user config string,
+	  use \n to combine two functions like usb_adb_en\nusb_ums_en
 
 config BR2_PACKAGE_USB_MASS_STORAGE
 	bool "rockchip usb mass storage"
 	depends on BR2_PACKAGE_RKSCRIPT
+	depends on !BR2_PACKAGE_USB_USER_CONFIG
 	help
 	  rockchip usb mass storage (ums)
 
