@@ -138,7 +138,7 @@ function apply_patch {
 
     if [ -n "$BR2_GEN_GIT" ]; then
         # Remove backup files
-        find $builddir/ '(' -name '*.orig' -o -name '.*.orig' ')' -exec rm -f {} \;
+        find $builddir/* '(' -name '*.orig' -o -name '.*.orig' ')' -exec rm -f {} \;
         git am "${path}/${patch}" --exclude "*" ||
             git commit --allow-empty --no-edit -m "${patch}"
 
