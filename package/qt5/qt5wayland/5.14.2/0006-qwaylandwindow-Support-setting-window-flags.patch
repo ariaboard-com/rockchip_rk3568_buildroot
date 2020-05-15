@@ -1,0 +1,58 @@
+From 0b57480f06291ade113ffd869260c05e17319153 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 7 May 2020 09:12:08 +0800
+Subject: [PATCH 6/9] qwaylandwindow: Support setting window flags
+
+Support setting window flags through app_id, for example:
+app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
+
+Also stop freeing wl surface in reset(), since libmali doesn't like that.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/client/qwaylandwindow.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 202d01c..d16a8d5 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -198,6 +198,21 @@ void QWaylandWindow::initWindow()
+         mShellSurface->requestWindowStates(window()->windowStates());
+     handleContentOrientationChange(window()->contentOrientation());
+     mFlags = window()->flags();
++
++    // HACK: Set window flags through app id
++    if (mShellSurface) {
++        char s[128] = "flags=";
++
++        if (mFlags & Qt::WindowStaysOnTopHint)
++            strcat(s, "stay-on-top|");
++        else if (mFlags & Qt::WindowStaysOnBottomHint)
++            strcat(s, "stay-on-bottom|");
++        if (mFlags & Qt::WindowDoesNotAcceptFocus)
++            strcat(s, "no-focus|");
++
++        if (strchr(s, '|'))
++            mShellSurface->setAppId(s);
++    }
+ }
+ 
+ void QWaylandWindow::initializeWlSurface()
+@@ -245,11 +260,13 @@ void QWaylandWindow::reset(bool sendDestroyEvent)
+     mShellSurface = nullptr;
+     delete mSubSurfaceWindow;
+     mSubSurfaceWindow = nullptr;
++    /* HACK: The libmali might try to access free-ed wl surface.
+     if (mSurface) {
+         emit wlSurfaceDestroyed();
+         QWriteLocker lock(&mSurfaceLock);
+         mSurface.reset();
+     }
++    */
+ 
+     if (mFrameCallback) {
+         wl_callback_destroy(mFrameCallback);
+-- 
+2.20.1
+
