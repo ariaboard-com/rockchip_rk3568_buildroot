@@ -8,13 +8,13 @@ config BR2_PACKAGE_NETSERVER
 if BR2_PACKAGE_NETSERVER
 config BR2_PACKAGE_NETSERVER_SANITIZER_DYNAMIC
 	bool "enable netserver sanitizer tools with dynamic linker"
-	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable netserver debug on sanitizer with dynamic linker.
 
 config BR2_PACKAGE_NETSERVER_SANITIZER_STATIC
 	bool "enable netserver sanitizer tools with static linker"
-	select BR2_PACKAGE_ROCKCHIP_SANITIZER
+	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable netserver debug on sanitizer with static linker.
 endif
