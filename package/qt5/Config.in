@@ -65,12 +65,6 @@ comment "Qt 5.9 needs host/toolchain w/ gcc >= 4.8"
 	depends on !BR2_ARM_CPU_ARMV4
 	depends on !BR2_arc && !BR2_nios2 && !BR2_xtensa
 
-config BR2_PACKAGE_QT5_VERSION_5_6
-	bool "LTS (5.6)"
-	help
-	  This option builds Qt 5.6, which is licensed under
-	  (L)GPL-2.0+.
-
 endchoice
 
 source "package/qt5/qt53d/Config.in"
