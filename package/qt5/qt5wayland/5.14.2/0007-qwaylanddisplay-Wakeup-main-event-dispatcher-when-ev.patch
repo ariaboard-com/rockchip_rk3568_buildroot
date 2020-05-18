@@ -57,7 +57,7 @@ index 38ae52f..b4d75b3 100644
 +QWaylandDisplayThread::~QWaylandDisplayThread()
 +{
 +    quit = true;
-+    wait();
++    wait(1000);
 +}
 +
 +void QWaylandDisplayThread::run()
@@ -73,8 +73,8 @@ index 38ae52f..b4d75b3 100644
 +        while (wl_display_prepare_read(mDisplay) != 0) {
 +            if (auto *dispatcher = QCoreApplication::eventDispatcher())
 +                dispatcher->wakeUp();
-+
 +            usleep(1000);
++            continue;
 +        }
 +
 +        ret = poll(&fd, 1, -1);
