@@ -34,6 +34,7 @@ mount_tmpfs_for_overlayfs_upper(){
 	mkdir -p $RW_ROOTFS_UPPER
 	mkdir -p $RW_ROOTFS_WORK
 	OVLFS_MOUNT_OPTS="$OVLFS_MOUNT_OPTS,upperdir=$RW_ROOTFS_UPPER,workdir=$RW_ROOTFS_WORK"
+	OVLFS_MOUNT_UPPERDIR_FLAG="YES"
 }
 
 mount_tmpfs_for_overlayfs_data(){
@@ -157,7 +158,9 @@ fi
 
 # Mount overlayfs upperdir
 mkdir $RW_ROOTFS
-mount_tmpfs_for_overlayfs_upper
+if [ -f "/tmp/.ovlfs_tmpfs4rw" -o -f "/etc/preinit.d/.ovlfs_tmpfs4rw" ]; then
+	mount_tmpfs_for_overlayfs_upper
+fi
 
 mkdir -p $RO_ROOTFS
 
@@ -181,8 +184,11 @@ if [ -n "$FLAG_WITH_LOWER_1_ROOTFS" -a $OVLFS_FLAG_TMPFS_UPPER -eq 1 ]; then
 	msg "fail to move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT"
 fi
 
-mount -o noatime,move $RO_ROOTFS_MOUNT_MOVE/$RW_ROOTFS $RW_ROOTFS
-msg "fail to move $RO_ROOTFS_MOUNT_MOVE/$OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT $OVERLAYFS_ROOTFS_LOWER_1_MOUNTPOINT"
+
+if [ "$OVLFS_MOUNT_UPPERDIR_FLAG" = "YES" ]; then
+	mount -o noatime,move $RW_ROOTFS_MOUNT_MOVE $RW_ROOTFS
+	msg "fail to move $RW_ROOTFS_MOUNT_MOVE $RW_ROOTFS"
+fi
 
 exec chroot . sh -c "$(cat << END
 
