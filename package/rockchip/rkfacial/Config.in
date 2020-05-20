@@ -1,0 +1,16 @@
+config BR2_PACKAGE_RKFACIAL
+    bool "rk facial"
+    select BR2_PACKAGE_ROCKFACE
+    select BR2_PACKAGE_LIBDRM
+    select BR2_PACKAGE_LINUX_RGA
+    select BR2_PACKAGE_SQLITE
+    select BR2_PACKAGE_CAMERA_ENGINE_RKISP
+    select BR2_PACKAGE_ALSA_LIB
+    select BR2_PACKAGE_MPP
+
+config BR2_PACKAGE_RKFACIAL_USE_WEB_SERVER
+    bool "use web server"
+    default n
+    depends on BR2_PACKAGE_RKFACIAL
+    select BR2_PACKAGE_LIBIPCPROTOCOL
+    select BR2_PACKAGE_LIBGDBUS
