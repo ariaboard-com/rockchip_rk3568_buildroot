@@ -7,7 +7,7 @@ logger "Received power key event: $@..."
 TIMEOUT=3 # s
 PIDFILE="/tmp/$(basename $0).pid"
 
-function short_press
+short_press()
 {
 	logger "Power key short press..."
 
@@ -30,7 +30,7 @@ function short_press
 	fi
 }
 
-function long_press
+long_press()
 {
 	logger "Power key long press (${TIMEOUT}s)..."
 
