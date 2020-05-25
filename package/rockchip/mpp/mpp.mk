@@ -22,8 +22,14 @@ MPP_POST_RSYNC_HOOKS += MPP_LINK_GIT
 ifeq ($(BR2_PACKAGE_RK3328),y)
 define MPP_H265_SUPPORTED_FIRMWARE
 	mkdir -p $(TARGET_DIR)/lib/firmware/
-	$(INSTALL) -m 0644 -D package/rockchip/mpp/monet.bin \
-		$(TARGET_DIR)/lib/firmware/
+
+	if test -e $(MPP_SITE)/../rktoolkit/monet.bin ; then \
+		$(INSTALL) -m 0644 -D $(MPP_SITE)/../rktoolkit/monet.bin \
+			$(TARGET_DIR)/lib/firmware/ ; \
+	else \
+		$(INSTALL) -m 0644 -D package/rockchip/mpp/monet.bin \
+			$(TARGET_DIR)/lib/firmware/ ; \
+	fi
 endef
 MPP_POST_INSTALL_TARGET_HOOKS += MPP_H265_SUPPORTED_FIRMWARE
 endif
