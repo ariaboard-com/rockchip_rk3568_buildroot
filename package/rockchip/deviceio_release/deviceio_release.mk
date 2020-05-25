@@ -19,6 +19,7 @@ endif
 ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), REALTEK)
 	LIBDEVICEIOSO = libDeviceIo_bluez.so
 	DEVICEIO_RELEASE_DEPENDENCIES += readline bluez5_utils libglib2 bluez-alsa
+	DEVICEIO_BSA = fake
 else ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), BROADCOM)
 	LIBDEVICEIOSO = libDeviceIo_broadcom.so
 	DEVICEIO_BSA = broadcom_bsa
