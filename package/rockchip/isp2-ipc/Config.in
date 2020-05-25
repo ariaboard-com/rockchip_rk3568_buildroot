@@ -1,9 +1,7 @@
-menuconfig BR2_PACKAGE_ISP2_IPC
-	bool "rockchip isp ipc"
+config BR2_PACKAGE_ISP2_IPC
+	bool "Rockchip ISP Server"
 	select BR2_PACKAGE_LIBGDBUS
 	select BR2_PACKAGE_LIBRKDB
 	help
-	  rockchip isp ipc
-
-
+	  Rockchip ISP server
 
