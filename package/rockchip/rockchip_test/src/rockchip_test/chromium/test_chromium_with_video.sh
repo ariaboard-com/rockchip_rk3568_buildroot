@@ -4,7 +4,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 echo performance | tee $(find /sys/ -name *governor)
 
-export XDG_RUNTIME_DIR=/tmp/.xdg
 touch /dev/video-dec0
 ln -sf /usr/lib/libmali.so /usr/lib/libMali.so.1
 
