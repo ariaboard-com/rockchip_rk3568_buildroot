@@ -28,14 +28,14 @@ endif
 
 QT5WEBENGINE_DEPENDENCIES += host-libpng host-libnss libnss
 
-QT5WEBENGINE_CONF_OPTS += -webengine-ffmpeg
+QT5WEBENGINE_CONFIG += -webengine-ffmpeg
 
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_WEBRTC),y)
-QT5WEBENGINE_CONF_OPTS += -webengine-webrtc
+QT5WEBENGINE_CONFIG += -webengine-webrtc
 endif
 
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS),y)
-QT5WEBENGINE_CONF_OPTS += -proprietary-codecs
+QT5WEBENGINE_CONFIG += -proprietary-codecs
 endif
 
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_ALSA),y)
@@ -43,6 +43,8 @@ QT5WEBENGINE_DEPENDENCIES += alsa-lib
 else
 QT5WEBENGINE_CONF_OPTS += QT_CONFIG-=alsa
 endif
+
+QT5WEBENGINE_CONF_OPTS += -- $(QT5WEBENGINE_CONFIG)
 
 # QtWebengine's build system uses python, but only supports python2. We work
 # around this by forcing python2 early in the PATH, via a python->python2
