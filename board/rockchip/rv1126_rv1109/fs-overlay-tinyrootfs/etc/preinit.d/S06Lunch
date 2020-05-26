@@ -18,6 +18,7 @@ soc_configure()
 lunch_start()
 {
 	soc_configure
+	ispserver &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
 	export HDR_MODE=0
@@ -27,6 +28,7 @@ lunch_start()
 lunch_stop()
 {
 	killall mediaserver
+	killall ispserver
 	echo "All applications have been stopped"
 }
 
