@@ -1,0 +1,5 @@
+config BR2_PACKAGE_RKSL
+    bool "rksl"
+    select BR2_PACKAGE_LIBDRM
+    select BR2_PACKAGE_LINUX_RGA
+    select BR2_PACKAGE_CAMERA_ENGINE_RKISP
