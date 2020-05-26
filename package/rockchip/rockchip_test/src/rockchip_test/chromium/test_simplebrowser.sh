@@ -4,7 +4,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 echo performance | tee $(find /sys/ -name *governor)
 
-export XDG_RUNTIME_DIR=/tmp/.xdg
 export export QT_QPA_PLATFORM=wayland
 
 touch /dev/video-dec0

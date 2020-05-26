@@ -56,7 +56,7 @@ COMPATIBLE=${COMPATIBLE#rockchip,}
 echo performance | tee $(find /sys/ -name *governor)
 
 echo "run glmark2 wayland with fullscreen......"
-export XDG_RUNTIME_DIR=/tmp/.xdg
+
 run_glmark2 ${CHIPNAME}
 
 echo "the governor is performance for now, please restart it........"
