@@ -1,0 +1,5 @@
+config BR2_PACKAGE_QFACIALGATE
+	bool "QFacialGate"
+	depends on BR2_PACKAGE_QT5
+	help
+	  Rockchip QFacialGate application based on QT
