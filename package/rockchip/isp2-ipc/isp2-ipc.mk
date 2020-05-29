@@ -12,7 +12,7 @@ ifeq ($(BR2_PACKAGE_RK_OEM), y)
  ISP2_IPC_CONF_OPTS += -DCONFIG_OEM=1
 endif
 
- ISP2_IPC_CONF_OPTS += -DENABLE_DBUS=1
+ ISP2_IPC_CONF_OPTS += -DCONFIG_DBUS=1
 
 endif
 $(eval $(cmake-package))
