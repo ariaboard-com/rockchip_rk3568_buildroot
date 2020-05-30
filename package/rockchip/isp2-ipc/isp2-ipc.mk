@@ -14,5 +14,9 @@ endif
 
  ISP2_IPC_CONF_OPTS += -DCONFIG_DBUS=1
 
+ifeq ($(BR2_PACKAGE_DBSERVER), y)
+ ISP2_IPC_CONF_OPTS += -DCONFIG_DBSERVER=1
+endif
+
 endif
 $(eval $(cmake-package))
