@@ -158,7 +158,7 @@ fi
 
 # Mount overlayfs upperdir
 mkdir $RW_ROOTFS
-if [ -f "/tmp/.ovlfs_tmpfs4rw" -o -f "/etc/preinit.d/.ovlfs_tmpfs4rw" ]; then
+if [ -f "/tmp/.ovlfs_tmpfs4rw" -o -f "/etc/preinit.d/.ovlfs_tmpfs4rw" -o $OVLFS_FLAG_TMPFS_UPPER -eq 0 ]; then
 	mount_tmpfs_for_overlayfs_upper
 fi
 
