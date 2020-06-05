@@ -1,4 +1,4 @@
-From efbb70a086b8ac0bba2d02a3023862e2d3b718c4 Mon Sep 17 00:00:00 2001
+From a5e78537e371c191d6a6e1f2dd350c684f17f5b6 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 8 Aug 2019 09:46:17 +0800
 Subject: [PATCH 20/25] compositor-drm: Support controlling output dynamically
@@ -20,11 +20,11 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 
 mode
 ---
- clients/desktop-shell.c    |  19 +++++
- desktop-shell/shell.c      |  39 ++++++++++
- libweston/compositor-drm.c | 174 +++++++++++++++++++++++++++++++++++++++++++++
- libweston/compositor.c     |  46 ++++++++++--
- 4 files changed, 271 insertions(+), 7 deletions(-)
+ clients/desktop-shell.c    |  19 ++++
+ desktop-shell/shell.c      |  39 +++++++++
+ libweston/compositor-drm.c | 175 +++++++++++++++++++++++++++++++++++++
+ libweston/compositor.c     |  46 ++++++++--
+ 4 files changed, 272 insertions(+), 7 deletions(-)
 
 diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
 index 599295e..acc0a41 100644
@@ -132,7 +132,7 @@ index 0bea96a..2849839 100644
  
  static void
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 9a4873e..4c1c1d2 100644
+index 9a4873e..a427c3a 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -37,6 +37,7 @@
@@ -188,7 +188,7 @@ index 9a4873e..4c1c1d2 100644
  	uint32_t crtc_id; /* object ID to pass to DRM functions */
  	uint32_t plane_id; /* object ID to pass to DRM functions */
  	int pipe; /* index of CRTC in resource array / bitmasks */
-@@ -1145,6 +1163,24 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -1145,6 +1163,23 @@ drm_output_repaint(struct weston_output *output_base,
  	int dx, dy, dw, dh, sw, sh;
  	int ret = 0;
  
@@ -202,18 +202,17 @@ index 9a4873e..4c1c1d2 100644
 +
 +		if (now_ms > (output->last_rotate_ms + DRM_ROTATE_FREEZE_MS))
 +			output->freezing &= ~DRM_OUTPUT_FREEZE_ROTATING;
++
++		weston_output_damage(&output->base);
 +	}
 +
-+	if (output->freezing) {
-+		weston_output_damage(&output->base);
-+		weston_output_schedule_repaint(&output->base);
++	if (output->freezing)
 +		return -1;
-+	}
 +
  	if (output->disable_pending || output->destroy_pending)
  		return -1;
  
-@@ -3136,6 +3172,8 @@ drm_output_enable(struct weston_output *base)
+@@ -3136,6 +3171,8 @@ drm_output_enable(struct weston_output *base)
  					  output->base.height);
  	}
  
@@ -222,7 +221,7 @@ index 9a4873e..4c1c1d2 100644
  	if (output->backlight) {
  		weston_log("Initialized backlight, device %s\n",
  			   output->backlight->path);
-@@ -3184,6 +3222,9 @@ drm_output_enable(struct weston_output *base)
+@@ -3184,6 +3221,9 @@ drm_output_enable(struct weston_output *base)
  
  	output->state_invalid = true;
  
@@ -232,7 +231,7 @@ index 9a4873e..4c1c1d2 100644
  	return 0;
  
  err_free:
-@@ -4199,6 +4240,135 @@ static const struct weston_drm_output_api api = {
+@@ -4199,6 +4239,137 @@ static const struct weston_drm_output_api api = {
  	drm_output_set_seat,
  };
  
@@ -301,8 +300,10 @@ index 9a4873e..4c1c1d2 100644
 +			drm_output_modeset(output, config + strlen("mode="));
 +		} else if (!strcmp(config, "freeze")) {
 +			output->freezing |= DRM_OUTPUT_FREEZE_USER;
++			output->state_invalid = true;
 +		} else if (!strcmp(config, "unfreeze")) {
 +			output->freezing &= ~DRM_OUTPUT_FREEZE_USER;
++			weston_output_damage(&output->base);
 +		} else if (!strncmp(config, "rect", strlen("rect"))) {
 +			int x1, y1, x2, y2, ret;
 +
@@ -368,7 +369,7 @@ index 9a4873e..4c1c1d2 100644
  static struct drm_backend *
  drm_backend_create(struct weston_compositor *compositor,
  		   struct weston_drm_backend_config *config)
-@@ -4362,6 +4532,10 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -4362,6 +4533,10 @@ drm_backend_create(struct weston_compositor *compositor,
  		goto err_udev_monitor;
  	}
  
@@ -451,5 +452,5 @@ index 0065dda..e5d69b7 100644
  
  /** Initializes a weston_output object with enough data so
 -- 
-2.11.0
+2.20.1
 
