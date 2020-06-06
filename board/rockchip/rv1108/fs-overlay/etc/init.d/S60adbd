@@ -22,7 +22,7 @@ case "$1" in
 	echo 0006 > /sys/class/android_usb/android0/idProduct
 	echo adb > /sys/class/android_usb/android0/functions
 	echo 1 > /sys/class/android_usb/android0/enable
-	start-stop-daemon --start --oknodo --pidfile /var/run/adbd.pid --startas /root/sbin/adbd --background
+	start-stop-daemon --start --oknodo --pidfile /var/run/adbd.pid --startas /root/bin/adbd --background
 	;;
   stop)
 	start-stop-daemon --stop --oknodo --pidfile /var/run/adbd.pid --retry 5
