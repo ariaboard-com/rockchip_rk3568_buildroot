@@ -1,17 +1,17 @@
-From 1002995dd3ad1484dfdf9dbdaa6c4df287f7b802 Mon Sep 17 00:00:00 2001
+From 6748f703555c5e74572e916c433891ee0a92df52 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 5 Nov 2019 18:15:18 +0800
-Subject: [PATCH 2/2] pixman-renderer: Support linux dmabuf
+Subject: [PATCH 22/25] pixman-renderer: Support linux dmabuf
 
 NOTE: Only support contig dmabuf.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/pixman-renderer.c | 185 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 180 insertions(+), 5 deletions(-)
+ libweston/pixman-renderer.c | 212 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 207 insertions(+), 5 deletions(-)
 
 diff --git a/libweston/pixman-renderer.c b/libweston/pixman-renderer.c
-index d45d18e..cd5beb9 100644
+index d45d18e..4d736dc 100644
 --- a/libweston/pixman-renderer.c
 +++ b/libweston/pixman-renderer.c
 @@ -35,6 +35,14 @@
@@ -29,7 +29,19 @@ index d45d18e..cd5beb9 100644
  #include <linux/input.h>
  
  struct pixman_output_state {
-@@ -351,7 +359,7 @@ repaint_region(struct weston_view *ev, struct weston_output *output,
+@@ -64,6 +72,11 @@ struct pixman_renderer {
+ 	struct wl_signal destroy_signal;
+ };
+ 
++struct dmabuf_data {
++	void *ptr;
++	size_t size;
++};
++
+ static inline struct pixman_output_state *
+ get_output_state(struct weston_output *output)
+ {
+@@ -351,7 +364,7 @@ repaint_region(struct weston_view *ev, struct weston_output *output,
  	else
  		filter = PIXMAN_FILTER_NEAREST;
  
@@ -38,7 +50,7 @@ index d45d18e..cd5beb9 100644
  		wl_shm_buffer_begin_access(ps->buffer_ref.buffer->shm_buffer);
  
  	if (ev->alpha < 1.0) {
-@@ -371,7 +379,7 @@ repaint_region(struct weston_view *ev, struct weston_output *output,
+@@ -371,7 +384,7 @@ repaint_region(struct weston_view *ev, struct weston_output *output,
  	if (mask_image)
  		pixman_image_unref(mask_image);
  
@@ -47,26 +59,23 @@ index d45d18e..cd5beb9 100644
  		wl_shm_buffer_end_access(ps->buffer_ref.buffer->shm_buffer);
  
  	if (pr->repaint_debug)
-@@ -594,10 +602,82 @@ buffer_state_handle_buffer_destroy(struct wl_listener *listener, void *data)
+@@ -593,11 +606,79 @@ buffer_state_handle_buffer_destroy(struct wl_listener *listener, void *data)
+ 	ps->buffer_destroy_listener.notify = NULL;
  }
  
- static void
++static void
 +pixman_renderer_attach_dmabuf(struct weston_surface *es,
 +			      struct weston_buffer *buffer,
 +			      struct linux_dmabuf_buffer *dmabuf)
 +{
 +	struct pixman_surface_state *ps = get_surface_state(es);
 +	struct dmabuf_attributes *attributes = &dmabuf->attributes;
++	struct dmabuf_data *data;
 +	pixman_format_code_t pixman_format;
-+	size_t size, vstride;
-+	void *ptr;
++	size_t vstride;
 +
-+	size = lseek(attributes->fd[0], 0, SEEK_END);
-+
-+	ptr = mmap(NULL, size, PROT_READ, MAP_SHARED, attributes->fd[0], 0);
-+	if (ptr == MAP_FAILED) {
-+		weston_log("could not mmap for dmabuf: %d\n",
-+			   attributes->fd[0]);
++	data = linux_dmabuf_buffer_get_user_data(dmabuf);
++	if (!data || !data->ptr) {
 +		weston_buffer_reference(&ps->buffer_ref, NULL);
 +		return;
 +	}
@@ -112,7 +121,7 @@ index d45d18e..cd5beb9 100644
 +
 +	ps->image = pixman_image_create_bits(pixman_format,
 +					     buffer->width, vstride,
-+					     ptr + attributes->offset[0],
++					     data->ptr + attributes->offset[0],
 +					     attributes->stride[0]);
 +
 +	ps->buffer_destroy_listener.notify =
@@ -121,7 +130,7 @@ index d45d18e..cd5beb9 100644
 +		      &ps->buffer_destroy_listener);
 +}
 +
-+static void
+ static void
  pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
  {
  	struct pixman_surface_state *ps = get_surface_state(es);
@@ -130,7 +139,7 @@ index d45d18e..cd5beb9 100644
  	pixman_format_code_t pixman_format;
  
  	weston_buffer_reference(&ps->buffer_ref, buffer);
-@@ -618,9 +698,14 @@ pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
+@@ -618,9 +699,14 @@ pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
  	shm_buffer = wl_shm_buffer_get(buffer->resource);
  
  	if (! shm_buffer) {
@@ -148,7 +157,7 @@ index d45d18e..cd5beb9 100644
  	}
  
  	switch (wl_shm_buffer_get_format(shm_buffer)) {
-@@ -737,6 +822,9 @@ pixman_renderer_create_surface(struct weston_surface *surface)
+@@ -737,6 +823,9 @@ pixman_renderer_create_surface(struct weston_surface *surface)
  	wl_signal_add(&pr->destroy_signal,
  		      &ps->renderer_destroy_listener);
  
@@ -158,15 +167,30 @@ index d45d18e..cd5beb9 100644
  	return 0;
  }
  
-@@ -840,6 +928,87 @@ debug_binding(struct weston_keyboard *keyboard, uint32_t time, uint32_t key,
+@@ -840,6 +929,113 @@ debug_binding(struct weston_keyboard *keyboard, uint32_t time, uint32_t key,
  	}
  }
  
++static void
++pixman_renderer_destroy_dmabuf(struct linux_dmabuf_buffer *dmabuf)
++{
++	struct dmabuf_data *data = dmabuf->user_data;
++	linux_dmabuf_buffer_set_user_data(dmabuf, NULL, NULL);
++
++	if (data) {
++		if (data->ptr)
++			munmap(data->ptr, data->size);
++
++		free(data);
++	}
++}
++
 +static bool
 +pixman_renderer_import_dmabuf(struct weston_compositor *ec,
 +			      struct linux_dmabuf_buffer *dmabuf)
 +{
 +	struct dmabuf_attributes *attributes = &dmabuf->attributes;
++	struct dmabuf_data *data;
 +	size_t total_size, vstride0;
 +	int i;
 +
@@ -204,7 +228,18 @@ index d45d18e..cd5beb9 100644
 +			return false;
 +	}
 +
-+	return true;
++	data = zalloc(sizeof *data);
++	if (!data)
++		return false;
++
++	linux_dmabuf_buffer_set_user_data(dmabuf, data,
++					  pixman_renderer_destroy_dmabuf);
++
++	data->size = lseek(attributes->fd[0], 0, SEEK_END);
++
++	data->ptr = mmap(NULL, data->size, PROT_READ,
++			 MAP_SHARED, attributes->fd[0], 0);
++	return data->ptr != MAP_FAILED;
 +}
 +
 +static bool
@@ -246,7 +281,7 @@ index d45d18e..cd5beb9 100644
  WL_EXPORT int
  pixman_renderer_init(struct weston_compositor *ec)
  {
-@@ -882,6 +1051,12 @@ pixman_renderer_init(struct weston_compositor *ec)
+@@ -882,6 +1078,12 @@ pixman_renderer_init(struct weston_compositor *ec)
  
  	wl_signal_init(&renderer->destroy_signal);
  
@@ -260,5 +295,4 @@ index d45d18e..cd5beb9 100644
  }
  
 -- 
-2.11.0
-
+2.20.1
