@@ -1,4 +1,4 @@
-From cf69cef23985ea08b80d0cc4de4abaaf2681076c Mon Sep 17 00:00:00 2001
+From 0a6d652ccf2a7122cfcef571dcd239d065cbd044 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 28 Jan 2019 18:22:18 +0800
 Subject: [PATCH 15/25] compositor-drm: Support perfer external connectors
@@ -14,11 +14,11 @@ Env "WESTON_DRM_PREFER_EXTERNAL":
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- clients/window.c            |  16 +++++
- desktop-shell/shell.c       |  21 +++---
- libweston/compositor-drm.c  | 172 ++++++++++++++++++++++++++++++++++++++++++--
+ clients/window.c            |  16 ++++
+ desktop-shell/shell.c       |  28 +++---
+ libweston/compositor-drm.c  | 172 ++++++++++++++++++++++++++++++++++--
  libweston/libinput-device.c |   5 ++
- 4 files changed, 198 insertions(+), 16 deletions(-)
+ 4 files changed, 204 insertions(+), 17 deletions(-)
 
 diff --git a/clients/window.c b/clients/window.c
 index 95796d4..3e1f6be 100644
@@ -69,10 +69,24 @@ index 95796d4..3e1f6be 100644
  	input->drag_enter_serial = serial;
  	input->drag_focus = window,
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
-index 0ebb556..0bea96a 100644
+index 0ebb556..6890ebb 100644
 --- a/desktop-shell/shell.c
 +++ b/desktop-shell/shell.c
-@@ -4608,7 +4608,7 @@ workspace_move_surface_down_binding(struct weston_keyboard *keyboard,
+@@ -2869,7 +2869,12 @@ configure_static_view(struct weston_view *ev, struct weston_layer *layer, int x,
+ 		}
+ 	}
+ 
+-	weston_view_set_position(ev, ev->output->x + x, ev->output->y + y);
++	if (ev->output) {
++		x += ev->output->x;
++		y += ev->output->y;
++	}
++
++	weston_view_set_position(ev, x, y);
+ 	ev->surface->is_mapped = true;
+ 	ev->is_mapped = true;
+ 
+@@ -4608,7 +4613,7 @@ workspace_move_surface_down_binding(struct weston_keyboard *keyboard,
  static void
  shell_reposition_view_on_output_destroy(struct weston_view *view)
  {
@@ -81,7 +95,7 @@ index 0ebb556..0bea96a 100644
  	struct weston_compositor *ec = view->surface->compositor;
  	struct shell_surface *shsurf;
  	float x, y;
-@@ -4629,16 +4629,14 @@ shell_reposition_view_on_output_destroy(struct weston_view *view)
+@@ -4629,16 +4634,14 @@ shell_reposition_view_on_output_destroy(struct weston_view *view)
  		}
  	}
  
@@ -104,7 +118,7 @@ index 0ebb556..0bea96a 100644
  	}
  
  
-@@ -4694,7 +4692,10 @@ handle_output_destroy(struct wl_listener *listener, void *data)
+@@ -4694,7 +4697,10 @@ handle_output_destroy(struct wl_listener *listener, void *data)
  	shell_for_each_layer(shell, shell_output_destroy_move_layer, output);
  
  	wl_list_remove(&output_listener->panel_surface_listener.link);
@@ -242,7 +256,7 @@ index e21e1c4..e5ac715 100644
  			if (create_output_for_connector(b, resources,
  							connector, drm_device) < 0)
  				continue;
-@@ -2996,22 +3069,44 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
+@@ -2996,15 +3069,36 @@ create_outputs(struct drm_backend *b, struct udev_device *drm_device)
  		}
  	}
  
@@ -261,7 +275,7 @@ index e21e1c4..e5ac715 100644
  	return 0;
  }
  
- static void
++static void
 +destroy_outputs(struct drm_backend *b, struct udev_device *drm_device)
 +{
 +	struct drm_output *output, *next;
@@ -276,10 +290,10 @@ index e21e1c4..e5ac715 100644
 +		drm_output_destroy(&output->base);
 +}
 +
-+static void
+ static void
  update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  {
- 	drmModeConnector *connector;
+@@ -3012,6 +3106,7 @@ update_outputs(struct drm_backend *b, struct udev_device *drm_device)
  	drmModeRes *resources;
  	struct drm_output *output, *next;
  	uint32_t *connected;
@@ -437,5 +451,5 @@ index 5e7182d..9c4d750 100644
  		output = container_of(c->output_list.next,
  				      struct weston_output, link);
 -- 
-2.11.0
+2.20.1
 
