@@ -81,6 +81,13 @@ config BR2_PACKAGE_ANDROID_TOOLS_AUTH_PASSWORD
 	string "adb auth password"
 	default ""
 
+config BR2_PACKAGE_ANDROID_TOOLS_AUTH_RSA
+	bool "adbd rsa authentication enable"
+
+config BR2_PACKAGE_ANDROID_TOOLS_AUTH_RSA_KEY_PATH
+	string "adbd rsa authentication public key path"
+	default "/etc/adbkey.pub"
+	depends on BR2_PACKAGE_ANDROID_TOOLS_AUTH_RSA
 endif
 
 endif
