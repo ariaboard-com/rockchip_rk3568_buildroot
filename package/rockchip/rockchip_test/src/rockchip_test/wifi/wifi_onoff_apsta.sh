@@ -128,6 +128,7 @@ sleep 1
 function wifi_bcm_init()
 {
 
+	echo 1 > /sys/class/rfkill/rfkill1/state
 	if [ ! -f ${module_pid_file} ];then
 		ifconfig wlan0 up
 		sleep 2
