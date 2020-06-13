@@ -18,6 +18,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_DBSERVER), y)
  ISP2_IPC_CONF_OPTS += -DCONFIG_DBSERVER=1
+ ISP2_IPC_DEPENDENCIES += libIPCProtocol
 endif
 
 endif
