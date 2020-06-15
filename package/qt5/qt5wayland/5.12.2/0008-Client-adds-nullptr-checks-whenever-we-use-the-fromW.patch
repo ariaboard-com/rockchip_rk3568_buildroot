@@ -1,7 +1,7 @@
-From dfdfc4bed56c0902a7c3b19a63d0588b20f84f94 Mon Sep 17 00:00:00 2001
+From 9d6d5fb4ade85b892a60441e879ac8a707e4caa1 Mon Sep 17 00:00:00 2001
 From: Ziyuan Xu <xzy.xu@rock-chips.com>
 Date: Mon, 29 Jul 2019 00:39:08 +0000
-Subject: [PATCH 2/2] Client: adds nullptr checks whenever we use the
+Subject: [PATCH 08/12] Client: adds nullptr checks whenever we use the
  fromWlSurface()
 
 This is similar to commit 09f1d74b6278("Client: Add safer fromObject
@@ -47,5 +47,5 @@ index b69789e..14343b8 100644
      mFocus = nullptr;
  
 -- 
-2.7.4
+2.20.1
 

@@ -1,11 +1,11 @@
-From 00c66954db7245a033ef4a7010d0e4e5b306196d Mon Sep 17 00:00:00 2001
+From baf6e4f1ae7ac3c98afb10f9e705d944e1663f5f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 3 Jan 2019 15:27:59 +0800
-Subject: [PATCH] qwayland-egl: Fix mali crash during exiting
+Subject: [PATCH 04/15] qwayland-egl: Fix mali crash during exiting
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h | 4 ++++
+ .../platforms/qwayland-egl/qwaylandeglplatformintegration.h   | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h b/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
@@ -24,5 +24,5 @@ index dde4303..f281498 100644
      { return m_client_buffer_integration; }
  
 -- 
-2.11.0
+2.20.1
 

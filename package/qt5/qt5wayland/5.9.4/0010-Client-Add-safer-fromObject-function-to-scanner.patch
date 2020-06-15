@@ -1,7 +1,7 @@
-From 09f1d74b627811571d62627121dbfc219a1a680d Mon Sep 17 00:00:00 2001
+From 0fe1906f84e1f4989598993acad40b8b93c79c14 Mon Sep 17 00:00:00 2001
 From: Johan Klokkhammer Helsing <johan.helsing@qt.io>
 Date: Mon, 8 Apr 2019 13:51:28 +0200
-Subject: [PATCH 1/2] Client: Add safer fromObject function to scanner
+Subject: [PATCH 10/15] Client: Add safer fromObject function to scanner
 
 Makes the scanner produce generated static functions such as
 
@@ -31,17 +31,17 @@ Reviewed-by: Paul Olav Tvete <paul.tvete@qt.io>
 Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---
  src/client/qwaylanddatadevice.cpp         |  8 ++++++--
- src/client/qwaylandinputdevice.cpp        | 16 ++++++++++++++--
+ src/client/qwaylandinputdevice.cpp        | 13 ++++++++++++-
  src/client/qwaylandqtkey.cpp              |  6 +++++-
  src/client/qwaylandscreen.cpp             |  5 +++--
  src/qtwaylandscanner/qtwaylandscanner.cpp | 11 +++++++++++
- 5 files changed, 39 insertions(+), 7 deletions(-)
+ 5 files changed, 37 insertions(+), 6 deletions(-)
 
 diff --git a/src/client/qwaylanddatadevice.cpp b/src/client/qwaylanddatadevice.cpp
-index 300c9de..7da1e6d 100644
+index 33068c5..4bfc99e 100644
 --- a/src/client/qwaylanddatadevice.cpp
 +++ b/src/client/qwaylanddatadevice.cpp
-@@ -151,9 +151,13 @@ void QWaylandDataDevice::data_device_drop()
+@@ -156,9 +156,13 @@ void QWaylandDataDevice::data_device_drop()
  
  void QWaylandDataDevice::data_device_enter(uint32_t serial, wl_surface *surface, wl_fixed_t x, wl_fixed_t y, wl_data_offer *id)
  {
@@ -55,23 +55,23 @@ index 300c9de..7da1e6d 100644
      m_dragPoint = calculateDragPosition(x, y, m_dragWindow);
 +    m_enterSerial = serial;
  
-     QMimeData *dragData = nullptr;
+     QMimeData *dragData = Q_NULLPTR;
      Qt::DropActions supportedActions;
 diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
-index 90e138a..b69789e 100644
+index 4def0de..0353c3f 100644
 --- a/src/client/qwaylandinputdevice.cpp
 +++ b/src/client/qwaylandinputdevice.cpp
-@@ -451,6 +451,9 @@ void QWaylandInputDevice::Pointer::pointer_enter(uint32_t serial, struct wl_surf
+@@ -445,6 +445,9 @@ void QWaylandInputDevice::Pointer::pointer_enter(uint32_t serial, struct wl_surf
          return;
  
      QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
 +    if (!window)
 +        return; // Ignore foreign surfaces
 +
-     mFocus = window;
-     mSurfacePos = QPointF(wl_fixed_to_double(sx), wl_fixed_to_double(sy));
-     mGlobalPos = window->window()->mapToGlobal(mSurfacePos.toPoint());
-@@ -477,10 +480,15 @@ void QWaylandInputDevice::Pointer::pointer_leave(uint32_t time, struct wl_surfac
+ #if QT_CONFIG(cursor)
+     window->window()->setCursor(window->window()->cursor());
+ #endif
+@@ -470,6 +473,10 @@ void QWaylandInputDevice::Pointer::pointer_leave(uint32_t time, struct wl_surfac
      if (!surface)
          return;
  
@@ -81,14 +81,8 @@ index 90e138a..b69789e 100644
 +
      if (!QWaylandWindow::mouseGrab()) {
          QWaylandWindow *window = QWaylandWindow::fromWlSurface(surface);
--        window->handleMouseLeave(mParent);
-+		window->handleMouseLeave(mParent);
-     }
-+
-     mFocus = nullptr;
-     mButtons = Qt::NoButton;
- 
-@@ -852,9 +860,13 @@ void QWaylandInputDevice::Touch::touch_down(uint32_t serial,
+         window->handleMouseLeave(mParent);
+@@ -806,9 +813,13 @@ void QWaylandInputDevice::Touch::touch_down(uint32_t serial,
      if (!surface)
          return;
  
@@ -104,10 +98,10 @@ index 90e138a..b69789e 100644
      mParent->handleTouchPoint(id, wl_fixed_to_double(x), wl_fixed_to_double(y), Qt::TouchPointPressed);
  }
 diff --git a/src/client/qwaylandqtkey.cpp b/src/client/qwaylandqtkey.cpp
-index a60185b..1926197 100644
+index ce0d212..269f1ed 100644
 --- a/src/client/qwaylandqtkey.cpp
 +++ b/src/client/qwaylandqtkey.cpp
-@@ -70,7 +70,11 @@ void QWaylandQtKeyExtension::zqt_key_v1_key(struct wl_surface *surface,
+@@ -70,7 +70,11 @@ void QWaylandQtKeyExtension::key_extension_qtkey(struct wl_surface *surface,
      }
  
      QWaylandInputDevice *dev = inputDevices.first();
@@ -121,10 +115,10 @@ index a60185b..1926197 100644
      if (!win || !win->window()) {
          qWarning("qt_key_extension: handle_qtkey: No keyboard focus");
 diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
-index 38d61f8..1fe0125 100644
+index 334e0ec..1c4b985 100644
 --- a/src/client/qwaylandscreen.cpp
 +++ b/src/client/qwaylandscreen.cpp
-@@ -199,8 +199,9 @@ QWaylandScreen * QWaylandScreen::waylandScreenFromWindow(QWindow *window)
+@@ -177,8 +177,9 @@ QWaylandScreen * QWaylandScreen::waylandScreenFromWindow(QWindow *window)
  
  QWaylandScreen *QWaylandScreen::fromWlOutput(::wl_output *output)
  {
@@ -137,10 +131,10 @@ index 38d61f8..1fe0125 100644
  
  void QWaylandScreen::output_mode(uint32_t flags, int width, int height, int refresh)
 diff --git a/src/qtwaylandscanner/qtwaylandscanner.cpp b/src/qtwaylandscanner/qtwaylandscanner.cpp
-index 6f4a33b..c617369 100644
+index 01dfa92..6ef535b 100644
 --- a/src/qtwaylandscanner/qtwaylandscanner.cpp
 +++ b/src/qtwaylandscanner/qtwaylandscanner.cpp
-@@ -982,6 +982,7 @@ bool Scanner::process()
+@@ -891,6 +891,7 @@ void process(QXmlStreamReader &xml, const QByteArray &headerPath, const QByteArr
              printf("\n");
              printf("        struct ::%s *object() { return m_%s; }\n", interfaceName, interfaceName);
              printf("        const struct ::%s *object() const { return m_%s; }\n", interfaceName, interfaceName);
@@ -148,7 +142,7 @@ index 6f4a33b..c617369 100644
              printf("\n");
              printf("        bool isInitialized() const;\n");
              printf("\n");
-@@ -1110,6 +1111,16 @@ bool Scanner::process()
+@@ -1019,6 +1020,16 @@ void process(QXmlStreamReader &xml, const QByteArray &headerPath, const QByteArr
              printf("    }\n");
              printf("\n");
  
@@ -164,7 +158,7 @@ index 6f4a33b..c617369 100644
 +
              printf("    bool %s::isInitialized() const\n", interfaceName);
              printf("    {\n");
-             printf("        return m_%s != nullptr;\n", interfaceName);
+             printf("        return m_%s != 0;\n", interfaceName);
 -- 
-2.7.4
+2.20.1
 

@@ -1,8 +1,8 @@
-From f38e44cea47d388bfac175fffa4e035f1d44078e Mon Sep 17 00:00:00 2001
+From c34f230bdf7dedbcbb0aa93d49ed5c40a348a563 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 2/3] qwaylandxdgshellv6: Support switching between fullscreen
- and maximized
+Subject: [PATCH 11/12] qwaylandxdgshellv6: Support switching between
+ fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.
 2/ Switching between fullscreen and maximized requests unsetting the old
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
-index 606f954..2572df4 100644
+index a8a16fa..7d40980 100644
 --- a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
 +++ b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
 @@ -98,6 +98,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
@@ -27,7 +27,7 @@ index 606f954..2572df4 100644
      m_applied = m_pending;
      qCDebug(lcQpaWayland) << "Applied pending zxdg_toplevel_v6 configure event:" << m_applied.size << m_applied.states;
  }
-@@ -162,6 +165,11 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
+@@ -160,6 +163,11 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
      // Re-send what's different from the applied state
      Qt::WindowStates changedStates = m_applied.states ^ states;
  
@@ -39,7 +39,7 @@ index 606f954..2572df4 100644
      if (changedStates & Qt::WindowMaximized) {
          if (states & Qt::WindowMaximized)
              set_maximized();
-@@ -172,8 +180,6 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
+@@ -170,8 +178,6 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
      if (changedStates & Qt::WindowFullScreen) {
          if (states & Qt::WindowFullScreen)
              set_fullscreen(nullptr);

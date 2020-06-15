@@ -1,7 +1,7 @@
-From 70e2de7a7ea5cea5a7514e14d1887f9dd301aacf Mon Sep 17 00:00:00 2001
+From bef7b2f40c1b9a00648bd9c6f6b26ccb6bc63c92 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 6 Jun 2018 21:30:26 +0800
-Subject: [PATCH 2/5] qwaylandwindow: Clear current surface before destroy
+Subject: [PATCH 01/12] qwaylandwindow: Clear current surface before destroy
 
 Conflicts:
     src/client/qwaylandwindow.cpp
@@ -35,5 +35,5 @@ index c46c498..bbd0ccb 100644
  
      if (mFrameCallback) {
 -- 
-2.7.4
+2.20.1
 

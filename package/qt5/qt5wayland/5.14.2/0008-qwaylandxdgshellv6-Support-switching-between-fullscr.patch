@@ -1,8 +1,8 @@
-From b8b966ea63e531b636f95ce6ecf814e4bbe24426 Mon Sep 17 00:00:00 2001
+From 51783d142a78fc895ce6175a7d8cb0f259db5ac3 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 8/9] qwaylandxdgshellv6: Support switching between fullscreen
- and maximized
+Subject: [PATCH 08/10] qwaylandxdgshellv6: Support switching between
+ fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.
 2/ Switching between fullscreen and maximized requests unsetting the old
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
-index 6bc2a14..6b88e7f 100644
+index 6fb3af16..431277bc 100644
 --- a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
 +++ b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
 @@ -96,6 +96,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()

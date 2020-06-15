@@ -1,7 +1,7 @@
-From 43dd0f3c0cf3e0cf74b376e8c029d5702bfb0d2a Mon Sep 17 00:00:00 2001
+From 50c9d0951bceafe0587968fa7702efe1a5933b08 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 09:12:08 +0800
-Subject: [PATCH] qwaylandwindow: Support setting window flags
+Subject: [PATCH 09/12] qwaylandwindow: Support setting window flags
 
 Support setting window flags through app_id, for example:
 app_id = "flags=stay-on-top|stay-on-bottom|no-focus"

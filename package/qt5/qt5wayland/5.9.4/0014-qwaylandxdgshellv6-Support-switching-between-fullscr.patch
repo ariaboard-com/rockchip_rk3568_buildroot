@@ -1,8 +1,8 @@
-From 17bc3f6243e21022534525927169bd6ea21babfb Mon Sep 17 00:00:00 2001
+From 04c851d39317012a5fa813c6077de4caabd9cbb7 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 2/3] qwaylandxdgshellv6: Support switching between fullscreen
- and maximized
+Subject: [PATCH 14/15] qwaylandxdgshellv6: Support switching between
+ fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.
 2/ Switching between fullscreen and maximized requests unsetting the old
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index fff10b1..f6e377f 100644
+index 3a84b5d..6889d6c 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -70,6 +70,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
@@ -27,7 +27,7 @@ index fff10b1..f6e377f 100644
  }
  
  void QWaylandXdgSurfaceV6::Toplevel::updatePosition()
-@@ -299,8 +302,13 @@ void QWaylandXdgSurfaceV6::setMaximized()
+@@ -297,8 +300,13 @@ void QWaylandXdgSurfaceV6::setMaximized()
  
  void QWaylandXdgSurfaceV6::setFullscreen()
  {
@@ -43,7 +43,7 @@ index fff10b1..f6e377f 100644
  }
  
  void QWaylandXdgSurfaceV6::setNormal()
-@@ -316,8 +324,13 @@ void QWaylandXdgSurfaceV6::setNormal()
+@@ -314,8 +322,13 @@ void QWaylandXdgSurfaceV6::setNormal()
  
  void QWaylandXdgSurfaceV6::setMinimized()
  {

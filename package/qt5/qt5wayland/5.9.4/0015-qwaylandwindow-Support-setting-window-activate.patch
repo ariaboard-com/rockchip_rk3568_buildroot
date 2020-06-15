@@ -1,27 +1,27 @@
-From 7cd062b28d137e81f6c2e6a246e96fa552a58391 Mon Sep 17 00:00:00 2001
+From 1cafa491877eaf39eb8d53a4937a9e54017130bd Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:28:29 +0800
-Subject: [PATCH 3/3] qwaylandwindow: Support setting window activate
+Subject: [PATCH 15/15] qwaylandwindow: Support setting window activate
 
 Support setting window flags through app_id, for example:
 app_id = "requests=activate"
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylandwindow.cpp | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ src/client/qwaylandwindow.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 5455009..c33684a 100644
+index df03b3f..d00a244 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -995,7 +995,13 @@ void QWaylandWindow::restoreMouseCursor(QWaylandInputDevice *device)
- 
- void QWaylandWindow::requestActivateWindow()
+@@ -999,6 +999,14 @@ void QWaylandWindow::requestActivateWindow()
  {
--    qCWarning(lcQpaWayland) << "Wayland does not support QWindow::requestActivate()";
+     // no-op. Wayland does not have activation protocol,
+     // we rely on compositor setting keyboard focus based on window stacking.
++
 +    if (!mShellSurface) {
-+        qCWarning(lcQpaWayland) << "Wayland does not support QWindow::requestActivate()";
++        qWarning("Wayland does not support QWindow::requestActivate()");
 +        return;
 +    }
 +

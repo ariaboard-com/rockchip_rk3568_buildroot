@@ -1,7 +1,7 @@
-From a517e7ce1a9aa2a47788116b3f60469b29a1c761 Mon Sep 17 00:00:00 2001
+From 4e43393330149100fda25f4a534e0915587d3c4c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 17:04:59 +0800
-Subject: [PATCH] qwaylanddisplay: Refactor flushRequests() for multiple
+Subject: [PATCH 03/15] qwaylanddisplay: Refactor flushRequests() for multiple
  readers
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -48,5 +48,5 @@ index 86cfe1a..437501f 100644
          exitWithError();
      }
 -- 
-2.11.0
+2.20.1
 
