@@ -1,7 +1,7 @@
-From 53a587401392564a5115db925a68855ebe742664 Mon Sep 17 00:00:00 2001
+From 90b1a1e1122a4078ccbf3450c0857e67eaece367 Mon Sep 17 00:00:00 2001
 From: "james.lin" <james.lin@rock-chips.com>
 Date: Mon, 9 Apr 2018 15:32:21 +0800
-Subject: [PATCH 22/30] fix h265_parser read vui error
+Subject: [PATCH 38/48] fix h265_parser read vui error
 
 ---
  gst-libs/gst/codecparsers/gsth265parser.c | 10 +++++-----
@@ -29,5 +29,5 @@ index cf7f71f5d..3e63aa081 100644
  
    return TRUE;
 -- 
-2.11.0
+2.20.1
 

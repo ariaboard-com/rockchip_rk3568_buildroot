@@ -1,7 +1,7 @@
-From 4ee1467c9f22cce4b09ed2735ac92238a1417eab Mon Sep 17 00:00:00 2001
+From 98d19443aa1a1c6c03033a41ca537da6b89b3633 Mon Sep 17 00:00:00 2001
 From: Andrey Konovalov <andrey.konovalov@linaro.org>
 Date: Tue, 9 Apr 2019 21:32:36 +0300
-Subject: [PATCH 18/30] waylandsink: make gst_wl_window_is_toplevel aware of
+Subject: [PATCH 18/48] waylandsink: make gst_wl_window_is_toplevel aware of
  XDG shell
 
 ---
@@ -25,5 +25,5 @@ index 0a1c15601..77b2d81d4 100644
  
  static void
 -- 
-2.11.0
+2.20.1
 

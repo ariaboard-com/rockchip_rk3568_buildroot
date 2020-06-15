@@ -1,7 +1,7 @@
-From e839cb0b9baee8bfe681cf97ee90668e98b8d223 Mon Sep 17 00:00:00 2001
+From 0bfc815438e70cb60203a76dd4d497b6113cc5a8 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 25 Dec 2018 16:20:35 +0800
-Subject: [PATCH 1/4] waylandsink: Enable changing window handle
+Subject: [PATCH 44/48] waylandsink: Enable changing window handle
 
 Changing window handle is dangerous, but we need this feature for:
 https://redmine.rockchip.com.cn/issues/184629
@@ -13,7 +13,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 78dd294..7bbea7d 100644
+index 403960bb8..c6c8327a2 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -652,9 +652,10 @@ render_last_buffer (GstWaylandSink * sink, gboolean redraw)
@@ -69,7 +69,7 @@ index 78dd294..7bbea7d 100644
      } else {
        GST_ERROR_OBJECT (sink, "Failed to find display handle, "
 diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
-index be92fe7..f63e8b8 100644
+index be92fe7f2..f63e8b8fe 100644
 --- a/ext/wayland/gstwaylandsink.h
 +++ b/ext/wayland/gstwaylandsink.h
 @@ -57,6 +57,7 @@ struct _GstWaylandSink
@@ -89,5 +89,5 @@ index be92fe7..f63e8b8 100644
    GMutex render_lock;
    GstBuffer *last_buffer;
 -- 
-2.11.0
+2.20.1
 

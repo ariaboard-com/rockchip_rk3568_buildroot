@@ -1,7 +1,7 @@
-From e4e93d4d2ea7cf6adcaa5cd6a77f564ffd1c0663 Mon Sep 17 00:00:00 2001
+From 0e382d2cb7aed999d10ce7542daa9ea3a703faa3 Mon Sep 17 00:00:00 2001
 From: Fabien Dessenne <fabien.dessenne@st.com>
 Date: Thu, 23 Feb 2017 11:48:13 +0100
-Subject: [PATCH 02/30] waylandsink: support fullscreen
+Subject: [PATCH 02/48] waylandsink: support fullscreen
 
 Add the fullscreen property that makes the sink displayed all across
 the output.
@@ -40,10 +40,11 @@ index ff0819452..158c9af88 100644
  }
  
  static void
-@@ -212,6 +218,18 @@ gst_wayland_sink_init (GstWaylandSink * sink)
+@@ -211,6 +217,18 @@ gst_wayland_sink_init (GstWaylandSink * sink)
+   g_mutex_init (&sink->render_lock);
  }
  
- static void
++static void
 +gst_wayland_sink_set_fullscreen (GstWaylandSink * sink, gboolean fullscreen)
 +{
 +  if (fullscreen == sink->fullscreen)
@@ -55,10 +56,9 @@ index ff0819452..158c9af88 100644
 +  g_mutex_unlock (&sink->render_lock);
 +}
 +
-+static void
+ static void
  gst_wayland_sink_get_property (GObject * object,
      guint prop_id, GValue * value, GParamSpec * pspec)
- {
 @@ -223,6 +241,11 @@ gst_wayland_sink_get_property (GObject * object,
        g_value_set_string (value, sink->display_name);
        GST_OBJECT_UNLOCK (sink);
@@ -158,5 +158,5 @@ index e247b4e23..10b49fd67 100644
          struct wl_surface * parent, GMutex * render_lock);
  
 -- 
-2.11.0
+2.20.1
 

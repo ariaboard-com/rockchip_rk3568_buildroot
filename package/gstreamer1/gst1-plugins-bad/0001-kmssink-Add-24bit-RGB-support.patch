@@ -1,7 +1,7 @@
-From de4dbca1c33af4952016dc2172271368187ac47d Mon Sep 17 00:00:00 2001
+From f0f4c9349e0a461743d90a28c5ff5897c4b66b32 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Thu, 8 Mar 2018 20:23:05 +0000
-Subject: [PATCH 01/30] kmssink: Add 24bit RGB support
+Subject: [PATCH 01/48] kmssink: Add 24bit RGB support
 
 https://bugzilla.gnome.org/show_bug.cgi?id=794186
 ---
@@ -40,5 +40,5 @@ index 838cddd38..90311f3fa 100644
        bpp = 32;
        break;
 -- 
-2.11.0
+2.20.1
 

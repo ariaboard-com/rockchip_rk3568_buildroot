@@ -1,7 +1,7 @@
-From d3a962eed3fe2ebb3de51452f111c47cf3ba412f Mon Sep 17 00:00:00 2001
+From 8a7e02cb8a957ea54460fc35d1f8532645521e52 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Mon, 27 Aug 2018 15:07:47 -0400
-Subject: [PATCH 06/30] kmssink: Generalize setting DRM object properties
+Subject: [PATCH 06/48] kmssink: Generalize setting DRM object properties
 
 https://bugzilla.gnome.org/show_bug.cgi?id=797027
 ---
@@ -27,7 +27,7 @@ index 075efc9bb..041eda500 100644
  {
    SetPropsIter *iter = user_data;
    GstKMSSink *self = iter->self;
-@@ -613,19 +616,34 @@ set_connector_prop (GQuark field_id, const GValue * value, gpointer user_data)
+@@ -613,18 +616,33 @@ set_connector_prop (GQuark field_id, const GValue * value, gpointer user_data)
      return TRUE;
    }
  
@@ -48,7 +48,7 @@ index 075efc9bb..041eda500 100644
    return TRUE;
  }
  
- static void
++static void
 +gst_kms_sink_update_properties (SetPropsIter * iter, GstStructure * props)
 +{
 +  GstKMSSink *self = iter->self;
@@ -61,10 +61,9 @@ index 075efc9bb..041eda500 100644
 +  drmModeFreeObjectProperties (iter->properties);
 +}
 +
-+static void
+ static void
  gst_kms_sink_update_connector_properties (GstKMSSink * self)
  {
-   SetPropsIter iter;
 @@ -634,13 +652,14 @@ gst_kms_sink_update_connector_properties (GstKMSSink * self)
      return;
  
@@ -86,5 +85,5 @@ index 075efc9bb..041eda500 100644
  
  static gboolean
 -- 
-2.11.0
+2.20.1
 

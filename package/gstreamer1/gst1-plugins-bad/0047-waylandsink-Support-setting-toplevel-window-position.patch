@@ -1,7 +1,7 @@
-From 15ee5178f3ee5e4d4a51a94b2ab84f411b33276c Mon Sep 17 00:00:00 2001
+From 68d1f424f5ef9844b2347a1ddd386359ce57910c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Mon, 27 May 2019 16:04:24 +0800
-Subject: [PATCH 32/32] waylandsink: Support setting toplevel window position
+Date: Mon, 15 Jun 2020 10:11:42 +0800
+Subject: [PATCH 47/48] waylandsink: Support setting toplevel window position
 
 Needs hacked wayland server, tested with:
 	waylandsink render-rectangle="<100,200,300,400>"
@@ -11,12 +11,12 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  ext/wayland/gstwaylandsink.c | 32 ++++++++++++++++++++------------
  ext/wayland/gstwaylandsink.h |  2 ++
  ext/wayland/wldisplay.h      |  2 +-
- ext/wayland/wlwindow.c       | 30 +++++++++++++++++++++++-------
+ ext/wayland/wlwindow.c       | 29 +++++++++++++++++++++++------
  ext/wayland/wlwindow.h       |  5 +++--
- 5 files changed, 49 insertions(+), 22 deletions(-)
+ 5 files changed, 49 insertions(+), 21 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 0f9bcf5..eef52d6 100644
+index c6c8327a2..3488db9c9 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -62,7 +62,8 @@ enum
@@ -58,7 +58,7 @@ index 0f9bcf5..eef52d6 100644
        g_signal_connect_object (sink->window, "closed",
            G_CALLBACK (on_window_closed), sink, 0);
      }
-@@ -965,16 +970,19 @@ gst_wayland_sink_set_render_rectangle (GstVideoOverlay * overlay,
+@@ -970,16 +975,19 @@ gst_wayland_sink_set_render_rectangle (GstVideoOverlay * overlay,
    g_return_if_fail (sink != NULL);
  
    g_mutex_lock (&sink->render_lock);
@@ -88,10 +88,10 @@ index 0f9bcf5..eef52d6 100644
    g_mutex_unlock (&sink->render_lock);
  }
 diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
-index 31d4644..e59610b 100644
+index f63e8b8fe..bcaadafbc 100644
 --- a/ext/wayland/gstwaylandsink.h
 +++ b/ext/wayland/gstwaylandsink.h
-@@ -68,6 +68,8 @@ struct _GstWaylandSink
+@@ -69,6 +69,8 @@ struct _GstWaylandSink
    gboolean redraw_pending;
    GMutex render_lock;
    GstBuffer *last_buffer;
@@ -101,7 +101,7 @@ index 31d4644..e59610b 100644
  
  struct _GstWaylandSinkClass
 diff --git a/ext/wayland/wldisplay.h b/ext/wayland/wldisplay.h
-index 7d9881f..04af1d4 100644
+index 7d9881f53..04af1d4d2 100644
 --- a/ext/wayland/wldisplay.h
 +++ b/ext/wayland/wldisplay.h
 @@ -55,8 +55,8 @@ struct _GstWlDisplay
@@ -115,7 +115,7 @@ index 7d9881f..04af1d4 100644
    struct wp_viewporter *viewporter;
    struct zwp_linux_dmabuf_v1 *dmabuf;
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index 011ac9e..2f7708d 100644
+index dd8d37d1c..f6bebf84e 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -78,7 +78,7 @@ handle_xdg_toplevel_configure (void *data,
@@ -136,7 +136,7 @@ index 011ac9e..2f7708d 100644
  }
  
  static void
-@@ -253,7 +253,8 @@ gst_wl_window_ensure_fullscreen (GstWlWindow * window, gboolean fullscreen)
+@@ -259,7 +259,8 @@ gst_wl_window_ensure_fullscreen (GstWlWindow * window, gboolean fullscreen)
  
  GstWlWindow *
  gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
@@ -145,13 +145,15 @@ index 011ac9e..2f7708d 100644
 +    GstVideoRectangle * render_rectangle)
  {
    GstWlWindow *window;
-   gint width;
-@@ -314,10 +315,21 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
-     goto error;
-   }
  
--  /* set the initial size to be the same as the reported video size */
--  width =
+@@ -321,11 +322,23 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
+ 
+   /* render_rectangle is already set via toplevel_configure in
+    * fullscreen mode */
+-  if (!fullscreen) {
++  if (fullscreen)
++    return window;
++
 +  if (render_rectangle->w || render_rectangle->h) {
 +    /* apply cached position and size */
 +    GST_DEBUG ("Applying window position (%d, %d)",
@@ -161,17 +163,16 @@ index 011ac9e..2f7708d 100644
 +                                        render_rectangle->w,
 +                                        render_rectangle->h, TRUE);
 +  } else {
-+    /* set the initial size to be the same as the reported video size */
-+    width =
-       gst_util_uint64_scale_int_round (info->width, info->par_n, info->par_d);
--  gst_wl_window_set_render_rectangle (window, 0, 0, width, info->height);
+     /* set the initial size to be the same as the reported video size */
+     gint width =
+         gst_util_uint64_scale_int_round (info->width, info->par_n, info->par_d);
+-    gst_wl_window_set_render_rectangle (window, 0, 0, width, info->height);
 +    gst_wl_window_set_render_rectangle (window, 0, 0,
 +                                        width, info->height, FALSE);
-+  }
+   }
  
    return window;
- 
-@@ -526,7 +538,7 @@ gst_wl_window_update_borders (GstWlWindow * window)
+@@ -536,7 +549,7 @@ gst_wl_window_update_borders (GstWlWindow * window)
  
  void
  gst_wl_window_set_render_rectangle (GstWlWindow * window, gint x, gint y,
@@ -180,7 +181,7 @@ index 011ac9e..2f7708d 100644
  {
    g_return_if_fail (window != NULL);
  
-@@ -535,6 +547,10 @@ gst_wl_window_set_render_rectangle (GstWlWindow * window, gint x, gint y,
+@@ -545,6 +558,10 @@ gst_wl_window_set_render_rectangle (GstWlWindow * window, gint x, gint y,
    window->render_rectangle.w = w;
    window->render_rectangle.h = h;
  
@@ -192,7 +193,7 @@ index 011ac9e..2f7708d 100644
    if (window->area_subsurface)
      wl_subsurface_set_position (window->area_subsurface, x, y);
 diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
-index 7f31a54..4938cea 100644
+index 7f31a549a..4938cea11 100644
 --- a/ext/wayland/wlwindow.h
 +++ b/ext/wayland/wlwindow.h
 @@ -84,7 +84,8 @@ GType gst_wl_window_get_type (void);
@@ -215,5 +216,5 @@ index 7f31a54..4938cea 100644
  G_END_DECLS
  
 -- 
-2.11.0
+2.20.1
 
