@@ -248,4 +248,5 @@ source "package/rockchip/smart_display_service/Config.in"
 source "package/rockchip/onvif_server/Config.in"
 source "package/rockchip/eptz_demo/Config.in"
 source "package/rockchip/rksl/Config.in"
+source "package/rockchip/pcba_adb_test/Config.in"
 endif
