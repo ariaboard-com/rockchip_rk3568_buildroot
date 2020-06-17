@@ -1,7 +1,7 @@
-From 70a61b48c36421be410645d21f6b07659c1918f4 Mon Sep 17 00:00:00 2001
+From 9126b3dc2e0f373a2fed4be4bc0c52643eea2f0d Mon Sep 17 00:00:00 2001
 From: Caesar Wang <wxt@rock-chips.com>
 Date: Tue, 3 Jul 2018 10:54:03 +0800
-Subject: [PATCH 08/15] qt5base: fix QT eglfs display bug
+Subject: [PATCH 08/18] qt5base: fix QT eglfs display bug
 
 The app occur Segmentation fault when it exit and click screen
 
@@ -11,7 +11,7 @@ Signed-off-by: Caesar Wang <wxt@rock-chips.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/src/gui/kernel/qscreen.cpp b/src/gui/kernel/qscreen.cpp
-index ad128a88..166c1297 100644
+index ad128a88e..166c12974 100644
 --- a/src/gui/kernel/qscreen.cpp
 +++ b/src/gui/kernel/qscreen.cpp
 @@ -385,6 +385,9 @@ QSize QScreen::availableSize() const

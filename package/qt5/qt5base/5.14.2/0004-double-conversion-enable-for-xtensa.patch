@@ -1,7 +1,7 @@
-From f423f160b984c47d831b10447af046bfbd6a3ba1 Mon Sep 17 00:00:00 2001
+From 27a45573ab609d4d9a735493df7d2d6ceb29c567 Mon Sep 17 00:00:00 2001
 From: Peter Seiderer <ps.report@gmx.net>
 Date: Tue, 10 Mar 2020 09:01:31 +0100
-Subject: [PATCH] double-conversion: enable for xtensa
+Subject: [PATCH 04/18] double-conversion: enable for xtensa
 
 [Upstream: https://github.com/google/double-conversion/commit/a54561be5588ac9b16d3c20760b9b554168bb8aa]
 Signed-off-by: Peter Seiderer <ps.report@gmx.net>
@@ -12,7 +12,7 @@ Signed-off-by: Peter Seiderer <ps.report@gmx.net>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/3rdparty/double-conversion/include/double-conversion/utils.h b/src/3rdparty/double-conversion/include/double-conversion/utils.h
-index 89ab1a31..001ce55f 100644
+index 89ab1a310..001ce55ff 100644
 --- a/src/3rdparty/double-conversion/include/double-conversion/utils.h
 +++ b/src/3rdparty/double-conversion/include/double-conversion/utils.h
 @@ -103,7 +103,7 @@ int main(int argc, char** argv) {
@@ -25,5 +25,5 @@ index 89ab1a31..001ce55f 100644
  #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
  #elif defined(__mc68000__) || \
 -- 
-2.26.0
+2.20.1
 

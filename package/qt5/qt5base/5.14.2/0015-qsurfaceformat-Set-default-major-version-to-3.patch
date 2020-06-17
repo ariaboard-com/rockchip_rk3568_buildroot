@@ -1,7 +1,7 @@
-From 88b96e22fa61c61f3a15158deb8dcac3c6725599 Mon Sep 17 00:00:00 2001
+From 0908bd5bf2909beaee6174a082396535015ee739 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 1 Apr 2020 14:13:03 +0800
-Subject: [PATCH 15/15] qsurfaceformat: Set default major version to 3
+Subject: [PATCH 15/18] qsurfaceformat: Set default major version to 3
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/gui/kernel/qsurfaceformat.cpp b/src/gui/kernel/qsurfaceformat.cpp
-index 23888622..b92b2696 100644
+index 238886220..b92b26961 100644
 --- a/src/gui/kernel/qsurfaceformat.cpp
 +++ b/src/gui/kernel/qsurfaceformat.cpp
 @@ -70,7 +70,7 @@ public:

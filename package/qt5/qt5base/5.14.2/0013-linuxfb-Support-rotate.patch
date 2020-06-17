@@ -1,7 +1,7 @@
-From 201a4588df0a0cee9bb56dcc126b77d2df7c34d5 Mon Sep 17 00:00:00 2001
+From d06b5adcb91f4d411f55c292a0c6941bdfddcf63 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 29 Apr 2019 12:11:42 +0800
-Subject: [PATCH 13/15] linuxfb: Support rotate
+Subject: [PATCH 13/18] linuxfb: Support rotate
 
 Base on:
 https://borkedlabs.com/blog/2015/06-01-qt5-linuxfb-rotation-for-lcds/
@@ -22,7 +22,7 @@ Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
  4 files changed, 62 insertions(+), 8 deletions(-)
 
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
-index 29d146f4..0c4f6d2c 100644
+index 29d146f47..0c4f6d2cd 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 @@ -49,6 +49,7 @@
@@ -89,7 +89,7 @@ index 29d146f4..0c4f6d2c 100644
  
      output->dirty[output->backFb] = QRegion();
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.h b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.h
-index 50a95767..4065392d 100644
+index 50a957679..4065392d8 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.h
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.h
 @@ -61,6 +61,8 @@ public:
@@ -102,7 +102,7 @@ index 50a95767..4065392d 100644
  
  QT_END_NAMESPACE
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbscreen.cpp b/src/plugins/platforms/linuxfb/qlinuxfbscreen.cpp
-index cb8962d4..40381fcb 100644
+index cb8962d4b..40381fcb2 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbscreen.cpp
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbscreen.cpp
 @@ -287,7 +287,7 @@ static void blankScreen(int fd, bool on)
@@ -188,7 +188,7 @@ index cb8962d4..40381fcb 100644
  }
  
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbscreen.h b/src/plugins/platforms/linuxfb/qlinuxfbscreen.h
-index c7ce455e..70ea02fa 100644
+index c7ce455e6..70ea02fae 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbscreen.h
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbscreen.h
 @@ -75,6 +75,8 @@ private:
