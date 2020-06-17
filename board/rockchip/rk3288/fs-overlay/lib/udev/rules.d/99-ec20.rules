@@ -1,0 +1,17 @@
+ACTION=="add|change", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", GOTO="dongle_usb_rules"
+GOTO="dongle_rules_end"
+
+LABEL="dongle_usb_rules"
+
+ENV{ID_VENDOR_ID}=="2c7c", ENV{ID_MODEL_ID}=="0125", GOTO="quectel_dialing_start"
+ENV{ID_VENDOR_ID}=="2c7c", ENV{ID_MODEL_ID}=="0121", GOTO="quectel_dialing_start"
+ENV{ID_VENDOR_ID}=="05c6", ENV{ID_MODEL_ID}=="9215", GOTO="quectel_dialing_start"
+ENV{ID_VENDOR_ID}=="05c6", ENV{ID_MODEL_ID}=="9090", GOTO="quectel_dialing_start"
+ENV{ID_VENDOR_ID}=="05c6", ENV{ID_MODEL_ID}=="9003", GOTO="quectel_dialing_start"
+
+LABEL="quectel_dialing_start"
+
+RUN+="/usr/bin/ec20.sh"
+GOTO="dongle_rules_end"
+
+LABEL="dongle_rules_end"
