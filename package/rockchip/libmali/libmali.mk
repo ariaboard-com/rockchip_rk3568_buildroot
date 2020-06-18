@@ -46,8 +46,8 @@ LIBMALI_LIBS = libmali-utgard-400-r7p0-r1p1$(LIBMALI_SUFFIX).so
 else ifneq ($(BR2_PACKAGE_RK3036)$(BR2_PACKAGE_RK3032),)
 LIBMALI_LIBS = libmali-utgard-400-r7p0$(LIBMALI_SUFFIX).so
 else ifeq ($(BR2_PACKAGE_RK3288),y)
-LIBMALI_LIBS = libmali-midgard-t76x-r14p0-r0p0$(LIBMALI_SUFFIX).so \
-	       libmali-midgard-t76x-r14p0-r1p0$(LIBMALI_SUFFIX).so
+LIBMALI_LIBS = libmali-midgard-t76x-r18p0-r0p0$(LIBMALI_SUFFIX).so \
+	       libmali-midgard-t76x-r18p0-r1p0$(LIBMALI_SUFFIX).so
 
 define LIBMALI_INSTALL_3288_HOOKS
 	$(INSTALL) -D -m 755 $(@D)/overlay/S10libmali_rk3288 $(1)/etc/init.d/S10libmali
@@ -55,7 +55,7 @@ endef
 LIBMALI_POST_INSTALL_HOOKS += LIBMALI_INSTALL_3288_HOOKS
 
 else ifneq ($(BR2_PACKAGE_RK3399)$(BR2_PACKAGE_RK3399PRO),)
-LIBMALI_LIBS = libmali-midgard-t86x-r14p0$(LIBMALI_SUFFIX).so
+LIBMALI_LIBS = libmali-midgard-t86x-r18p0$(LIBMALI_SUFFIX).so
 else ifeq ($(BR2_PACKAGE_RK3328),y)
 LIBMALI_LIBS = libmali-utgard-450-r7p0-r0p0$(LIBMALI_SUFFIX).so
 endif
