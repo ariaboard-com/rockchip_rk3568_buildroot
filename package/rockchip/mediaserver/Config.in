@@ -22,6 +22,18 @@ config BR2_PACKAGE_MEDIASERVER_SANITIZER_STATIC
 	help
 	  Enable mediaserver debug on sanitizer with static linker.
 
+config BR2_PACKAGE_MEDIASERVE_BIN
+        bool "Enable mediaserver bin"
+        default y
+        help
+          rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_LIB_EXAMPLE
+        bool "Enable mediaserver lib example"
+        default y if !BR2_PACKAGE_MEDIASERVE_BIN
+        help
+          rockchip mediaserver options
+
 config BR2_PACKAGE_MEDIASERVE_CONIFG
 	string "mediaserver config"
 	default "none"
