@@ -17,4 +17,8 @@ config BR2_PACKAGE_STORAGE_MANAGER_SANITIZER_STATIC
 	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable storage manager debug on sanitizer with static linker.
+
+config BR2_PACKAGE_STORAGE_MANAGER_FILE_LOAD_DELAY
+	int "file load delay, us"
+	default 0
 endif
