@@ -1,0 +1,26 @@
+From 3e273ed247cccee5d54452bff81806176424e726 Mon Sep 17 00:00:00 2001
+From: Lin Huang <hl@rock-chips.com>
+Date: Fri, 19 Jun 2020 17:24:12 +0800
+Subject: [PATCH] fix compile error
+
+Signed-off-by: Lin Huang <hl@rock-chips.com>
+---
+ src/platformsupport/fbconvenience/qfbscreen.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/platformsupport/fbconvenience/qfbscreen.cpp b/src/platformsupport/fbconvenience/qfbscreen.cpp
+index f2410fc..5089dd6 100644
+--- a/src/platformsupport/fbconvenience/qfbscreen.cpp
++++ b/src/platformsupport/fbconvenience/qfbscreen.cpp
+@@ -57,7 +57,7 @@ QFbScreen::QFbScreen()
+       mDepth(16),
+       mFormat(QImage::Format_RGB16),
+       mPainter(nullptr),
+-      mDirectPainting(false);
++      mDirectPainting(false)
+ {
+ }
+ 
+-- 
+2.7.4
+
