@@ -35,6 +35,15 @@ config BR2_PACKAGE_MEDIASERVE_CONIFG
 	string "mediaserver config"
 	default "none"
 
+config BR2_PACKAGE_MEDIASERVE_DBUS
+	bool "Enable dbus server"
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_DBUS_CPP
+	select BR2_PACKAGE_LIBRKDB
+	default y
+	help
+	  rockchip mediaserver options
+
 config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	bool "Enable link api features"
 	select BR2_PACKAGE_CJSON
