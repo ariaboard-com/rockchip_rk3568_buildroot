@@ -25,6 +25,12 @@ endif
 ifeq (y,$(BR2_TOOLCHAIN_EXTERNAL_HEADERS_4_19))
 FIRMWARE_DIR = "vendor"
 SXLOAD_WIFI = "S36load_rv1109_wifi_modules"
+RK_WIFI_CHIP_NAME1 = AP6256
+RK_WIFI_CHIP_NAME2 = AP6255
+endif
+
+ifeq (y,$(BR2_PACKAGE_RKWIFIBT_COMPATIBLE))
+SXLOAD_WIFI = "S36load_ampakall_wifi_modules"
 endif
 
 define RKWIFIBT_INSTALL_COMMON
@@ -32,6 +38,7 @@ define RKWIFIBT_INSTALL_COMMON
     $(INSTALL) -D -m 0755 $(@D)/wpa_supplicant.conf $(TARGET_DIR)/etc/
     $(INSTALL) -D -m 0755 $(@D)/dnsmasq.conf $(TARGET_DIR)/etc/
     $(INSTALL) -D -m 0755 $(@D)/wifi_start.sh $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(@D)/wifi_ap6xxx_rftest.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/src/rk_wifi_init $(TARGET_DIR)/usr/bin/
 endef
 
@@ -39,6 +46,8 @@ define RKWIFIBT_BROADCOM_INSTALL
     $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/$(SXLOAD_WIFI)
     $(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
+    -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(RK_WIFI_CHIP_NAME1)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
+    -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(RK_WIFI_CHIP_NAME2)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
@@ -75,7 +84,7 @@ define RKWIFIBT_BUILD_CMDS
     mkdir -p $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
     -$(TOPDIR)/../build.sh modules
     find $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/* -name $(BR2_PACKAGE_RKWIFIBT_WIFI_KO) | xargs -n1 -i cp {} $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
-    $(TARGET_STRIP) $(STRIP_STRIP_DEBUG) $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/*.ko
+    -$(TARGET_STRIP) $(STRIP_STRIP_DEBUG) $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/*.ko
     $(TARGET_CC) -o $(@D)/brcm_tools/brcm_patchram_plus1 $(@D)/brcm_tools/brcm_patchram_plus1.c
     $(TARGET_CC) -o $(@D)/brcm_tools/dhd_priv $(@D)/brcm_tools/dhd_priv.c
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
