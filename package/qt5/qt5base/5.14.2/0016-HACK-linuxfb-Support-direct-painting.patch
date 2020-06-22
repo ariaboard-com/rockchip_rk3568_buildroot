@@ -113,7 +113,7 @@ index c42fd879f..dedff7265 100644
        mFormat(QImage::Format_RGB16),
 -      mPainter(nullptr)
 +      mPainter(nullptr),
-+      mDirectPainting(false);
++      mDirectPainting(false)
  {
  }
  
