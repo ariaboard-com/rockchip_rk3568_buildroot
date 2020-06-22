@@ -54,20 +54,13 @@ MINIGUI_CONF_OPTS = \
     --enable-mousecalibrate \
     --with-pic
 
-ifeq ($(BR2_PACKAGE_MINIGUI_SOFTWARE_SCALE),y)
-MINIGUI_CONF_ENV += CFLAGS+=" -DDRM_VOP_SCALE=0"
-MINIGUI_CONF_OPTS += --enable-pixman
-MINIGUI_DEPENDENCIES += pixman
-else
-MINIGUI_CONF_ENV += CFLAGS+=" -DDRM_VOP_SCALE=1"
-endif
-
 ifeq ($(BR2_PACKAGE_LIBDRM),y)
 MINIGUI_TARGET=drmcon
 MINIGUI_CONF_OPTS += \
     --enable-videodrmcon \
     --disable-videofbcon
 
+MINIGUI_DEPENDENCIES += pixman
 else
 MINIGUI_TARGET=fbcon
 MINIGUI_CONF_OPTS += \
