@@ -17,7 +17,7 @@
 #include "camera_gst.config"
 #include "qt.config"
 #include "qt_app.config"
-BR2_ROOTFS_OVERLAY="board/rockchip/rk1808/fs-overlay-64/ board/rockchip/common/qt"
+BR2_ROOTFS_OVERLAY="board/rockchip/rk1808/fs-overlay-64/ board/rockchip/common/qt board/rockchip/common/firefly"
 BR2_TARGET_GENERIC_HOSTNAME="rk1808"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK1808 Buildroot"
 BR2_PACKAGE_MULTIVIDEOPLAYER=n
