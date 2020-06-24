@@ -1,2 +1,0 @@
-#!/bin/sh
-alsactl restore 1 -f /var/lib/alsa/asound.state
