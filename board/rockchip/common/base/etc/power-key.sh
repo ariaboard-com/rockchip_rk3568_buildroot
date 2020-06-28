@@ -34,8 +34,8 @@ long_press()
 {
 	logger "Power key long press (${TIMEOUT}s)..."
 
-	logger "Prepare to halt..."
-	halt
+	logger "Prepare to power off..."
+	poweroff
 }
 
 case "$EVENT" in
