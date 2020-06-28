@@ -2,14 +2,14 @@
 
 EVENT=${1:-short-press}
 
-logger "Received power key event: $@..."
+logger -t $(basename $0) "[$$]: Received power key event: $@..."
 
 TIMEOUT=3 # s
 PIDFILE="/tmp/$(basename $0).pid"
 
 short_press()
 {
-	logger "Power key short press..."
+	logger -t $(basename $0) "[$$]: Power key short press..."
 
 	if type pm-suspend &>/dev/null; then
 		LOCK=/var/run/pm-utils/locks/pm-suspend.lock
@@ -22,19 +22,20 @@ short_press()
 	fi
 
 	if [ ! -f $LOCK ]; then
-		logger "Prepare to suspend..."
+		logger -t $(basename $0) "[$$]: Prepare to suspend..."
 
-		$PRE_SUSPEND
-		$SUSPEND_CMD
-		$POST_SUSPEND
+		sh -c "$PRE_SUSPEND"
+		sh -c "$SUSPEND_CMD"
+		sh -c "$POST_SUSPEND"
 	fi
 }
 
 long_press()
 {
-	logger "Power key long press (${TIMEOUT}s)..."
+	logger -t $(basename $0) "[$$]: Power key long press (${TIMEOUT}s)..."
 
-	logger "Prepare to power off..."
+	logger -t $(basename $0) "[$$]: Prepare to power off..."
+
 	poweroff
 }
 
@@ -45,6 +46,9 @@ case "$EVENT" in
 			-c "sleep $TIMEOUT; $0 long-press"
 		;;
 	release)
+		# Avoid race with press event
+		sleep .2
+
 		start-stop-daemon -K -q -p $PIDFILE && short_press
 		;;
 	short-press)
