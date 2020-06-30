@@ -5,9 +5,10 @@ if [ ${ret} = 1 ]; then
 	sleep 1
 fi
 
-rfkill block bluetooth
-rfkill unblock bluetooth
-	
+echo 0 > /sys/class/rfkill/rfkill0/state
+sleep 1
+echo 1 > /sys/class/rfkill/rfkill0/state
+
 /usr/bin/rtk_hciattach -n -s 115200 /dev/ttyS2 rtk_h5 1500000 noflow &
 
 usr/libexec/bluetooth/bluetoothd --compat -n &
