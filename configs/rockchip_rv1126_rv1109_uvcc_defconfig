@@ -1,13 +1,9 @@
 #include "base.config"
-#include "base_extra.config"
-#include "debug.config"
-#include "network.config"
 #include "video_mpp.config"
 #include "rv1126_rv1109_arm.config"
-BR2_TARGET_TZ_INFO=y
-BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-sysv/"
-#BR2_PACKAGE_GDB=y
-#BR2_PACKAGE_GDB_DEBUGGER=y
+BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-uvc/"
+BR2_PACKAGE_GDB=y
+BR2_PACKAGE_GDB_DEBUGGER=y
 BR2_PACKAGE_RKMEDIA_MPP=y
 BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE=y
 BR2_PACKAGE_RKMEDIA_RKRGA=y
@@ -28,9 +24,15 @@ BR2_PACKAGE_UVC_APP=y
 BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER=y
 BR2_PACKAGE_SMART_DISPLAY_SERVICE=y
 BR2_PACKAGE_ROCKX=y
-BR2_PACKAGE_CONNMAN=y
-BR2_PACKAGE_CONNMAN_LOOPBACK=y
-BR2_PACKAGE_CONNMAN_CLIENT=y
 BR2_PACKAGE_CALLFUNIPC=y
 BR2_PACKAGE_ISP2_IPC=y
-
+#  - we have to use eudev, because need udev support
+BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV=y
+#  - we need to use fsck and resize2fs to check and extend ext2/4 file system when the first time system boot up
+BR2_PACKAGE_E2FSPROGS=y
+BR2_PACKAGE_E2FSPROGS_FSCK=y
+BR2_PACKAGE_E2FSPROGS_RESIZE2FS=y
+#  - usb device package used to init and config udc like adb and usb mass storage
+BR2_PACKAGE_USBDEVICE=y
+#  - we need adb as the basic tool
+BR2_PACKAGE_ANDROID_TOOLS=y
