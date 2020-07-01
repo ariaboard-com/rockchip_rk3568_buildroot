@@ -117,6 +117,18 @@ config BR2_PACKAGE_RKMEDIA_ROCKFACE
     help
       wrapped function of rockface
 
+if BR2_PACKAGE_RKMEDIA_ROCKFACE
+
+config BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
+    bool "enable face recognize"
+    depends on BR2_PACKAGE_ROCKFACE_FACE_RECOGNITION
+    depends on BR2_PACKAGE_SQLITE
+    default y
+    help
+        enable rockface recognize
+
+endif # BR2_PACKAGE_RKMEDIA_ROCKFACE
+
 config BR2_PACKAGE_RKMEDIA_ROCKX
     bool "rockx"
     select BR2_PACKAGE_RKNPU
