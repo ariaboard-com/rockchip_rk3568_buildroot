@@ -17,5 +17,10 @@ ifeq ($(BR2_PACKAGE_ROCKX),y)
     UVC_APP_CONF_OPTS += "-DEPTZ_SUPPORT=ON" "-DROCKX_HEADER_DIR=$(STAGING_DIR)/usr/include/rockx"
 endif
 
+ifeq ($(BR2_PACKAGE_DBSERVER),y)
+    UVC_APP_DEPENDENCIES += libIPCProtocol
+    UVC_APP_CONF_OPTS += "-DDBSERVER_SUPPORT=ON" "-DLIBIPCPROTOCOL_HEADER_DIR=$(STAGING_DIR)/usr/include/libIPCProtocol"
+endif
+
     $(eval $(cmake-package))
 endif
