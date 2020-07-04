@@ -91,4 +91,11 @@ config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_SCHEDULES_MANAGER
+        bool "Enable schedules manager"
+        depends on BR2_PACKAGE_MEDIASERVE_DBUS
+        default y if BR2_PACKAGE_MEDIASERVE_DBUS
+        help
+          rockchip mediaserver options
+
 endif
