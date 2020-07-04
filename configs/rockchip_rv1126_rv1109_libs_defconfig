@@ -1,6 +1,9 @@
 #include "audio.config"
 #include "video_mpp.config"
 #include "rv1126_rv1109_arm.config"
+BR2_INIT_NONE=y
+BR2_SYSTEM_BIN_SH_NONE=y
+# BR2_PACKAGE_BUSYBOX is not set
 BR2_PACKAGE_ROCKCHIP=y
 BR2_PACKAGE_RKMEDIA_MPP=y
 BR2_PACKAGE_RKMEDIA_MPP_ENCODER_OSD=y
