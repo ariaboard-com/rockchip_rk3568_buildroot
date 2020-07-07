@@ -38,7 +38,7 @@ Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
  5 files changed, 37 insertions(+), 6 deletions(-)
 
 diff --git a/src/client/qwaylanddatadevice.cpp b/src/client/qwaylanddatadevice.cpp
-index 33068c5..4bfc99e 100644
+index 33068c5e..4bfc99e4 100644
 --- a/src/client/qwaylanddatadevice.cpp
 +++ b/src/client/qwaylanddatadevice.cpp
 @@ -156,9 +156,13 @@ void QWaylandDataDevice::data_device_drop()
@@ -58,7 +58,7 @@ index 33068c5..4bfc99e 100644
      QMimeData *dragData = Q_NULLPTR;
      Qt::DropActions supportedActions;
 diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
-index 4def0de..0353c3f 100644
+index 4def0de8..0353c3f4 100644
 --- a/src/client/qwaylandinputdevice.cpp
 +++ b/src/client/qwaylandinputdevice.cpp
 @@ -445,6 +445,9 @@ void QWaylandInputDevice::Pointer::pointer_enter(uint32_t serial, struct wl_surf
@@ -98,7 +98,7 @@ index 4def0de..0353c3f 100644
      mParent->handleTouchPoint(id, wl_fixed_to_double(x), wl_fixed_to_double(y), Qt::TouchPointPressed);
  }
 diff --git a/src/client/qwaylandqtkey.cpp b/src/client/qwaylandqtkey.cpp
-index ce0d212..269f1ed 100644
+index ce0d2124..269f1edb 100644
 --- a/src/client/qwaylandqtkey.cpp
 +++ b/src/client/qwaylandqtkey.cpp
 @@ -70,7 +70,11 @@ void QWaylandQtKeyExtension::key_extension_qtkey(struct wl_surface *surface,
@@ -115,7 +115,7 @@ index ce0d212..269f1ed 100644
      if (!win || !win->window()) {
          qWarning("qt_key_extension: handle_qtkey: No keyboard focus");
 diff --git a/src/client/qwaylandscreen.cpp b/src/client/qwaylandscreen.cpp
-index 334e0ec..1c4b985 100644
+index 334e0ec4..1c4b985c 100644
 --- a/src/client/qwaylandscreen.cpp
 +++ b/src/client/qwaylandscreen.cpp
 @@ -177,8 +177,9 @@ QWaylandScreen * QWaylandScreen::waylandScreenFromWindow(QWindow *window)
@@ -131,7 +131,7 @@ index 334e0ec..1c4b985 100644
  
  void QWaylandScreen::output_mode(uint32_t flags, int width, int height, int refresh)
 diff --git a/src/qtwaylandscanner/qtwaylandscanner.cpp b/src/qtwaylandscanner/qtwaylandscanner.cpp
-index 01dfa92..6ef535b 100644
+index 01dfa921..6ef535b1 100644
 --- a/src/qtwaylandscanner/qtwaylandscanner.cpp
 +++ b/src/qtwaylandscanner/qtwaylandscanner.cpp
 @@ -891,6 +891,7 @@ void process(QXmlStreamReader &xml, const QByteArray &headerPath, const QByteArr

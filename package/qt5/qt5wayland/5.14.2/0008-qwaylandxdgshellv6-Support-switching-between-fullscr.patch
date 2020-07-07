@@ -1,4 +1,4 @@
-From 51783d142a78fc895ce6175a7d8cb0f259db5ac3 Mon Sep 17 00:00:00 2001
+From 77791133a03e2b0fa25b14b460757a96eb561647 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
 Subject: [PATCH 08/10] qwaylandxdgshellv6: Support switching between

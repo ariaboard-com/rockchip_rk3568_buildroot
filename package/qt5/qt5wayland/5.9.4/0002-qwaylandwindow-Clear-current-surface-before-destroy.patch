@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 308f386..93bd7e7 100644
+index 308f3864..93bd7e71 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -247,8 +247,16 @@ void QWaylandWindow::reset()

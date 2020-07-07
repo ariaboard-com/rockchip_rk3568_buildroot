@@ -1,7 +1,7 @@
-From 86220437895915503dff3f7025001505c16dec19 Mon Sep 17 00:00:00 2001
+From 448a089d9dcc2dccd5adc58393706e3113a3d2b2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 24 Dec 2018 15:40:56 +0800
-Subject: [PATCH 07/12] gsttools: videowidget: Provide widget window id for
+Subject: [PATCH 09/14] gsttools: videowidget: Provide widget window id for
  video window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
-index 684fa24..ea37f18 100644
+index be7933e..2f5b249 100644
 --- a/src/gsttools/qgstreamervideowidget.cpp
 +++ b/src/gsttools/qgstreamervideowidget.cpp
 @@ -43,10 +43,11 @@
@@ -27,7 +27,7 @@ index 684fa24..ea37f18 100644
  public:
      QGstreamerVideoWidget(QGstreamerVideoOverlay *overlay, QWidget *parent = 0)
 @@ -85,6 +86,12 @@ public:
-         painter.fillRect(rect(), palette().window());
+         painter.fillRect(rect(), palette().background());
      }
  
 +    WId videoWinId() const Q_DECL_OVERRIDE {
@@ -39,7 +39,7 @@ index 684fa24..ea37f18 100644
  protected:
      void paintEvent(QPaintEvent *) override
      {
-@@ -131,7 +138,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
+@@ -135,7 +142,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
      m_widget = new QGstreamerVideoWidget(&m_videoOverlay);
  
      m_widget->installEventFilter(this);
@@ -48,7 +48,7 @@ index 684fa24..ea37f18 100644
  }
  
  GstElement *QGstreamerVideoWidgetControl::videoSink()
-@@ -146,6 +153,10 @@ void QGstreamerVideoWidgetControl::setVideoSink(GstElement *sink)
+@@ -150,6 +157,10 @@ void QGstreamerVideoWidgetControl::setVideoSink(GstElement *sink)
  
  void QGstreamerVideoWidgetControl::onOverlayActiveChanged()
  {
@@ -59,7 +59,7 @@ index 684fa24..ea37f18 100644
      updateWidgetAttributes();
  }
  
-@@ -171,7 +182,7 @@ bool QGstreamerVideoWidgetControl::eventFilter(QObject *object, QEvent *e)
+@@ -175,7 +186,7 @@ bool QGstreamerVideoWidgetControl::eventFilter(QObject *object, QEvent *e)
  {
      if (m_widget && object == m_widget) {
          if (e->type() == QEvent::ParentChange || e->type() == QEvent::Show || e->type() == QEvent::WinIdChange) {

@@ -1,4 +1,4 @@
-From b0ff76694e62d1428631cfa1433ed0a42b74f6c4 Mon Sep 17 00:00:00 2001
+From 276ae9b38d90b98a5a705efd2fb896b67e20fff4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 15 Jun 2020 16:48:42 +0800
 Subject: [PATCH 10/10] Revert "Use a dedicated EGLContext for the decorations
@@ -10,10 +10,24 @@ Somehow mali doesn't work well with this.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
+ src/client/qwaylandwindow.cpp                 |   2 +-
  .../client/wayland-egl/qwaylandglcontext.cpp  | 203 +++++++++++++-----
  .../client/wayland-egl/qwaylandglcontext.h    |   4 +-
- 2 files changed, 148 insertions(+), 59 deletions(-)
+ 3 files changed, 149 insertions(+), 60 deletions(-)
 
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 59b95691..c6e88d51 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -1044,7 +1044,7 @@ void QWaylandWindow::requestActivateWindow()
+     }
+ 
+     // HACK: Set window activate through app id
+-    mShellSurface->setAppId("requests=activate");
++    mShellSurface->setAppId(QLatin1String("requests=activate"));
+ }
+ 
+ bool QWaylandWindow::isExposed() const
 diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp
 index 7679a5fb..2f6040ee 100644
 --- a/src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp

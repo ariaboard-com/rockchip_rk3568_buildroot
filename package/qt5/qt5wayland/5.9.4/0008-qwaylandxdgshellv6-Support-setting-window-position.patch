@@ -23,7 +23,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  3 files changed, 31 insertions(+), 3 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index ef465d1..3db9a3c 100644
+index ef465d1b..3db9a3ce 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -347,8 +347,6 @@ void QWaylandWindow::setGeometry(const QRect &rect)
@@ -45,7 +45,7 @@ index ef465d1..3db9a3c 100644
      int x = 0;
      int y = 0;
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index ac97453..3a84b5d 100644
+index ac974536..3a84b5d7 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -72,6 +72,26 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
@@ -98,7 +98,7 @@ index ac97453..3a84b5d 100644
      ack_configure(serial);
  
 diff --git a/src/client/qwaylandxdgshellv6_p.h b/src/client/qwaylandxdgshellv6_p.h
-index fbcaafd..6016580 100644
+index fbcaafda..6016580c 100644
 --- a/src/client/qwaylandxdgshellv6_p.h
 +++ b/src/client/qwaylandxdgshellv6_p.h
 @@ -102,6 +102,7 @@ private:

@@ -1,7 +1,7 @@
-From 2b67a975b25d5a7ef779bd247ab8deb212064f59 Mon Sep 17 00:00:00 2001
+From cece520a09571cba8f5841bafe9344b27139b368 Mon Sep 17 00:00:00 2001
 From: Ziyuan Xu <xzy.xu@rock-chips.com>
 Date: Fri, 12 Jul 2019 17:02:45 +0800
-Subject: [PATCH 01/12] GStreamer: change playbin to playbin3
+Subject: [PATCH 01/11] GStreamer: change playbin to playbin3
 
 Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---

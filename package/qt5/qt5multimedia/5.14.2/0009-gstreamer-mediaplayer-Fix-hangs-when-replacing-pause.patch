@@ -1,7 +1,7 @@
-From 8800884bc0f8c097cbf986c3ab1a2556bd3518ba Mon Sep 17 00:00:00 2001
+From b3976d68799017e3a64c56aff03b1951778c9b46 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 17:51:51 +0800
-Subject: [PATCH 3/4] gstreamer: mediaplayer: Fix hangs when replacing paused
+Subject: [PATCH 09/11] gstreamer: mediaplayer: Fix hangs when replacing paused
  video sink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -10,10 +10,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/src/gsttools/qgstreamerplayersession.cpp b/src/gsttools/qgstreamerplayersession.cpp
-index b967868..7d76982 100755
+index a2a7683..c4be0be 100755
 --- a/src/gsttools/qgstreamerplayersession.cpp
 +++ b/src/gsttools/qgstreamerplayersession.cpp
-@@ -747,6 +747,11 @@ void QGstreamerPlayerSession::setVideoRenderer(QObject *videoOutput)
+@@ -793,6 +793,11 @@ void QGstreamerPlayerSession::setVideoRenderer(QObject *videoOutput)
          //while the sink is paused. The pad will be blocked as soon as the current
          //buffer is processed.
          if (m_state == QMediaPlayer::PausedState) {
@@ -26,5 +26,5 @@ index b967868..7d76982 100755
              qDebug() << "Starting video output to avoid blocking in paused state...";
  #endif
 -- 
-2.11.0
+2.20.1
 

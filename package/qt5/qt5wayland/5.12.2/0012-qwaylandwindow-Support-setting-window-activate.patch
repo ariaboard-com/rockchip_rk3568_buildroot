@@ -1,4 +1,4 @@
-From badf78a628f066b8222be0d719c00a91d2ca58b7 Mon Sep 17 00:00:00 2001
+From 1e13bb9055bbfa30c377591c8835bcf4f06dace2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:28:29 +0800
 Subject: [PATCH 12/12] qwaylandwindow: Support setting window activate
@@ -12,10 +12,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 19e74ea..b707035 100644
+index 98fadb0..1c293ae 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -997,7 +997,13 @@ void QWaylandWindow::restoreMouseCursor(QWaylandInputDevice *device)
+@@ -995,7 +995,13 @@ void QWaylandWindow::restoreMouseCursor(QWaylandInputDevice *device)
  
  void QWaylandWindow::requestActivateWindow()
  {
@@ -26,7 +26,7 @@ index 19e74ea..b707035 100644
 +    }
 +
 +    // HACK: Set window activate through app id
-+    mShellSurface->setAppId("requests=activate");
++    mShellSurface->setAppId(QLatin1String("requests=activate"));
  }
  
  void QWaylandWindow::unfocus()

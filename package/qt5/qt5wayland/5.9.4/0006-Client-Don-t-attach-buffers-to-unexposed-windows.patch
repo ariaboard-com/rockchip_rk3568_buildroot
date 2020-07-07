@@ -47,7 +47,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 39 insertions(+), 7 deletions(-)
 
 diff --git a/src/client/qwaylandshmbackingstore.cpp b/src/client/qwaylandshmbackingstore.cpp
-index 045748a..760ccf6 100644
+index 045748a1..760ccf67 100644
 --- a/src/client/qwaylandshmbackingstore.cpp
 +++ b/src/client/qwaylandshmbackingstore.cpp
 @@ -218,8 +218,7 @@ void QWaylandShmBackingStore::flush(QWindow *window, const QRegion &region, cons
@@ -61,7 +61,7 @@ index 045748a..760ccf6 100644
  
  void QWaylandShmBackingStore::resize(const QSize &size, const QRegion &)
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 6e05348..20920f1 100644
+index 6e053483..20920f1d 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -265,6 +265,7 @@ void QWaylandWindow::reset()
@@ -106,7 +106,7 @@ index 6e05348..20920f1 100644
      const QVector<QRect> rects = damage.rects();
      for (const QRect &rect: rects)
 diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
-index 1d29119..dc63c20 100644
+index 1d29119f..dc63c20f 100644
 --- a/src/client/qwaylandwindow_p.h
 +++ b/src/client/qwaylandwindow_p.h
 @@ -131,6 +131,8 @@ public:
@@ -140,7 +140,7 @@ index 1d29119..dc63c20 100644
      static const wl_callback_listener callbackListener;
      static void frameCallback(void *data, struct wl_callback *wl_callback, uint32_t time);
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index 70da12c..ac97453 100644
+index 70da12cb..ac974536 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -200,9 +200,14 @@ void QWaylandXdgSurfaceV6::setType(Qt::WindowType type, QWaylandWindow *transien
@@ -182,7 +182,7 @@ index 70da12c..ac97453 100644
  
  void QWaylandXdgSurfaceV6::setMaximized()
 diff --git a/src/client/qwaylandxdgshellv6_p.h b/src/client/qwaylandxdgshellv6_p.h
-index 1acd8e0..fbcaafd 100644
+index 1acd8e01..fbcaafda 100644
 --- a/src/client/qwaylandxdgshellv6_p.h
 +++ b/src/client/qwaylandxdgshellv6_p.h
 @@ -84,6 +84,7 @@ public:

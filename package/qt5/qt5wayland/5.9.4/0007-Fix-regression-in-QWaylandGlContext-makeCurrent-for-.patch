@@ -41,7 +41,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  3 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
-index 35d8617..d81d5fa 100644
+index 35d86176..d81d5fa4 100644
 --- a/src/client/qwaylanddisplay_p.h
 +++ b/src/client/qwaylanddisplay_p.h
 @@ -57,6 +57,7 @@
@@ -62,7 +62,7 @@ index 35d8617..d81d5fa 100644
  class QWaylandBuffer;
  class QWaylandScreen;
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 20920f1..ef465d1 100644
+index 20920f1d..ef465d1b 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -467,10 +467,14 @@ void QWaylandWindow::configure(uint32_t edges, int32_t width, int32_t height)
@@ -81,7 +81,7 @@ index 20920f1..ef465d1 100644
  
  void QWaylandWindow::doResize()
 diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
-index 6b5c532..2a4ec33 100644
+index 6b5c5326..2a4ec332 100644
 --- a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
 +++ b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
 @@ -132,13 +132,16 @@ void QWaylandEglWindow::updateSurface(bool create)

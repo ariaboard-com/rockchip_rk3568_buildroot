@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 3db9a3c..aa372b4 100644
+index 3db9a3ce..aa372b47 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -331,7 +331,10 @@ void QWaylandWindow::setGeometry_helper(const QRect &rect)

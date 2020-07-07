@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h b/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
-index dde4303..f281498 100644
+index dde43038..f2814980 100644
 --- a/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
 +++ b/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
 @@ -58,6 +58,10 @@ public:

@@ -1,12 +1,12 @@
-From 7a0911a5fd25ec3f16c3fc82b53546ea597af46f Mon Sep 17 00:00:00 2001
+From 2fdca158a8ca9ec145ae9ac137914bbbaa556f9a Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Wed, 19 Jul 2017 17:59:44 +0800
-Subject: [PATCH] qt5multimedia: qmlvideo support assigned videosink
+Subject: [PATCH 01/12] qt5multimedia: qmlvideo support assigned videosink
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---
- src/qtmultimediaquicktools/qdeclarativevideooutput.cpp        |  2 +-
- src/qtmultimediaquicktools/qdeclarativevideooutput_window.cpp | 11 ++++++++---
+ .../qdeclarativevideooutput.cpp                       |  2 +-
+ .../qdeclarativevideooutput_window.cpp                | 11 ++++++++---
  2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp
@@ -45,5 +45,5 @@ index bae29e1..f24fcaa 100644
          break;
      default: break;
 -- 
-1.9.1
+2.20.1
 

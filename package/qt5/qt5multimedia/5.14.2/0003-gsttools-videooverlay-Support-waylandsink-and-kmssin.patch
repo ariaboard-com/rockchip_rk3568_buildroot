@@ -1,22 +1,16 @@
-From 57d55ee51db719ca81b165e39291d9bb0bc4fd26 Mon Sep 17 00:00:00 2001
+From 785408cc86a7e546fdaa4a4916ce8c5bd225ad83 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
-Subject: [PATCH 06/10] gsttools: videooverlay: Support waylandsink in the
- right way
-
-Conflicts:
-    src/gsttools/qgstreamervideooverlay.cpp
-    src/multimedia/gsttools_headers/qgstreamervideooverlay_p.h
+Subject: [PATCH 03/11] gsttools: videooverlay: Support waylandsink and kmssink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
-Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp            | 160 +++++++++++++++++----
- .../gsttools_headers/qgstreamervideooverlay_p.h    |   2 +
- 2 files changed, 138 insertions(+), 24 deletions(-)
+ src/gsttools/qgstreamervideooverlay.cpp | 151 ++++++++++++++++++++----
+ src/gsttools/qgstreamervideooverlay_p.h |   2 +
+ 2 files changed, 127 insertions(+), 26 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 1f3e285..599b104 100644
+index 6b862e4..1d0db34 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -40,7 +40,11 @@
@@ -39,13 +33,18 @@ index 1f3e285..599b104 100644
 +#include <wayland-client-protocol.h>
 +#endif
 +
+ #include <QtMultimedia/private/qtmultimediaglobal_p.h>
+ 
  QT_BEGIN_NAMESPACE
+@@ -447,27 +455,100 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
+ {
+     m_windowId = id;
  
- struct ElementMap
-@@ -442,23 +450,108 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
-         setWindowHandle_helper(id);
- }
- 
+-    if (isActive())
+-        setWindowHandle_helper(id);
++    setWindowHandle_helper(id);
++}
++
 +static QWindow *findWindow(WId id) {
 +    const auto allWindows = QGuiApplication::allWindows();
 +    for (QWindow *window : allWindows)
@@ -53,44 +52,8 @@ index 1f3e285..599b104 100644
 +            return window;
 +
 +    return NULL;
-+}
-+
-+#ifdef ENABLE_WAYLAND_PLATFORM
-+// See qt5wayland->qwaylandwindow.cpp
-+static QPoint getDisplayPosition(QWindow *window)
-+{
-+    QPoint pos;
-+
-+    if (!window)
-+        return pos;
-+
-+    bool decoration = false;
-+    switch (window->type()) {
-+        case Qt::Window:
-+        case Qt::Widget:
-+        case Qt::Dialog:
-+        case Qt::Tool:
-+        case Qt::Drawer:
-+            decoration = true;
-+            break;
-+        default:
-+            break;
-+    }
-+    if (window->flags() & Qt::FramelessWindowHint ||
-+        window->windowState() == Qt::WindowFullScreen ||
-+        window->flags() & Qt::BypassWindowManagerHint ||
-+        window->parent())
-+        decoration = false;
-+
-+    if (decoration) {
-+        QMargins m = window->frameMargins();
-+        return QPoint(m.left(), m.top());
-+    }
-+
-+    return pos;
-+}
-+#endif
-+
+ }
+ 
  void QGstreamerVideoOverlay::setWindowHandle_helper(WId id)
  {
 -#if GST_CHECK_VERSION(1,0,0)
@@ -108,22 +71,23 @@ index 1f3e285..599b104 100644
 +            QGuiApplication::platformNativeInterface();
 +    wl_surface *surface = NULL;
 +    wl_compositor *compositor = NULL;
- #endif
++#endif
 +    QWindow *window;
 +    GstVideoOverlay *overlay;
++    QPoint position;
 +
 +#if !GST_CHECK_VERSION(1,0,0)
 +    qWarning("Only support gstreamer-1.0\n");
 +    goto out;
-+#endif
-+
+ #endif
+ 
+-        // Properties need to be reset when changing the winId.
+-        m_sinkProperties->reset();
 +    if (!m_videoSink || !GST_IS_VIDEO_OVERLAY(m_videoSink))
 +        goto out;
 +
 +    overlay = GST_VIDEO_OVERLAY(m_videoSink);
- 
--        // Properties need to be reset when changing the winId.
--        m_sinkProperties->reset();
++
 +    window = findWindow(id);
 +    if (!window)
 +        goto no_window;
@@ -136,17 +100,41 @@ index 1f3e285..599b104 100644
 +
 +    // It's wayland platform, using wl_surface as window handle.
 +    if (compositor) {
-+        if (!surface) {
-+            // There's no surface for overlay now.
-+            gst_video_overlay_set_window_handle(overlay, 0);
-+            goto out;
++        if (isActive()) {
++            gst_video_overlay_set_window_handle(overlay, (WId) surface);
++
++            if (!surface)
++                // There's no surface for overlay now.
++                goto out;
 +        }
 +
-+        gst_video_overlay_set_window_handle(overlay, (WId) surface);
++        if (!m_rect.width() || !m_rect.height())
++            goto out;
 +
-+        QPoint pos = getDisplayPosition(window);
-+        gst_video_overlay_set_render_rectangle(overlay, pos.x() + m_rect.x(),
-+                pos.y() + m_rect.y(), m_rect.width(), m_rect.height());
++        // HACK: Force updating decoration
++        window->setFlags(window->flags());
++
++        position = QPoint(window->frameMargins().left(),
++                          window->frameMargins().top());
++
++        // HACK: kmssink is using global position
++        if (strstr(GST_ELEMENT_NAME(m_videoSink), "kmssink"))
++            position += window->geometry().topLeft();
++
++        gst_video_overlay_set_render_rectangle(overlay,
++                                               position.x() + m_rect.x(),
++                                               position.y() + m_rect.y(),
++                                               m_rect.width(), m_rect.height());
++
++        // HACK: Tell wayland server about the video rectangle
++        struct wl_region *region = wl_compositor_create_region(compositor);
++        wl_region_add(region, position.x() + m_rect.x(),
++                      position.y() + m_rect.y(),
++                      m_rect.width(), m_rect.height());
++        wl_region_add(region, -1, -1, 1, 1);
++        wl_surface_set_opaque_region(surface, region);
++        wl_region_destroy(region);
++
 +        goto out;
      }
 +#endif // ENABLE_WAYLAND_PLATFORM
@@ -163,7 +151,7 @@ index 1f3e285..599b104 100644
  }
  
  void QGstreamerVideoOverlay::expose()
-@@ -490,24 +583,43 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
+@@ -499,24 +580,42 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
          h = rect.height();
      }
  
@@ -181,8 +169,7 @@ index 1f3e285..599b104 100644
 -#endif
 +    m_rect = QRect(x, y, w, h);
 +
-+    if (isActive())
-+        setWindowHandle_helper(m_windowId);
++    setWindowHandle_helper(m_windowId);
  }
  
  bool QGstreamerVideoOverlay::processSyncMessage(const QGstreamerMessage &message)
@@ -219,10 +206,10 @@ index 1f3e285..599b104 100644
  #if !GST_CHECK_VERSION(1,0,0)
      if (gm && (GST_MESSAGE_TYPE(gm) == GST_MESSAGE_ELEMENT) &&
              gst_structure_has_name(gm->structure, "prepare-xwindow-id")) {
-diff --git a/src/multimedia/gsttools_headers/qgstreamervideooverlay_p.h b/src/multimedia/gsttools_headers/qgstreamervideooverlay_p.h
+diff --git a/src/gsttools/qgstreamervideooverlay_p.h b/src/gsttools/qgstreamervideooverlay_p.h
 index f2ca8a2..32b3d93 100644
---- a/src/multimedia/gsttools_headers/qgstreamervideooverlay_p.h
-+++ b/src/multimedia/gsttools_headers/qgstreamervideooverlay_p.h
+--- a/src/gsttools/qgstreamervideooverlay_p.h
++++ b/src/gsttools/qgstreamervideooverlay_p.h
 @@ -54,6 +54,7 @@
  #include <private/qgstreamerbushelper_p.h>
  #include <private/qgstreamerbufferprobe_p.h>
@@ -240,5 +227,5 @@ index f2ca8a2..32b3d93 100644
  
  QT_END_NAMESPACE
 -- 
-2.7.4
+2.20.1
 

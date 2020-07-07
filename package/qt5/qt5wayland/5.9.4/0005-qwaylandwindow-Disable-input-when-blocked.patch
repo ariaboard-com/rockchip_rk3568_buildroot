@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 39 insertions(+), 8 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 93bd7e7..6e05348 100644
+index 93bd7e71..6e053483 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -97,6 +97,7 @@ QWaylandWindow::QWaylandWindow(QWindow *window)
@@ -83,7 +83,7 @@ index 93bd7e7..6e05348 100644
  {
      QMutexLocker resizeLocker(&mResizeLock);
 diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
-index bd4a359..1d29119 100644
+index bd4a3590..1d29119f 100644
 --- a/src/client/qwaylandwindow_p.h
 +++ b/src/client/qwaylandwindow_p.h
 @@ -155,6 +155,8 @@ public:

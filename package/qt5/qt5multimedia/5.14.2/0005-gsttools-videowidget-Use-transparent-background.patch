@@ -1,7 +1,7 @@
-From 9cf81e681dba47af7cedd4b5b0d003d1ac5cd753 Mon Sep 17 00:00:00 2001
+From a6072020075c3e8d3bd5f190821c4c68b294238c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 24 Dec 2018 15:38:58 +0800
-Subject: [PATCH 06/12] gsttools: videowidget: Use transparent background
+Subject: [PATCH 05/11] gsttools: videowidget: Use transparent background
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

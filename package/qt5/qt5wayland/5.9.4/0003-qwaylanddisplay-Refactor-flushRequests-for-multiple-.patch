@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index 86cfe1a..437501f 100644
+index 86cfe1a0..437501fd 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -74,6 +74,7 @@

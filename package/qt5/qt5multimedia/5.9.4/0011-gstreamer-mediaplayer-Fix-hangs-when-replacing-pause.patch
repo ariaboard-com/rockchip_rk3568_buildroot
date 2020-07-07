@@ -1,12 +1,12 @@
-From 105b2a2bbd0056c8624fa125025bfa9632611c6e Mon Sep 17 00:00:00 2001
+From b1c5e044f67f2f1ba710f1fae1a1516b4139fe1d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 17:51:51 +0800
-Subject: [PATCH] gstreamer: mediaplayer: Fix hangs when replacing paused video
- sink
+Subject: [PATCH 11/12] gstreamer: mediaplayer: Fix hangs when replacing paused
+ video sink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp | 5 +++++
+ .../gstreamer/mediaplayer/qgstreamerplayersession.cpp        | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp b/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp
@@ -26,5 +26,5 @@ index aa8ce5a..8dceb25 100755
              qDebug() << "Starting video output to avoid blocking in paused state...";
  #endif
 -- 
-2.11.0
+2.20.1
 
