@@ -22,6 +22,12 @@ CUPS_FILTERS_CONF_OPTS = \
 	--with-jpeg \
 	--without-rcdir
 
+ifeq ($(BR2_PACKAGE_DEJAVU),y)
+CUPS_FILTERS_DEPENDENCIES += dejavu
+CUPS_FILTERS_CONF_OPTS += \
+	--with-test-font-path=$(TARGET_DIR)/usr/share/fonts/dejavu/DejaVuSans.ttf
+endif
+
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 CUPS_FILTERS_CONF_OPTS += --with-png
 CUPS_FILTERS_DEPENDENCIES += libpng
