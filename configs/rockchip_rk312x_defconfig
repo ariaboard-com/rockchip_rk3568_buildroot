@@ -1,4 +1,4 @@
-#include "rk3126c_arm.config"
+#include "rk312x_arm.config"
 #include "base.config"
 #include "base_extra.config"
 #include "gpu.config"
@@ -6,17 +6,13 @@
 #include "video_mpp.config"
 #include "video_gst.config"
 #include "audio.config"
-#include "camera.config"
-#include "camera_gst.config"
-#include "test.config"
-#include "debug.config"
-#include "benchmark.config"
 #include "wifi.config"
 #include "network.config"
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"
-BR2_TARGET_GENERIC_HOSTNAME="rk3126c"
-BR2_TARGET_GENERIC_ISSUE="Welcome to RK3126C Buildroot"
+BR2_TARGET_GENERIC_HOSTNAME="rk312x"
+BR2_TARGET_GENERIC_ISSUE="Welcome to RK312X Buildroot"
 BR2_PACKAGE_RKWIFIBT_RTL8723DS=y
-BR2_PACKAGE_RKFFPLAY=y
+# BR2_PACKAGE_NOTO_SANS_SC is not set
+# BR2_PACKAGE_SOURCE_HAN_SANS_CN is not set
