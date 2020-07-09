@@ -68,17 +68,17 @@ define LIBMALI_INSTALL_CMDS
 		$(INSTALL) -D -m 644 $(LIBMALI_LIBS) $(1)/usr/lib/
 
 	for l in $(LIBMALI_LIBS); do \
-		patchelf --set-soname libmali.so.1 $(1)/usr/lib/$$l ; \
+		patchelf --set-soname libmali.so $(1)/usr/lib/$$l ; \
 	done
 
 	echo $(LIBMALI_LIBS) | xargs -n 1 | head -n 1 | \
-		xargs -i ln -sf {} $(1)/usr/lib/libmali.so.1
+		xargs -i ln -sf {} $(1)/usr/lib/libmali.so
 endef
 LIBMALI_POST_INSTALL_HOOKS += LIBMALI_INSTALL_CMDS
 endif
 
 define LIBMALI_CREATE_LINKS
-	ln -sf libmali.so.1 $(1)/usr/lib/libmali.so
+	ln -sf libmali.so $(1)/usr/lib/libmali.so.1
 	ln -sf libmali.so $(1)/usr/lib/libMali.so.1
 	ln -sf libMali.so.1 $(1)/usr/lib/libMali.so
 
