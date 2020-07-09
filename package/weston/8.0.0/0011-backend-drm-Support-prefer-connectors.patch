@@ -1,4 +1,4 @@
-From 0ebd32978346088b7dffe35bec2eb2194c6d8d28 Mon Sep 17 00:00:00 2001
+From 3d3e7f4128821239933e5a851fbc0ffade71b0d2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 23 Jun 2020 10:05:48 +0800
 Subject: [PATCH 11/23] backend-drm: Support prefer connectors
@@ -21,8 +21,8 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  libweston/backend-drm/drm-internal.h |  18 ++
  libweston/backend-drm/drm.c          | 248 +++++++++++++++++++++++----
  libweston/backend-drm/kms.c          |  10 +-
- libweston/compositor.c               |  37 +++-
- 5 files changed, 296 insertions(+), 42 deletions(-)
+ libweston/compositor.c               |  38 +++-
+ 5 files changed, 297 insertions(+), 42 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 9a77479..0908763 100644
@@ -623,7 +623,7 @@ index 7c0e59a..975df91 100644
  
  	return 0;
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index b29a9db..4b7faab 100644
+index b29a9db..1046f39 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -98,6 +98,25 @@ weston_compositor_build_view_list(struct weston_compositor *compositor);
@@ -688,6 +688,14 @@ index b29a9db..4b7faab 100644
  		output->repaint_status = REPAINT_AWAITING_COMPLETION;
  
  	weston_compositor_repick(ec);
+@@ -5987,6 +6020,7 @@ weston_compositor_remove_output(struct weston_output *output)
+ 	assert(output->destroying);
+ 	assert(output->enabled);
+ 
++	weston_compositor_build_view_list(compositor);
+ 	wl_list_for_each(view, &compositor->view_list, link) {
+ 		if (view->output_mask & (1u << output->id))
+ 			weston_view_assign_output(view);
 -- 
 2.20.1
 
