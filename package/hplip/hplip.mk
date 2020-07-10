@@ -11,6 +11,12 @@ HPLIP_DEPENDENCIES = cups libusb jpeg host-pkgconf
 HPLIP_LICENSE = GPL-2.0, BSD-3-Clause, MIT
 HPLIP_LICENSE_FILES = COPYING
 
+ifeq ($(BR2_arm),y)
+HPLIP_MACHINE=arm32
+else ifeq ($(BR2_aarch64),y)
+HPLIP_MACHINE=arm64
+endif
+
 HPLIP_CONF_OPTS = \
 	--disable-qt4 \
 	--disable-scan-build \
@@ -25,7 +31,8 @@ HPLIP_CONF_OPTS = \
 	--disable-foomatic-drv-install \
 	--disable-foomatic-rip-hplip-install \
 	--enable-new-hpcups \
-	--enable-lite-build
+	--enable-lite-build \
+	--enable-class-driver
 
 # build system does not support cups-config
 HPLIP_CONF_ENV = LIBS=`$(STAGING_DIR)/usr/bin/cups-config --libs`
@@ -40,6 +47,16 @@ endif
 define HPLIP_POST_INSTALL_TARGET_FIXUP
 	mkdir -p $(TARGET_DIR)/usr/share/hplip/data/models
 	cp $(@D)/data/models/* $(TARGET_DIR)/usr/share/hplip/data/models
+
+	ln -sf hbpl1-$(HPLIP_MACHINE).so \
+		$(TARGET_DIR)/usr/share/hplip/prnt/plugins/hbpl1.so
+	ln -sf lj-$(HPLIP_MACHINE).so \
+		$(TARGET_DIR)/usr/share/hplip/prnt/plugins/lj.so
+
+	echo -e "[plugin]\ninstalled=1\neula=1\nversion=$(HPLIP_VERSION)" > \
+		$(@D)/hplip.state
+	$(INSTALL) -D -m 0644 $(@D)/hplip.state \
+		$(TARGET_DIR)/var/lib/hp/hplip.state
 endef
 HPLIP_POST_INSTALL_TARGET_HOOKS += HPLIP_POST_INSTALL_TARGET_FIXUP
 
