@@ -15,6 +15,7 @@ config BR2_PACKAGE_CHROMIUM_WAYLAND
 	select BR2_PACKAGE_WEBP
 	select BR2_PACKAGE_WEBP_DEMUX
 	select BR2_PACKAGE_WEBP_MUX
+	select BR2_PACKAGE_AT_SPI2_ATK
 	help
 	  Chromium browser for wayland
 
