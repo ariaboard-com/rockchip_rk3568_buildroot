@@ -204,6 +204,8 @@ $(BUILD_DIR)/%/.stamp_rsynced:
 	rsync -au --chmod=u=rwX,go=rX $(RSYNC_VCS_EXCLUSIONS) $(call qstrip,$(SRCDIR))/ $(@D)
 	$(foreach hook,$($(PKG)_POST_RSYNC_HOOKS),$(call $(hook))$(sep))
 	$(Q)touch $@
+	@test -d $(SRCDIR)/.git && (cd $(SRCDIR) && git status --ignored -s | \
+		grep "" && echo "WARN: $(SRCDIR) is dirty!") || true
 
 # Patch
 #
