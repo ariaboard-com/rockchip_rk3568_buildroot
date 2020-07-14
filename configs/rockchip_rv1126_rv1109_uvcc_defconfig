@@ -1,4 +1,5 @@
 #include "base.config"
+#include "debug.config"
 #include "audio.config"
 #include "video_mpp.config"
 #include "rv1126_rv1109_arm.config"
