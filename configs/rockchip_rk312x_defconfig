@@ -6,6 +6,7 @@
 #include "video_mpp.config"
 #include "video_gst.config"
 #include "audio.config"
+#include "audio_gst.config"
 #include "wifi.config"
 #include "network.config"
 #include "bt.config"
