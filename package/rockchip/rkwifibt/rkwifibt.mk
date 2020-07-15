@@ -44,6 +44,7 @@ endef
 
 define RKWIFIBT_BROADCOM_INSTALL
     $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/$(SXLOAD_WIFI)
+    $(SED) 's/WIFI_KO/\/$(FIRMWARE_DIR)\/lib\/modules\/$(BR2_PACKAGE_RKWIFIBT_WIFI_KO)/g' $(@D)/$(SXLOAD_WIFI)
     $(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(RK_WIFI_CHIP_NAME1)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
