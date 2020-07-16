@@ -63,8 +63,8 @@ function lunch_rockchip()
 	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" olddefconfig &>/dev/null
 
 	if ! diff ${CONFIG}{,.new}; then
-		read -p "Found old config, override it? (y/n):" YES
-		[ "$YES" = "y" ] && cp ${CONFIG}{.new,}
+		read -t 10 -p "Found old config, override it? (y/n):" YES
+		[ "$YES" != "n" ] && cp ${CONFIG}{.new,}
 	fi
 }
 
