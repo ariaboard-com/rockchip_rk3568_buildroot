@@ -1,20 +1,39 @@
 #!/bin/bash
 #/******************************************************************/
-#/*  Copyright (C)  ROCK-CHIPS FUZHOU . All Rights Reserved.       */
+#/*  Copyright (C)  ROCK-CHIPS . All Rights Reserved.       */
 #/*******************************************************************
 #File    :   flash_stress_test.sh
-#Desc    :   EMMC write and read stress test tools 
+#Desc    :   flash write and read stress test tools
 #Author  :   ZYF
-#Date    :   2017-05-05
+#Date    :   2020-07-16
 #Notes   :    
-#Revision 1.00  2017/05/05 Zhaoyifeng
-#Init file. 
+# Revision Data       Author                                Note.
+# 1.00     2017/05/05 Zhaoyifeng                            1.First version
+# 1.10     2020/06/28 Dingqiang Lin(jon.lin@rock-chips.com) 1.Simplify test_log 2.Add more introduction
+# 1.20     2020/07/16 Hans Yang                             1.use /dev/urandom to generate test data
+#Introduction.
 #********************************************************************/
 # usage£º
 # sudo flash_stress_test.sh dirnum testcount
-# example  £ºsrc file size 5MB, totle test data 500GB 
-#         sudo flash_stress_test.sh 5 20000
-#soure file info: totle size 5MB
+# example  £º
+# 	count for script command:
+#		SLC Nand 128MB, 100K P/E cycles, normaly we test 5K P/E ¡ª¡ª 128MB * 5000
+#       src file size 5MB, totle test data 128MB * 5000, testcount = 128MB * 5000 / 5MB * 5(dirnum) = 20600
+#   command:
+#		sudo flash_stress_test.sh 5 20000
+#	available space need:
+#		src file size: 5MB
+#		des file size: 5MB * dirnum = 25MB
+#       log file size: 189B(log item size) * 20000 = 3691KB
+#			    total: about 34MB
+#   result analyze:
+#		success:
+#			1. shell progress stop;
+#			2. print "-------copy and check success------------"
+#		fail:
+#			1. shell progress stop;
+#			2. any printing with "error" tag
+#
 #********************************************************************/
 
 test_dir=/data/cfg/rockchip_test/flash_test
@@ -24,8 +43,8 @@ md5_dir=$test_dir/md5_data
 
 usage()
 {
-echo "Usage: emmc_stress_test.sh [dirnum] [looptime]"
-echo "emmc_stress_test.sh 5 20000"
+echo "Usage: flash_stress_test.sh [dirnum] [looptime]"
+echo "flash_stress_test.sh 5 20000"
 }
 
 test_max_count=200
@@ -78,7 +97,7 @@ then
             else  
                 rand=$(random ${file_size[$i-1]} ${file_size[$i]})  
             fi  
-            dd if=/dev/zero of=$file_path/test.$i.$rand.bin bs=$rand count=1000  
+            dd if=/dev/urandom of=$file_path/test.$i.$rand.bin bs=$rand count=1024
         done  
         echo ===========  
     done  
@@ -94,12 +113,11 @@ while [ $count -lt $test_max_count ]; do
 	echo $count >> $test_dir/test_log.txt
     dir_loop=0
     while [ $dir_loop -lt $test_max_dir ]; do
-    	echo "$count copy $source_dir to $dest_dir/${dir_loop}"
-    	echo "$count copy $source_dir to $dest_dir/${dir_loop}" >> $test_dir/test_log.txt
+	echo "$count test $source_dir to $dest_dir/${dir_loop}"
     	rm -rf  $dest_dir/$dir_loop
     	if [ $? == 0 ]; then
     		echo "$count clean $dest_dir/${dir_loop} success"
-    		echo "$count clean $dest_dir/${dir_loop} success" >> $test_dir/test_log.txt
+		echo "$count clean ${dir_loop}" >> $test_dir/test_log.txt
     	else
     		echo "$count clean $dest_dir/${dir_loop} error"
     		echo "$count clean $dest_dir/${dir_loop} error" >> $test_dir/test_log.txt
@@ -109,11 +127,10 @@ while [ $count -lt $test_max_count ]; do
     	#sleep 1
     	#start copy data
     	echo "$count $dir_loop start copy data"
-    	echo "$count $dir_loop start copy data" >> $test_dir/test_log.txt
     	cp  -rf   $source_dir $dest_dir/$dir_loop
     	if [ $? == 0 ]; then
     		echo "$count cp  $source_dir to $dest_dir/${dir_loop} success"
-    		echo "$count cp  $source_dir to $dest_dir/${dir_loop} success" >> $test_dir/test_log.txt
+		echo "$count cp ${dir_loop}" >> $test_dir/test_log.txt
     	else
     		echo "$count cp  $source_dir to $dest_dir/${dir_loop} error"
     		echo "$count cp  $source_dir to $dest_dir/${dir_loop} error" >> $test_dir/test_log.txt
@@ -140,7 +157,7 @@ while [ $count -lt $test_max_count ]; do
     	diff $md5_dir/source.md5 $md5_dir/dest${dir_loop}.md5
     	if [ $? == 0 ]; then
     		echo "$count check source to $dest_dir/${dir_loop} success"
-    		echo "$count check source to $dest_dir/${dir_loop} success" >> $test_dir/test_log.txt
+		echo "$count check ${dir_loop}" >> $test_dir/test_log.txt
     		rm  $md5_dir/dest${dir_loop}.md5
 			rm -rf  $dest_dir/$dir_loop
     	else
