@@ -1,4 +1,4 @@
-From a85c8a53027c687fb45d7aa0be30d0cd00a23397 Mon Sep 17 00:00:00 2001
+From fc96d88e912c305b8ec582889dcbe4e46448f80a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
 Subject: [PATCH 10/12] qwaylanddisplay: Wakeup main event dispatcher when
@@ -13,12 +13,12 @@ for pending events and wakeup the main event dispatcher.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylanddisplay.cpp | 64 +++++++++++++++++++++++++++++++++-
+ src/client/qwaylanddisplay.cpp | 50 +++++++++++++++++++++++++++++++++-
  src/client/qwaylanddisplay_p.h |  2 ++
- 2 files changed, 65 insertions(+), 1 deletion(-)
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index dbebc52..17fb2cf 100644
+index dbebc52..a287278 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -73,6 +73,8 @@
@@ -30,7 +30,7 @@ index dbebc52..17fb2cf 100644
  #include <errno.h>
  #include <poll.h>
  
-@@ -82,6 +84,62 @@ namespace QtWaylandClient {
+@@ -82,6 +84,48 @@ namespace QtWaylandClient {
  
  Q_LOGGING_CATEGORY(lcQpaWayland, "qt.qpa.wayland"); // for general (uncategorized) Wayland platform logging
  
@@ -45,55 +45,41 @@ index dbebc52..17fb2cf 100644
 +
 +private:
 +    struct wl_display *mDisplay = nullptr;
++    bool quit;
 +};
 +
 +QWaylandDisplayThread::QWaylandDisplayThread(struct wl_display *display)
-+    : mDisplay(display)
++    : mDisplay(display), quit(false)
 +{
 +    start();
 +}
 +
 +QWaylandDisplayThread::~QWaylandDisplayThread()
 +{
-+    setTerminationEnabled(true);
-+    terminate();
++    quit = true;
 +    wait();
 +}
 +
 +void QWaylandDisplayThread::run()
 +{
-+    struct pollfd fd;
-+    int ret;
-+
-+    fd.fd = wl_display_get_fd(mDisplay);
-+    fd.events = POLLIN | POLLERR | POLLHUP;
-+
-+    while (true) {
-+        /* wakeup dispatcher for pending events */
-+        while (wl_display_prepare_read(mDisplay) != 0) {
++    while (!quit) {
++        if (wl_display_prepare_read(mDisplay) != 0) {
++            /* wakeup dispatcher for pending events */
 +            if (auto *dispatcher = QCoreApplication::eventDispatcher())
 +                dispatcher->wakeUp();
-+            usleep(1000);
-+            continue;
++        } else {
++            wl_display_flush(mDisplay);
++            wl_display_cancel_read(mDisplay);
 +        }
 +
-+        ret = poll(&fd, 1, -1);
-+        if (ret > 0 && fd.revents & POLLIN)
-+            wl_display_read_events(mDisplay);
-+        else
-+            wl_display_cancel_read(mDisplay);
-+
-+        if (wl_display_get_error(mDisplay) != 0)
-+            break;
-+
-+        wl_display_flush(mDisplay);
++        usleep(100000);
 +    }
 +}
 +
  struct wl_surface *QWaylandDisplay::createSurface(void *handle)
  {
      struct wl_surface *surface = mCompositor.create_surface();
-@@ -141,6 +199,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+@@ -141,6 +185,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
  
      mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
  
@@ -102,7 +88,7 @@ index dbebc52..17fb2cf 100644
      forceRoundTrip();
  }
  
-@@ -163,8 +223,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
+@@ -163,8 +209,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
  #if QT_CONFIG(cursor)
      qDeleteAll(mCursorThemesBySize);
  #endif

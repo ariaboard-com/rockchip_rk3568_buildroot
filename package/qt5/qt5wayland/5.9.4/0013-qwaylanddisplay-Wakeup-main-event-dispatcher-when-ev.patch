@@ -1,4 +1,4 @@
-From 2eb757da1bfcf5911ac056a49b0d108d4a5b1f4e Mon Sep 17 00:00:00 2001
+From 96db584ab961e2af7f9de745b02ef43043f4495d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
 Subject: [PATCH 13/15] qwaylanddisplay: Wakeup main event dispatcher when
@@ -13,12 +13,12 @@ for pending events and wakeup the main event dispatcher.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylanddisplay.cpp | 65 +++++++++++++++++++++++++++++++++-
+ src/client/qwaylanddisplay.cpp | 51 +++++++++++++++++++++++++++++++++-
  src/client/qwaylanddisplay_p.h |  2 ++
- 2 files changed, 66 insertions(+), 1 deletion(-)
+ 2 files changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index 437501fd..34cef34b 100644
+index 437501fd..58675733 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -73,6 +73,8 @@
@@ -30,7 +30,7 @@ index 437501fd..34cef34b 100644
  #include <errno.h>
  #include <poll.h>
  
-@@ -80,6 +82,62 @@ QT_BEGIN_NAMESPACE
+@@ -80,6 +82,48 @@ QT_BEGIN_NAMESPACE
  
  namespace QtWaylandClient {
  
@@ -45,55 +45,41 @@ index 437501fd..34cef34b 100644
 +
 +private:
 +    struct wl_display *mDisplay = nullptr;
++    bool quit;
 +};
 +
 +QWaylandDisplayThread::QWaylandDisplayThread(struct wl_display *display)
-+    : mDisplay(display)
++    : mDisplay(display), quit(false)
 +{
 +    start();
 +}
 +
 +QWaylandDisplayThread::~QWaylandDisplayThread()
 +{
-+    setTerminationEnabled(true);
-+    terminate();
++    quit = true;
 +    wait();
 +}
 +
 +void QWaylandDisplayThread::run()
 +{
-+    struct pollfd fd;
-+    int ret;
-+
-+    fd.fd = wl_display_get_fd(mDisplay);
-+    fd.events = POLLIN | POLLERR | POLLHUP;
-+
-+    while (true) {
-+        /* wakeup dispatcher for pending events */
-+        while (wl_display_prepare_read(mDisplay) != 0) {
++    while (!quit) {
++        if (wl_display_prepare_read(mDisplay) != 0) {
++            /* wakeup dispatcher for pending events */
 +            if (auto *dispatcher = QCoreApplication::eventDispatcher())
 +                dispatcher->wakeUp();
-+            usleep(1000);
-+            continue;
++        } else {
++            wl_display_flush(mDisplay);
++            wl_display_cancel_read(mDisplay);
 +        }
 +
-+        ret = poll(&fd, 1, -1);
-+        if (ret > 0 && fd.revents & POLLIN)
-+            wl_display_read_events(mDisplay);
-+        else
-+            wl_display_cancel_read(mDisplay);
-+
-+        if (wl_display_get_error(mDisplay) != 0)
-+            break;
-+
-+        wl_display_flush(mDisplay);
++        usleep(100000);
 +    }
 +}
 +
  struct wl_surface *QWaylandDisplay::createSurface(void *handle)
  {
      struct wl_surface *surface = mCompositor.create_surface();
-@@ -153,6 +211,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+@@ -153,6 +197,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
  
      mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
  
@@ -102,7 +88,7 @@ index 437501fd..34cef34b 100644
      forceRoundTrip();
  }
  
-@@ -168,7 +228,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
+@@ -168,7 +214,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
  #if QT_CONFIG(wayland_datadevice)
      delete mDndSelectionHandler.take();
  #endif
