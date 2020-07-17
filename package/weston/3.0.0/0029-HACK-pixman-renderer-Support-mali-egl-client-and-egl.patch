@@ -1,4 +1,4 @@
-From a0fb859e52c7c008e1e6cfa11aff496fba4ef3cc Mon Sep 17 00:00:00 2001
+From b9217386a25e615c499766b15f0e29508214683b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 22 May 2020 11:39:00 +0800
 Subject: [PATCH 29/30] HACK: pixman-renderer: Support mali egl client and egl
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 181 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 7686e7b..d54046e 100644
+index 7686e7b..73d3b97 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -116,6 +116,10 @@ libweston_@LIBWESTON_MAJOR@_la_SOURCES =			\
@@ -22,7 +22,7 @@ index 7686e7b..d54046e 100644
  	shared/weston-egl-ext.h
  
 +if ENABLE_EGL
-+libweston_@LIBWESTON_MAJOR@_la_LIBADD += $(EGL_LIBS)
++libweston_@LIBWESTON_MAJOR@_la_LIBADD += $(EGL_LIBS) $(DRM_COMPOSITOR_GBM_LIBS)
 +endif
 +
  lib_LTLIBRARIES += libweston-desktop-@LIBWESTON_MAJOR@.la

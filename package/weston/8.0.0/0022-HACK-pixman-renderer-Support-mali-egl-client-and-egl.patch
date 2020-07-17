@@ -1,4 +1,4 @@
-From c3ac9b6b2dfed19c1c3ac7b6141169c13468e33e Mon Sep 17 00:00:00 2001
+From 59d97b6fa3a7d996e585a7d2e17bcc05c4c7b1be Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 14:53:52 +0800
 Subject: [PATCH 22/23] HACK: pixman-renderer: Support mali egl client and egl
@@ -9,42 +9,41 @@ lots of hacks to attach a wl_buffer created in that way.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- libweston/meson.build             |   8 +-
- libweston/pixman-renderer.c       | 176 ++++++++++++++++++++++++++++++
- libweston/renderer-gl/meson.build |   2 -
- 3 files changed, 181 insertions(+), 5 deletions(-)
+ libweston/meson.build       |  11 +--
+ libweston/pixman-renderer.c | 176 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 181 insertions(+), 6 deletions(-)
 
 diff --git a/libweston/meson.build b/libweston/meson.build
-index 08d23ec..32755dc 100644
+index 08d23ec..42d8f38 100644
 --- a/libweston/meson.build
 +++ b/libweston/meson.build
-@@ -67,12 +67,14 @@ srcs_libweston = [
+@@ -67,12 +67,11 @@ srcs_libweston = [
  	weston_direct_display_server_protocol_h,
  ]
  
 -if get_option('renderer-gl')
 -	dep_egl = dependency('egl', required: false)
 -	if not dep_egl.found()
+-		error('libweston + gl-renderer requires egl which was not found. Or, you can use \'-Drenderer-gl=false\'.')
+-	endif
+-	deps_libweston += dep_egl
 +dep_egl = dependency('egl', required: false)
-+if not dep_egl.found()
-+	if get_option('renderer-gl')
- 		error('libweston + gl-renderer requires egl which was not found. Or, you can use \'-Drenderer-gl=false\'.')
- 	endif
-+else
- 	deps_libweston += dep_egl
-+	config_h.set('ENABLE_EGL', '1')
++dep_gbm = dependency('gbm', required: false)
++if dep_egl.found() and dep_gbm.found()
++	deps_libweston += [ dep_egl, dep_gbm ]
++	config_h.set('ENABLE_PIXMAN_EGL', '1')
  endif
  
  lib_weston = shared_library(
 diff --git a/libweston/pixman-renderer.c b/libweston/pixman-renderer.c
-index 7be7b4c..2e6db8d 100644
+index 7be7b4c..e0f1391 100644
 --- a/libweston/pixman-renderer.c
 +++ b/libweston/pixman-renderer.c
 @@ -44,6 +44,17 @@
  #include "linux-dmabuf.h"
  #include "linux-dmabuf-unstable-v1-server-protocol.h"
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +#include <fcntl.h>
 +#include <sys/stat.h>
 +
@@ -63,7 +62,7 @@ index 7be7b4c..2e6db8d 100644
  
  	struct wl_signal destroy_signal;
 +
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +	PFNEGLBINDWAYLANDDISPLAYWL bind_display;
 +	PFNEGLUNBINDWAYLANDDISPLAYWL unbind_display;
 +	PFNEGLQUERYWAYLANDBUFFERWL query_buffer;
@@ -81,7 +80,7 @@ index 7be7b4c..2e6db8d 100644
  	size_t size;
  };
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +/* HACK: For mali_buffer_sharing */
 +struct egl_buffer_info {
 +	int dma_fd;
@@ -104,7 +103,7 @@ index 7be7b4c..2e6db8d 100644
  	struct linux_dmabuf_buffer *dmabuf;
  	pixman_format_code_t pixman_format;
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +	EGLint format;
 +#endif
 +
@@ -115,7 +114,7 @@ index 7be7b4c..2e6db8d 100644
  	if (! shm_buffer) {
  		if ((dmabuf = linux_dmabuf_buffer_get(buffer->resource))) {
  			pixman_renderer_attach_dmabuf(es, buffer, dmabuf);
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +		} else if (pr->egl_inited &&
 +			   pr->query_buffer(pr->egl_display,
 +					    (void *)buffer->resource,
@@ -172,7 +171,7 @@ index 7be7b4c..2e6db8d 100644
  {
  	struct pixman_renderer *pr = get_renderer(ec);
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +	if (pr->egl_inited) {
 +		if (pr->unbind_display)
 +			pr->unbind_display(pr->egl_display, ec->wl_display);
@@ -194,7 +193,7 @@ index 7be7b4c..2e6db8d 100644
  	*num_modifiers = 0;
  }
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +static bool
 +pixman_renderer_init_egl(struct pixman_renderer *pr,
 +			 struct weston_compositor *ec)
@@ -271,26 +270,13 @@ index 7be7b4c..2e6db8d 100644
  	renderer->base.query_dmabuf_modifiers =
  		pixman_renderer_query_dmabuf_modifiers;
  
-+#ifdef ENABLE_EGL
++#ifdef ENABLE_PIXMAN_EGL
 +	pixman_renderer_init_egl(renderer, ec);
 +#endif
 +
  	return 0;
  }
  
-diff --git a/libweston/renderer-gl/meson.build b/libweston/renderer-gl/meson.build
-index 374e65b..209afce 100644
---- a/libweston/renderer-gl/meson.build
-+++ b/libweston/renderer-gl/meson.build
-@@ -2,8 +2,6 @@ if not get_option('renderer-gl')
- 	subdir_done()
- endif
- 
--config_h.set('ENABLE_EGL', '1')
--
- srcs_renderer_gl = [
- 	'egl-glue.c',
- 	'gl-renderer.c',
 -- 
 2.20.1
 
