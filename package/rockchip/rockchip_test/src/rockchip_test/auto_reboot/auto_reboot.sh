@@ -55,7 +55,7 @@ sleep $delay
 cnt=`cat $CNT`
 if [ $cnt != "off" ]; then
     sync
-    if [ -e /sys/fs/pstore/ ]; then
+    if [ -e /sys/fs/pstore/console-ramoops-0 ]; then
         echo "check console-ramoops-o message"
         grep -q "Restarting system" /sys/fs/pstore/console-ramoops-0
         if [ $? -ne 0 -a $cnt -ge 2 ]; then
