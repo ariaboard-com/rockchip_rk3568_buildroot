@@ -22,5 +22,12 @@ ifeq ($(BR2_PACKAGE_ISP2_IPC_DBSERVER), y)
  ISP2_IPC_DEPENDENCIES += libIPCProtocol
 endif
 
+ifeq ($(BR2_PACKAGE_ISP2_IPC_MINILOGGER), y)
+    ISP2_IPC_CONF_OPTS += -DENABLE_MINILOGGER=ON
+    ISP2_IPC_DEPENDENCIES += minilogger
+else
+    ISP2_IPC_CONF_OPTS += -DENABLE_MINILOGGER=OFF
+endif
+
 endif
 $(eval $(cmake-package))

@@ -18,4 +18,10 @@ config BR2_PACKAGE_ISP2_IPC_DBSERVER
     help
       Use database to save configuration
 
+config BR2_PACKAGE_ISP2_IPC_MINILOGGER
+    bool "enable ispserver miniloger print"
+    select BR2_PACKAGE_MINILOGGER
+    help
+      Enable ispserver miniloger print.
+
 endif # BR2_PACKAGE_ISP2_IPC

@@ -17,4 +17,11 @@ config BR2_PACKAGE_NETSERVER_SANITIZER_STATIC
 	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable netserver debug on sanitizer with static linker.
+
+config BR2_PACKAGE_NETSERVER_MINILOGGER
+	bool "enable netserver miniloger print"
+	select BR2_PACKAGE_MINILOGGER
+	default y
+	help
+	  Enable netserver miniloger print.
 endif
