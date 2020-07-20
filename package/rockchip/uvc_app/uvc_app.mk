@@ -8,8 +8,10 @@ ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKISP),y)
 endif
 
 ifneq ($(BR2_PACKAGE_RKMEDIA_UVC), y)
+ifeq ($(BR2_PACKAGE_RKMEDIA), y)
     UVC_APP_DEPENDENCIES = rkmedia
     UVC_APP_CONF_OPTS = -DCOMPILES_CAMERA=ON
+endif
 endif
 
 ifeq ($(BR2_PACKAGE_ROCKX),y)
