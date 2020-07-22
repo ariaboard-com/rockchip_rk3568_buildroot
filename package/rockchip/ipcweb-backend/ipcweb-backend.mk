@@ -12,10 +12,14 @@ IPCWEB_BACKEND_DEPENDENCIES += rk_oem
 IPCWEB_BACKEND_CONF_OPTS += -DIPCWEBBACKEND_INSTALL_ON_OEM_PARTITION=ON
 define IPCWEB_BACKEND_INSTALL_TARGET_CMDS
 	cp -rfp $(IPCWEB_BACKEND_SITE)/www $(BASE_DIR)/oem
+	mkdir -p $(BASE_DIR)/oem/www/cgi-bin/
+	cp -rfp $(@D)/src/entry.cgi $(BASE_DIR)/oem/www/cgi-bin/
 endef
 else
 define IPCWEB_BACKEND_INSTALL_TARGET_CMDS
-	cp -rfp $(IPCWEB_BACKEND_SITE)/www $(TARGET_DIR)/usr
+	cp -rfp $(IPCWEB_BACKEND_SITE)/ $(TARGET_DIR)/usr
+	mkdir -p  $(TARGET_DIR)/usr/www/cgi-bin/
+	cp -rfp $(@D)/src/entry.cgi $(TARGET_DIR)/usr/www/cgi-bin/
 endef
 endif
 
