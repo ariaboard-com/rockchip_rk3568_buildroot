@@ -1,18 +1,26 @@
-config BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
+menuconfig BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
 	bool "Rockchip Camera Engine Rkaiq for linux"
 	help
 	  Rockchip camera engine rkaiq for linux.
 
+if BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
+
 config BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE
-	depends on BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
 	string "Rockchip Camera Engine IQ xml file"
 	default ""
 	help
 	  Rockchip sensor IQ xml file.
 
 config BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE_USE_BIN
-	depends on BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
 	bool "Rockchip Camera Engine IQ xml file conver to bin"
-	default ""
+	default n
 	help
 	  Rockchip sensor IQ bin file.
+
+config BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_RKISP_DEMO
+	bool "Build rkisp_demo"
+	default n
+	help
+		Build rkisp_demo
+
+endif

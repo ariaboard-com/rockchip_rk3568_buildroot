@@ -75,6 +75,10 @@ else
 	endif
 endif
 
+ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_RKISP_DEMO), y)
+CAMERA_ENGINE_RKAIQ_CONF_OPTS += -DENABLE_RKISP_DEMO=ON
+endif
+
 define CAMERA_ENGINE_RKAIQ_INSTALL_STAGING_CMDS
 	$(TARGET_MAKE_ENV) DESTDIR=$(STAGING_DIR) $(MAKE) -C $($(PKG)_BUILDDIR) install
 	$(INSTALL) -D -m  644 $(@D)/rkisp_api/all_lib/Release/librkisp_api.so $(STAGING_DIR)/usr/lib/
@@ -86,10 +90,11 @@ define CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_CMDS
 	mkdir -p $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/
 	$(INSTALL) -D -m  644 $(@D)/all_lib/Release/librkaiq.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
 	$(INSTALL) -D -m  644 $(@D)/rkisp_api/all_lib/Release/librkisp_api.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
-        $(foreach iqfile,$(CAMERA_ENGINE_RKAIQ_IQFILE),
-                $(INSTALL) -D -m  644 $(@D)/iqfiles/$(iqfile) \
-                        $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
-        )
+	$(foreach iqfile,$(CAMERA_ENGINE_RKAIQ_IQFILE),
+		$(INSTALL) -D -m  644 $(@D)/iqfiles/$(iqfile) \
+		$(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
+	)
+	$(INSTALL) -D -m  644 $(@D)/rkisp_demo/exe/Release/rkisp_demo $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/ || true
 endef
 
 $(eval $(cmake-package))
