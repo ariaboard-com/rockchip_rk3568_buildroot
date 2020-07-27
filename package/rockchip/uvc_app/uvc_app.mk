@@ -3,14 +3,6 @@ ifeq ($(BR2_PACKAGE_UVC_APP), y)
     UVC_APP_SITE_METHOD = local
     UVC_APP_INSTALL_STAGING = YES
     UVC_APP_DEPENDENCIES = libdrm mpp
-
-define UVC_APP_INSTALL_TARGET_CMDS
-    if [ -f $(UVC_APP_SITE)/mpp_enc_cfg.conf ]; then \
-         $(INSTALL) -m 644 -D $(UVC_APP_SITE)/mpp_enc_cfg.conf \
-              $(TARGET_DIR)/etc/mpp_enc_cfg.conf;\
-    fi
-endef
-
 ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKISP),y)
     UVC_APP_DEPENDENCIES += camera_engine_rkisp
 endif
