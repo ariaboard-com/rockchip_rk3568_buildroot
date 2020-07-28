@@ -38,12 +38,7 @@ endef
 
 define QFACIALGATE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/QFacialGate	$(TARGET_DIR)/usr/bin/QFacialGate
-	if [ x${BR2_PACKAGE_RK1806} != x ]; then \
-		$(INSTALL) -D -m 0755 $(@D)/S06_QFacialGate $(TARGET_DIR)/etc/init.d/; \
-	fi
-	if [ x${BR2_PACKAGE_RK1808} != x ]; then \
-		$(INSTALL) -D -m 0755 $(@D)/S06_QFacialGate $(TARGET_DIR)/etc/init.d/; \
-	fi
+	$(INSTALL) -D -m 0755 $(@D)/S06_QFacialGate $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
