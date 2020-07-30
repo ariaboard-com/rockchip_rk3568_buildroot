@@ -16,7 +16,6 @@ mkdir $BSPDIR
 mkdir -p $BSPDIR/lib
 mkdir -p $BSPDIR/include
 mkdir -p $BSPDIR/example
-mkdir -p $BSPDIR/resource
 
 cd $BSPDIR
 # copy libs
@@ -49,7 +48,7 @@ cp $SDK_DIR/external/rkmedia/include/rkmedia ./include/ -vrf
 #copy examples
 cp $SDK_DIR/external/rkmedia/test/c_api/* ./example/ -vrf
 
-#copy resource, like camera aiq files
-cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./resource -vrf
+#copy iqfiles to examples
+cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./example -vrf
 
 cd -
