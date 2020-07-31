@@ -20,5 +20,8 @@ endif
         RKFACIAL_CONF_OPTS += "-DUSE_WEB_SERVER=y"
         RKFACIAL_DEPENDENCIES += libIPCProtocol libgdbus
     endif
+    ifeq ($(BR2_PACKAGE_RKFACIAL_ENABLE_IR_TEST_DATA), y)
+        RKFACIAL_CONF_OPTS += "-DIR_TEST_DATA=y"
+    endif
     $(eval $(cmake-package))
 endif

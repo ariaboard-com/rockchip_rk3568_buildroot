@@ -18,3 +18,8 @@ config BR2_PACKAGE_RKFACIAL_USE_WEB_SERVER
     depends on BR2_PACKAGE_RKFACIAL
     select BR2_PACKAGE_LIBIPCPROTOCOL
     select BR2_PACKAGE_LIBGDBUS
+
+config BR2_PACKAGE_RKFACIAL_ENABLE_IR_TEST_DATA
+    bool "enable ir test data"
+    default n
+    depends on BR2_PACKAGE_RKFACIAL
