@@ -1,4 +1,4 @@
-From 59d97b6fa3a7d996e585a7d2e17bcc05c4c7b1be Mon Sep 17 00:00:00 2001
+From c8de97d63af99a19d883008e0aafbf80ddf30d5f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 14:53:52 +0800
 Subject: [PATCH 22/23] HACK: pixman-renderer: Support mali egl client and egl
@@ -10,8 +10,8 @@ lots of hacks to attach a wl_buffer created in that way.
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  libweston/meson.build       |  11 +--
- libweston/pixman-renderer.c | 176 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 181 insertions(+), 6 deletions(-)
+ libweston/pixman-renderer.c | 177 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 182 insertions(+), 6 deletions(-)
 
 diff --git a/libweston/meson.build b/libweston/meson.build
 index 08d23ec..42d8f38 100644
@@ -36,10 +36,10 @@ index 08d23ec..42d8f38 100644
  
  lib_weston = shared_library(
 diff --git a/libweston/pixman-renderer.c b/libweston/pixman-renderer.c
-index 7be7b4c..e0f1391 100644
+index 7be7b4c..ae2a311 100644
 --- a/libweston/pixman-renderer.c
 +++ b/libweston/pixman-renderer.c
-@@ -44,6 +44,17 @@
+@@ -44,6 +44,18 @@
  #include "linux-dmabuf.h"
  #include "linux-dmabuf-unstable-v1-server-protocol.h"
  
@@ -52,12 +52,13 @@ index 7be7b4c..e0f1391 100644
 +#include <EGL/eglext.h>
 +#include <GLES2/gl2.h>
 +#include <GLES2/gl2ext.h>
++#include "shared/weston-egl-ext.h"  /* for PFN* stuff */
 +#endif
 +
  struct pixman_output_state {
  	void *shadow_buffer;
  	pixman_image_t *shadow_image;
-@@ -71,6 +82,18 @@ struct pixman_renderer {
+@@ -71,6 +83,18 @@ struct pixman_renderer {
  	struct weston_binding *debug_binding;
  
  	struct wl_signal destroy_signal;
@@ -76,7 +77,7 @@ index 7be7b4c..e0f1391 100644
  };
  
  struct dmabuf_data {
-@@ -78,6 +101,16 @@ struct dmabuf_data {
+@@ -78,6 +102,16 @@ struct dmabuf_data {
  	size_t size;
  };
  
@@ -93,7 +94,7 @@ index 7be7b4c..e0f1391 100644
  static inline struct pixman_output_state *
  get_output_state(struct weston_output *output)
  {
-@@ -692,11 +725,16 @@ pixman_renderer_attach_dmabuf(struct weston_surface *es,
+@@ -692,11 +726,16 @@ pixman_renderer_attach_dmabuf(struct weston_surface *es,
  static void
  pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
  {
@@ -110,7 +111,7 @@ index 7be7b4c..e0f1391 100644
  	weston_buffer_reference(&ps->buffer_ref, buffer);
  	weston_buffer_release_reference(&ps->buffer_release_ref,
  					es->buffer_release_ref.buffer_release);
-@@ -719,7 +757,56 @@ pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
+@@ -719,7 +758,56 @@ pixman_renderer_attach(struct weston_surface *es, struct weston_buffer *buffer)
  	if (! shm_buffer) {
  		if ((dmabuf = linux_dmabuf_buffer_get(buffer->resource))) {
  			pixman_renderer_attach_dmabuf(es, buffer, dmabuf);
@@ -167,7 +168,7 @@ index 7be7b4c..e0f1391 100644
  			weston_log("unhandled buffer type!\n");
  			weston_buffer_reference(&ps->buffer_ref, NULL);
  			weston_buffer_release_reference(&ps->buffer_release_ref,
-@@ -888,6 +975,21 @@ pixman_renderer_destroy(struct weston_compositor *ec)
+@@ -888,6 +976,21 @@ pixman_renderer_destroy(struct weston_compositor *ec)
  {
  	struct pixman_renderer *pr = get_renderer(ec);
  
@@ -189,7 +190,7 @@ index 7be7b4c..e0f1391 100644
  	wl_signal_emit(&pr->destroy_signal, pr);
  	weston_binding_destroy(pr->debug_binding);
  	free(pr);
-@@ -1072,6 +1174,76 @@ pixman_renderer_query_dmabuf_modifiers(struct weston_compositor *wc,
+@@ -1072,6 +1175,76 @@ pixman_renderer_query_dmabuf_modifiers(struct weston_compositor *wc,
  	*num_modifiers = 0;
  }
  
@@ -266,7 +267,7 @@ index 7be7b4c..e0f1391 100644
  WL_EXPORT int
  pixman_renderer_init(struct weston_compositor *ec)
  {
-@@ -1119,6 +1291,10 @@ pixman_renderer_init(struct weston_compositor *ec)
+@@ -1119,6 +1292,10 @@ pixman_renderer_init(struct weston_compositor *ec)
  	renderer->base.query_dmabuf_modifiers =
  		pixman_renderer_query_dmabuf_modifiers;
  
