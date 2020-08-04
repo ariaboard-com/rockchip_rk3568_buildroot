@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export HDR_MODE=1
+
 case "$1" in
   start)
     ispserver -no-sync-db &
