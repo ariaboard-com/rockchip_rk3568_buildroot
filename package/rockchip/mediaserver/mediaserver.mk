@@ -87,4 +87,9 @@ ifeq ($(BR2_PACKAGE_MEDIASERVE_TB), y)
     MEDIASERVER_CONF_OPTS += -DENABLE_TB=ON
 endif
 
+ifeq ($(BR2_PACKAGE_MEDIASERVE_ZBAR), y)
+    MEDIASERVER_DEPENDENCIES += jpeg imagemagick zbar
+    MEDIASERVER_CONF_OPTS += -DENABLE_ZBAR=ON
+endif
+
 $(eval $(cmake-package))
