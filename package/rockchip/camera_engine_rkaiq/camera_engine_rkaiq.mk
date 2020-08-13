@@ -49,7 +49,9 @@ fi;
 endef
 
 define IQFILE_CONVER_CMD
-	$(call conver_iqfiles, $(@D)/iqfiles, $(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE))
+        $(foreach iqfile, $(call qstrip,$(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE)),
+		$(call conver_iqfiles, $(@D)/iqfiles, $(iqfile))
+        )
 endef
 
 define IQFILES_CONVER_CMD
@@ -82,7 +84,10 @@ define CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_CMDS
 	mkdir -p $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/
 	$(INSTALL) -D -m  644 $(@D)/all_lib/Release/librkaiq.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
 	$(INSTALL) -D -m  644 $(@D)/rkisp_api/all_lib/Release/librkisp_api.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
-	$(INSTALL) -D -m  644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKAIQ_IQFILE) $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
+        $(foreach iqfile,$(CAMERA_ENGINE_RKAIQ_IQFILE),
+                $(INSTALL) -D -m  644 $(@D)/iqfiles/$(iqfile) \
+                        $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
+        )
 endef
 
 $(eval $(cmake-package))
