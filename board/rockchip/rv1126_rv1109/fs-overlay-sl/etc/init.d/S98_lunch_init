@@ -9,6 +9,7 @@ case "$1" in
 			cp /oem/rockchip_test/auto_reboot.sh /data/cfg/rockchip_test
 			source /data/cfg/rockchip_test/auto_reboot.sh &
 		fi
+		rksl &
 		;;
 	stop)
 		[ -f /oem/RkLunch-stop.sh ] && source /oem/RkLunch-stop.sh
