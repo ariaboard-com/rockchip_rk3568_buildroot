@@ -50,5 +50,7 @@ cp $SDK_DIR/external/rkmedia/test/c_api/* ./example/ -vrf
 
 #copy iqfiles to examples
 cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./example -vrf
+#copy vqefiles to examples
+cp $SDK_DIR/external/common_algorithm/audio/rkap_aec/para ./example/vqefiles -vrf
 
 cd -
