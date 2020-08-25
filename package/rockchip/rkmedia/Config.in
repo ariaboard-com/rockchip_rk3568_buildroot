@@ -178,6 +178,13 @@ config BR2_PACKAGE_RKMEDIA_MOVE_DETECTION
     help
       wrapped function of rk movedetection algorithm
 
+config BR2_PACKAGE_RKMEDIA_OCCLUSION_DETECTION
+    bool "rk occlusion detection wrapper"
+    select BR2_PACKAGE_COMMON_ALGORITHM
+    select BR2_PACKAGE_COMMON_ALGORITHM_OCCLUSION_DETECT
+    help
+      wrapped function of rk occlusion detection algorithm
+
 config BR2_PACKAGE_RKMEDIA_ANR
     bool "audio automatic noise reduction algorithm"
     select BR2_PACKAGE_COMMON_ALGORITHM
