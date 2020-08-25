@@ -34,6 +34,7 @@ cp $LIBDIR/libavutil.* ./lib/ -dv
 
 cp $LIBDIR/libRKAP* ./lib/ -dv
 cp $LIBDIR/libmd_share.so ./lib/ -dv
+cp $LIBDIR/libod_share.so ./lib/ -dv
 
 cp $LIBDIR/librkaiq.* ./lib/ -dv
 cp $LIBDIR/libeasymedia.* ./lib/ -dv
