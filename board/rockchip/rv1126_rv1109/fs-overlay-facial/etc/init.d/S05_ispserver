@@ -1,6 +1,8 @@
 #!/bin/sh
 
 export HDR_MODE=1
+#vi_aging adjust
+io -4 0xfe801048 0x10
 
 case "$1" in
   start)
