@@ -17,6 +17,8 @@ CAMERA_ENGINE_RKAIQ_DEPENDENCIES = host-camera_engine_rkaiq
 
 CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR = $(TARGET_DIR)
 
+CAMERA_ENGINE_RKAIQ_CONF_OPTS = -DBUILDROOT_BUILD_PROJECT=TRUE
+
 define HOST_CAMERA_ENGINE_RKAIQ_BUILD_CMDS
 	cd $(@D)/rkisp_parser_demo/build/linux && ./make-Makefiles.bash && $(MAKE)
 endef
