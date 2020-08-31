@@ -47,7 +47,7 @@ cp $HEADER_DIR/rkaiq ./include/ -rf
 cp $SDK_DIR/external/rkmedia/include/rkmedia ./include/ -vrf
 
 #copy examples
-cp $SDK_DIR/external/rkmedia/test/c_api/* ./example/ -vrf
+cp $SDK_DIR/external/rkmedia/examples/* ./example/ -vrf
 
 #copy iqfiles to examples
 cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./example -vrf
