@@ -1,22 +1,38 @@
-From 761b2431edaadaa1047f80f9ee475301c4ef2b83 Mon Sep 17 00:00:00 2001
+From 049604630a40be45871f53207f5aabedf00a6c7a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:42:31 +0800
-Subject: [PATCH 13/23] backend-drm: Support mirror mode
+Subject: [PATCH 13/27] backend-drm: Support mirror mode
 
 Set env "WESTON_DRM_MIRROR" to enable mirror mode, and set env
 "WESTON_DRM_KEEP_RATIO" to keep the aspect ratio.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
+ desktop-shell/shell.c                 |   3 +
  include/libweston/libweston.h         |   2 +
  libweston/backend-drm/drm-internal.h  |   6 +
  libweston/backend-drm/drm.c           | 289 +++++++++++++++++++++++++-
  libweston/backend-drm/meson.build     |   3 +-
  libweston/backend-drm/state-propose.c |   5 +-
  libweston/compositor.c                |   2 +-
+ libweston/input.c                     |   7 +
  meson.build                           |   8 +
- 7 files changed, 302 insertions(+), 13 deletions(-)
+ 9 files changed, 312 insertions(+), 13 deletions(-)
 
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 0908763..f8cd2f2 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -4319,6 +4319,9 @@ weston_view_set_initial_position(struct weston_view *view,
+ 	}
+ 
+ 	wl_list_for_each(output, &compositor->output_list, link) {
++		if (!output->unavailable)
++			continue;
++
+ 		if (pixman_region32_contains_point(&output->region, ix, iy, NULL)) {
+ 			target_output = output;
+ 			break;
 diff --git a/include/libweston/libweston.h b/include/libweston/libweston.h
 index e3e5258..972d23f 100644
 --- a/include/libweston/libweston.h
@@ -466,7 +482,7 @@ index 767c34f..87f7a75 100644
  		state = drm_output_propose_state(output_base, pending_state, mode);
  		if (!state) {
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 4b7faab..47c40b3 100644
+index 1046f39..46f7048 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -1301,7 +1301,7 @@ weston_view_assign_output(struct weston_view *ev)
@@ -478,6 +494,31 @@ index 4b7faab..47c40b3 100644
  			continue;
  
  		pixman_region32_intersect(&region, &ev->transform.boundingbox,
+diff --git a/libweston/input.c b/libweston/input.c
+index 28dcb0b..42c961b 100644
+--- a/libweston/input.c
++++ b/libweston/input.c
+@@ -1685,6 +1685,10 @@ weston_pointer_clamp(struct weston_pointer *pointer, wl_fixed_t *fx, wl_fixed_t
+ 	wl_list_for_each(output, &ec->output_list, link) {
+ 		if (pointer->seat->output && pointer->seat->output != output)
+ 			continue;
++
++		if (output->unavailable)
++			continue;
++
+ 		if (pixman_region32_contains_point(&output->region,
+ 						   x, y, NULL))
+ 			valid = 1;
+@@ -1754,6 +1758,9 @@ weston_pointer_handle_output_destroy(struct wl_listener *listener, void *data)
+ 	y = wl_fixed_to_int(pointer->y);
+ 
+ 	wl_list_for_each(output, &ec->output_list, link) {
++		if (output->unavailable)
++			continue;
++
+ 		if (pixman_region32_contains_point(&output->region,
+ 						   x, y, NULL))
+ 			return;
 diff --git a/meson.build b/meson.build
 index 82107e1..e5b5359 100644
 --- a/meson.build
