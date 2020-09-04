@@ -34,3 +34,17 @@ BR2_PACKAGE_EXPAT=y
 BR2_PACKAGE_JSON_C=y
 BR2_PACKAGE_LIBGLIB2=y
 # BR2_PACKAGE_IFUPDOWN_SCRIPTS is not set
+#  - user space IEEE 802.1X/WPA supplicant
+BR2_PACKAGE_WPA_SUPPLICANT=y
+#  - support ap mode for your wifi
+BR2_PACKAGE_WPA_SUPPLICANT_AP_SUPPORT=y
+#  - enable support for the autoscan feature (allow periodic scan)
+BR2_PACKAGE_WPA_SUPPLICANT_AUTOSCAN=y
+#  - enable eap support for your wifi
+BR2_PACKAGE_WPA_SUPPLICANT_EAP=y
+#  - install wpa_cli command line utility
+BR2_PACKAGE_WPA_SUPPLICANT_CLI=y
+#  - install libwpa_client.so
+BR2_PACKAGE_WPA_SUPPLICANT_WPA_CLIENT_SO=y
+#  - install wpa_passphrase command line utility
+BR2_PACKAGE_WPA_SUPPLICANT_PASSPHRASE=y
