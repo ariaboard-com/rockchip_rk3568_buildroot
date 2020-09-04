@@ -57,6 +57,7 @@ MODULES_TMP_TAR=$OUTPUT_DIR/modules.ko.tar
 	-o -name dw_mmc.ko       \
 	-o -name mmc_block.ko    \
 	-o -name mmc_core.ko     \
+	-o -name bcmdhd.ko \
 	-o -name modules.dep ` )
 ( cd $TARGET && rm -rf $TARGET/lib/modules/$KERNEL_VERSION && tar xf $MODULES_TMP_TAR&& rm $MODULES_TMP_TAR )
 
