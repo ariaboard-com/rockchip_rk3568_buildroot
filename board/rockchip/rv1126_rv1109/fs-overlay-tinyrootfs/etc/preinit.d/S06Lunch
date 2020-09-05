@@ -7,7 +7,8 @@ lunch_start()
 	ispserver &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
-	mediaserver -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
+	#mediaserver -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
+	#mediaserver -a -d -c /etc/bat.conf
 }
 
 lunch_stop()
