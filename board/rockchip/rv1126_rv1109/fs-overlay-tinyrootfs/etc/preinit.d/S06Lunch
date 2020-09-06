@@ -7,7 +7,7 @@ lunch_start()
 	ispserver &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
-	mediaserver -c /usr/share/mediaserver/tb_rtsp-link.conf > /dev/kmsg 2>&1 &
+	mediaserver -a -d -c /usr/share/mediaserver/tb_rtsp-link.conf > /dev/kmsg 2>&1 &
 }
 
 lunch_stop()
