@@ -98,4 +98,9 @@ config BR2_PACKAGE_MEDIASERVE_SCHEDULES_MANAGER
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_TB
+        bool "Enable thunder boot"
+        help
+          rockchip mediaserver options
+
 endif
