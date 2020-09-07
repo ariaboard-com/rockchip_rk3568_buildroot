@@ -1,7 +1,7 @@
-From c52ca400bf2d4aacaf044e47c0ad9fc89cb80b24 Mon Sep 17 00:00:00 2001
+From e521aeeb71de0351554113d3ec3ac306b6ec82a4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 23 Jun 2020 17:17:13 +0800
-Subject: [PATCH 04/23] HACK: backend-drm: Disable atomic and
+Subject: [PATCH 04/28] HACK: backend-drm: Disable atomic and
  DRM_CLIENT_CAP_ASPECT_RATIO
 
 These APIs are unstable on Rockchip BSP 4.4 kernel.

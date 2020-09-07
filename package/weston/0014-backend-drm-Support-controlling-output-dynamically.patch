@@ -1,7 +1,7 @@
-From cc19b9394abe44f039617da89d22d62ee0f11e35 Mon Sep 17 00:00:00 2001
+From 767dccab7fccb828f5c46389ce83c1e7368ad5c2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:37:37 +0800
-Subject: [PATCH 14/23] backend-drm: Support controlling output dynamically
+Subject: [PATCH 14/28] backend-drm: Support controlling output dynamically
 
 Use config file to control output's rotation/mode/freezen/display
 rectangle.
@@ -18,18 +18,18 @@ echo "output:HDMI-A-1:mode=800x600" >> /tmp/.weston_drm.conf
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- desktop-shell/shell.c                |  40 +++++++
+ desktop-shell/shell.c                |  44 ++++++-
  libweston/backend-drm/drm-internal.h |  19 +++
  libweston/backend-drm/drm.c          | 173 ++++++++++++++++++++++++++-
  libweston/backend-drm/modes.c        |   6 +-
  libweston/compositor.c               |   8 ++
- 5 files changed, 242 insertions(+), 4 deletions(-)
+ 5 files changed, 245 insertions(+), 5 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
-index 0908763..3ebec30 100644
+index f8cd2f2..329869b 100644
 --- a/desktop-shell/shell.c
 +++ b/desktop-shell/shell.c
-@@ -4906,6 +4906,41 @@ shell_resize_surface_to_output(struct desktop_shell *shell,
+@@ -4909,6 +4909,41 @@ shell_resize_surface_to_output(struct desktop_shell *shell,
  					output->height);
  }
  
@@ -50,7 +50,7 @@ index 0908763..3ebec30 100644
 +
 +		shsurf = get_shell_surface(view->surface);
 +		if (!shsurf)
-+			return;
++			continue;
 +
 +		desktop_surface = shsurf->desktop_surface;
 +		if (weston_desktop_surface_get_fullscreen(desktop_surface)) {
@@ -71,7 +71,7 @@ index 0908763..3ebec30 100644
  
  static void
  handle_output_resized(struct wl_listener *listener, void *data)
-@@ -4915,8 +4950,13 @@ handle_output_resized(struct wl_listener *listener, void *data)
+@@ -4918,8 +4953,13 @@ handle_output_resized(struct wl_listener *listener, void *data)
  	struct weston_output *output = (struct weston_output *)data;
  	struct shell_output *sh_output = find_shell_output_from_weston_output(shell, output);
  
@@ -85,6 +85,17 @@ index 0908763..3ebec30 100644
  }
  
  static void
+@@ -4968,7 +5008,9 @@ handle_output_move_layer(struct desktop_shell *shell,
+ 
+ 		x = view->geometry.x + output->move_x;
+ 		y = view->geometry.y + output->move_y;
+-		weston_view_set_position(view, x, y);
++
++		if (pixman_region32_contains_point(&output->region, x, y, NULL))
++			weston_view_set_position(view, x, y);
+ 	}
+ }
+ 
 diff --git a/libweston/backend-drm/drm-internal.h b/libweston/backend-drm/drm-internal.h
 index efe6d09..5ebd440 100644
 --- a/libweston/backend-drm/drm-internal.h
@@ -137,7 +148,7 @@ index efe6d09..5ebd440 100644
  drm_output_set_mode(struct weston_output *base,
  		    enum weston_drm_backend_output_mode mode,
 diff --git a/libweston/backend-drm/drm.c b/libweston/backend-drm/drm.c
-index c8091ee..227179a 100644
+index 0c2023c..b0b63db 100644
 --- a/libweston/backend-drm/drm.c
 +++ b/libweston/backend-drm/drm.c
 @@ -40,6 +40,7 @@
@@ -394,10 +405,10 @@ index cadeb3b..f7a17de 100644
  			if (!backend->aspect_ratio_supported ||
  			    aspect_ratio == drm_mode->base.aspect_ratio)
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 46f7048..05ada15 100644
+index 33b62a9..7bee911 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
-@@ -6089,12 +6089,15 @@ weston_output_set_transform(struct weston_output *output,
+@@ -6091,12 +6091,15 @@ weston_output_set_transform(struct weston_output *output,
  	int mid_x, mid_y;
  	struct weston_head *head;
  	int ver;
@@ -413,7 +424,7 @@ index 46f7048..05ada15 100644
  	weston_output_transform_scale_init(output, transform, output->scale);
  
  	pixman_region32_init(&old_region);
-@@ -6102,6 +6105,11 @@ weston_output_set_transform(struct weston_output *output,
+@@ -6104,6 +6107,11 @@ weston_output_set_transform(struct weston_output *output,
  
  	weston_output_init_geometry(output, output->x, output->y);
  

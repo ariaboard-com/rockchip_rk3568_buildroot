@@ -1,7 +1,7 @@
-From 3d3e7f4128821239933e5a851fbc0ffade71b0d2 Mon Sep 17 00:00:00 2001
+From e818ba2cf0e67db64dac458a1fd356c7b165f6c7 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 23 Jun 2020 10:05:48 +0800
-Subject: [PATCH 11/23] backend-drm: Support prefer connectors
+Subject: [PATCH 11/28] backend-drm: Support prefer connectors
 
 Using internal connector as main output by default.
 
@@ -21,8 +21,8 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  libweston/backend-drm/drm-internal.h |  18 ++
  libweston/backend-drm/drm.c          | 248 +++++++++++++++++++++++----
  libweston/backend-drm/kms.c          |  10 +-
- libweston/compositor.c               |  38 +++-
- 5 files changed, 297 insertions(+), 42 deletions(-)
+ libweston/compositor.c               |  40 ++++-
+ 5 files changed, 299 insertions(+), 42 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 9a77479..0908763 100644
@@ -623,7 +623,7 @@ index 7c0e59a..975df91 100644
  
  	return 0;
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index b29a9db..1046f39 100644
+index b29a9db..593ca2c 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -98,6 +98,25 @@ weston_compositor_build_view_list(struct weston_compositor *compositor);
@@ -652,13 +652,15 @@ index b29a9db..1046f39 100644
  /** Send wl_output events for mode and scale changes
   *
   * \param head Send on all resources bound to this head.
-@@ -1265,6 +1284,18 @@ weston_view_assign_output(struct weston_view *ev)
+@@ -1265,6 +1284,20 @@ weston_view_assign_output(struct weston_view *ev)
  	uint32_t max, area, mask;
  	pixman_box32_t *e;
  
 +	/* The static views should bind to the specific output */
-+	if (ev->output &&
-+	    weston_compositor_is_static_layer(get_view_layer(ev))) {
++	if (weston_compositor_is_static_layer(get_view_layer(ev))) {
++		if (!ev->output)
++			return;
++
 +		ev->output_mask |= 1u << ev->output->id;
 +
 +		if (ev->output->destroying)
@@ -671,7 +673,7 @@ index b29a9db..1046f39 100644
  	new_output = NULL;
  	max = 0;
  	mask = 0;
-@@ -2725,12 +2756,14 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
+@@ -2725,12 +2758,14 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
  	if (output->dirty)
  		weston_output_update_matrix(output);
  
@@ -688,7 +690,7 @@ index b29a9db..1046f39 100644
  		output->repaint_status = REPAINT_AWAITING_COMPLETION;
  
  	weston_compositor_repick(ec);
-@@ -5987,6 +6020,7 @@ weston_compositor_remove_output(struct weston_output *output)
+@@ -5987,6 +6022,7 @@ weston_compositor_remove_output(struct weston_output *output)
  	assert(output->destroying);
  	assert(output->enabled);
  

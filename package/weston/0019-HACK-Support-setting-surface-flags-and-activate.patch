@@ -1,7 +1,7 @@
-From 541efd847caaed9302a6e760b3a6869fda214b96 Mon Sep 17 00:00:00 2001
+From 798c7e3c63ed3bd10aee1e0dfd2b34397af67d60 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
-Subject: [PATCH 19/23] HACK: Support setting surface flags and activate
+Subject: [PATCH 19/28] HACK: Support setting surface flags and activate
 
 Support setting surface flags through app_id, for example:
 app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
@@ -19,7 +19,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 141 insertions(+)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
-index 3ebec30..51b6133 100644
+index 329869b..20f8fc6 100644
 --- a/desktop-shell/shell.c
 +++ b/desktop-shell/shell.c
 @@ -1943,6 +1943,11 @@ shell_surface_update_layer(struct shell_surface *shsurf)
@@ -54,7 +54,7 @@ index 3ebec30..51b6133 100644
  
  	weston_layer_set_position(&shell->lock_layer,
  				  WESTON_LAYER_POSITION_LOCK);
-@@ -4851,6 +4862,8 @@ shell_for_each_layer(struct desktop_shell *shell,
+@@ -4854,6 +4865,8 @@ shell_for_each_layer(struct desktop_shell *shell,
  	func(shell, &shell->background_layer, data);
  	func(shell, &shell->lock_layer, data);
  	func(shell, &shell->input_panel_layer, data);
@@ -63,7 +63,7 @@ index 3ebec30..51b6133 100644
  
  	wl_array_for_each(ws, &shell->workspaces.array)
  		func(shell, &(*ws)->layer, data);
-@@ -5236,6 +5249,8 @@ wet_shell_init(struct weston_compositor *ec,
+@@ -5241,6 +5254,8 @@ wet_shell_init(struct weston_compositor *ec,
  	weston_layer_init(&shell->background_layer, ec);
  	weston_layer_init(&shell->lock_layer, ec);
  	weston_layer_init(&shell->input_panel_layer, ec);
@@ -72,7 +72,7 @@ index 3ebec30..51b6133 100644
  
  	weston_layer_set_position(&shell->fullscreen_layer,
  				  WESTON_LAYER_POSITION_FULLSCREEN);
-@@ -5243,6 +5258,10 @@ wet_shell_init(struct weston_compositor *ec,
+@@ -5248,6 +5263,10 @@ wet_shell_init(struct weston_compositor *ec,
  				  WESTON_LAYER_POSITION_UI);
  	weston_layer_set_position(&shell->background_layer,
  				  WESTON_LAYER_POSITION_BACKGROUND);
@@ -257,10 +257,10 @@ index 21ff080..691ec01 100644
  
  void
 diff --git a/libweston/input.c b/libweston/input.c
-index 28dcb0b..60d1da0 100644
+index 42c961b..a1632a7 100644
 --- a/libweston/input.c
 +++ b/libweston/input.c
-@@ -1872,6 +1872,9 @@ weston_view_activate(struct weston_view *view,
+@@ -1879,6 +1879,9 @@ weston_view_activate(struct weston_view *view,
  			peek_next_activate_serial(compositor);
  	}
  

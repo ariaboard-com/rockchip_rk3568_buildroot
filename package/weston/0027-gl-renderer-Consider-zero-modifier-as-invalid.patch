@@ -1,7 +1,7 @@
-From 9512bf45cbf2cd1986428a2d7cb49ff021cba45e Mon Sep 17 00:00:00 2001
+From 8b0068ef2aff8e204d345a787db43a885faeb988 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 1 Sep 2020 08:51:17 +0800
-Subject: [PATCH] gl-renderer: Consider zero modifier as invalid
+Subject: [PATCH 27/28] gl-renderer: Consider zero modifier as invalid
 
 Some clients(e.g. chromium) might pass zero modifier as invalid
 modifier.

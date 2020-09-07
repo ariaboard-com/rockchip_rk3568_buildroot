@@ -1,7 +1,7 @@
-From 6422bd37a9017da6be9ae3e5187ac7f8a303f754 Mon Sep 17 00:00:00 2001
+From 9cf486e5dc54cedf61f659346bdc0120b29c42f1 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 3 Dec 2018 10:40:16 +0800
-Subject: [PATCH 10/23] compositor: Support freezing display
+Subject: [PATCH 10/28] compositor: Support freezing display
 
 Freeze display when the specified file(from env "WESTON_FREEZE_DISPLAY")
 exists.

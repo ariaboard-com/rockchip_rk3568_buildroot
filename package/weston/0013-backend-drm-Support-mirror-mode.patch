@@ -1,7 +1,7 @@
-From 63380f60061080f3245e1456109264015a60ee41 Mon Sep 17 00:00:00 2001
+From ac24025f1ab090a439bde7ac6763570e0586bfc3 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:42:31 +0800
-Subject: [PATCH 13/27] backend-drm: Support mirror mode
+Subject: [PATCH 13/28] backend-drm: Support mirror mode
 
 Set env "WESTON_DRM_MIRROR" to enable mirror mode, and set env
 "WESTON_DRM_KEEP_RATIO" to keep the aspect ratio.
@@ -509,10 +509,10 @@ index 767c34f..87f7a75 100644
  		state = drm_output_propose_state(output_base, pending_state, mode);
  		if (!state) {
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 1046f39..46f7048 100644
+index 593ca2c..33b62a9 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
-@@ -1301,7 +1301,7 @@ weston_view_assign_output(struct weston_view *ev)
+@@ -1303,7 +1303,7 @@ weston_view_assign_output(struct weston_view *ev)
  	mask = 0;
  	pixman_region32_init(&region);
  	wl_list_for_each(output, &ec->output_list, link) {

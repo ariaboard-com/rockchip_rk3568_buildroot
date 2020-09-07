@@ -1,7 +1,7 @@
-From d466b56c6d565e0f6ef7037827995163cd980e82 Mon Sep 17 00:00:00 2001
+From b88498f36f301bcb2cd1877f2a7fb2832ec69d8b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 10:20:40 +0800
-Subject: [PATCH 23/23] Support holding display for the first app
+Subject: [PATCH 23/28] Support holding display for the first app
 
 Use '-w' or '--warm-up' to enable it.
 
@@ -63,7 +63,7 @@ index 44a36fb..969a8df 100644
  
  struct weston_buffer {
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index ecdec51..bcbf68c 100644
+index 7b65ebf..c858547 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -117,6 +117,24 @@ weston_compositor_is_static_layer(struct weston_layer *layer)
@@ -91,7 +91,7 @@ index ecdec51..bcbf68c 100644
  /** Send wl_output events for mode and scale changes
   *
   * \param head Send on all resources bound to this head.
-@@ -2650,6 +2668,12 @@ weston_compositor_build_view_list(struct weston_compositor *compositor)
+@@ -2652,6 +2670,12 @@ weston_compositor_build_view_list(struct weston_compositor *compositor)
  
  	wl_list_for_each(layer, &compositor->layer_list, link) {
  		wl_list_for_each(view, &layer->view_list.link, layer_link.link) {
@@ -104,7 +104,7 @@ index ecdec51..bcbf68c 100644
  			view_list_add(compositor, view);
  		}
  	}
-@@ -2705,6 +2729,11 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
+@@ -2707,6 +2731,11 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
  	/* Rebuild the surface list and update surface transforms up front. */
  	weston_compositor_build_view_list(ec);
  
