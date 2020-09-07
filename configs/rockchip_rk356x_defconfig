@@ -1,0 +1,6 @@
+#include "base.config"
+#include "base_extra.config"
+#include "benchmark.config"
+#include "debug.config"
+#include "rk356x_arm64.config"
+#include "test.config"

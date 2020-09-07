@@ -64,6 +64,11 @@ config BR2_PACKAGE_RK3326
     help
         Use rockchip's rk3326 chip
 
+config BR2_PACKAGE_RK356X
+    bool "rk356x chip"
+    help
+        Use rockchip's rk356x chip
+
 config BR2_PACKAGE_PX30
     bool "px30 chip"
     help
