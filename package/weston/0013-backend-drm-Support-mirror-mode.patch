@@ -1,4 +1,4 @@
-From 049604630a40be45871f53207f5aabedf00a6c7a Mon Sep 17 00:00:00 2001
+From 63380f60061080f3245e1456109264015a60ee41 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:42:31 +0800
 Subject: [PATCH 13/27] backend-drm: Support mirror mode
@@ -10,14 +10,15 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  desktop-shell/shell.c                 |   3 +
  include/libweston/libweston.h         |   2 +
+ libweston/backend-drm/drm-gbm.c       |   4 +-
  libweston/backend-drm/drm-internal.h  |   6 +
- libweston/backend-drm/drm.c           | 289 +++++++++++++++++++++++++-
+ libweston/backend-drm/drm.c           | 293 ++++++++++++++++++++++++--
  libweston/backend-drm/meson.build     |   3 +-
  libweston/backend-drm/state-propose.c |   5 +-
  libweston/compositor.c                |   2 +-
  libweston/input.c                     |   7 +
  meson.build                           |   8 +
- 9 files changed, 312 insertions(+), 13 deletions(-)
+ 10 files changed, 316 insertions(+), 17 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 0908763..f8cd2f2 100644
@@ -46,6 +47,21 @@ index e3e5258..972d23f 100644
  };
  
  enum weston_pointer_motion_mask {
+diff --git a/libweston/backend-drm/drm-gbm.c b/libweston/backend-drm/drm-gbm.c
+index 324c2a8..a0ab85e 100644
+--- a/libweston/backend-drm/drm-gbm.c
++++ b/libweston/backend-drm/drm-gbm.c
+@@ -256,8 +256,8 @@ drm_output_fini_egl(struct drm_output *output)
+ 	/* Destroying the GBM surface will destroy all our GBM buffers,
+ 	 * regardless of refcount. Ensure we destroy them here. */
+ 	if (!b->shutting_down &&
+-	    output->scanout_plane->state_cur->fb &&
+-	    output->scanout_plane->state_cur->fb->type == BUFFER_GBM_SURFACE) {
++	    output->scanout_plane->state_cur->fb && (output->is_mirror ||
++	    output->scanout_plane->state_cur->fb->type == BUFFER_GBM_SURFACE)) {
+ 		drm_plane_state_free(output->scanout_plane->state_cur, true);
+ 		output->scanout_plane->state_cur =
+ 			drm_plane_state_alloc(NULL, output->scanout_plane);
 diff --git a/libweston/backend-drm/drm-internal.h b/libweston/backend-drm/drm-internal.h
 index 5573aee..efe6d09 100644
 --- a/libweston/backend-drm/drm-internal.h
@@ -71,7 +87,7 @@ index 5573aee..efe6d09 100644
  
  static inline struct drm_head *
 diff --git a/libweston/backend-drm/drm.c b/libweston/backend-drm/drm.c
-index 53b49de..c8091ee 100644
+index 53b49de..0c2023c 100644
 --- a/libweston/backend-drm/drm.c
 +++ b/libweston/backend-drm/drm.c
 @@ -66,6 +66,11 @@
@@ -438,6 +454,17 @@ index 53b49de..c8091ee 100644
  }
  
  static int
+@@ -1307,8 +1570,8 @@ drm_output_fini_pixman(struct drm_output *output)
+ 	/* Destroying the Pixman surface will destroy all our buffers,
+ 	 * regardless of refcount. Ensure we destroy them here. */
+ 	if (!b->shutting_down &&
+-	    output->scanout_plane->state_cur->fb &&
+-	    output->scanout_plane->state_cur->fb->type == BUFFER_PIXMAN_DUMB) {
++	    output->scanout_plane->state_cur->fb && (output->is_mirror ||
++	    output->scanout_plane->state_cur->fb->type == BUFFER_PIXMAN_DUMB)) {
+ 		drm_plane_state_free(output->scanout_plane->state_cur, true);
+ 		output->scanout_plane->state_cur =
+ 			drm_plane_state_alloc(NULL, output->scanout_plane);
 @@ -3007,6 +3270,12 @@ drm_backend_create(struct weston_compositor *compositor,
  	if (buf)
  		sscanf(buf, "%dx%d", &b->virtual_width, &b->virtual_height);
