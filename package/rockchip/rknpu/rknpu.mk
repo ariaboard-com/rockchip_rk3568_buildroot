@@ -7,6 +7,7 @@ RKNPU_VERSION = 1.2.1
 RKNPU_SITE_METHOD = local
 RKNPU_SITE = $(TOPDIR)/../external/rknpu
 NPU_TEST_FILE = $(@D)/test
+RKNPU_INSTALL_STAGING = YES
 
 ifeq ($(BR2_PACKAGE_RKNPU_PCIE),y)
 NPU_KO_FILE = galcore_rk3399pro-npu-pcie.ko
@@ -14,6 +15,12 @@ else ifeq ($(BR2_PACKAGE_RK3399PRO_NPU),y)
 NPU_KO_FILE = galcore_rk3399pro-npu.ko
 else ifeq ($(BR2_PACKAGE_RK1806),y)
 NPU_KO_FILE = galcore_rk1806.ko
+else ifeq ($(BR2_PACKAGE_RV1126_RV1109),y)
+ifeq ($(BR2_PACKAGE_RKNPU_USE_MINI_DRIVER),y)
+NPU_KO_FILE = galcore_puma_tb.ko
+else
+NPU_KO_FILE = galcore_puma.ko
+endif
 else
 NPU_KO_FILE = galcore.ko
 endif
@@ -24,8 +31,13 @@ else
 NPU_PLATFORM_ARCH = linux-aarch64
 endif
 
+ifeq ($(BR2_PACKAGE_RV1126_RV1109),y)
+NPU_PLATFORM_ARCH = linux-armhf-puma
+endif
+
 ifeq ($(BR2_PACKAGE_RKNPU_USE_MINI_DRIVER), y)
 NPU_PLATFORM = $(NPU_PLATFORM_ARCH)-mini
+BUILD_NOT_START_RKNN_SCRIPT=y
 else
 NPU_PLATFORM = $(NPU_PLATFORM_ARCH)
 endif
@@ -34,9 +46,10 @@ ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)
 BUILD_PYTHON_RKNN=y
 endif
 
-ifeq ($(BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER), y)
-BUILD_NOT_START_RKNN_SCRIPT=y
-endif
+define RKNPU_INSTALL_STAGING_CMDS
+    mkdir -p $(STAGING_DIR)/usr/include/rknn
+    $(INSTALL) -D -m 0644 $(@D)/rknn/include/rknn_runtime.h $(STAGING_DIR)/usr/include/rknn/rknn_runtime.h
+endef
 
 define RKNPU_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/lib/modules/

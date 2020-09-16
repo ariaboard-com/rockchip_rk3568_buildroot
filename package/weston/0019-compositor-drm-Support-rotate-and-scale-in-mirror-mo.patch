@@ -1,7 +1,7 @@
-From 0d2684ae707942c9736b90ba5b2e3d51e3b97a9c Mon Sep 17 00:00:00 2001
+From 9472bc4e6732c9ca6c0764cf0291b74276e31cae Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Thu, 1 Aug 2019 20:51:22 +0800
-Subject: [PATCH 19/22] compositor-drm: Support rotate and scale in mirror mode
+Date: Mon, 24 Feb 2020 16:09:41 +0800
+Subject: [PATCH 19/25] compositor-drm: Support rotate and scale in mirror mode
 
 Use rockchip rga for mirror mode.
 
@@ -10,8 +10,8 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  Makefile.am                |   1 +
  config.h.in                |   6 +
  configure.ac               |  10 ++
- libweston/compositor-drm.c | 342 +++++++++++++++++++++++++++++++++++++--------
- 4 files changed, 300 insertions(+), 59 deletions(-)
+ libweston/compositor-drm.c | 332 +++++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 290 insertions(+), 59 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
 index e9679e6..7686e7b 100644
@@ -64,7 +64,7 @@ index 0961ca8..01a18de 100644
  PKG_CHECK_MODULES(LIBINPUT_BACKEND, [libinput >= 0.8.0])
  PKG_CHECK_MODULES(COMPOSITOR, [$COMPOSITOR_MODULES])
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index d593c04..5b26878 100644
+index c260896..9a4873e 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -63,6 +63,11 @@
@@ -79,16 +79,15 @@ index d593c04..5b26878 100644
  #ifndef DRM_CAP_TIMESTAMP_MONOTONIC
  #define DRM_CAP_TIMESTAMP_MONOTONIC 0x6
  #endif
-@@ -222,6 +227,8 @@ struct drm_output {
+@@ -222,6 +227,7 @@ struct drm_output {
  
  	struct wl_list link;
  	bool is_mirror;
 +	pixman_box32_t plane_bounds;
-+	bool can_scale;
  
- 	uint32_t crtc_id; /* object ID to pass to DRM functions */
- 	uint32_t plane_id; /* object ID to pass to DRM functions */
-@@ -869,37 +876,217 @@ drm_waitvblank_pipe(struct drm_output *output)
+ 	bool can_scale;
+ 
+@@ -871,37 +877,259 @@ drm_waitvblank_pipe(struct drm_output *output)
  		return 0;
  }
  
@@ -131,6 +130,7 @@ index d593c04..5b26878 100644
 +{
 +#ifndef HAVE_RGA
 +	/* TODO: Use pixman to do the copy */
++	weston_log("rga not supported\n");
 +	return -1;
 +#else
 +	RgaSURF_FORMAT src_format, dst_format;
@@ -148,6 +148,7 @@ index d593c04..5b26878 100644
 +	if (!rga_inited) {
 +		ret = c_RkRgaInit();
 +		if (ret < 0) {
++			weston_log("rga not supported\n");
 +			rga_supported = false;
 +			return ret;
 +		}
@@ -158,8 +159,10 @@ index d593c04..5b26878 100644
 +	dst_format = rga_get_format(dst->format);
 +
 +	if (src_format == RK_FORMAT_UNKNOWN ||
-+	    dst_format == RK_FORMAT_UNKNOWN)
++	    dst_format == RK_FORMAT_UNKNOWN) {
++		weston_log("unsupported fb format\n");
 +		return -1;
++	}
 +
 +	ret = drmPrimeHandleToFD(src->fd, src->handle,
 +				 DRM_CLOEXEC, &src_fd);
@@ -193,6 +196,44 @@ index d593c04..5b26878 100644
 +		     dst_format);
 +
 +	ret = c_RkRgaBlit(&src_info, &dst_info, NULL);
++
++	/**
++	 * Fill the rest with black.
++	 * Rga can only handle w > 1 and h > 1.
++	 */
++	if (dy > 1) {
++		rga_set_rect(&dst_info.rect, 0, 0, dst->width, dy,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dy + dh < dst->height - 1) {
++		rga_set_rect(&dst_info.rect, 0, dy + dh,
++			     dst->width, dst->height - dy - dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dx > 1) {
++		rga_set_rect(&dst_info.rect, 0, dy, dx, dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
++
++	if (dx + dw < dst->width - 1) {
++		rga_set_rect(&dst_info.rect, dx + dw, dy,
++			     dst->width - dx - dw, dh,
++			     dst->stride * 8 / dst->format->bpp, dst->height,
++			     dst_format);
++
++		ret |= c_RkRgaColorFill(&dst_info);
++	}
 +
 +	close(dst_fd);
 +close_src:
@@ -290,9 +331,10 @@ index d593c04..5b26878 100644
 +
 +		output->fb_pending = fb;
 +		drm_fb_ref(output->fb_pending);
-+		return;
+ 		return;
 +	}
-+
+ 
+-	drm_fb_ref(output->fb_pending);
 +	memset(&output->plane_bounds, 0, sizeof(pixman_box32_t));
 +
 +	/* Mirroring to dumb fb */
@@ -311,19 +353,18 @@ index d593c04..5b26878 100644
 +
 +	if (output->is_mirror) {
 +		drm_output_prepare_mirror_fb(output);
- 		return;
++		return;
 +	}
 +
 +	drm_output_render(output, damage);
- 
--	drm_fb_ref(output->fb_pending);
++
 +	// Repaint all mirrors
 +	wl_list_for_each(output, &b->mirror_list, link)
 +		weston_output_schedule_repaint(&output->base);
  }
  
  static int
-@@ -963,34 +1150,26 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -964,34 +1192,26 @@ drm_output_repaint(struct weston_output *output_base,
  		output->state_invalid = false;
  	}
  
@@ -369,7 +410,7 @@ index d593c04..5b26878 100644
  		weston_log("set plane failed: %m\n");
  		goto err_pageflip;
  	}
-@@ -1777,11 +1956,7 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
+@@ -1778,11 +1998,7 @@ drm_output_switch_mode(struct weston_output *output_base, struct weston_mode *mo
  	drm_fb_unref(output->fb_dummy);
  	output->fb_dummy = NULL;
  
@@ -382,73 +423,16 @@ index d593c04..5b26878 100644
  		drm_output_fini_pixman(output);
  		if (drm_output_init_pixman(output, b) < 0) {
  			weston_log("failed to init output pixman state with "
-@@ -1989,7 +2164,8 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+@@ -1992,7 +2208,7 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
  	mode->base.width = info->hdisplay;
  	mode->base.height = info->vdisplay;
  
 -	if (drm_virtual_width && drm_virtual_height) {
-+	if (!output->is_mirror && output->can_scale &&
-+	    drm_virtual_width && drm_virtual_height) {
- 		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
- 			   output->base.name, drm_virtual_width,
- 			   drm_virtual_height, mode->base.width,
-@@ -2181,6 +2357,55 @@ drm_plane_is_primary(struct drm_backend *b, int plane_id)
- 	return type == DRM_PLANE_TYPE_PRIMARY;
- }
- 
-+static bool
-+drm_plane_can_scale(struct drm_backend *b, int plane_id)
-+{
-+	drmModeObjectPropertiesPtr props;
-+	drmModePropertyPtr prop = NULL;
-+	uint64_t value;
-+	unsigned i;
-+	bool ret = false;
-+
-+	if (!getenv("WESTON_DRM_ALLOW_SCALE"))
-+		return false;
-+
-+	props = drmModeObjectGetProperties(b->drm.fd, plane_id,
-+					   DRM_MODE_OBJECT_PLANE);
-+	if (!props)
-+		return false;
-+
-+	for (i = 0; i < props->count_props; i++) {
-+		prop = drmModeGetProperty(b->drm.fd, props->props[i]);
-+		if (!prop)
-+			continue;
-+
-+		if(drm_property_type_is(prop, DRM_MODE_PROP_BITMASK) &&
-+		   !strcmp(prop->name, "FEATURE"))
-+			break;
-+
-+		drmModeFreeProperty(prop);
-+	}
-+
-+	if (i == props->count_props)
-+		goto out;
-+
-+	value = props->prop_values[i];
-+
-+	for (i = 0; i < (unsigned) prop->count_enums; i++) {
-+		if (strcmp(prop->enums[i].name, "scale"))
-+			continue;
-+
-+		ret = value & (1LL << prop->enums[i].value);
-+		break;
-+	}
-+
-+	drmModeFreeProperty(prop);
-+
-+out:
-+	drmModeFreeObjectProperties(props);
-+	return ret;
-+}
-+
- static int
- find_plane_for_crtc(struct drm_backend *b, int pipe)
- {
-@@ -2840,18 +3065,17 @@ drm_output_enable(struct weston_output *base)
++	if (!output->is_mirror && drm_virtual_width && drm_virtual_height) {
+ 		if (output->can_scale) {
+ 			weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
+ 				   output->base.name, drm_virtual_width,
+@@ -2897,18 +3113,17 @@ drm_output_enable(struct weston_output *base)
  	if (b->pageflip_timeout)
  		drm_output_pageflip_timer_create(output);
  
@@ -476,7 +460,7 @@ index d593c04..5b26878 100644
  		wl_list_insert(&b->mirror_list, &output->link);
  
  		// HACK: Make it unavailable for views?
-@@ -2933,14 +3157,13 @@ drm_output_deinit(struct weston_output *base)
+@@ -2990,14 +3205,13 @@ drm_output_deinit(struct weston_output *base)
  	drm_fb_unref(output->fb_current);
  	output->fb_current = NULL;
  
@@ -497,14 +481,6 @@ index d593c04..5b26878 100644
  
  	weston_plane_release(&output->fb_plane);
  	weston_plane_release(&output->cursor_plane);
-@@ -3068,6 +3291,7 @@ create_output_for_connector(struct drm_backend *b,
- 	output->pipe = i;
- 	output->connector_id = connector->connector_id;
- 	output->plane_id = plane_id;
-+	output->can_scale = drm_plane_can_scale(b, plane_id);
- 
- 	output->backlight = backlight_init(drm_device,
- 					   connector->connector_type);
 -- 
 2.11.0
 

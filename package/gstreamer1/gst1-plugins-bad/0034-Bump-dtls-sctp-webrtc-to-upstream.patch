@@ -1,4 +1,4 @@
-From aac7fdcaeb1985597741f43d4f45b6aee7c47ba1 Mon Sep 17 00:00:00 2001
+From fbbffe4d14c4c13c6fdb47aa35805fe65ab930e5 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 18 Sep 2019 18:22:24 +0800
 Subject: [PATCH] Bump dtls/sctp/webrtc to upstream
@@ -9,6 +9,7 @@ Bump to:
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  configure.ac                                |   21 +
+ ext/Makefile.am                             |    8 +
  ext/dtls/Makefile.am                        |    2 +-
  ext/dtls/gstdtlsagent.c                     |   42 +-
  ext/dtls/gstdtlscertificate.c               |   29 +-
@@ -50,6 +51,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  ext/webrtc/webrtcsdp.h                      |   32 +-
  ext/webrtc/webrtctransceiver.c              |   39 +-
  ext/webrtc/webrtctransceiver.h              |    5 +
+ gst-libs/gst/Makefile.am                    |    6 +-
  gst-libs/gst/sctp/Makefile.am               |   26 +
  gst-libs/gst/sctp/meson.build               |   26 +
  gst-libs/gst/sctp/sctp-prelude.h            |   31 +
@@ -72,9 +74,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  gst-libs/gst/webrtc/rtptransceiver.c        |   30 +-
  gst-libs/gst/webrtc/rtptransceiver.h        |    6 +
  gst-libs/gst/webrtc/webrtc_fwd.h            |  236 +-
+ pkgconfig/Makefile.am                       |    5 +-
  pkgconfig/gstreamer-sctp-uninstalled.pc.in  |   12 +
  pkgconfig/gstreamer-sctp.pc.in              |   12 +
- 66 files changed, 9005 insertions(+), 1375 deletions(-)
+ 69 files changed, 9020 insertions(+), 1379 deletions(-)
  create mode 100644 ext/sctp/Makefile.am
  create mode 100644 ext/sctp/gstsctpdec.c
  create mode 100644 ext/sctp/gstsctpdec.h
@@ -99,7 +102,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  create mode 100644 pkgconfig/gstreamer-sctp.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index 1a27e2daa..b053aa64a 100644
+index 34b5d1f..ac5677a 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -2310,6 +2310,22 @@ AG_GST_CHECK_FEATURE(WEBRTC, [WebRTC], webrtc, [
@@ -158,8 +161,41 @@ index 1a27e2daa..b053aa64a 100644
  pkgconfig/gstreamer-wayland.pc
  pkgconfig/gstreamer-wayland-uninstalled.pc
  pkgconfig/gstreamer-webrtc.pc
+diff --git a/ext/Makefile.am b/ext/Makefile.am
+index 4de9214..d4d5e96 100644
+--- a/ext/Makefile.am
++++ b/ext/Makefile.am
+@@ -280,6 +280,12 @@ else
+ SBC_DIR=
+ endif
+ 
++if USE_SCTP
++SCTP_DIR=sctp
++else
++SCTP_DIR=
++endif
++
+ if USE_SMOOTHSTREAMING
+ SMOOTHSTREAMING_DIR = smoothstreaming
+ else
+@@ -448,6 +454,7 @@ SUBDIRS=\
+ 	$(OPUS_DIR) \
+ 	$(RSVG_DIR) \
+ 	$(SBC_DIR) \
++	$(SCTP_DIR) \
+ 	$(SMOOTHSTREAMING_DIR) \
+ 	$(SMOOTHWAVE_DIR) \
+ 	$(SNDFILE_DIR) \
+@@ -515,6 +522,7 @@ DIST_SUBDIRS = \
+ 	rsvg \
+ 	resindvd \
+ 	sbc \
++	sctp \
+ 	smoothstreaming \
+ 	sndfile \
+ 	soundtouch \
 diff --git a/ext/dtls/Makefile.am b/ext/dtls/Makefile.am
-index 20a95f3f8..63cbcd866 100644
+index 20a95f3..63cbcd8 100644
 --- a/ext/dtls/Makefile.am
 +++ b/ext/dtls/Makefile.am
 @@ -18,7 +18,7 @@ libgstdtls_la_CFLAGS = \
@@ -172,7 +208,7 @@ index 20a95f3f8..63cbcd866 100644
  
  noinst_HEADERS = \
 diff --git a/ext/dtls/gstdtlsagent.c b/ext/dtls/gstdtlsagent.c
-index 55500f95b..4070c7957 100644
+index 55500f9..4070c79 100644
 --- a/ext/dtls/gstdtlsagent.c
 +++ b/ext/dtls/gstdtlsagent.c
 @@ -42,10 +42,6 @@
@@ -284,7 +320,7 @@ index 55500f95b..4070c7957 100644
  
    G_OBJECT_CLASS (gst_dtls_agent_parent_class)->finalize (gobject);
 diff --git a/ext/dtls/gstdtlscertificate.c b/ext/dtls/gstdtlscertificate.c
-index c2d9bb217..4e4484942 100644
+index c2d9bb2..4e44849 100644
 --- a/ext/dtls/gstdtlscertificate.c
 +++ b/ext/dtls/gstdtlscertificate.c
 @@ -45,17 +45,18 @@
@@ -357,7 +393,7 @@ index c2d9bb217..4e4484942 100644
  
    name = X509_get_subject_name (priv->x509);
 diff --git a/ext/dtls/gstdtlsconnection.c b/ext/dtls/gstdtlsconnection.c
-index 77ed95e5c..244ec997c 100644
+index 77ed95e..244ec99 100644
 --- a/ext/dtls/gstdtlsconnection.c
 +++ b/ext/dtls/gstdtlsconnection.c
 @@ -42,15 +42,15 @@
@@ -535,7 +571,7 @@ index 77ed95e5c..244ec997c 100644
  
    return size;
 diff --git a/ext/dtls/gstdtlsdec.c b/ext/dtls/gstdtlsdec.c
-index 87b822131..a1ae7205a 100644
+index 87b8221..a1ae720 100644
 --- a/ext/dtls/gstdtlsdec.c
 +++ b/ext/dtls/gstdtlsdec.c
 @@ -141,7 +141,8 @@ gst_dtls_dec_class_init (GstDtlsDecClass * klass)
@@ -579,7 +615,7 @@ index 87b822131..a1ae7205a 100644
        g_object_weak_ref (G_OBJECT (agent), (GWeakNotify) agent_weak_ref_notify,
            (gpointer) g_strdup (pem));
 diff --git a/ext/dtls/gstdtlssrtpdec.c b/ext/dtls/gstdtlssrtpdec.c
-index 983621001..949f20d20 100644
+index 9836210..949f20d 100644
 --- a/ext/dtls/gstdtlssrtpdec.c
 +++ b/ext/dtls/gstdtlssrtpdec.c
 @@ -123,7 +123,8 @@ gst_dtls_srtp_dec_class_init (GstDtlsSrtpDecClass * klass)
@@ -593,7 +629,7 @@ index 983621001..949f20d20 100644
    properties[PROP_PEER_PEM] =
        g_param_spec_string ("peer-pem",
 diff --git a/ext/dtls/meson.build b/ext/dtls/meson.build
-index 1ce99dcbd..74babae17 100644
+index 1ce99dc..74babae 100644
 --- a/ext/dtls/meson.build
 +++ b/ext/dtls/meson.build
 @@ -11,15 +11,18 @@ dtls_sources = [
@@ -619,7 +655,7 @@ index 1ce99dcbd..74babae17 100644
  endif
 diff --git a/ext/sctp/Makefile.am b/ext/sctp/Makefile.am
 new file mode 100644
-index 000000000..957ee6a93
+index 0000000..957ee6a
 --- /dev/null
 +++ b/ext/sctp/Makefile.am
 @@ -0,0 +1,22 @@
@@ -647,7 +683,7 @@ index 000000000..957ee6a93
 +    gstsctpdec.h
 diff --git a/ext/sctp/gstsctpdec.c b/ext/sctp/gstsctpdec.c
 new file mode 100644
-index 000000000..870a3ba00
+index 0000000..870a3ba
 --- /dev/null
 +++ b/ext/sctp/gstsctpdec.c
 @@ -0,0 +1,656 @@
@@ -1309,7 +1345,7 @@ index 000000000..870a3ba00
 +}
 diff --git a/ext/sctp/gstsctpdec.h b/ext/sctp/gstsctpdec.h
 new file mode 100644
-index 000000000..845fac4d4
+index 0000000..845fac4
 --- /dev/null
 +++ b/ext/sctp/gstsctpdec.h
 @@ -0,0 +1,66 @@
@@ -1381,7 +1417,7 @@ index 000000000..845fac4d4
 +#endif /* __GST_SCTP_DEC_H__ */
 diff --git a/ext/sctp/gstsctpenc.c b/ext/sctp/gstsctpenc.c
 new file mode 100644
-index 000000000..ec33ca9ae
+index 0000000..ec33ca9
 --- /dev/null
 +++ b/ext/sctp/gstsctpenc.c
 @@ -0,0 +1,954 @@
@@ -2341,7 +2377,7 @@ index 000000000..ec33ca9ae
 +}
 diff --git a/ext/sctp/gstsctpenc.h b/ext/sctp/gstsctpenc.h
 new file mode 100644
-index 000000000..a05bd4e8d
+index 0000000..a05bd4e
 --- /dev/null
 +++ b/ext/sctp/gstsctpenc.h
 @@ -0,0 +1,77 @@
@@ -2424,7 +2460,7 @@ index 000000000..a05bd4e8d
 +#endif /* __GST_SCTP_ENC_H__ */
 diff --git a/ext/sctp/gstsctpplugin.c b/ext/sctp/gstsctpplugin.c
 new file mode 100644
-index 000000000..888a94c84
+index 0000000..888a94c
 --- /dev/null
 +++ b/ext/sctp/gstsctpplugin.c
 @@ -0,0 +1,53 @@
@@ -2483,7 +2519,7 @@ index 000000000..888a94c84
 +    plugin_init, PACKAGE_VERSION, "BSD", GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)
 diff --git a/ext/sctp/meson.build b/ext/sctp/meson.build
 new file mode 100644
-index 000000000..c83047ec4
+index 0000000..c83047e
 --- /dev/null
 +++ b/ext/sctp/meson.build
 @@ -0,0 +1,37 @@
@@ -2526,7 +2562,7 @@ index 000000000..c83047ec4
 +endif
 diff --git a/ext/sctp/sctpassociation.c b/ext/sctp/sctpassociation.c
 new file mode 100644
-index 000000000..50a3ed374
+index 0000000..50a3ed3
 --- /dev/null
 +++ b/ext/sctp/sctpassociation.c
 @@ -0,0 +1,841 @@
@@ -3373,7 +3409,7 @@ index 000000000..50a3ed374
 +}
 diff --git a/ext/sctp/sctpassociation.h b/ext/sctp/sctpassociation.h
 new file mode 100644
-index 000000000..4510ba70f
+index 0000000..4510ba7
 --- /dev/null
 +++ b/ext/sctp/sctpassociation.h
 @@ -0,0 +1,123 @@
@@ -3501,7 +3537,7 @@ index 000000000..4510ba70f
 +
 +#endif /* __GST_SCTP_ASSOCIATION_H__ */
 diff --git a/ext/webrtc/Makefile.am b/ext/webrtc/Makefile.am
-index 5f9a71488..778f112d0 100644
+index 5f9a714..778f112 100644
 --- a/ext/webrtc/Makefile.am
 +++ b/ext/webrtc/Makefile.am
 @@ -7,11 +7,13 @@ noinst_HEADERS = \
@@ -3549,7 +3585,7 @@ index 5f9a71488..778f112d0 100644
  libgstwebrtc_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
  libgstwebrtc_la_LIBTOOLFLAGS = $(GST_PLUGIN_LIBTOOLFLAGS)
 diff --git a/ext/webrtc/fwd.h b/ext/webrtc/fwd.h
-index 903145fbf..aa26ec6de 100644
+index 903145f..aa26ec6 100644
 --- a/ext/webrtc/fwd.h
 +++ b/ext/webrtc/fwd.h
 @@ -41,6 +41,10 @@ typedef struct _GstWebRTCNiceTransport GstWebRTCNiceTransport;
@@ -3564,7 +3600,7 @@ index 903145fbf..aa26ec6de 100644
  typedef struct _TransportStreamClass TransportStreamClass;
  
 diff --git a/ext/webrtc/gstwebrtcbin.c b/ext/webrtc/gstwebrtcbin.c
-index b3746bf3e..4d2d95f49 100644
+index b3746bf..4d2d95f 100644
 --- a/ext/webrtc/gstwebrtcbin.c
 +++ b/ext/webrtc/gstwebrtcbin.c
 @@ -28,6 +28,8 @@
@@ -7908,7 +7944,7 @@ index b3746bf3e..4d2d95f49 100644
 +  webrtc->priv->is_closed = TRUE;
  }
 diff --git a/ext/webrtc/gstwebrtcbin.h b/ext/webrtc/gstwebrtcbin.h
-index 49603ec5e..d38e50985 100644
+index 49603ec..d38e509 100644
 --- a/ext/webrtc/gstwebrtcbin.h
 +++ b/ext/webrtc/gstwebrtcbin.h
 @@ -23,22 +23,10 @@
@@ -7987,7 +8023,7 @@ index 49603ec5e..d38e50985 100644
    GstStructure *stats;
  };
 diff --git a/ext/webrtc/gstwebrtcice.c b/ext/webrtc/gstwebrtcice.c
-index ce30d3b44..17e3f25d3 100644
+index ce30d3b..17e3f25 100644
 --- a/ext/webrtc/gstwebrtcice.c
 +++ b/ext/webrtc/gstwebrtcice.c
 @@ -32,15 +32,11 @@
@@ -8499,7 +8535,7 @@ index ce30d3b44..17e3f25d3 100644
  
    ice->priv->nice_agent = nice_agent_new (ice->priv->main_context,
 diff --git a/ext/webrtc/gstwebrtcice.h b/ext/webrtc/gstwebrtcice.h
-index cacf497a8..4b0cfdce3 100644
+index cacf497..4b0cfdc 100644
 --- a/ext/webrtc/gstwebrtcice.h
 +++ b/ext/webrtc/gstwebrtcice.h
 @@ -48,6 +48,8 @@ struct _GstWebRTCICE
@@ -8521,7 +8557,7 @@ index cacf497a8..4b0cfdce3 100644
  G_END_DECLS
  
 diff --git a/ext/webrtc/gstwebrtcstats.c b/ext/webrtc/gstwebrtcstats.c
-index 38a6a02a2..7ecf9b9aa 100644
+index 38a6a02..7ecf9b9 100644
 --- a/ext/webrtc/gstwebrtcstats.c
 +++ b/ext/webrtc/gstwebrtcstats.c
 @@ -40,8 +40,8 @@ _init_debug (void)
@@ -9000,7 +9036,7 @@ index 38a6a02a2..7ecf9b9aa 100644
  }
  
 diff --git a/ext/webrtc/icestream.c b/ext/webrtc/icestream.c
-index dd4852468..e51af7044 100644
+index dd48524..e51af70 100644
 --- a/ext/webrtc/icestream.c
 +++ b/ext/webrtc/icestream.c
 @@ -27,12 +27,6 @@
@@ -9050,7 +9086,7 @@ index dd4852468..e51af7044 100644
  
  GstWebRTCICEStream *
 diff --git a/ext/webrtc/meson.build b/ext/webrtc/meson.build
-index c98bd0d89..3e7a5d1d8 100644
+index c98bd0d..3e7a5d1 100644
 --- a/ext/webrtc/meson.build
 +++ b/ext/webrtc/meson.build
 @@ -4,6 +4,7 @@ webrtc_sources = [
@@ -9089,7 +9125,7 @@ index c98bd0d89..3e7a5d1d8 100644
 +  plugins += [gstwebrtc_plugin]
  endif
 diff --git a/ext/webrtc/nicetransport.c b/ext/webrtc/nicetransport.c
-index 2365cfd52..5e7f30e71 100644
+index 2365cfd..5e7f30e 100644
 --- a/ext/webrtc/nicetransport.c
 +++ b/ext/webrtc/nicetransport.c
 @@ -27,13 +27,6 @@
@@ -9142,7 +9178,7 @@ index 2365cfd52..5e7f30e71 100644
  GstWebRTCNiceTransport *
 diff --git a/ext/webrtc/sctptransport.c b/ext/webrtc/sctptransport.c
 new file mode 100644
-index 000000000..f5643e9fe
+index 0000000..f5643e9
 --- /dev/null
 +++ b/ext/webrtc/sctptransport.c
 @@ -0,0 +1,270 @@
@@ -9418,7 +9454,7 @@ index 000000000..f5643e9fe
 +}
 diff --git a/ext/webrtc/sctptransport.h b/ext/webrtc/sctptransport.h
 new file mode 100644
-index 000000000..d5327a77e
+index 0000000..d5327a7
 --- /dev/null
 +++ b/ext/webrtc/sctptransport.h
 @@ -0,0 +1,65 @@
@@ -9488,7 +9524,7 @@ index 000000000..d5327a77e
 +
 +#endif /* __GST_WEBRTC_SCTP_TRANSPORT_H__ */
 diff --git a/ext/webrtc/transportreceivebin.c b/ext/webrtc/transportreceivebin.c
-index 6730b1fb7..d059fa270 100644
+index 6730b1f..d059fa2 100644
 --- a/ext/webrtc/transportreceivebin.c
 +++ b/ext/webrtc/transportreceivebin.c
 @@ -25,23 +25,24 @@
@@ -9750,7 +9786,7 @@ index 6730b1fb7..d059fa270 100644
    gst_element_class_set_metadata (element_class, "WebRTC Transport Receive Bin",
        "Filter/Network/WebRTC", "A bin for webrtc connections",
 diff --git a/ext/webrtc/transportreceivebin.h b/ext/webrtc/transportreceivebin.h
-index f26b4ad0f..a4c187064 100644
+index f26b4ad..a4c1870 100644
 --- a/ext/webrtc/transportreceivebin.h
 +++ b/ext/webrtc/transportreceivebin.h
 @@ -46,7 +46,11 @@ struct _TransportReceiveBin
@@ -9766,7 +9802,7 @@ index f26b4ad0f..a4c187064 100644
    GCond                      pad_block_cond;
    ReceiveState               receive_state;
 diff --git a/ext/webrtc/transportsendbin.c b/ext/webrtc/transportsendbin.c
-index be1b8aa37..36522d336 100644
+index be1b8aa..36522d3 100644
 --- a/ext/webrtc/transportsendbin.c
 +++ b/ext/webrtc/transportsendbin.c
 @@ -27,9 +27,11 @@
@@ -9824,7 +9860,7 @@ index be1b8aa37..36522d336 100644
    gst_element_class_set_metadata (element_class, "WebRTC Transport Send Bin",
        "Filter/Network/WebRTC", "A bin for webrtc connections",
 diff --git a/ext/webrtc/transportstream.c b/ext/webrtc/transportstream.c
-index 894b3217a..01261ae1b 100644
+index 894b321..01261ae 100644
 --- a/ext/webrtc/transportstream.c
 +++ b/ext/webrtc/transportstream.c
 @@ -40,6 +40,71 @@ enum
@@ -9931,7 +9967,7 @@ index 894b3217a..01261ae1b 100644
  
  TransportStream *
 diff --git a/ext/webrtc/transportstream.h b/ext/webrtc/transportstream.h
-index 9c4e4a0de..97d4f215b 100644
+index 9c4e4a0..97d4f21 100644
 --- a/ext/webrtc/transportstream.h
 +++ b/ext/webrtc/transportstream.h
 @@ -37,6 +37,12 @@ typedef struct
@@ -9974,7 +10010,7 @@ index 9c4e4a0de..97d4f215b 100644
  G_END_DECLS
  
 diff --git a/ext/webrtc/utils.c b/ext/webrtc/utils.c
-index 2b99c7047..044d58322 100644
+index 2b99c70..044d583 100644
 --- a/ext/webrtc/utils.c
 +++ b/ext/webrtc/utils.c
 @@ -21,9 +21,17 @@
@@ -10095,7 +10131,7 @@ index 2b99c7047..044d58322 100644
 +  return ret;
 +}
 diff --git a/ext/webrtc/utils.h b/ext/webrtc/utils.h
-index f76f850d9..5e4f6c647 100644
+index f76f850..5e4f6c6 100644
 --- a/ext/webrtc/utils.h
 +++ b/ext/webrtc/utils.h
 @@ -26,12 +26,30 @@
@@ -10140,7 +10176,7 @@ index f76f850d9..5e4f6c647 100644
  
 diff --git a/ext/webrtc/webrtcdatachannel.c b/ext/webrtc/webrtcdatachannel.c
 new file mode 100644
-index 000000000..693e626cd
+index 0000000..693e626
 --- /dev/null
 +++ b/ext/webrtc/webrtcdatachannel.c
 @@ -0,0 +1,1351 @@
@@ -11497,7 +11533,7 @@ index 000000000..693e626cd
 +}
 diff --git a/ext/webrtc/webrtcdatachannel.h b/ext/webrtc/webrtcdatachannel.h
 new file mode 100644
-index 000000000..b054ed4b8
+index 0000000..b054ed4
 --- /dev/null
 +++ b/ext/webrtc/webrtcdatachannel.h
 @@ -0,0 +1,85 @@
@@ -11587,7 +11623,7 @@ index 000000000..b054ed4b8
 +
 +#endif /* __GST_WEBRTC_DATA_CHANNEL_H__ */
 diff --git a/ext/webrtc/webrtcsdp.c b/ext/webrtc/webrtcsdp.c
-index 5584d9bd1..42d650f7b 100644
+index 5584d9b..42d650f 100644
 --- a/ext/webrtc/webrtcsdp.c
 +++ b/ext/webrtc/webrtcsdp.c
 @@ -24,9 +24,9 @@
@@ -12015,7 +12051,7 @@ index 5584d9bd1..42d650f7b 100644
 +  return ret;
 +}
 diff --git a/ext/webrtc/webrtcsdp.h b/ext/webrtc/webrtcsdp.h
-index 779dcc276..7620091fa 100644
+index 779dcc2..7620091 100644
 --- a/ext/webrtc/webrtcsdp.h
 +++ b/ext/webrtc/webrtcsdp.h
 @@ -38,7 +38,7 @@ const gchar *                       _sdp_source_to_string                   (SDP
@@ -12064,7 +12100,7 @@ index 779dcc276..7620091fa 100644
  
  #endif /* __WEBRTC_UTILS_H__ */
 diff --git a/ext/webrtc/webrtctransceiver.c b/ext/webrtc/webrtctransceiver.c
-index 1735b1a8a..f26536741 100644
+index 1735b1a..f265367 100644
 --- a/ext/webrtc/webrtctransceiver.c
 +++ b/ext/webrtc/webrtctransceiver.c
 @@ -25,9 +25,14 @@
@@ -12129,7 +12165,7 @@ index 1735b1a8a..f26536741 100644
  }
  
 diff --git a/ext/webrtc/webrtctransceiver.h b/ext/webrtc/webrtctransceiver.h
-index 25bb24e82..c03730415 100644
+index 25bb24e..c037304 100644
 --- a/ext/webrtc/webrtctransceiver.h
 +++ b/ext/webrtc/webrtctransceiver.h
 @@ -44,6 +44,8 @@ struct _WebRTCTransceiver
@@ -12151,9 +12187,35 @@ index 25bb24e82..c03730415 100644
  G_END_DECLS
  
  #endif /* __WEBRTC_TRANSCEIVER_H__ */
+diff --git a/gst-libs/gst/Makefile.am b/gst-libs/gst/Makefile.am
+index db67fc8..0d18cde 100644
+--- a/gst-libs/gst/Makefile.am
++++ b/gst-libs/gst/Makefile.am
+@@ -7,18 +7,18 @@ OPENCV_DIR=opencv
+ endif
+ 
+ SUBDIRS = uridownloader adaptivedemux interfaces basecamerabinsrc codecparsers \
+-	 insertbin mpegts video audio player isoff webrtc $(WAYLAND_DIR) \
++	 insertbin mpegts video audio sctp player isoff webrtc $(WAYLAND_DIR) \
+ 	 $(OPENCV_DIR)
+ 
+ noinst_HEADERS = gst-i18n-plugin.h gettext.h glib-compat-private.h
+ DIST_SUBDIRS = uridownloader adaptivedemux interfaces basecamerabinsrc \
+-	codecparsers insertbin mpegts wayland opencv video audio player isoff webrtc
++	codecparsers insertbin mpegts wayland opencv video audio player isoff sctp webrtc
+ 
+ adaptivedemux: uridownloader
+ 
+ INDEPENDENT_SUBDIRS = \
+ 	interfaces basecamerabinsrc codecparsers insertbin uridownloader \
+-	mpegts player isoff $(WAYLAND_DIR) $(OPENCV_DIR)
++	mpegts player isoff sctp $(WAYLAND_DIR) $(OPENCV_DIR)
+ 
+ .PHONY: independent-subdirs $(INDEPENDENT_SUBDIRS)
+ 
 diff --git a/gst-libs/gst/sctp/Makefile.am b/gst-libs/gst/sctp/Makefile.am
 new file mode 100644
-index 000000000..afc2c34fb
+index 0000000..afc2c34
 --- /dev/null
 +++ b/gst-libs/gst/sctp/Makefile.am
 @@ -0,0 +1,26 @@
@@ -12185,7 +12247,7 @@ index 000000000..afc2c34fb
 +    sctp-prelude.h
 diff --git a/gst-libs/gst/sctp/meson.build b/gst-libs/gst/sctp/meson.build
 new file mode 100644
-index 000000000..876f990e8
+index 0000000..876f990
 --- /dev/null
 +++ b/gst-libs/gst/sctp/meson.build
 @@ -0,0 +1,26 @@
@@ -12217,7 +12279,7 @@ index 000000000..876f990e8
 +  dependencies : [gstbase_dep])
 diff --git a/gst-libs/gst/sctp/sctp-prelude.h b/gst-libs/gst/sctp/sctp-prelude.h
 new file mode 100644
-index 000000000..e92e78fbc
+index 0000000..e92e78f
 --- /dev/null
 +++ b/gst-libs/gst/sctp/sctp-prelude.h
 @@ -0,0 +1,31 @@
@@ -12254,7 +12316,7 @@ index 000000000..e92e78fbc
 +#endif /* __GST_SCTP_PRELUDE_H__ */
 diff --git a/gst-libs/gst/sctp/sctpreceivemeta.c b/gst-libs/gst/sctp/sctpreceivemeta.c
 new file mode 100644
-index 000000000..e1c77d466
+index 0000000..e1c77d4
 --- /dev/null
 +++ b/gst-libs/gst/sctp/sctpreceivemeta.c
 @@ -0,0 +1,93 @@
@@ -12353,7 +12415,7 @@ index 000000000..e1c77d466
 +}
 diff --git a/gst-libs/gst/sctp/sctpreceivemeta.h b/gst-libs/gst/sctp/sctpreceivemeta.h
 new file mode 100644
-index 000000000..5a508370c
+index 0000000..5a50837
 --- /dev/null
 +++ b/gst-libs/gst/sctp/sctpreceivemeta.h
 @@ -0,0 +1,57 @@
@@ -12416,7 +12478,7 @@ index 000000000..5a508370c
 +#endif /* __GST_SCTP_RECEIVE_META_H__ */
 diff --git a/gst-libs/gst/sctp/sctpsendmeta.c b/gst-libs/gst/sctp/sctpsendmeta.c
 new file mode 100644
-index 000000000..d8ce14fc9
+index 0000000..d8ce14f
 --- /dev/null
 +++ b/gst-libs/gst/sctp/sctpsendmeta.c
 @@ -0,0 +1,102 @@
@@ -12524,7 +12586,7 @@ index 000000000..d8ce14fc9
 +}
 diff --git a/gst-libs/gst/sctp/sctpsendmeta.h b/gst-libs/gst/sctp/sctpsendmeta.h
 new file mode 100644
-index 000000000..b1860e52f
+index 0000000..b1860e5
 --- /dev/null
 +++ b/gst-libs/gst/sctp/sctpsendmeta.h
 @@ -0,0 +1,69 @@
@@ -12598,7 +12660,7 @@ index 000000000..b1860e52f
 +
 +#endif /* __GST_SCTP_SEND_META_H__ */
 diff --git a/gst-libs/gst/webrtc/Makefile.am b/gst-libs/gst/webrtc/Makefile.am
-index 945c4c079..edc9de0aa 100644
+index 945c4c0..edc9de0 100644
 --- a/gst-libs/gst/webrtc/Makefile.am
 +++ b/gst-libs/gst/webrtc/Makefile.am
 @@ -38,6 +38,7 @@ nodist_libgstwebrtc_@GST_API_VERSION@include_HEADERS = $(built_headers)
@@ -12610,7 +12672,7 @@ index 945c4c079..edc9de0aa 100644
  	$(GST_BASE_CFLAGS) \
  	$(GST_CFLAGS) \
 diff --git a/gst-libs/gst/webrtc/dtlstransport.c b/gst-libs/gst/webrtc/dtlstransport.c
-index c3b2d519d..ea7671fb2 100644
+index c3b2d51..ea7671f 100644
 --- a/gst-libs/gst/webrtc/dtlstransport.c
 +++ b/gst-libs/gst/webrtc/dtlstransport.c
 @@ -23,7 +23,7 @@
@@ -12623,7 +12685,7 @@ index c3b2d519d..ea7671fb2 100644
  
  #ifdef HAVE_CONFIG_H
 diff --git a/gst-libs/gst/webrtc/dtlstransport.h b/gst-libs/gst/webrtc/dtlstransport.h
-index 207328e73..feb3944bb 100644
+index 207328e..feb3944 100644
 --- a/gst-libs/gst/webrtc/dtlstransport.h
 +++ b/gst-libs/gst/webrtc/dtlstransport.h
 @@ -35,6 +35,9 @@ GType gst_webrtc_dtls_transport_get_type(void);
@@ -12646,7 +12708,7 @@ index 207328e73..feb3944bb 100644
  
  #endif /* __GST_WEBRTC_DTLS_TRANSPORT_H__ */
 diff --git a/gst-libs/gst/webrtc/icetransport.c b/gst-libs/gst/webrtc/icetransport.c
-index e6f44378f..d7e77d90f 100644
+index e6f4437..d7e77d9 100644
 --- a/gst-libs/gst/webrtc/icetransport.c
 +++ b/gst-libs/gst/webrtc/icetransport.c
 @@ -23,7 +23,7 @@
@@ -12659,7 +12721,7 @@ index e6f44378f..d7e77d90f 100644
  
  #ifdef HAVE_CONFIG_H
 diff --git a/gst-libs/gst/webrtc/icetransport.h b/gst-libs/gst/webrtc/icetransport.h
-index 86860a236..c1e56d41e 100644
+index 86860a2..c1e56d4 100644
 --- a/gst-libs/gst/webrtc/icetransport.h
 +++ b/gst-libs/gst/webrtc/icetransport.h
 @@ -34,6 +34,9 @@ GType gst_webrtc_ice_transport_get_type(void);
@@ -12682,7 +12744,7 @@ index 86860a236..c1e56d41e 100644
  
  #endif /* __GST_WEBRTC_ICE_TRANSPORT_H__ */
 diff --git a/gst-libs/gst/webrtc/meson.build b/gst-libs/gst/webrtc/meson.build
-index f138fa374..a9f11dc59 100644
+index f138fa3..a9f11dc 100644
 --- a/gst-libs/gst/webrtc/meson.build
 +++ b/gst-libs/gst/webrtc/meson.build
 @@ -25,29 +25,28 @@ webrtc_enumtypes_headers = [
@@ -12728,7 +12790,7 @@ index f138fa374..a9f11dc59 100644
    dependencies : gstwebrtc_dependencies,
  )
 diff --git a/gst-libs/gst/webrtc/rtcsessiondescription.c b/gst-libs/gst/webrtc/rtcsessiondescription.c
-index af5cd1c0d..abdf5ca92 100644
+index af5cd1c..abdf5ca 100644
 --- a/gst-libs/gst/webrtc/rtcsessiondescription.c
 +++ b/gst-libs/gst/webrtc/rtcsessiondescription.c
 @@ -22,7 +22,7 @@
@@ -12741,7 +12803,7 @@ index af5cd1c0d..abdf5ca92 100644
  
  #ifdef HAVE_CONFIG_H
 diff --git a/gst-libs/gst/webrtc/rtcsessiondescription.h b/gst-libs/gst/webrtc/rtcsessiondescription.h
-index 3e0f1f4cd..5308c549a 100644
+index 3e0f1f4..5308c54 100644
 --- a/gst-libs/gst/webrtc/rtcsessiondescription.h
 +++ b/gst-libs/gst/webrtc/rtcsessiondescription.h
 @@ -38,7 +38,7 @@ GType gst_webrtc_session_description_get_type (void);
@@ -12764,7 +12826,7 @@ index 3e0f1f4cd..5308c549a 100644
  
  #endif /* __GST_WEBRTC_PEERCONNECTION_H__ */
 diff --git a/gst-libs/gst/webrtc/rtpreceiver.c b/gst-libs/gst/webrtc/rtpreceiver.c
-index f21d77ef1..768e9876d 100644
+index f21d77e..768e987 100644
 --- a/gst-libs/gst/webrtc/rtpreceiver.c
 +++ b/gst-libs/gst/webrtc/rtpreceiver.c
 @@ -23,7 +23,7 @@
@@ -12777,7 +12839,7 @@ index f21d77ef1..768e9876d 100644
  
  #ifdef HAVE_CONFIG_H
 diff --git a/gst-libs/gst/webrtc/rtpreceiver.h b/gst-libs/gst/webrtc/rtpreceiver.h
-index 82a541cf8..55a9a86fd 100644
+index 82a541c..55a9a86 100644
 --- a/gst-libs/gst/webrtc/rtpreceiver.h
 +++ b/gst-libs/gst/webrtc/rtpreceiver.h
 @@ -35,9 +35,9 @@ GType gst_webrtc_rtp_receiver_get_type(void);
@@ -12803,7 +12865,7 @@ index 82a541cf8..55a9a86fd 100644
  
  #endif /* __GST_WEBRTC_RTP_RECEIVER_H__ */
 diff --git a/gst-libs/gst/webrtc/rtpsender.c b/gst-libs/gst/webrtc/rtpsender.c
-index da743f32d..3a8a9044f 100644
+index da743f3..3a8a904 100644
 --- a/gst-libs/gst/webrtc/rtpsender.c
 +++ b/gst-libs/gst/webrtc/rtpsender.c
 @@ -23,7 +23,7 @@
@@ -12816,7 +12878,7 @@ index da743f32d..3a8a9044f 100644
  
  #ifdef HAVE_CONFIG_H
 diff --git a/gst-libs/gst/webrtc/rtpsender.h b/gst-libs/gst/webrtc/rtpsender.h
-index f1af0900b..bcaf93c60 100644
+index f1af090..bcaf93c 100644
 --- a/gst-libs/gst/webrtc/rtpsender.h
 +++ b/gst-libs/gst/webrtc/rtpsender.h
 @@ -35,6 +35,9 @@ GType gst_webrtc_rtp_sender_get_type(void);
@@ -12839,7 +12901,7 @@ index f1af0900b..bcaf93c60 100644
  
  #endif /* __GST_WEBRTC_RTP_SENDER_H__ */
 diff --git a/gst-libs/gst/webrtc/rtptransceiver.c b/gst-libs/gst/webrtc/rtptransceiver.c
-index d0d9628d0..08019462a 100644
+index d0d9628..0801946 100644
 --- a/gst-libs/gst/webrtc/rtptransceiver.c
 +++ b/gst-libs/gst/webrtc/rtptransceiver.c
 @@ -23,7 +23,7 @@
@@ -12919,7 +12981,7 @@ index d0d9628d0..08019462a 100644
 +  webrtc->direction = GST_WEBRTC_RTP_TRANSCEIVER_DIRECTION_NONE;
  }
 diff --git a/gst-libs/gst/webrtc/rtptransceiver.h b/gst-libs/gst/webrtc/rtptransceiver.h
-index 6192314d0..4b2e6e30c 100644
+index 6192314..4b2e6e3 100644
 --- a/gst-libs/gst/webrtc/rtptransceiver.h
 +++ b/gst-libs/gst/webrtc/rtptransceiver.h
 @@ -36,6 +36,9 @@ GType gst_webrtc_rtp_transceiver_get_type(void);
@@ -12946,7 +13008,7 @@ index 6192314d0..4b2e6e30c 100644
  
  #endif /* __GST_WEBRTC_RTP_TRANSCEIVER_H__ */
 diff --git a/gst-libs/gst/webrtc/webrtc_fwd.h b/gst-libs/gst/webrtc/webrtc_fwd.h
-index be0a3c334..fced4ab9c 100644
+index be0a3c3..fced4ab 100644
 --- a/gst-libs/gst/webrtc/webrtc_fwd.h
 +++ b/gst-libs/gst/webrtc/webrtc_fwd.h
 @@ -27,8 +27,13 @@
@@ -13287,9 +13349,39 @@ index be0a3c334..fced4ab9c 100644
 +} GstWebRTCICETransportPolicy;
 +
  #endif /* __GST_WEBRTC_FWD_H__ */
+diff --git a/pkgconfig/Makefile.am b/pkgconfig/Makefile.am
+index 0e69cd1..e02e290 100644
+--- a/pkgconfig/Makefile.am
++++ b/pkgconfig/Makefile.am
+@@ -6,6 +6,7 @@ pcverfiles =  \
+ 	gstreamer-insertbin-@GST_API_VERSION@.pc \
+ 	gstreamer-mpegts-@GST_API_VERSION@.pc \
+ 	gstreamer-player-@GST_API_VERSION@.pc \
++	gstreamer-sctp-@GST_API_VERSION@.pc \
+ 	gstreamer-webrtc-@GST_API_VERSION@.pc \
+ 	gstreamer-bad-audio-@GST_API_VERSION@.pc \
+ 	gstreamer-bad-video-@GST_API_VERSION@.pc
+@@ -16,6 +17,7 @@ pcverfiles_uninstalled = \
+ 	gstreamer-insertbin-@GST_API_VERSION@-uninstalled.pc \
+ 	gstreamer-mpegts-@GST_API_VERSION@-uninstalled.pc \
+ 	gstreamer-player-@GST_API_VERSION@-uninstalled.pc \
++	gstreamer-sctp-@GST_API_VERSION@-uninstalled.pc \
+ 	gstreamer-webrtc-@GST_API_VERSION@-uninstalled.pc \
+ 	gstreamer-bad-audio-@GST_API_VERSION@-uninstalled.pc \
+ 	gstreamer-bad-video-@GST_API_VERSION@-uninstalled.pc
+@@ -58,7 +60,8 @@ pcinfiles = \
+            gstreamer-player.pc.in gstreamer-player-uninstalled.pc.in \
+            gstreamer-webrtc.pc.in gstreamer-webrtc-uninstalled.pc.in \
+            gstreamer-bad-audio.pc.in gstreamer-bad-audio-uninstalled.pc.in \
+-           gstreamer-bad-video.pc.in gstreamer-bad-video-uninstalled.pc.in
++           gstreamer-bad-video.pc.in gstreamer-bad-video-uninstalled.pc.in \
++           gstreamer-sctp.pc.in gstreamer-sctp-uninstalled.pc.in
+ 
+ DISTCLEANFILES = $(pcinfiles:.in=)
+ EXTRA_DIST = $(pcinfiles)
 diff --git a/pkgconfig/gstreamer-sctp-uninstalled.pc.in b/pkgconfig/gstreamer-sctp-uninstalled.pc.in
 new file mode 100644
-index 000000000..417623ae7
+index 0000000..417623a
 --- /dev/null
 +++ b/pkgconfig/gstreamer-sctp-uninstalled.pc.in
 @@ -0,0 +1,12 @@
@@ -13307,7 +13399,7 @@ index 000000000..417623ae7
 +
 diff --git a/pkgconfig/gstreamer-sctp.pc.in b/pkgconfig/gstreamer-sctp.pc.in
 new file mode 100644
-index 000000000..ac8589763
+index 0000000..ac85897
 --- /dev/null
 +++ b/pkgconfig/gstreamer-sctp.pc.in
 @@ -0,0 +1,12 @@

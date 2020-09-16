@@ -20,6 +20,7 @@ define SKELETON_INIT_COMMON_INSTALL_TARGET_CMDS
 	$(call SYSTEM_RSYNC,$(SKELETON_INIT_COMMON_PATH),$(TARGET_DIR))
 	$(call SYSTEM_USR_SYMLINKS_OR_DIRS,$(TARGET_DIR))
 	$(call SYSTEM_LIB_SYMLINK,$(TARGET_DIR))
+	$(SED) 's,@PATH@,$(BR2_SYSTEM_DEFAULT_PATH),' $(TARGET_DIR)/etc/profile
 	$(INSTALL) -m 0644 support/misc/target-dir-warning.txt \
 		$(TARGET_DIR_WARNING_FILE)
 endef
@@ -79,6 +80,13 @@ define SKELETON_INIT_COMMON_SET_BIN_SH
 	rm -f $(TARGET_DIR)/bin/sh
 endef
 else
+# Add /bin/sh to /etc/shells otherwise some login tools like dropbear
+# can reject the user connection. See man shells.
+define SKELETON_INIT_COMMON_ADD_SH_TO_SHELLS
+	grep -qsE '^/bin/sh$$' $(TARGET_DIR)/etc/shells \
+		|| echo "/bin/sh" >> $(TARGET_DIR)/etc/shells
+endef
+SKELETON_INIT_COMMON_TARGET_FINALIZE_HOOKS += SKELETON_INIT_COMMON_ADD_SH_TO_SHELLS
 ifneq ($(SKELETON_INIT_COMMON_BIN_SH),)
 define SKELETON_INIT_COMMON_SET_BIN_SH
 	ln -sf $(SKELETON_INIT_COMMON_BIN_SH) $(TARGET_DIR)/bin/sh

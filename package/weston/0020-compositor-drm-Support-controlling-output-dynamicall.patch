@@ -1,7 +1,7 @@
-From 9faa6905a1ad6e6d1b11b271edc761c34dab6499 Mon Sep 17 00:00:00 2001
+From efbb70a086b8ac0bba2d02a3023862e2d3b718c4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 8 Aug 2019 09:46:17 +0800
-Subject: [PATCH] compositor-drm: Support controlling output dynamically
+Subject: [PATCH 20/25] compositor-drm: Support controlling output dynamically
 
 Use config file to control output's rotation/mode/freezen/display
 rectangle.
@@ -132,7 +132,7 @@ index 0bea96a..2849839 100644
  
  static void
 diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
-index 5b26878..0db93b4 100644
+index 9a4873e..4c1c1d2 100644
 --- a/libweston/compositor-drm.c
 +++ b/libweston/compositor-drm.c
 @@ -37,6 +37,7 @@
@@ -176,8 +176,8 @@ index 5b26878..0db93b4 100644
  struct drm_output {
  	struct weston_output base;
  	drmModeConnector *connector;
-@@ -230,6 +243,11 @@ struct drm_output {
- 	pixman_box32_t plane_bounds;
+@@ -231,6 +244,11 @@ struct drm_output {
+ 
  	bool can_scale;
  
 +	int freezing;
@@ -188,7 +188,7 @@ index 5b26878..0db93b4 100644
  	uint32_t crtc_id; /* object ID to pass to DRM functions */
  	uint32_t plane_id; /* object ID to pass to DRM functions */
  	int pipe; /* index of CRTC in resource array / bitmasks */
-@@ -1102,6 +1120,24 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -1145,6 +1163,24 @@ drm_output_repaint(struct weston_output *output_base,
  	int dx, dy, dw, dh, sw, sh;
  	int ret = 0;
  
@@ -213,7 +213,7 @@ index 5b26878..0db93b4 100644
  	if (output->disable_pending || output->destroy_pending)
  		return -1;
  
-@@ -3088,6 +3124,8 @@ drm_output_enable(struct weston_output *base)
+@@ -3136,6 +3172,8 @@ drm_output_enable(struct weston_output *base)
  					  output->base.height);
  	}
  
@@ -222,7 +222,7 @@ index 5b26878..0db93b4 100644
  	if (output->backlight) {
  		weston_log("Initialized backlight, device %s\n",
  			   output->backlight->path);
-@@ -3136,6 +3174,9 @@ drm_output_enable(struct weston_output *base)
+@@ -3184,6 +3222,9 @@ drm_output_enable(struct weston_output *base)
  
  	output->state_invalid = true;
  
@@ -232,7 +232,7 @@ index 5b26878..0db93b4 100644
  	return 0;
  
  err_free:
-@@ -4151,6 +4192,135 @@ static const struct weston_drm_output_api api = {
+@@ -4199,6 +4240,135 @@ static const struct weston_drm_output_api api = {
  	drm_output_set_seat,
  };
  
@@ -368,7 +368,7 @@ index 5b26878..0db93b4 100644
  static struct drm_backend *
  drm_backend_create(struct weston_compositor *compositor,
  		   struct weston_drm_backend_config *config)
-@@ -4314,6 +4484,10 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -4362,6 +4532,10 @@ drm_backend_create(struct weston_compositor *compositor,
  		goto err_udev_monitor;
  	}
  

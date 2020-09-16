@@ -74,7 +74,7 @@ define DOWNLOAD_GIT
 	$(EXTRA_ENV) $(DL_WRAPPER) -b git \
 		-o $(DL_DIR)/$($(PKG)_SOURCE) \
 		$(if $($(PKG)_GIT_SUBMODULES),-r) \
-		-H $(PKGDIR)/$($(PKG)_RAWNAME).hash \
+		-H '$($(2)_HASH_FILE)' \
 		$(QUIET) \
 		-- \
 		$($(PKG)_SITE) \
@@ -123,7 +123,7 @@ endef
 define DOWNLOAD_SCP
 	$(EXTRA_ENV) $(DL_WRAPPER) -b scp \
 		-o $(DL_DIR)/$(2) \
-		-H $(PKGDIR)/$($(PKG)_RAWNAME).hash \
+		-H '$($(2)_HASH_FILE)' \
 		$(QUIET) \
 		-- \
 		'$(call stripurischeme,$(call qstrip,$(1)))' \
@@ -144,7 +144,7 @@ endef
 define DOWNLOAD_WGET
 	$(EXTRA_ENV) $(DL_WRAPPER) -b wget \
 		-o $(DL_DIR)/$(2) \
-		-H $(PKGDIR)/$($(PKG)_RAWNAME).hash \
+		-H '$($(2)_HASH_FILE)' \
 		$(QUIET) \
 		-- \
 		'$(call qstrip,$(1))' \
@@ -154,7 +154,7 @@ endef
 define DOWNLOAD_LOCALFILES
 	$(EXTRA_ENV) $(DL_WRAPPER) -b cp \
 		-o $(DL_DIR)/$(2) \
-		-H $(PKGDIR)/$($(PKG)_RAWNAME).hash \
+		-H '$($(2)_HASH_FILE)' \
 		$(QUIET) \
 		-- \
 		$(call stripurischeme,$(call qstrip,$(1))) \

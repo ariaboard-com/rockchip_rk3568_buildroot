@@ -1,0 +1,97 @@
+From 4bd7916e2c8dac0daed94497079aa077a393e94e Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Tue, 16 Jun 2020 12:17:51 +0800
+Subject: [PATCH] Support holding display for the first app
+
+Use '-w' or '--warm-up' to enable it.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ compositor/main.c      |  4 ++++
+ libweston/compositor.c | 14 ++++++++++++++
+ libweston/compositor.h |  1 +
+ 3 files changed, 19 insertions(+)
+
+diff --git a/compositor/main.c b/compositor/main.c
+index f8a60e9..9981122 100644
+--- a/compositor/main.c
++++ b/compositor/main.c
+@@ -557,6 +557,7 @@ usage(int error_code)
+ 		"  --log=FILE\t\tLog to the given file\n"
+ 		"  -c, --config=FILE\tConfig file to load, defaults to weston.ini\n"
+ 		"  --no-config\t\tDo not read weston.ini\n"
++		"  -w, --warm-up\t\tHold display for the first app\n"
+ 		"  -h, --help\t\tThis help message\n\n");
+ 
+ #if defined(BUILD_DRM_COMPOSITOR)
+@@ -1785,6 +1786,7 @@ int main(int argc, char *argv[])
+ 	struct weston_seat *seat;
+ 	struct wet_compositor user_data;
+ 	int require_input;
++	int32_t warm_up = 0;
+ 
+ 	const struct weston_option core_options[] = {
+ 		{ WESTON_OPTION_STRING, "backend", 'B', &backend },
+@@ -1798,6 +1800,7 @@ int main(int argc, char *argv[])
+ 		{ WESTON_OPTION_BOOLEAN, "version", 0, &version },
+ 		{ WESTON_OPTION_BOOLEAN, "no-config", 0, &noconfig },
+ 		{ WESTON_OPTION_STRING, "config", 'c', &config_file },
++		{ WESTON_OPTION_BOOLEAN, "warm-up", 'w', &warm_up },
+ 	};
+ 
+ 	if (os_fd_set_cloexec(fileno(stdin))) {
+@@ -1897,6 +1900,7 @@ int main(int argc, char *argv[])
+ 	ec->idle_time = idle_time;
+ 	ec->default_pointer_grab = NULL;
+ 	ec->exit = handle_exit;
++	ec->warm_up = warm_up;
+ 
+ 	weston_compositor_log_capabilities(ec);
+ 
+diff --git a/libweston/compositor.c b/libweston/compositor.c
+index e1adda3..2a0aafb 100644
+--- a/libweston/compositor.c
++++ b/libweston/compositor.c
+@@ -2226,6 +2226,15 @@ weston_compositor_build_view_list(struct weston_compositor *compositor)
+ 	wl_list_init(&compositor->view_list);
+ 	wl_list_for_each(layer, &compositor->layer_list, link) {
+ 		wl_list_for_each(view, &layer->view_list.link, layer_link.link) {
++			if (compositor->warm_up &&
++			    layer->position != WESTON_LAYER_POSITION_BACKGROUND &&
++			    layer->position != WESTON_LAYER_POSITION_UI &&
++			    layer->position != WESTON_LAYER_POSITION_CURSOR &&
++			    layer->position != WESTON_LAYER_POSITION_FADE) {
++				weston_log("seeing the first app\n");
++				compositor->warm_up = false;
++			}
++
+ 			view_list_add(compositor, view);
+ 		}
+ 	}
+@@ -2279,6 +2288,11 @@ weston_output_repaint(struct weston_output *output, void *repaint_data)
+ 	/* Rebuild the surface list and update surface transforms up front. */
+ 	weston_compositor_build_view_list(ec);
+ 
++	if (ec->warm_up) {
++		weston_log("holding display for the first app...\n");
++		return -1;
++	}
++
+ 	if (output->assign_planes && !output->disable_planes) {
+ 		output->assign_planes(output, repaint_data);
+ 	} else {
+diff --git a/libweston/compositor.h b/libweston/compositor.h
+index a626d61..5f8c9c9 100644
+--- a/libweston/compositor.h
++++ b/libweston/compositor.h
+@@ -944,6 +944,7 @@ struct weston_compositor {
+ 	/* Whether to let the compositor run without any input device. */
+ 	bool require_input;
+ 
++	bool warm_up;
+ };
+ 
+ struct weston_buffer {
+-- 
+2.20.1
+

@@ -1,0 +1,15 @@
+menuconfig BR2_PACKAGE_LIBIPCPROTOCOL
+	bool "rockchip libIPCProtocol"
+	select BR2_PACKAGE_LIBGDBUS
+	select BR2_PACKAGE_LIBRKDB
+	help
+	  rockchip libIPCProtocol
+
+if BR2_PACKAGE_LIBIPCPROTOCOL
+
+config BR2_PACKAGE_LIBIPCPROTOCOL_DEMO
+	bool "rockchip libIPCProtocol demo"
+	help
+	  provide demo to show the usage of libIPCProtocol
+
+endif

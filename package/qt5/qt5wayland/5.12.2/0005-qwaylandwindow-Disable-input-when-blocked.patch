@@ -1,4 +1,4 @@
-From 41ffb6f6638397b3da05c2ee95732de5b01f0d24 Mon Sep 17 00:00:00 2001
+From b3f90a95bfcc0baa852d047e9b7378bcafb9d8a8 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 9 Jan 2019 11:23:14 +0800
 Subject: [PATCH 5/5] qwaylandwindow: Disable input when blocked
@@ -10,12 +10,12 @@ Conflicts:
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---
- src/client/qwaylandwindow.cpp | 46 +++++++++++++++++++++++++++++++++++--------
+ src/client/qwaylandwindow.cpp | 42 ++++++++++++++++++++++++++++-------
  src/client/qwaylandwindow_p.h |  5 +++++
- 2 files changed, 43 insertions(+), 8 deletions(-)
+ 2 files changed, 39 insertions(+), 8 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index bbd0ccb..1c1aa47 100644
+index bbd0ccb..4eb6453 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -81,6 +81,7 @@ QWaylandWindow::QWaylandWindow(QWindow *window)
@@ -51,7 +51,7 @@ index bbd0ccb..1c1aa47 100644
          set_input_region(region);
          wl_region_destroy(region);
      }
-@@ -444,6 +441,39 @@ void QWaylandWindow::setMask(const QRegion &mask)
+@@ -444,6 +441,35 @@ void QWaylandWindow::setMask(const QRegion &mask)
      wl_surface::commit();
  }
  
@@ -68,24 +68,20 @@ index bbd0ccb..1c1aa47 100644
 +
 +bool QWaylandWindow::windowEvent(QEvent *event)
 +{
-+    bool ret = false;
-+
 +    switch (event->type()) {
 +    case QEvent::WindowBlocked: // Blocked by another modal window.
 +        mBlocked = true;
 +        updateInputRegion();
-+        ret = true;
 +        break;
 +    case QEvent::WindowUnblocked:
 +        mBlocked = false;
 +        updateInputRegion();
-+        ret = true;
 +        break;
 +    default:
 +        break;
 +    }
 +
-+    return ret;
++    return QPlatformWindow::windowEvent(event);
 +}
 +
  void QWaylandWindow::applyConfigureWhenPossible()
@@ -115,5 +111,5 @@ index 56ebd3c..67a36b3 100644
      QRect mLastExposeGeometry;
  
 -- 
-2.7.4
+2.20.1
 

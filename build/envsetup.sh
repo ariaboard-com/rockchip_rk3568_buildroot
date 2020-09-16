@@ -12,16 +12,24 @@ function choose_board()
 	echo "Lunch menu...pick a combo:"
 	echo ""
 
-	echo ${DEFCONFIG_ARRAY[@]} | xargs -n 1 | sed "=" | sed "N;s/\n/. /"
+	echo "0. non-rockchip boards"
+	echo ${RK_DEFCONFIG_ARRAY[@]} | xargs -n 1 | sed "=" | sed "N;s/\n/. /"
 
 	local INDEX
 	while true; do
-		read -p "Which would you like? [1]: " INDEX
-		INDEX=$((${INDEX:-1} - 1))
+		read -p "Which would you like? [0]: " INDEX
+		INDEX=$((${INDEX:-0} - 1))
+
+		if [ "$INDEX" -eq -1 ]; then
+			echo "Lunching for non-rockchip boards..."
+			unset TARGET_OUTPUT_DIR
+			unset RK_BUILD_CONFIG
+			break;
+		fi
 
 		if echo $INDEX | grep -vq [^0-9]; then
-			TARGET_BUILD_CONFIG="${DEFCONFIG_ARRAY[$INDEX]}"
-			[ -n "$TARGET_BUILD_CONFIG" ] && break
+			RK_BUILD_CONFIG="${RK_DEFCONFIG_ARRAY[$INDEX]}"
+			[ -n "$RK_BUILD_CONFIG" ] && break
 		fi
 
 		echo
@@ -30,23 +38,23 @@ function choose_board()
 	done
 }
 
-function lunch()
+function lunch_rockchip()
 {
-	TARGET_DIR_NAME="$TARGET_BUILD_CONFIG"
+	TARGET_DIR_NAME="$RK_BUILD_CONFIG"
 	export TARGET_OUTPUT_DIR="$BUILDROOT_OUTPUT_DIR/$TARGET_DIR_NAME"
 
 	mkdir -p $TARGET_OUTPUT_DIR || return
 
 	echo "==========================================="
 	echo
-	echo "#TARGET_BOARD=`echo $TARGET_BUILD_CONFIG | cut -d '_' -f 2`"
+	echo "#TARGET_BOARD=`echo $RK_BUILD_CONFIG | cut -d '_' -f 2`"
 	echo "#OUTPUT_DIR=output/$TARGET_DIR_NAME"
-	echo "#CONFIG=${TARGET_BUILD_CONFIG}_defconfig"
+	echo "#CONFIG=${RK_BUILD_CONFIG}_defconfig"
 	echo
 	echo "==========================================="
 
 	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" \
-		"$TARGET_BUILD_CONFIG"_defconfig
+		"$RK_BUILD_CONFIG"_defconfig
 
 	CONFIG=${TARGET_OUTPUT_DIR}/.config
 	cp ${CONFIG}{,.new}
@@ -67,31 +75,32 @@ function main()
 	BUILDROOT_DIR=$(dirname ${SCRIPT_DIR})
 	BUILDROOT_OUTPUT_DIR=${BUILDROOT_DIR}/output
 	TOP_DIR=$(dirname ${BUILDROOT_DIR})
-	source ${TOP_DIR}/device/rockchip/.BoardConfig.mk
 	echo Top of tree: ${TOP_DIR}
 
 	# Set croot alias
 	alias croot="cd ${TOP_DIR}"
 
-	DEFCONFIG_ARRAY=(
+	RK_DEFCONFIG_ARRAY=(
 		$(cd ${BUILDROOT_DIR}/configs/; ls rockchip_* | \
 			sed "s/_defconfig$//" | grep "$1" | sort)
 	)
 
-	DEFCONFIG_ARRAY_LEN=${#DEFCONFIG_ARRAY[@]}
-	if [ $DEFCONFIG_ARRAY_LEN -eq 0 ]; then
+	RK_DEFCONFIG_ARRAY_LEN=${#RK_DEFCONFIG_ARRAY[@]}
+	if [ $RK_DEFCONFIG_ARRAY_LEN -eq 0 ]; then
 		echo No available configs${1:+" for: $1"}
 		return
 	fi
 
 	if [ -n "$1" ]; then
-		TARGET_BUILD_CONFIG=${DEFCONFIG_ARRAY[0]}
+		RK_BUILD_CONFIG=${RK_DEFCONFIG_ARRAY[0]}
 	else
 		choose_board
 	fi
-	[ -n "$TARGET_BUILD_CONFIG" ] || return
+	[ -n "$RK_BUILD_CONFIG" ] || return
 
-	lunch
+	source ${TOP_DIR}/device/rockchip/.BoardConfig.mk
+
+	lunch_rockchip
 }
 
 if [ "${BASH_SOURCE}" == "$0" ];then

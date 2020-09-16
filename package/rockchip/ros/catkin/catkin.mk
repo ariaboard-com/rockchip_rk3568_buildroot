@@ -9,7 +9,7 @@ CATKIN_SITE = https://github.com/ros/catkin/archive
 CATKIN_SOURCE = $(CATKIN_VERSION).tar.gz
 CATKIN_INSTALL_STAGING = YES
 
-HOST_CATKIN_DEPENDENCIES += host-python-catkin_pkg host-python-em host-python-empy
+HOST_CATKIN_DEPENDENCIES += host-python-catkin_pkg host-python-em host-python-empy host-python-pyparsing
 
 HOST_CATKIN_CONF_OPTS += -DCMAKE_INSTALL_PREFIX=$(HOST_DIR)$(CATKIN_ROS_DIR)
 

@@ -95,7 +95,7 @@ function collect_necessary_target()
 	# lib
 	temp_necessary_lib_array=(
 		`$TOOLCHAINS_ARM_LINUX_READELF -d $necessary_bins_string | \
-		grep NEEDED | cut -d '[' -f2 | cut -d ']' -f1 | cut -d '.' -f1 | sort -u`
+		grep NEEDED | cut -d '[' -f2 | cut -d ']' -f1 | cut -d '.' -f1 | cut -d '-' -f1 | sort -u`
 	)
 	temp_necessary_lib_array_len=${#temp_necessary_lib_array[@]}
 	if [ 0 == $temp_necessary_lib_array_len ]; then
@@ -105,7 +105,7 @@ function collect_necessary_target()
 	i=0
 	for element in ${temp_necessary_lib_array[@]}
 	do
-		path=(`find $TARGET_DIR/usr/lib -name ${element}.so* | sort -u`)
+		path=(`find $TARGET_DIR/usr/lib -name ${element}*so* | sort -u`)
 		if [ 0 == ${#path[@]} ]; then continue; fi
 		for path_element in ${path[@]}
 		do

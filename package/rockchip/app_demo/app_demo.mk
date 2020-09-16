@@ -38,4 +38,9 @@ endif
 
 endif
 
+ifeq ($(BR2_PACKAGE_APP_DEMO_RMSL),y)
+APP_DEMO_DEPENDENCIES += camera_engine_rkisp linux-rga mpp
+APP_DEMO_CONF_OPTS += "-DMODULE_RK_RMSL_DEMO=ON"
+endif
+
 $(eval $(cmake-package))

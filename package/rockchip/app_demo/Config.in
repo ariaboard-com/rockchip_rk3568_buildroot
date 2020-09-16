@@ -37,5 +37,11 @@ config BR2_PACKAGE_APP_DEMO_NPU_UVC_CONNECTION
 	select BR2_PACKAGE_SDL2_GFX
 	select BR2_PACKAGE_SDL2_TTF
 
+config BR2_PACKAGE_APP_DEMO_RMSL
+	bool "Rockchip Module Structured Light demo"
+	select BR2_PACKAGE_CAMERA_ENGINE_RKISP
+	select BR2_PACKAGE_MPP
+	select BR2_PACKAGE_LINUX_RGA
+
 endif
 

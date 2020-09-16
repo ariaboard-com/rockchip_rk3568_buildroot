@@ -27,6 +27,7 @@ define RKSCRIPT_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/S21mountall.sh $(TARGET_DIR)/etc/init.d/
 #	$(INSTALL) -m 0755 -D $(@D)/S22resize-disk $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -m 0755 -D $(@D)/S50usbdevice $(TARGET_DIR)/etc/init.d/
+	$(INSTALL) -m 0755 -D $(@D)/S51n4 $(TARGET_DIR)/etc/init.d/
 	$(INSTALL) -m 0755 -D $(@D)/usbdevice $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -m 0755 -D $(@D)/waylandtest.sh $(TARGET_DIR)/usr/bin/
 	echo -e "/dev/block/by-name/misc\t\t/misc\t\t\temmc\t\tdefaults\t\t0\t0" >> $(TARGET_DIR)/etc/fstab
@@ -38,6 +39,15 @@ define RKSCRIPT_INSTALL_TARGET_CMDS
 	fi
 	touch $(RKSCRIPT_USB_CONFIG_FILE)
 endef
+
+ifneq ($(call qstrip,$(BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM)),none)
+PCM_ID=$(call qstrip,$(BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM))
+define RKSCRIPT_INSTALL_TARGET_PCM_HOOK
+	$(SED) "s#\#PCM_ID#${PCM_ID}#g" $(@D)/asound.conf.in
+	$(INSTALL) -m 0644 -D $(@D)/asound.conf.in $(TARGET_DIR)/etc/asound.conf
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_INSTALL_TARGET_PCM_HOOK
+endif
 
 ifeq ($(BR2_PACKAGE_ANDROID_TOOLS_ADBD),y)
 define RKSCRIPT_ADD_ADBD_CONFIG
@@ -128,6 +138,20 @@ define RKSCRIPT_ADD_USB_MODULE_SUPPORT
 		$(TARGET_DIR)/etc/init.d/S50usbdevice
 endef
 RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_ADD_USB_MODULE_SUPPORT
+endif
+
+ifeq ($(BR2_PACKAGE_RKSCRIPT_USE_BUSYBOX_MOUNT),y)
+define RKSCRIPT_FIXED_SD_MOUNT
+	$(SED) "s#users\,##g" $(TARGET_DIR)/lib/udev/rules.d/61-sd-cards-auto-mount.rules
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_FIXED_SD_MOUNT
+endif
+
+ifeq ($(BR2_PACKAGE_RECOVERY),y)
+define RKSCRIPT_REMOVE_AUTO_MOUNTALL_RC_FILE
+	rm -f $(TARGET_DIR)/etc/init.d/S21mountall.sh
+endef
+RKSCRIPT_POST_INSTALL_TARGET_HOOKS += RKSCRIPT_REMOVE_AUTO_MOUNTALL_RC_FILE
 endif
 
 $(eval $(generic-package))

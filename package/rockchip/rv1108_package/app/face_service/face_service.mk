@@ -3,17 +3,12 @@ FACE_SERVICE_SITE_METHOD = local
 FACE_SERVICE_INSTALL_STAGING = YES
 
 # add dependencies
-FACE_SERVICE_DEPENDENCIES = hal adk messenger linux-rga rkfb camerahal rkcamera process_units
+FACE_SERVICE_DEPENDENCIES = hal adk messenger linux-rga rkfb camerahal rkcamera process_units database
 
 # add package dependencies & opts
 ifeq ($(BR2_PACKAGE_SQLITE),y)
     FACE_SERVICE_DEPENDENCIES += sqlite
     FACE_SERVICE_CONF_OPTS += -DUSE_SQLITE=1
-endif
-
-ifeq ($(BR2_PACKAGE_DATABASE),y)
-    FACE_SERVICE_DEPENDENCIES += database
-    FACE_SERVICE_CONF_OPTS += -DUSE_DATABASE=1
 endif
 
 ifeq ($(BR2_PACKAGE_RKFACE),y)
@@ -52,14 +47,21 @@ ifeq ($(BR2_PACKAGE_FACE_SERVICE_FACE_CAPTURE),y)
     FACE_SERVICE_CONF_OPTS += -DUSE_FACE_CAPTURE=1
 endif
 
-ifeq ($(BR2_PACKAGE_FACE_SERVICE_H264_ENCODE),y)
-    FACE_SERVICE_DEPENDENCIES += ffmpeg mpp rkmedia
-    FACE_SERVICE_CONF_OPTS += -DUSE_H264_ENCODER=1
-endif
-
 ifeq ($(BR2_PACKAGE_RV1108_VENDOR_STORAGE),y)
     FACE_SERVICE_DEPENDENCIES += rv1108_vendor_storage
     FACE_SERVICE_CONF_OPTS += -DUSE_VENDOR_STORAGE=1
+endif
+
+ifeq ($(BR2_PACKAGE_ADK_RKMEDIA_H264_ENCODE),y)
+    FACE_SERVICE_CONF_OPTS += -DUSE_H264_ENCODE=1
+endif
+
+ifeq ($(BR2_PACKAGE_ADK_RKMEDIA_MP4_MUXER),y)
+    FACE_SERVICE_CONF_OPTS += -DUSE_MP4_MUXER=1
+endif
+
+ifeq ($(BR2_PACKAGE_ADK_RKMEDIA_RTSP_STREAM),y)
+    FACE_SERVICE_CONF_OPTS += -DUSE_RTSP_STREAM=1
 endif
 
 FACE_SERVICE_CONF_OPTS += \

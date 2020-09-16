@@ -6,10 +6,10 @@
 case "$1" in
   start)
 
-        target_part_name="root"
-        find_target_part=0
+	target_part_name="root"
+	find_target_part=0
 	storage_type_emmc=1
-        mount_dir="/root"
+	mount_dir="/root"
 	nor_block_path=/dev/mtdblock7
 
 	if [ -e /dev/mmcblk0p1 ]; then

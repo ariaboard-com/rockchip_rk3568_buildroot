@@ -1,0 +1,45 @@
+From 2a785438d3b73416bb639a6b63f23085d66eeab4 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 22 Oct 2018 09:05:00 +0800
+Subject: [PATCH 12/25] compositor-drm: Use ARGB as default gbm format
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 8e1e788..f8a4437 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -1770,6 +1770,8 @@ static int
+ fallback_format_for(uint32_t format)
+ {
+ 	switch (format) {
++	case GBM_FORMAT_ARGB8888:
++		return GBM_FORMAT_XRGB8888;
+ 	case GBM_FORMAT_XRGB8888:
+ 		return GBM_FORMAT_ARGB8888;
+ 	case GBM_FORMAT_XRGB2101010:
+@@ -2153,6 +2155,9 @@ drm_output_init_pixman(struct drm_output *output, struct drm_backend *b)
+ 	unsigned int i;
+ 
+ 	switch (format) {
++		case GBM_FORMAT_ARGB8888:
++			pixman_format = PIXMAN_a8r8g8b8;
++			break;
+ 		case GBM_FORMAT_XRGB8888:
+ 			pixman_format = PIXMAN_x8r8g8b8;
+ 			break;
+@@ -3543,7 +3548,7 @@ drm_backend_create(struct weston_compositor *compositor,
+ 	b->use_pixman = config->use_pixman;
+ 	b->pageflip_timeout = config->pageflip_timeout;
+ 
+-	if (parse_gbm_format(config->gbm_format, GBM_FORMAT_XRGB8888, &b->gbm_format) < 0)
++	if (parse_gbm_format(config->gbm_format, GBM_FORMAT_ARGB8888, &b->gbm_format) < 0)
+ 		goto err_compositor;
+ 
+ 	if (config->seat_id)
+-- 
+2.11.0
+

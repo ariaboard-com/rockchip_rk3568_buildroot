@@ -1,0 +1,80 @@
+From 8b1af4ff56941bea4c302de06579b8b4adc01cf1 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Mon, 24 Feb 2020 17:09:52 +0800
+Subject: [PATCH 25/25] compositor-drm: Support using RGA to scale virtual
+ screen
+
+Try to use RGA when drm cannot do the scaling.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ libweston/compositor-drm.c | 46 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 34 insertions(+), 12 deletions(-)
+
+diff --git a/libweston/compositor-drm.c b/libweston/compositor-drm.c
+index 4c1c1d2..83c93af 100644
+--- a/libweston/compositor-drm.c
++++ b/libweston/compositor-drm.c
+@@ -1241,6 +1241,33 @@ drm_output_repaint(struct weston_output *output_base,
+ 	sw = output->fb_pending->width;
+ 	sh = output->fb_pending->height;
+ 
++	if (!output->can_scale && (dw != sw || dh != sh)) {
++		if (!output->fb_dummy) {
++			output->fb_dummy =
++				drm_fb_create_dumb(backend,
++						   mode->mode_info.hdisplay,
++						   mode->mode_info.vdisplay,
++						   backend->gbm_format);
++			if (!output->fb_dummy) {
++				weston_log("failed to create fb_dummy\n");
++				goto err_pageflip;
++			}
++		}
++
++		if (drm_copy_fb(output->fb_pending, output->fb_dummy, 0,
++				0, 0, dw, dh) < 0) {
++			weston_log("copy plane failed\n");
++			goto err_pageflip;
++		}
++
++		drm_fb_unref(output->fb_pending);
++		output->fb_pending = output->fb_dummy;
++		output->fb_dummy = NULL;
++
++		sw = dw;
++		sh = dh;
++	}
++
+ 	ret = drmModeSetPlane(backend->drm.fd,
+ 			      output->plane_id,
+ 			      output->crtc_id,
+@@ -2245,18 +2272,13 @@ drm_output_add_mode(struct drm_output *output, const drmModeModeInfo *info)
+ 	mode->base.height = info->vdisplay;
+ 
+ 	if (!output->is_mirror && drm_virtual_width && drm_virtual_height) {
+-		if (output->can_scale) {
+-			weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
+-				   output->base.name, drm_virtual_width,
+-				   drm_virtual_height, mode->base.width,
+-				   mode->base.height);
+-
+-			mode->base.width = drm_virtual_width;
+-			mode->base.height = drm_virtual_height;
+-		} else {
+-			weston_log("Output %s: cannot scale for virtual size\n",
+-				   output->base.name);
+-		}
++		weston_log("Output %s: using virtual size %dx%d for %dx%d\n",
++			   output->base.name, drm_virtual_width,
++			   drm_virtual_height, mode->base.width,
++			   mode->base.height);
++
++		mode->base.width = drm_virtual_width;
++		mode->base.height = drm_virtual_height;
+ 	}
+ 
+ 	/* Calculate higher precision (mHz) refresh rate */
+-- 
+2.11.0
+

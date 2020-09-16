@@ -1,0 +1,26 @@
+From 223609356961d997e0d6a3e2524304dd0ef463a5 Mon Sep 17 00:00:00 2001
+From: Eddie Cai <eddie.cai.linux@gmail.com>
+Date: Thu, 21 May 2020 09:19:12 +0800
+Subject: [PATCH] clients: desktop-shell: use second clock format by default
+
+Signed-off-by: Eddie Cai <eddie.cai.linux@gmail.com>
+---
+ clients/desktop-shell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
+index acc0a41..2d989e3 100644
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -52,7 +52,7 @@
+ 
+ #include "weston-desktop-shell-client-protocol.h"
+ 
+-#define DEFAULT_CLOCK_FORMAT CLOCK_FORMAT_MINUTES
++#define DEFAULT_CLOCK_FORMAT CLOCK_FORMAT_SECONDS
+ 
+ extern char **environ; /* defined by libc */
+ 
+-- 
+2.17.1
+

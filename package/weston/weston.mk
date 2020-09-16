@@ -140,4 +140,11 @@ else
 WESTON_CONF_OPTS += --disable-demo-clients-install
 endif
 
+define WESTON_INSTALL_TARGET_ENV
+	$(INSTALL) -D -m 0644 $(WESTON_PKGDIR)/weston.sh \
+		$(TARGET_DIR)/etc/profile.d/weston.sh
+endef
+
+WESTON_POST_INSTALL_TARGET_HOOKS += WESTON_INSTALL_TARGET_ENV
+
 $(eval $(autotools-package))

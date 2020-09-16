@@ -12,6 +12,13 @@ ifeq ($(BR2_PACKAGE_MPP_ALLOCATOR_DRM),y)
 MPP_CONF_OPTS += "-DHAVE_DRM=ON"
 endif
 
+define MPP_LINK_GIT
+	rm -rf $(@D)/.git
+	ln -s $(SRCDIR)/.git $(@D)/
+endef
+
+MPP_POST_RSYNC_HOOKS += MPP_LINK_GIT
+
 ifeq ($(BR2_PACKAGE_RK3328),y)
 define MPP_H265_SUPPORTED_FIRMWARE
 	mkdir -p $(TARGET_DIR)/lib/firmware/
@@ -19,6 +26,10 @@ define MPP_H265_SUPPORTED_FIRMWARE
 		$(TARGET_DIR)/lib/firmware/
 endef
 MPP_POST_INSTALL_TARGET_HOOKS += MPP_H265_SUPPORTED_FIRMWARE
+endif
+
+ifeq ($(BR2_PACKAGE_RK_OEM), y)
+MPP_INSTALL_TARGET_OPTS = DESTDIR=$(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR) install/fast
 endif
 
 $(eval $(cmake-package))

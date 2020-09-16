@@ -22,4 +22,5 @@ BR2_PACKAGE_N4=y
 #  - input event daemon used to handle key event, ie. power on/off system
 BR2_PACKAGE_INPUT_EVENT_DAEMON=y
 BR2_PACKAGE_PM_UTILS=y
+BR2_PACKAGE_LRZSZ=y
 

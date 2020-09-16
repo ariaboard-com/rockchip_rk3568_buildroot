@@ -1,0 +1,9 @@
+#include "base.config"
+#include "base_extra.config"
+#include "rv1126_rv1109_arm.config"
+#include "recovery.config"
+BR2_TOOLCHAIN_EXTERNAL_PATH="$(TOPDIR)/../prebuilts/gcc/linux-x86/arm/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf"
+BR2_TOOLCHAIN_EXTERNAL_CUSTOM_PREFIX="arm-linux-gnueabihf"
+BR2_TOOLCHAIN_EXTERNAL_GCC_8=y
+BR2_TOOLCHAIN_EXTERNAL_HEADERS_4_19=y
+BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-recovery/"

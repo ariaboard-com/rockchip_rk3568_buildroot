@@ -3,6 +3,15 @@ config BR2_PACKAGE_RKSCRIPT
 	help
 	  rockchip script for linux use.
 
+if BR2_PACKAGE_RKSCRIPT
+
+config BR2_PACKAGE_RKSCRIPT_USE_BUSYBOX_MOUNT
+	bool "use busybox mount"
+	default y
+	help
+	  use busybox mount
+endif
+
 config BR2_PACKAGE_USB_MODULE
 	bool "rockchip usb module"
 	help
@@ -57,3 +66,11 @@ config BR2_PACKAGE_USB_MASS_STORAGE_BLOCK_AUTO_MOUNT
 	  Warning that umount ums shared block may be failed, because
 	  usb is unabled to manage other applications which used ums
 	  shared block when usb was going to umount block.
+
+config BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM
+	string "default PCM"
+	default "none"
+	depends on BR2_PACKAGE_RKSCRIPT
+
+	help
+	  Change alsa default PCM to you selected

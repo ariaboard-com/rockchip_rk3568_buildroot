@@ -15,6 +15,7 @@ case "$1" in
 		export GST_V4L2_PREFERRED_FOURCC=YU12
 		export QT_GSTREAMER_WINDOW_VIDEOSINK=waylandsink
 		export QT_WAYLAND_CLIENT_BUFFER_INTEGRATION=wayland
+		export QT_QUICK_BACKEND=software
 		mkdir -p /tmp/.xdg &&  chmod 0700 /tmp/.xdg
 		export XDG_RUNTIME_DIR=/tmp/.xdg
 		weston --tty=2 -B=drm-backend.so --idle-time=0 --use-pixman&

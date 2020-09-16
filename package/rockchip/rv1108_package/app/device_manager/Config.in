@@ -13,11 +13,11 @@ config BR2_PACKAGE_DEVICE_MANAGER_IPC_NANOMSG
 	select BR2_PACKAGE_ADK
 	select BR2_PACKAGE_MESSENGER
 
-config BR2_PACKAGE_DEVICE_MANAGER_STORAGEDEVICE
+config BR2_PACKAGE_DEVICE_MANAGER_STORAGE_DEVICE
         bool "storage device support"
        default y
 
-config BR2_PACKAGE_DEVICE_MANAGER_WLAN
+config BR2_PACKAGE_DEVICE_MANAGER_WLAN_DEVICE
        bool "wlan device support"
        default y
 

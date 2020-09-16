@@ -1,0 +1,10 @@
+config BR2_PACKAGE_CALLFUNIPC
+	bool "CallFunIpc"
+	select BR2_PACKAGE_LIBGDBUS
+	select BR2_PACKAGE_LIBRKDB
+	help
+	  rockchip CallFunIpc
+
+config BR2_PACKAGE_CALLFUNIPC_DEMO
+	bool "CallFunIpc demo"
+	depends on BR2_PACKAGE_CALLFUNIPC

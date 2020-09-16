@@ -31,17 +31,6 @@ menu "face_service setting options"
         select BR2_PACKAGE_RKMEDIA_MPP
         select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
 
-    config BR2_PACKAGE_FACE_SERVICE_H264_ENCODE
-        bool "Enable h264 encoder"
-        default n
-        select BR2_PACKAGE_MPP
-        select BR2_PACKAGE_RKMEDIA
-        select BR2_PACKAGE_RKMEDIA_MPP
-        select BR2_PACKAGE_RKMEDIA_MPP_ENCODER
-        select BR2_PACKAGE_FFMPEG
-        select BR2_PACKAGE_FFMPEG_SWSCALE
-        select BR2_PACKAGE_RKMEDIA_FFMPEG
-
     config BR2_PACKAGE_FACE_SERVICE_USE_UVC
         bool "use UVC"
         default n

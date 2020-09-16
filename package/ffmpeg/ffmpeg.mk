@@ -146,7 +146,7 @@ endif
 
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_BSFS)),all)
 FFMPEG_CONF_OPTS += --disable-bsfs \
-	$(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_BSFS)),--enable-bsfs=$(x))
+	$(foreach x,$(call qstrip,$(BR2_PACKAGE_FFMPEG_BSFS)),--enable-bsf=$(x))
 endif
 
 ifneq ($(call qstrip,$(BR2_PACKAGE_FFMPEG_PROTOCOLS)),all)
@@ -241,6 +241,11 @@ FFMPEG_CONF_OPTS += --enable-libdrm
 FFMPEG_DEPENDENCIES += libdrm
 else
 FFMPEG_CONF_OPTS += --disable-libdrm
+
+ifeq ($(BR2_PACKAGE_LIBION),y)
+FFMPEG_CONF_OPTS += --enable-libion
+FFMPEG_DEPENDENCIES += libion
+endif
 endif
 
 ifeq ($(BR2_PACKAGE_LIBOPENH264),y)

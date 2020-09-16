@@ -94,7 +94,7 @@ define step_pkg_size_end
 
 	if [ -z "$(3)" ]; then \
 		grep "^$(1)," $(BUILD_DIR)/packages-file-list$(3).txt | \
-			cut -d',' -f 2 | uniq | \
+			cut -d',' -f 2 | sort | uniq | \
 			tar --no-recursion --ignore-failed-read -cf $($(PKG)_DIR)/$($(PKG)_BASE_NAME).tar -C $(TARGET_DIR) -T -; true; \
 	fi
 
@@ -454,6 +454,12 @@ else
  $(2)_DL_VERSION := $$(strip $$($(2)_VERSION))
 endif
 $(2)_VERSION := $$(call sanitize,$$($(2)_DL_VERSION))
+
+$(2)_HASH_FILE = \
+	$$(strip \
+		$$(if $$(wildcard $$($(2)_PKGDIR)/$$($(2)_VERSION)/$$($(2)_RAWNAME).hash),\
+			$$($(2)_PKGDIR)/$$($(2)_VERSION)/$$($(2)_RAWNAME).hash,\
+			$$($(2)_PKGDIR)/$$($(2)_RAWNAME).hash))
 
 ifdef $(3)_OVERRIDE_SRCDIR
   $(2)_OVERRIDE_SRCDIR ?= $$($(3)_OVERRIDE_SRCDIR)

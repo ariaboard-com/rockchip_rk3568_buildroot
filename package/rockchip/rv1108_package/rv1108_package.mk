@@ -21,9 +21,9 @@ RV_BOARD_USERDATA_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/userdata
 RV_BOARD_ROOT_DIR=$(RV_DEVICE_PRODUCT_BOARD_DIR)/root
 
 ### build loader
-ifeq ($(RK_STORAGE_TYPE),emmc)
+ifeq ($(RK_LOADER_BUILD_TYPE),emmc)
     EMMC_ONLY=1
-else ifeq ($(RK_STORAGE_TYPE),nor) 
+else ifeq ($(RK_LOADER_BUILD_TYPE),nor)
     NOR_ONLY=1
 else
     ALL_SUPPORT=1

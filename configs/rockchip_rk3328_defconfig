@@ -7,7 +7,9 @@
 #include "video_gst.config"
 #include "video_gst_rtsp.config"
 #include "audio.config"
+#include "audio_gst.config"
 #include "camera.config"
+#include "camera_gst.config"
 #include "test.config"
 #include "debug.config"
 #include "benchmark.config"
@@ -22,3 +24,4 @@ BR2_TARGET_GENERIC_ISSUE="Welcome to RK3328 Buildroot"
 BR2_PACKAGE_RKWIFIBT_RTL8723DS=y
 BR2_PACKAGE_PULSEAUDIO=y
 BR2_PACKAGE_PULSEAUDIO_DAEMON=y
+BR2_PACKAGE_RKSCRIPT_DEFAULT_PCM="rockchiphdmi"

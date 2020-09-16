@@ -1,0 +1,2 @@
+# <file system>			<mount pt>		<type>		<options>		<dump>	<pass>
+/dev/block/by-name/userdata	/userdata		ext2		defaults		0	2

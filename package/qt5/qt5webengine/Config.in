@@ -22,6 +22,7 @@ comment "qt5webengine needs an OpenGL and EGL-capable backend"
 
 config BR2_PACKAGE_QT5WEBENGINE
 	bool "qt5webengine"
+	depends on !BR2_PACKAGE_QT5_VERSION_5_9
 	depends on BR2_PACKAGE_QT5WEBENGINE_ARCH_SUPPORTS
 	depends on BR2_TOOLCHAIN_USES_GLIBC # execinfo.h, mallinfo
 	depends on BR2_HOST_GCC_AT_LEAST_4_8 # qt5base-icu
@@ -38,10 +39,11 @@ config BR2_PACKAGE_QT5WEBENGINE
 	select BR2_HOSTARCH_NEEDS_IA32_COMPILER if !BR2_ARCH_IS_64 # v8/chromium
 	select BR2_PACKAGE_FFMPEG
 	select BR2_PACKAGE_LIBGLIB2
-	select BR2_PACKAGE_LIBNSS if !BR2_PACKAGE_QT5_VERSION_5_6
+	select BR2_PACKAGE_LIBNSS
 	select BR2_PACKAGE_LIBVPX
 	select BR2_PACKAGE_OPUS
 	select BR2_PACKAGE_WEBP
+	select BR2_PACKAGE_WEBP_MUX
 	select BR2_PACKAGE_WEBP_DEMUX
 	select BR2_PACKAGE_QT5BASE_DBUS
 	select BR2_PACKAGE_QT5BASE_EGLFS
@@ -74,6 +76,42 @@ config BR2_PACKAGE_QT5WEBENGINE
 	  http://doc.qt.io/qt-5/qtwebengine-index.html
 
 if BR2_PACKAGE_QT5WEBENGINE
+
+choice
+	prompt "Qt5WebEngine version"
+	default BR2_PACKAGE_QT5WEBENGINE_5_13
+
+config BR2_PACKAGE_QT5WEBENGINE_5_12
+	bool "5.12"
+	help
+	  This option builds QtWebEngine 5.12, which is licensed under
+	  (L)GPL-3.0+.
+
+config BR2_PACKAGE_QT5WEBENGINE_5_13
+	bool "5.13"
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8
+	help
+	  This option builds QtWebEngine 5.13, which is licensed under
+	  (L)GPL-3.0+.
+
+config BR2_PACKAGE_QT5WEBENGINE_5_14
+	bool "5.14"
+	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_9
+	help
+	  This option builds QtWebEngine 5.14, which is licensed under
+	  (L)GPL-3.0+.
+
+endchoice
+
+config BR2_PACKAGE_QT5WEBENGINE_VERSION
+	string
+	default "5.12.7"     if BR2_PACKAGE_QT5WEBENGINE_5_12
+	default "5.13.2"     if BR2_PACKAGE_QT5WEBENGINE_5_13
+	default "5.14.2"     if BR2_PACKAGE_QT5WEBENGINE_5_14
+
+config BR2_PACKAGE_QT5WEBENGINE_WEBRTC
+	bool "webrtc"
+	default y
 
 config BR2_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS
 	bool "proprietary codecs"
