@@ -1,0 +1,4 @@
+config BR2_PACKAGE_CHROMIUM
+	bool "Rockchip chromium"
+	help
+	  "rockchip chromium with video hardware acceleration"

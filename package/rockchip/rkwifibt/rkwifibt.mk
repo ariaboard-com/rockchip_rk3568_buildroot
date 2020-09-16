@@ -13,6 +13,7 @@ RKWIFIBT_LICENSE_FILES = NOTICE
 RKWIFIBT_DEPENDENCIES = wpa_supplicant
 
 BT_TTY_DEV = $(call qstrip,$(BR2_PACKAGE_RKWIFIBT_BTUART))
+SXLOAD_WIFI = "S36load_wifi_modules"
 FIRMWARE_DIR = "system"
 
 ifeq ($(call qstrip,$(BR2_ARCH)),aarch64)
@@ -23,6 +24,7 @@ endif
 
 ifeq (y,$(BR2_TOOLCHAIN_EXTERNAL_HEADERS_4_19))
 FIRMWARE_DIR = "vendor"
+SXLOAD_WIFI = "S36load_rv1109_wifi_modules"
 endif
 
 define RKWIFIBT_INSTALL_COMMON
@@ -34,8 +36,8 @@ define RKWIFIBT_INSTALL_COMMON
 endef
 
 define RKWIFIBT_BROADCOM_INSTALL
-    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/S36load_wifi_modules
-    $(INSTALL) -D -m 0755 $(@D)/S36load_wifi_modules $(TARGET_DIR)/etc/init.d/
+    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/$(SXLOAD_WIFI)
+    $(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/brcm_patchram_plus1 $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
@@ -50,7 +52,7 @@ endef
 
 define RKWIFIBT_REALTEK_INSTALL
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/rtwpriv $(TARGET_DIR)/usr/bin/
-    $(INSTALL) -D -m 0755 $(@D)/S36load_wifi_modules $(TARGET_DIR)/etc/init.d/
+    $(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
