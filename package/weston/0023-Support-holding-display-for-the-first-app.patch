@@ -1,4 +1,4 @@
-From b88498f36f301bcb2cd1877f2a7fb2832ec69d8b Mon Sep 17 00:00:00 2001
+From 1a662608e2a504f5ff595cbb4219fe3790f3e6ae Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 10:20:40 +0800
 Subject: [PATCH 23/28] Support holding display for the first app
@@ -50,10 +50,10 @@ index 8eb8a47..528347d 100644
  	weston_compositor_log_capabilities(wet.compositor);
  
 diff --git a/include/libweston/libweston.h b/include/libweston/libweston.h
-index 44a36fb..969a8df 100644
+index d5749e8..5127349 100644
 --- a/include/libweston/libweston.h
 +++ b/include/libweston/libweston.h
-@@ -1118,6 +1118,8 @@ struct weston_compositor {
+@@ -1119,6 +1119,8 @@ struct weston_compositor {
  	struct weston_log_scope *timeline;
  
  	struct content_protection *content_protection;
@@ -63,7 +63,7 @@ index 44a36fb..969a8df 100644
  
  struct weston_buffer {
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 7b65ebf..c858547 100644
+index cf4ff9a..9c6d0ab 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
 @@ -117,6 +117,24 @@ weston_compositor_is_static_layer(struct weston_layer *layer)

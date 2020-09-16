@@ -1,9 +1,9 @@
-From 767dccab7fccb828f5c46389ce83c1e7368ad5c2 Mon Sep 17 00:00:00 2001
+From 18c42cc3f2b19ade6bd06da2adad2c436c1eca15 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:37:37 +0800
 Subject: [PATCH 14/28] backend-drm: Support controlling output dynamically
 
-Use config file to control output's rotation/mode/freezen/display
+Use config file to control output's rotation/mode/off/freeze/display
 rectangle.
 
 Default config file is "/tmp/.weston_drm.conf", can override with
@@ -11,6 +11,7 @@ Default config file is "/tmp/.weston_drm.conf", can override with
 
 Supported configs format is "output:<output name>:<config>", for
 example:
+echo "output:DSI-1:off" >> /tmp/.weston_drm.conf
 echo "output:eDP-1:freeze" >> /tmp/.weston_drm.conf
 echo "output:all:rotate90" >> /tmp/.weston_drm.conf
 echo "output:all:rect=<100,20,1636,2068>" >> /tmp/.weston_drm.conf
@@ -19,11 +20,12 @@ echo "output:HDMI-A-1:mode=800x600" >> /tmp/.weston_drm.conf
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  desktop-shell/shell.c                |  44 ++++++-
- libweston/backend-drm/drm-internal.h |  19 +++
- libweston/backend-drm/drm.c          | 173 ++++++++++++++++++++++++++-
+ include/libweston/libweston.h        |   1 +
+ libweston/backend-drm/drm-internal.h |  17 +++
+ libweston/backend-drm/drm.c          | 178 ++++++++++++++++++++++++++-
  libweston/backend-drm/modes.c        |   6 +-
- libweston/compositor.c               |   8 ++
- 5 files changed, 245 insertions(+), 5 deletions(-)
+ libweston/compositor.c               |  13 ++
+ 6 files changed, 254 insertions(+), 5 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index f8cd2f2..329869b 100644
@@ -96,8 +98,20 @@ index f8cd2f2..329869b 100644
  	}
  }
  
+diff --git a/include/libweston/libweston.h b/include/libweston/libweston.h
+index 972d23f..7a73957 100644
+--- a/include/libweston/libweston.h
++++ b/include/libweston/libweston.h
+@@ -352,6 +352,7 @@ struct weston_output {
+ 			    struct weston_head *head);
+ 
+ 	bool unavailable;
++	bool freezing;
+ };
+ 
+ enum weston_pointer_motion_mask {
 diff --git a/libweston/backend-drm/drm-internal.h b/libweston/backend-drm/drm-internal.h
-index efe6d09..5ebd440 100644
+index efe6d09..4e2d2f8 100644
 --- a/libweston/backend-drm/drm-internal.h
 +++ b/libweston/backend-drm/drm-internal.h
 @@ -129,6 +129,10 @@
@@ -121,19 +135,17 @@ index efe6d09..5ebd440 100644
  };
  
  struct drm_mode {
-@@ -564,6 +571,11 @@ struct drm_output {
+@@ -564,6 +571,9 @@ struct drm_output {
  	bool is_mirror;
  
  	pixman_box32_t plane_bounds;
 +
 +	uint32_t original_transform;
 +	int64_t last_rotate_ms;
-+
-+	bool freeze;
  };
  
  static inline struct drm_head *
-@@ -647,6 +659,13 @@ drm_mode_list_destroy(struct drm_backend *backend, struct wl_list *mode_list);
+@@ -647,6 +657,13 @@ drm_mode_list_destroy(struct drm_backend *backend, struct wl_list *mode_list);
  void
  drm_output_print_modes(struct drm_output *output);
  
@@ -148,7 +160,7 @@ index efe6d09..5ebd440 100644
  drm_output_set_mode(struct weston_output *base,
  		    enum weston_drm_backend_output_mode mode,
 diff --git a/libweston/backend-drm/drm.c b/libweston/backend-drm/drm.c
-index 0c2023c..b0b63db 100644
+index 0c2023c..d692249 100644
 --- a/libweston/backend-drm/drm.c
 +++ b/libweston/backend-drm/drm.c
 @@ -40,6 +40,7 @@
@@ -180,7 +192,7 @@ index 0c2023c..b0b63db 100644
  
  	assert(!output->virtual);
  
-@@ -750,12 +758,18 @@ drm_output_repaint(struct weston_output *output_base,
+@@ -750,7 +758,10 @@ drm_output_repaint(struct weston_output *output_base,
  	assert(!output->state_last);
  
  	weston_compositor_read_presentation_clock(b->compositor, &now);
@@ -192,15 +204,7 @@ index 0c2023c..b0b63db 100644
  		weston_compositor_damage_all(b->compositor);
  		usleep(b->compositor->repaint_msec);
  		return 0;
- 	}
- 
-+	if (output->freeze)
-+		return 0;
-+
- 	/* If planes have been disabled in the core, we might not have
- 	 * hit assign_planes at all, so might not have valid output state
- 	 * here. */
-@@ -2077,8 +2091,13 @@ drm_output_enable(struct weston_output *base)
+@@ -2077,8 +2088,13 @@ drm_output_enable(struct weston_output *base)
  				      &output->scanout_plane->base,
  				      &b->compositor->primary_plane);
  
@@ -214,7 +218,7 @@ index 0c2023c..b0b63db 100644
  	weston_log("Output %s (crtc %d) video modes:\n",
  		   output->base.name, output->crtc_id);
  	drm_output_print_modes(output);
-@@ -3231,6 +3250,154 @@ static const struct weston_drm_output_api api = {
+@@ -3231,6 +3247,162 @@ static const struct weston_drm_output_api api = {
  	drm_output_set_seat,
  };
  
@@ -290,12 +294,20 @@ index 0c2023c..b0b63db 100644
 +		} else if (!strncmp(config, "mode=", strlen("mode="))) {
 +			drm_output_modeset(output, config + strlen("mode="));
 +		} else if (!strcmp(config, "freeze")) {
-+			output->freeze = true;
-+		} else if (!strcmp(config, "unfreeze")) {
-+			if (!output->freeze)
++			output->base.freezing = true;
++		} else if (!strcmp(config, "off")) {
++			output->base.freezing = true;
++			if (!output->virtual)
++				drm_set_dpms(&output->base, WESTON_DPMS_OFF);
++		} else if (!strcmp(config, "unfreeze") ||
++			   !strcmp(config, "on")) {
++			if (!output->base.freezing)
 +				continue;
 +
-+			output->freeze = false;
++			output->base.freezing = false;
++
++			if (!output->virtual)
++				drm_set_dpms(&output->base, WESTON_DPMS_ON);
 +
 +			drm_output_update_complete(output, 0, 0, 0);
 +			output->page_flip_pending = false;
@@ -369,7 +381,7 @@ index 0c2023c..b0b63db 100644
  static struct drm_backend *
  drm_backend_create(struct weston_compositor *compositor,
  		   struct weston_drm_backend_config *config)
-@@ -3449,6 +3616,10 @@ drm_backend_create(struct weston_compositor *compositor,
+@@ -3449,6 +3621,10 @@ drm_backend_create(struct weston_compositor *compositor,
  		goto err_udev_monitor;
  	}
  
@@ -405,10 +417,22 @@ index cadeb3b..f7a17de 100644
  			if (!backend->aspect_ratio_supported ||
  			    aspect_ratio == drm_mode->base.aspect_ratio)
 diff --git a/libweston/compositor.c b/libweston/compositor.c
-index 33b62a9..7bee911 100644
+index 33b62a9..b628caa 100644
 --- a/libweston/compositor.c
 +++ b/libweston/compositor.c
-@@ -6091,12 +6091,15 @@ weston_output_set_transform(struct weston_output *output,
+@@ -2803,6 +2803,11 @@ weston_output_maybe_repaint(struct weston_output *output, struct timespec *now,
+ 	int ret = 0;
+ 	int64_t msec_to_repaint;
+ 
++	/* If we're sleeping, drop the repaint machinery entirely; we will
++	 * explicitly repaint it when we come back. */
++	if (output->freezing)
++		goto err;
++
+ 	/* We're not ready yet; come back to make a decision later. */
+ 	if (output->repaint_status != REPAINT_SCHEDULED)
+ 		return ret;
+@@ -6091,12 +6096,15 @@ weston_output_set_transform(struct weston_output *output,
  	int mid_x, mid_y;
  	struct weston_head *head;
  	int ver;
@@ -424,7 +448,7 @@ index 33b62a9..7bee911 100644
  	weston_output_transform_scale_init(output, transform, output->scale);
  
  	pixman_region32_init(&old_region);
-@@ -6104,6 +6107,11 @@ weston_output_set_transform(struct weston_output *output,
+@@ -6104,6 +6112,11 @@ weston_output_set_transform(struct weston_output *output,
  
  	weston_output_init_geometry(output, output->x, output->y);
  

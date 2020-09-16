@@ -1,4 +1,4 @@
-From 798c7e3c63ed3bd10aee1e0dfd2b34397af67d60 Mon Sep 17 00:00:00 2001
+From 784aae2b134c7cd45721cbde4570057fdb348701 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
 Subject: [PATCH 19/28] HACK: Support setting surface flags and activate
@@ -97,10 +97,10 @@ index c82fd28..cbe2430 100644
  	struct wl_listener pointer_focus_listener;
  	struct weston_surface *grab_surface;
 diff --git a/include/libweston/libweston.h b/include/libweston/libweston.h
-index 972d23f..44a36fb 100644
+index 7a73957..d5749e8 100644
 --- a/include/libweston/libweston.h
 +++ b/include/libweston/libweston.h
-@@ -1380,6 +1380,12 @@ struct weston_pointer_constraint {
+@@ -1381,6 +1381,12 @@ struct weston_pointer_constraint {
  	struct wl_listener surface_activate_listener;
  };
  
@@ -113,7 +113,7 @@ index 972d23f..44a36fb 100644
  struct weston_surface {
  	struct wl_resource *resource;
  	struct wl_signal destroy_signal; /* callback argument: this surface */
-@@ -1481,6 +1487,9 @@ struct weston_surface {
+@@ -1482,6 +1488,9 @@ struct weston_surface {
  
  	/* Transparent hole region(excluding it's lower subsurface area) */
  	pixman_region32_t hole;
