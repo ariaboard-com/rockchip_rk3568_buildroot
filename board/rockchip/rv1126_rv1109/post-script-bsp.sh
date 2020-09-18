@@ -6,16 +6,21 @@ SDK_DIR=`dirname $BUILDROOT_DIR`
 export LIBDIR=$TARGET_DIR/usr/lib/
 export HEADER_DIR=$STAGING_DIR/usr/include
 export BSPDIR=$TARGET_DIR/../BSP
+export BINDIR=$TARGET_DIR/usr/bin/
 
 echo "$BUILDROOT_DIR"
 echo "$SDK_DIR"
 echo "$LIBDIR"
+echo "$BINDIR"
 
 rm -rf $BSPDIR
 mkdir $BSPDIR
 mkdir -p $BSPDIR/lib
 mkdir -p $BSPDIR/include
 mkdir -p $BSPDIR/example
+mkdir -p $BSPDIR/npu/ko
+mkdir -p $BSPDIR/npu/lib
+mkdir -p $BSPDIR/npu/include
 
 cd $BSPDIR
 # copy libs
@@ -54,4 +59,26 @@ cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./example -vrf
 #copy vqefiles to examples
 cp $SDK_DIR/external/common_algorithm/audio/rkap_aec/para ./example/vqefiles -vrf
 
+########################### npu ##############################
+
+#rknpu ko
+cp $TARGET_DIR/etc/init.d/S60NPU_init ./npu/ko/ -v
+cp $TARGET_DIR/lib32/modules/galcore.ko ./npu/ko/ -v
+
+# rknpu lib
+cp $LIBDIR/cl_viv_vx_ext.h ./npu/lib/ -dv
+cp $LIBDIR/libArchModelSw.so ./npu/lib/ -dv
+cp $LIBDIR/libGAL.so ./npu/lib/ -dv
+cp $LIBDIR/libNN* ./npu/lib/ -dv
+cp $LIBDIR/libOpen* ./npu/lib/ -dv
+cp $LIBDIR/librknn_runtime.so ./npu/lib/ -dv
+cp $LIBDIR/libVSC* ./npu/lib/ -dv
+
+# rockx
+cp $LIBDIR/librknn_api.so ./npu/lib/ -dv
+cp $LIBDIR/librockx.so ./npu/lib/ -dv
+cp $LIBDIR/person_detection_v2.data ./npu/lib/ -dv
+cp $LIBDIR/face_detection_v2.data ./npu/lib/ -dv
+cp $HEADER_DIR/rockx ./npu/include/ -vrf
+#
 cd -
