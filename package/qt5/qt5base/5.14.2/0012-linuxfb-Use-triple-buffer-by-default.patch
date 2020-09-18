@@ -1,7 +1,7 @@
-From 59e8ddc2779eed50d33e12a65100d80f48a14916 Mon Sep 17 00:00:00 2001
+From 362a8a4101de528a1ded8254dd0dbf809aa9364e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 16 Apr 2019 18:46:49 +0800
-Subject: [PATCH 12/15] linuxfb: Use triple buffer by default
+Subject: [PATCH 12/18] linuxfb: Use triple buffer by default
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 44 insertions(+), 12 deletions(-)
 
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
-index dcc1ef27..29d146f4 100644
+index dcc1ef279..29d146f47 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 @@ -59,7 +59,13 @@ QT_BEGIN_NAMESPACE

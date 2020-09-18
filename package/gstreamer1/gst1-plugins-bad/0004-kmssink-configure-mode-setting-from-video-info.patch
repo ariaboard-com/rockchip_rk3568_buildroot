@@ -1,7 +1,7 @@
-From 96f95e2ab1ea8a5145a2f809691c96f8e4402164 Mon Sep 17 00:00:00 2001
+From 86a4091d6926da0cf8562a1a63fa3b2e38a54e6c Mon Sep 17 00:00:00 2001
 From: Philipp Zabel <p.zabel@pengutronix.de>
 Date: Fri, 17 Aug 2018 11:12:26 +0200
-Subject: [PATCH 04/30] kmssink: configure mode setting from video info
+Subject: [PATCH 04/48] kmssink: configure mode setting from video info
 
 drmModeGetFB returns -EINVAL for multi-planar framebuffers. Instead of
 depending on the framebuffer dimensions to select the mode, use width
@@ -73,5 +73,5 @@ index 1331883ce..3400d3244 100644
    {
      GST_ERROR_OBJECT (self, "cannot find appropriate mode");
 -- 
-2.11.0
+2.20.1
 

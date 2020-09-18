@@ -1,7 +1,8 @@
-From 1461acd2407a0ef5316f770b5f6ef2f82f4fd962 Mon Sep 17 00:00:00 2001
+From c23072ff44cbe40c574c16249c7d618ef43e4893 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Nov 2018 16:03:31 +0800
-Subject: [PATCH 2/7] gsttools: videowidget: Set overlay rectangle when resized
+Subject: [PATCH 06/12] gsttools: videowidget: Set overlay rectangle when
+ resized
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -55,5 +56,5 @@ index 792df42..476b5e6 100644
      m_widget->installEventFilter(this);
      m_videoOverlay.setWindowHandle(m_windowId = m_widget->winId());
 -- 
-2.11.0
+2.20.1
 

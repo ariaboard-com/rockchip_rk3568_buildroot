@@ -1,7 +1,7 @@
-From a83c034c820de5c42f173e8b2c580373be59934f Mon Sep 17 00:00:00 2001
+From 07cd9f0dee189f15179eea96d41b5e43dfeb0c2e Mon Sep 17 00:00:00 2001
 From: Guillaume Desmottes <guillaume.desmottes@collabora.co.uk>
 Date: Thu, 23 Aug 2018 14:29:37 +0200
-Subject: [PATCH 05/30] kmssink: add 'connector-properties' prop
+Subject: [PATCH 05/48] kmssink: add 'connector-properties' prop
 
 Can be used to pass custom connector properties to DRM. Properties can
 be enumerated using modetest tool. These properties can then be applied
@@ -12,7 +12,7 @@ structure is ignored.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=797027
 ---
- sys/kms/gstkmssink.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ sys/kms/gstkmssink.c | 113 +++++++++++++++++++++++++++++++++++++++++++
  sys/kms/gstkmssink.h |   1 +
  2 files changed, 114 insertions(+)
 
@@ -28,10 +28,11 @@ index 3400d3244..075efc9bb 100644
    PROP_N
  };
  
-@@ -560,6 +561,89 @@ ensure_allowed_caps (GstKMSSink * self, drmModeConnector * conn,
+@@ -559,6 +560,89 @@ ensure_allowed_caps (GstKMSSink * self, drmModeConnector * conn,
+   return (self->allowed_caps && !gst_caps_is_empty (self->allowed_caps));
  }
  
- static gboolean
++static gboolean
 +set_drm_property (gint fd, guint32 object, guint32 object_type,
 +    drmModeObjectPropertiesPtr properties, const gchar * prop_name,
 +    guint64 value)
@@ -114,10 +115,9 @@ index 3400d3244..075efc9bb 100644
 +  drmModeFreeObjectProperties (iter.properties);
 +}
 +
-+static gboolean
+ static gboolean
  gst_kms_sink_start (GstBaseSink * bsink)
  {
-   GstKMSSink *self;
 @@ -667,6 +751,8 @@ retry_find_plane:
    g_object_notify_by_pspec (G_OBJECT (self), g_properties[PROP_DISPLAY_WIDTH]);
    g_object_notify_by_pspec (G_OBJECT (self), g_properties[PROP_DISPLAY_HEIGHT]);
@@ -195,5 +195,5 @@ index a80699c44..bb978bcd4 100644
    GstVideoInfo vinfo;
    GstCaps *allowed_caps;
 -- 
-2.11.0
+2.20.1
 

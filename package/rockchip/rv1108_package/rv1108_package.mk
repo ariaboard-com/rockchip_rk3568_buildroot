@@ -7,7 +7,6 @@ RV_SDK_DIR=$(TOPDIR)/..
 RV_OUTPUT_DIR=$(TOPDIR)/output/rockchip_rv1108
 RV_IMAGE_DIR=$(RV_OUTPUT_DIR)/images
 RV_LOADER_DIR=$(TOPDIR)/../loader
-RV_TARGET_USB_BOOT_DIR=$(TOPDIR)/../tools/Windows_Upgrade_Tool/AndroidTool_Release_v2.65/Image/
 RV_KERNEL_DIR=$(TOPDIR)/../kernel
 RV_USERDATA_DIR=$(RV_OUTPUT_DIR)/userdata
 RV_MODULES_DIR=$(RV_OUTPUT_DIR)/modules
@@ -55,7 +54,7 @@ loader:
 	make -C $(RV_LOADER_DIR) PLAT=rv1108loader $(LOADER_BUILD_MAKE_ENV)
 	cp $(RV_LOADER_DIR)/rk_tools/bin/rv11/RV1108_DDR3.bin  $(RV_IMAGE_DIR)/rv1108ddr.bin
 	cp $(RV_LOADER_DIR)/Project/rv1108loader/Debug/bin/rv1108loader.bin $(RV_IMAGE_DIR)/
-	cp $(RV_LOADER_DIR)/RV1108_usb_boot_V1.24.bin $(RV_TARGET_USB_BOOT_DIR)/RV1108_usb_boot.bin
+	cp $(RV_LOADER_DIR)/RV1108_usb_boot_V1.24.bin $(RV_IMAGE_DIR)/RV1108_usb_boot.bin
 
 loader-clean:
 	make -C $(RV_LOADER_DIR) PLAT=rv1108usbplug clean

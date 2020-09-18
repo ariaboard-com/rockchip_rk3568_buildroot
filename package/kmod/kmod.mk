@@ -4,10 +4,12 @@
 #
 ################################################################################
 
-KMOD_VERSION = 24
+KMOD_VERSION = 26
 KMOD_SOURCE = kmod-$(KMOD_VERSION).tar.xz
 KMOD_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/kmod
 KMOD_INSTALL_STAGING = YES
+# 0002-Do-not-check-for-undefined-symbols-when-building-the.patch
+KMOD_AUTORECONF = YES
 KMOD_DEPENDENCIES = host-pkgconf
 HOST_KMOD_DEPENDENCIES = host-pkgconf
 
@@ -28,6 +30,10 @@ KMOD_CONF_OPTS = --disable-static --enable-shared
 KMOD_CONF_OPTS += --disable-manpages
 HOST_KMOD_CONF_OPTS = --disable-manpages
 
+ifeq ($(BR2_PACKAGE_BASH_COMPLETION),y)
+KMOD_CONF_OPTS += --with-bashcompletiondir=/usr/share/bash-completion/completions
+endif
+
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 KMOD_DEPENDENCIES += zlib
 KMOD_CONF_OPTS += --with-zlib
@@ -46,11 +52,8 @@ endif
 ifeq ($(BR2_PACKAGE_KMOD_TOOLS),y)
 
 # add license info for kmod tools
-KMOD_LICENSE := $(KMOD_LICENSE), GPL-2.0+ (tools)
+KMOD_LICENSE += , GPL-2.0+ (tools)
 KMOD_LICENSE_FILES += COPYING
-
-# take precedence over busybox implementation
-KMOD_DEPENDENCIES += $(if $(BR2_PACKAGE_BUSYBOX),busybox)
 
 # /sbin is really /usr/sbin with merged /usr, so adjust relative symlink
 ifeq ($(BR2_ROOTFS_MERGED_USR),y)
@@ -74,7 +77,7 @@ endif
 # host.
 define HOST_KMOD_INSTALL_TOOLS
 	mkdir -p $(HOST_DIR)/sbin/
-	ln -sf ../usr/bin/kmod $(HOST_DIR)/sbin/depmod
+	ln -sf ../bin/kmod $(HOST_DIR)/sbin/depmod
 endef
 
 HOST_KMOD_POST_INSTALL_HOOKS += HOST_KMOD_INSTALL_TOOLS

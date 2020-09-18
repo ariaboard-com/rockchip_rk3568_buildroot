@@ -1,5 +1,0 @@
-RV1108_VENDOR_STORAGE_SITE = $(TOPDIR)/../framework/vendor_storage
-RV1108_VENDOR_STORAGE_SITE_METHOD = local
-RV1108_VENDOR_STORAGE_INSTALL_STAGING = YES
-
-$(eval $(cmake-package))

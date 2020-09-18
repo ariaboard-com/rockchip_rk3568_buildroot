@@ -1,7 +1,7 @@
-From 4cad15491de472a169892e381a02bda6cdca35f4 Mon Sep 17 00:00:00 2001
+From ace0d00f16251b82b9adb3235c5db28d77493207 Mon Sep 17 00:00:00 2001
 From: Niels De Graef <niels.degraef@barco.com>
 Date: Fri, 1 Mar 2019 10:17:23 +0100
-Subject: [PATCH 15/30] waylandsink: prefix wl_shell-specific variables with
+Subject: [PATCH 15/48] waylandsink: prefix wl_shell-specific variables with
  wl_
 
 ---
@@ -169,5 +169,5 @@ index 547ed55e0..ce2fa939a 100644
    /* the size and position of the area_(sub)surface */
    GstVideoRectangle render_rectangle;
 -- 
-2.11.0
+2.20.1
 

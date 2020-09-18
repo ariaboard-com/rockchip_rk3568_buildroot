@@ -4,11 +4,41 @@ menuconfig BR2_PACKAGE_ROCKFACE
 
 if BR2_PACKAGE_ROCKFACE
 
+config BR2_PACKAGE_ROCKFACE_INSTATLL_PATH
+    string "The path of install rockface data and library"
+    default ""
+    help
+      Directory to install the rockface data and library.
+
 config BR2_PACKAGE_ROCKFACE_FACE_DETECTION
     bool "Face detection support"
-    default y
+    default n
     help
         Face detection support
+
+config BR2_PACKAGE_ROCKFACE_FACE_DETECTION_V2
+    bool "Face detection v2 support"
+    default n
+    help
+        Face detection v2 support
+
+config BR2_PACKAGE_ROCKFACE_FACE_DETECTION_V3
+    bool "Face detection v3 support"
+    default n
+    help
+        Face detection v3 support
+
+config BR2_PACKAGE_ROCKFACE_FACE_DETECTION_V3_FAST
+    bool "Face detection v3 fast support"
+    default n
+    help
+        Face detection v3 fast support
+
+config BR2_PACKAGE_ROCKFACE_FACE_DETECTION_V3_LARGE
+    bool "Face detection v3 large support"
+    default y
+    help
+        Face detection v3 large support
 
 config BR2_PACKAGE_ROCKFACE_FACE_RECOGNITION
     bool "Face recognition support"

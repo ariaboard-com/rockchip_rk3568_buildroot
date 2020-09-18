@@ -1,7 +1,7 @@
-From 8daa6462a5fc507b9c96ddce1f37d606b756c8f6 Mon Sep 17 00:00:00 2001
+From 3a560a45360e247840a5da210cd529394747ef09 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 6 Mar 2020 17:20:40 +0800
-Subject: [PATCH 14/15] qscreen: Update toplevel windows' screen when needed
+Subject: [PATCH 14/18] qscreen: Update toplevel windows' screen when needed
 
 Update toplevel windows' screen when creating new primary screen, since
 we cleared it during destroying the old one.
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 16 insertions(+)
 
 diff --git a/src/gui/kernel/qscreen.cpp b/src/gui/kernel/qscreen.cpp
-index 166c1297..04d245f4 100644
+index 166c12974..04d245f45 100644
 --- a/src/gui/kernel/qscreen.cpp
 +++ b/src/gui/kernel/qscreen.cpp
 @@ -74,7 +74,23 @@ QScreen::QScreen(QPlatformScreen *screen)

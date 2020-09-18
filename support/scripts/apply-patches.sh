@@ -138,13 +138,16 @@ function apply_patch {
 
     if [ -n "$BR2_GEN_GIT" ]; then
         # Remove backup files
-        find $builddir/* '(' -name '*.orig' -o -name '.*.orig' ')' -exec rm -f {} \;
+        find $builddir/ '(' -name '*.orig' -o -name '.*.orig' ')' -exec rm -f {} \;
         git am "${path}/${patch}" --exclude "*" ||
             git commit --allow-empty --no-edit -m "${patch}"
 
         git add -f *
         git commit --allow-empty --amend --no-edit
         rm -rf .git/rebase-apply/
+
+        # Wait for auto gc
+        while [ -f .git/gc.pid ]; do sleep 1;done
     fi
 }
 

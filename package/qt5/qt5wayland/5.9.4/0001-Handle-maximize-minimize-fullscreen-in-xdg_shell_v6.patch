@@ -1,20 +1,20 @@
-From a91582b1cb8fbcb3c1ed076e071dc9662c5cbb1d Mon Sep 17 00:00:00 2001
+From 9cc7f9c00946f0ff2d9930fb2c16628da832ef2d Mon Sep 17 00:00:00 2001
 From: Giulio Camuffo <giulio.camuffo@kdab.com>
 Date: Sat, 1 Jul 2017 09:53:07 +0200
-Subject: [PATCH] Handle maximize/minimize/fullscreen in xdg_shell_v6
+Subject: [PATCH 01/15] Handle maximize/minimize/fullscreen in xdg_shell_v6
 
 Change-Id: I385eb3279d91f1c38d2f5d46bc63b324f0456ca4
 ---
- src/client/qwaylandwindow.cpp     |  6 +++-
- src/client/qwaylandxdgshellv6.cpp | 61 ++++++++++++++++++++++++++++++++++++---
- src/client/qwaylandxdgshellv6_p.h |  8 ++++-
+ src/client/qwaylandwindow.cpp     |  6 ++-
+ src/client/qwaylandxdgshellv6.cpp | 61 +++++++++++++++++++++++++++++--
+ src/client/qwaylandxdgshellv6_p.h |  8 +++-
  3 files changed, 69 insertions(+), 6 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index cac92a7..808aea9 100644
+index 6d7c0885..308f3864 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -971,7 +971,11 @@ bool QWaylandWindow::setWindowStateInternal(Qt::WindowStates state)
+@@ -971,7 +971,11 @@ bool QWaylandWindow::setWindowStateInternal(Qt::WindowState state)
      // As of february 2013 QWindow::setWindowState sets the new state value after
      // QPlatformWindow::setWindowState returns, so we cannot rely on QWindow::windowState
      // here. We use then this mState variable.
@@ -28,7 +28,7 @@ index cac92a7..808aea9 100644
      if (mShellSurface) {
          createDecoration();
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index cd81778..5ace219 100644
+index 7473174d..70da12cb 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -56,6 +56,8 @@ QWaylandXdgSurfaceV6::Toplevel::Toplevel(QWaylandXdgSurfaceV6 *xdgSurface)
@@ -80,7 +80,7 @@ index cd81778..5ace219 100644
  }
  
  void QWaylandXdgSurfaceV6::Toplevel::zxdg_toplevel_v6_close()
-@@ -229,6 +253,35 @@ void QWaylandXdgSurfaceV6::zxdg_surface_v6_configure(uint32_t serial)
+@@ -231,6 +255,35 @@ void QWaylandXdgSurfaceV6::zxdg_surface_v6_configure(uint32_t serial)
      ack_configure(serial);
  }
  
@@ -117,7 +117,7 @@ index cd81778..5ace219 100644
  
  QWaylandXdgShellV6::QWaylandXdgShellV6(struct ::wl_registry *registry, uint32_t id, uint32_t availableVersion)
 diff --git a/src/client/qwaylandxdgshellv6_p.h b/src/client/qwaylandxdgshellv6_p.h
-index 769f198..1acd8e0 100644
+index 769f1983..1acd8e01 100644
 --- a/src/client/qwaylandxdgshellv6_p.h
 +++ b/src/client/qwaylandxdgshellv6_p.h
 @@ -88,6 +88,10 @@ public:
@@ -144,5 +144,5 @@ index 769f198..1acd8e0 100644
          QWaylandXdgSurfaceV6 *m_xdgSurface;
      };
 -- 
-1.9.1
+2.20.1
 

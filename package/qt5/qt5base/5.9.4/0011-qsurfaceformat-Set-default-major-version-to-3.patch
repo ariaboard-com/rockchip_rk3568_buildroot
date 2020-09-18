@@ -1,7 +1,7 @@
-From 99d3943cb28c4acb03c29bb9a6ecdadbe9cc2d5c Mon Sep 17 00:00:00 2001
+From 5d9b381b4a4484a1c00f75fcee956a59a6ae16c7 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 1 Apr 2020 14:13:03 +0800
-Subject: [PATCH] qsurfaceformat: Set default major version to 3
+Subject: [PATCH 11/14] qsurfaceformat: Set default major version to 3
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

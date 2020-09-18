@@ -6,6 +6,13 @@
 
 ifeq ($(BR2_PACKAGE_RK_OEM), y)
 RK_OEM_SITE_METHOD = local
+RK_OEM_IMAGE_OUTPUT = $(TOPDIR)/../rockdev/oem.img
+RK_OEM_FAKEROOT_SCRIPT = oem_fakeroot.fs
+RK_OEM_FILESYSTEM_TYPE = $(BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE)
+
+ifeq ($(RK_OEM_FILESYSTEM_TYPE),"")
+RK_OEM_FILESYSTEM_TYPE = ext4
+endif
 
 ifeq ($(BR2_PACKAGE_RK_OEM_RESOURCE_DIR),"")
 RK_OEM_SITE = $(TOPDIR)/package/rockchip/rk_oem/src
@@ -40,6 +47,16 @@ define RK_OEM_TARGET_POST_CLEAN_HOOK_CMDS
 		\( -name '*.a' -o -name '*.la' \) -print0 | xargs -0 rm -f
 endef
 
+define RK_OEM_TARGET_POST_MKIMAGE_HOOK_CMDS
+	echo "#!/bin/sh" > $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	echo "set -e" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	echo "[ -d $(RK_OEM_INSTALL_TARGET_DIR)/www ] && chown -R www-data:www-data $(RK_OEM_INSTALL_TARGET_DIR)/www" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	echo "[ -d $(RK_OEM_INSTALL_TARGET_DIR)/usr/www ] && chown -R www-data:www-data $(RK_OEM_INSTALL_TARGET_DIR)/usr/www" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	echo "mkdir -p $$(dirname $(RK_OEM_IMAGE_OUTPUT))" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	echo "$(TOPDIR)/../device/rockchip/common/mk-image.sh $(RK_OEM_INSTALL_TARGET_DIR) $(RK_OEM_IMAGE_OUTPUT) $(RK_OEM_FILESYSTEM_TYPE)" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	chmod a+x $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+endef
+
 define RK_OEM_TARGET_FINALIZE_STRIP_HOOK_CMDS
 	find $(RK_OEM_INSTALL_TARGET_DIR) -type f \( -perm /111 -o -name '*.so*' \) \
 		-not \( -name 'libpthread*.so*' -o -name 'ld-*.so*' -o -name '*.ko' \) -print0 | \
@@ -52,6 +69,12 @@ RK_OEM_TARGET_FINALIZE_HOOKS += RK_OEM_TARGET_FINALIZE_STRIP_HOOK_CMDS
 endif
 endif
 RK_OEM_POST_INSTALL_TARGET_HOOKS += RK_OEM_TARGET_POST_CLEAN_HOOK_CMDS
+RK_OEM_POST_INSTALL_TARGET_HOOKS += RK_OEM_TARGET_POST_MKIMAGE_HOOK_CMDS
+
+define RK_OEM_TARGET_FINALIZE_MKIMAGE_HOOK_CMDS
+	$(HOST_DIR)/bin/fakeroot -- $(BUILD_DIR)/rk_oem/$(RK_OEM_FAKEROOT_SCRIPT)
+endef
+RK_OEM_TARGET_FINALIZE_HOOKS += RK_OEM_TARGET_FINALIZE_MKIMAGE_HOOK_CMDS
 
 endif
 

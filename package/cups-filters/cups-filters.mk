@@ -4,20 +4,29 @@
 #
 ################################################################################
 
-CUPS_FILTERS_VERSION = 1.17.9
+CUPS_FILTERS_VERSION = 1.27.5
 CUPS_FILTERS_SITE = http://openprinting.org/download/cups-filters
 CUPS_FILTERS_LICENSE = GPL-2.0, GPL-2.0+, GPL-3.0, GPL-3.0+, LGPL-2, LGPL-2.1+, MIT, BSD-4-Clause
 CUPS_FILTERS_LICENSE_FILES = COPYING
 
 CUPS_FILTERS_DEPENDENCIES = cups libglib2 lcms2 qpdf fontconfig freetype jpeg
 
-CUPS_FILTERS_CONF_OPTS = --disable-imagefilters \
+CUPS_FILTERS_CONF_OPTS = \
 	--disable-mutool \
 	--disable-foomatic \
+	--disable-braille \
+	--enable-imagefilters \
 	--with-cups-config=$(STAGING_DIR)/usr/bin/cups-config \
 	--with-sysroot=$(STAGING_DIR) \
 	--with-pdftops=pdftops \
-	--with-jpeg
+	--with-jpeg \
+	--without-rcdir
+
+ifeq ($(BR2_PACKAGE_DEJAVU),y)
+CUPS_FILTERS_DEPENDENCIES += dejavu
+CUPS_FILTERS_CONF_OPTS += \
+	--with-test-font-path=$(TARGET_DIR)/usr/share/fonts/dejavu/DejaVuSans.ttf
+endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 CUPS_FILTERS_CONF_OPTS += --with-png
@@ -40,7 +49,8 @@ else
 CUPS_FILTERS_CONF_OPTS += --disable-dbus
 endif
 
-ifeq ($(BR2_PACKAGE_AVAHI),y)
+# avahi support requires avahi-client, which needs avahi-daemon and dbus
+ifeq ($(BR2_PACKAGE_AVAHI_DAEMON)$(BR2_PACKAGE_DBUS),yy)
 CUPS_FILTERS_DEPENDENCIES += avahi
 CUPS_FILTERS_CONF_OPTS += --enable-avahi
 else
@@ -67,5 +77,15 @@ CUPS_FILTERS_CONF_OPTS += --enable-poppler
 else
 CUPS_FILTERS_CONF_OPTS += --disable-poppler
 endif
+
+define CUPS_FILTERS_INSTALL_INIT_SYSV
+	$(INSTALL) -D -m 0755 package/cups-filters/S82cups-browsed \
+		$(TARGET_DIR)/etc/init.d/S82cups-browsed
+endef
+
+define CUPS_FILTERS_INSTALL_INIT_SYSTEMD
+	$(INSTALL) -D -m 0755 $(@D)/utils/cups-browsed.service \
+		$(TARGET_DIR)/usr/lib/systemd/system/cups-browsed.service
+endef
 
 $(eval $(autotools-package))

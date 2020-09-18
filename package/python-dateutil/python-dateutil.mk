@@ -10,4 +10,7 @@ PYTHON_DATEUTIL_SETUP_TYPE = setuptools
 PYTHON_DATEUTIL_LICENSE = BSD-3-Clause
 PYTHON_DATEUTIL_LICENSE_FILES = LICENSE
 
+HOST_PYTHON_DATEUTIL_DEPENDENCIES = host-python-six
+
+$(eval $(host-python-package))
 $(eval $(python-package))

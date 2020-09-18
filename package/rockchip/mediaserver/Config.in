@@ -1,8 +1,5 @@
 menuconfig BR2_PACKAGE_MEDIASERVER
 	bool "rockchip mediaserver"
-	select BR2_PACKAGE_DBUS
-	select BR2_PACKAGE_DBUS_CPP
-	select BR2_PACKAGE_LIBRKDB
 	select BR2_PACKAGE_JSON_FOR_MODERN_CPP
 	select BR2_PACKAGE_RKMEDIA
 	help
@@ -22,9 +19,30 @@ config BR2_PACKAGE_MEDIASERVER_SANITIZER_STATIC
 	help
 	  Enable mediaserver debug on sanitizer with static linker.
 
+config BR2_PACKAGE_MEDIASERVE_BIN
+        bool "Enable mediaserver bin"
+        default y
+        help
+          rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_LIB_EXAMPLE
+        bool "Enable mediaserver lib example"
+        default y if !BR2_PACKAGE_MEDIASERVE_BIN
+        help
+          rockchip mediaserver options
+
 config BR2_PACKAGE_MEDIASERVE_CONIFG
 	string "mediaserver config"
 	default "none"
+
+config BR2_PACKAGE_MEDIASERVE_DBUS
+	bool "Enable dbus server"
+	select BR2_PACKAGE_DBUS
+	select BR2_PACKAGE_DBUS_CPP
+	select BR2_PACKAGE_LIBRKDB
+	default y
+	help
+	  rockchip mediaserver options
 
 config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	bool "Enable link api features"
@@ -70,6 +88,13 @@ config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         bool "Enable rockx"
         default y if BR2_PACKAGE_RKMEDIA_ROCKX
+        help
+          rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_SCHEDULES_MANAGER
+        bool "Enable schedules manager"
+        depends on BR2_PACKAGE_MEDIASERVE_DBUS
+        default y if BR2_PACKAGE_MEDIASERVE_DBUS
         help
           rockchip mediaserver options
 

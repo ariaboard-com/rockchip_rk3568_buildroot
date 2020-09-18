@@ -15,18 +15,24 @@ info_view
 echo "***********************************************************"
 echo "glmark2 fullscreen test:					1"
 echo "glmark2 offscreen test:					2"
+echo "glmark2 stress test:					3"
 echo "***********************************************************"
 
 read -t 30 GPU_CHOICE
 
 glmark2_fullscreen_test()
 {
-	sh ${DIR_GPU}/test_glmark2_fullscreen.sh
+	sh ${DIR_GPU}/test_fullscreen_glmark2.sh
 }
 
 glmark2_offscreen_test()
 {
-	sh ${DIR_GPU}/test_glmark2_offscreen.sh
+	sh ${DIR_GPU}/test_offscreen_glmark2.sh
+}
+
+glmark2_stress_test()
+{
+	sh ${DIR_GPU}/test_stress_glmark2.sh
 }
 
 case ${GPU_CHOICE} in
@@ -35,6 +41,9 @@ case ${GPU_CHOICE} in
 		;;
 	2)
 		glmark2_offscreen_test
+		;;
+	3)
+		glmark2_stress_test
 		;;
 	*)
 		echo "not fount your input."

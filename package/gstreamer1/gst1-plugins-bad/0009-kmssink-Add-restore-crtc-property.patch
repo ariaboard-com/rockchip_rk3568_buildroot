@@ -1,7 +1,7 @@
-From b88782e2ae64e86942af8f9cc2a03d2fc7f30b7d Mon Sep 17 00:00:00 2001
+From 8435d7387fbc90af394cf60c2315ba2007ecd3d4 Mon Sep 17 00:00:00 2001
 From: Devarsh Thakkar <devarsht@xilinx.com>
 Date: Sat, 25 Aug 2018 22:47:34 +0530
-Subject: [PATCH 09/30] kmssink: Add "restore-crtc" property
+Subject: [PATCH 09/48] kmssink: Add "restore-crtc" property
 
 This adds "restore-crtc" property using which one
 can restore previous crtc mode.
@@ -108,10 +108,11 @@ index bc85ffe0f..aa6422b9e 100644
      case PROP_CAN_SCALE:
        g_value_set_boolean (value, sink->can_scale);
        break;
-@@ -1916,6 +1941,19 @@ gst_kms_sink_class_init (GstKMSSinkClass * klass)
+@@ -1915,6 +1940,19 @@ gst_kms_sink_class_init (GstKMSSinkClass * klass)
+       "When enabled, the sink try to configure the display mode", FALSE,
        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
  
-   /**
++  /**
 +   * kmssink:restore-crtc:
 +   *
 +   * Restore previous CRTC setting if new CRTC mode was set forcefully.
@@ -124,10 +125,9 @@ index bc85ffe0f..aa6422b9e 100644
 +      "be restored when going to NULL state.", TRUE,
 +      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT);
 +
-+  /**
+   /**
     * kmssink:can-scale:
     *
-    * User can tell kmssink if the driver can support scale.
 diff --git a/sys/kms/gstkmssink.h b/sys/kms/gstkmssink.h
 index 778c51c8b..65407dab4 100644
 --- a/sys/kms/gstkmssink.h
@@ -150,5 +150,5 @@ index 778c51c8b..65407dab4 100644
    GstPollFD pollfd;
  
 -- 
-2.11.0
+2.20.1
 

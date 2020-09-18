@@ -1,7 +1,7 @@
-From 905ac920383be5cc50b07cb82dc6995ef9e76d11 Mon Sep 17 00:00:00 2001
+From 1c48a7cda1a9538ff9cd394929397c4b9171979d Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Mon, 28 Aug 2017 11:42:53 +0800
-Subject: [PATCH 03/10] Avoid X11 header collision when x11 disabled
+Subject: [PATCH 03/14] Avoid X11 header collision when x11 disabled
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---
@@ -25,5 +25,5 @@ index 7151123..756d295 100644
      qsgvideonode_egl.h
  
 -- 
-2.7.4
+2.20.1
 

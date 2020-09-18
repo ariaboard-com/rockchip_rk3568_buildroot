@@ -1,7 +1,7 @@
-From 53ced74f76dc7bbd0b42555852e13f880e1eca88 Mon Sep 17 00:00:00 2001
+From 59ad844138e7052263ff5a477116b60a7d80f4d2 Mon Sep 17 00:00:00 2001
 From: Ziyuan Xu <xzy.xu@rock-chips.com>
 Date: Fri, 12 Jul 2019 17:02:45 +0800
-Subject: [PATCH 04/10] GStreamer: change playbin to playbin3
+Subject: [PATCH 04/14] GStreamer: change playbin to playbin3
 
 Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---
@@ -29,5 +29,5 @@ index 24d3e88..59fa80e 100644
  # define QT_GSTREAMER_COLORCONVERSION_ELEMENT_NAME "ffmpegcolorspace"
  # define QT_GSTREAMER_RAW_AUDIO_MIME "audio/x-raw-int"
 -- 
-2.7.4
+2.20.1
 

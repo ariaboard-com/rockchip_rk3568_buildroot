@@ -1,32 +1,19 @@
 #!/bin/sh
 #
 
-soc_configure()
-{
-	#vpu 600M
-#	echo 600 >/sys/kernel/debug/mpp_service/rkvenc/clk_core
-
-	#cpu x2
-	echo 0 > /sys/devices/system/cpu/cpu2/online
-	echo 0 > /sys/devices/system/cpu/cpu3/online
-
-	#npu 600M
-	echo 600000000 > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/min_freq
-	echo 600000000 > /sys/devices/platform/ffbc0000.npu/devfreq/ffbc0000.npu/max_freq
-}
-
 lunch_start()
 {
-	soc_configure
+	export HDR_MODE=0
+	ispserver &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
-	export HDR_MODE=0
-	mediaserver -d -a -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
+	mediaserver -c /usr/share/mediaserver/mediaserver_tb.conf > /dev/kmsg 2>&1 &
 }
 
 lunch_stop()
 {
 	killall mediaserver
+	killall ispserver
 	echo "All applications have been stopped"
 }
 

@@ -1,7 +1,7 @@
-From dbe72ea44bc448f6bbe4219613563852aeed10db Mon Sep 17 00:00:00 2001
+From 7ea092cafeaaa13f422b73aebad513bbc81c88b3 Mon Sep 17 00:00:00 2001
 From: Haihua Hu <jared.hu@nxp.com>
 Date: Thu, 18 Oct 2018 13:35:04 +0800
-Subject: [PATCH 19/30] wayland/wlbuffer: just return if used_by_compositor is
+Subject: [PATCH 19/48] wayland/wlbuffer: just return if used_by_compositor is
  true when attach
 
 When buffer is used by compositor, we don't need attach it and hold one
@@ -28,5 +28,5 @@ index 4ac99ef4b..21214604f 100644
    wl_surface_attach (surface, self->wlbuffer, 0, 0);
  
 -- 
-2.11.0
+2.20.1
 

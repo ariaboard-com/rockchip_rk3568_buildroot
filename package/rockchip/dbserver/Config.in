@@ -17,4 +17,11 @@ config BR2_PACKAGE_DBSERVER_SANITIZER_STATIC
 	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable dbserver debug on sanitizer with static linker.
+
+config BR2_PACKAGE_DBSERVER_MINILOGGER
+	bool "enable dbserver miniloger print"
+	select BR2_PACKAGE_MINILOGGER
+	default y
+	help
+	  Enable dbserver miniloger print.
 endif

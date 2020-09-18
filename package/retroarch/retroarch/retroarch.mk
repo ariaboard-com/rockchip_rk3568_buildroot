@@ -33,6 +33,14 @@ ifeq ($(BR2_PACKAGE_RETROARCH_HID),)
 	RETROARCH_CONF_OPTS += --disable-hid --disable-libusb
 endif
 
+ifeq ($(BR2_PACKAGE_RETROARCH_ASSETS),)
+
+define RETRO_ASSETS_INSTALL_TARGET_CMDS
+	cp -r  retro-assets  $(TARGET_DIR)/usr/lib/libretro/
+endef
+
+endif
+
 ifeq ($(BR2_PACKAGE_ZLIB),y)
 	RETROARCH_CONF_OPTS += --enable-zlib
 	RETROARCH_DEPENDENCIES += zlib

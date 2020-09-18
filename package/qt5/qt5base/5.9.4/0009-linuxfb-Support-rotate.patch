@@ -1,7 +1,7 @@
-From 9c61c9d3d83ee247ced601a9816d5cdde4149322 Mon Sep 17 00:00:00 2001
+From 266079c59b2e95c7275bf7c1128b337d0640963b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Mon, 29 Apr 2019 12:11:42 +0800
-Subject: [PATCH] linuxfb: Support rotate
+Date: Wed, 17 Jun 2020 15:40:06 +0800
+Subject: [PATCH 09/14] linuxfb: Support rotate
 
 Base on:
 https://borkedlabs.com/blog/2015/06-01-qt5-linuxfb-rotation-for-lcds/
@@ -11,14 +11,14 @@ export QT_QPA_PLATFORM=linuxfb:rotation=90
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- .../platforms/linuxfb/qlinuxfbdrmscreen.cpp        | 34 ++++++++++++++++++++--
- src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.h  |  2 ++
- src/plugins/platforms/linuxfb/qlinuxfbscreen.cpp   | 33 +++++++++++++++++----
- src/plugins/platforms/linuxfb/qlinuxfbscreen.h     |  2 ++
+ .../platforms/linuxfb/qlinuxfbdrmscreen.cpp   | 34 +++++++++++++++++--
+ .../platforms/linuxfb/qlinuxfbdrmscreen.h     |  2 ++
+ .../platforms/linuxfb/qlinuxfbscreen.cpp      | 33 +++++++++++++++---
+ .../platforms/linuxfb/qlinuxfbscreen.h        |  2 ++
  4 files changed, 63 insertions(+), 8 deletions(-)
 
 diff --git a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
-index 2cbdf4cf..6a0c7bc4 100644
+index 62bf11bd..3533509e 100644
 --- a/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 +++ b/src/plugins/platforms/linuxfb/qlinuxfbdrmscreen.cpp
 @@ -50,6 +50,7 @@
@@ -29,7 +29,7 @@ index 2cbdf4cf..6a0c7bc4 100644
  #include <QtFbSupport/private/qfbcursor_p.h>
  #include <QtFbSupport/private/qfbwindow_p.h>
  #include <QtKmsSupport/private/qkmsdevice_p.h>
-@@ -367,9 +368,16 @@ void QLinuxFbDevice::swapBuffers(Output *output)
+@@ -352,9 +353,16 @@ void QLinuxFbDevice::swapBuffers(Output *output)
  
  QLinuxFbDrmScreen::QLinuxFbDrmScreen(const QStringList &args)
      : m_screenConfig(nullptr),
@@ -48,7 +48,7 @@ index 2cbdf4cf..6a0c7bc4 100644
  }
  
  QLinuxFbDrmScreen::~QLinuxFbDrmScreen()
-@@ -399,6 +407,13 @@ bool QLinuxFbDrmScreen::initialize()
+@@ -384,6 +392,13 @@ bool QLinuxFbDrmScreen::initialize()
      QLinuxFbDevice::Output *output(m_device->output(0));
  
      mGeometry = QRect(QPoint(0, 0), output->currentRes());
@@ -59,10 +59,10 @@ index 2cbdf4cf..6a0c7bc4 100644
 +        mGeometry.setHeight(tmp);
 +    }
 +
- #ifdef USE_RGB16
-     mDepth = 16;
-     mFormat = QImage::Format_RGB16;
-@@ -439,8 +454,21 @@ QRegion QLinuxFbDrmScreen::doRedraw()
+     mDepth = 32;
+     mFormat = QImage::Format_ARGB32;
+     mPhysicalSize = output->kmsOutput.physical_size;
+@@ -419,8 +434,21 @@ QRegion QLinuxFbDrmScreen::doRedraw()
      // Image has alpha but no need for blending at this stage.
      // Do not waste time with the default SourceOver.
      pntr.setCompositionMode(QPainter::CompositionMode_Source);
@@ -198,5 +198,5 @@ index c7ce455e..70ea02fa 100644
  
  QT_END_NAMESPACE
 -- 
-2.11.0
+2.20.1
 

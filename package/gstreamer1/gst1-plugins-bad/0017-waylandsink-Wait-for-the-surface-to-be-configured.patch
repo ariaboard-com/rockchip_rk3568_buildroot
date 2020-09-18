@@ -1,7 +1,7 @@
-From 839eaf211699a3c0c89c7fae270667693c46dc35 Mon Sep 17 00:00:00 2001
+From 7b202dd59e3c8d8bea95afe1cb85cf331a26437d Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Mon, 25 Mar 2019 22:21:09 -0400
-Subject: [PATCH 17/30] waylandsink: Wait for the surface to be configured
+Subject: [PATCH 17/48] waylandsink: Wait for the surface to be configured
 
 With latest XDG shell, we need to fait for the surface to have been
 configured before we can attach a buffer to it. This is being enforce by
@@ -85,5 +85,5 @@ index 861e324ad..c3f017216 100644
    /* the size and position of the area_(sub)surface */
    GstVideoRectangle render_rectangle;
 -- 
-2.11.0
+2.20.1
 

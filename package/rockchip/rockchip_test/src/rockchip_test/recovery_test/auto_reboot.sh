@@ -49,7 +49,7 @@ echo "You can stop reboot by: echo off > /oem/rockchip_test/reboot_cnt"
 sleep $delay
 cnt=`cat $CNT`
 if [ $cnt != "off" ]; then
-	recoverySystem
+	update
 	reboot
 else
 	echo "Auto reboot is off"

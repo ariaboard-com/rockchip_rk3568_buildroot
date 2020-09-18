@@ -1,7 +1,7 @@
-From 0d8f6fb0b31cf8917865a98a2821972648570667 Mon Sep 17 00:00:00 2001
+From ec363501949d57334493a04021d84c21709b871b Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Mon, 27 Aug 2018 15:08:08 -0400
-Subject: [PATCH 07/30] kmssink: Add 'plane-properties' property
+Subject: [PATCH 07/48] kmssink: Add 'plane-properties' property
 
 This is similar to 'connector-properties' but will change
 selected plane properties instead.
@@ -123,5 +123,5 @@ index bb978bcd4..778c51c8b 100644
    GstVideoInfo vinfo;
    GstCaps *allowed_caps;
 -- 
-2.11.0
+2.20.1
 

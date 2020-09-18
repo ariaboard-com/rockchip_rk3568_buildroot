@@ -17,8 +17,6 @@
 #include "bt.config"
 #include "qt.config"
 #include "qt_app.config"
-BR2_ARM_ENABLE_NEON=y
-BR2_ARM_FPU_NEON_FP_ARMV8=y
 BR2_CCACHE=y
 BR2_TARGET_GENERIC_HOSTNAME="px30_64"
 BR2_TARGET_GENERIC_ISSUE="Welcome to PX30 Buildroot"

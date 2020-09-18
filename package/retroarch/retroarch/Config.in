@@ -28,4 +28,10 @@ config BR2_PACKAGE_RETROARCH_HID
 	help
 	  Support hid inputs.
 
+config BR2_PACKAGE_RETROARCH_ASSETS
+        bool "retroarch assets"
+        default y
+        help
+          Support assets GUI_icon.
+
 endif

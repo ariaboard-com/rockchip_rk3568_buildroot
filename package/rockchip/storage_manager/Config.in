@@ -17,4 +17,15 @@ config BR2_PACKAGE_STORAGE_MANAGER_SANITIZER_STATIC
 	select BR2_PACKAGE_ADDRESS_SANITIZER
 	help
 	  Enable storage manager debug on sanitizer with static linker.
+
+config BR2_PACKAGE_STORAGE_MANAGER_MINILOGGER
+	bool "enable storage manager miniloger print"
+	select BR2_PACKAGE_MINILOGGER
+	default y
+	help
+	  Enable storage manager miniloger print.
+
+config BR2_PACKAGE_STORAGE_MANAGER_FILE_LOAD_DELAY
+	int "file load delay, us"
+	default 0
 endif

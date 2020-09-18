@@ -39,15 +39,10 @@ config BR2_PACKAGE_RK3128H
     help
         Use rockchip's rk3128H box chip
 
-config BR2_PACKAGE_RK3128
-    bool "rk3128 chip"
+config BR2_PACKAGE_RK312X
+    bool "rk312x chip"
     help
-        Use rockchip's rk3128 chip
-
-config BR2_PACKAGE_RK3126C
-    bool "rk3126c chip"
-    help
-        Use rockchip's rk3126c chip
+        Use rockchip's rk312x chip
 
 config BR2_PACKAGE_RK3399
     bool "rk3399 chip"
@@ -147,6 +142,7 @@ source "package/rockchip/rockchip_utils/Config.in"
 source "package/rockchip/mdev_mount/Config.in"
 source "package/rockchip/alsa_capture/Config.in"
 source "package/rockchip/uvc_app/Config.in"
+source "package/rockchip/uac_app/Config.in"
 source "package/rockchip/libmali/Config.in"
 source "package/rockchip/libhdmiset/Config.in"
 source "package/rockchip/dialserver/Config.in"
@@ -156,6 +152,7 @@ source "package/rockchip/iflytekSDK/Config.in"
 source "package/rockchip/eq_drc_process/Config.in"
 source "package/rockchip/alsa_ladspa/Config.in"
 source "package/rockchip/rockchip_test/Config.in"
+source "package/rockchip/QStressTest/Config.in"
 source "package/rockchip/rockchip_modules/Config.in"
 source "package/rockchip/broadcom_bsa/Config.in"
 source "package/rockchip/cypress_bsa/Config.in"
@@ -169,6 +166,7 @@ source "package/rockchip/ueventd/Config.in"
 source "package/rockchip/rkupdate/Config.in"
 source "package/rockchip/rktoolkit/Config.in"
 source "package/rockchip/rkmedia/Config.in"
+source "package/rockchip/rockit/Config.in"
 source "package/rockchip/app_demo/Config.in"
 source "package/rockchip/music/Config.in"
 source "package/rockchip/video/Config.in"
@@ -176,6 +174,7 @@ source "package/rockchip/camera/Config.in"
 source "package/rockchip/carmachine/Config.in"
 source "package/rockchip/gallery/Config.in"
 source "package/rockchip/QLauncher/Config.in"
+source "package/rockchip/QFacialGate/Config.in"
 source "package/rockchip/settings/Config.in"
 source "package/rockchip/qcamera/Config.in"
 source "package/rockchip/qfm/Config.in"
@@ -198,12 +197,12 @@ source "package/rockchip/minigui/Config.in"
 source "package/rockchip/minigui_desktop/Config.in"
 source "package/rockchip/libpng12/Config.in"
 source "package/rockchip/kernel_modules/Config.in"
-source "package/rockchip/glmarktest/Config.in"
 source "package/rockchip/tensorflow/Config.in"
 source "package/rockchip/rknpu/Config.in"
 source "package/rockchip/rknpu-fw/Config.in"
 source "package/rockchip/rknn_demo/Config.in"
 source "package/rockchip/ficial_gate/Config.in"
+source "package/rockchip/rkfacial/Config.in"
 source "package/rockchip/pose_body/Config.in"
 source "package/rockchip/face_detect/Config.in"
 source "package/rockchip/rockx/Config.in"
@@ -245,4 +244,6 @@ source "package/rockchip/isp2-ipc/Config.in"
 source "package/rockchip/smart_display_service/Config.in"
 source "package/rockchip/onvif_server/Config.in"
 source "package/rockchip/eptz_demo/Config.in"
+source "package/rockchip/rksl/Config.in"
+source "package/rockchip/pcba_adb_test/Config.in"
 endif

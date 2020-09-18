@@ -1,4 +1,4 @@
-From 717d84b57d4e0f488f939a1ade7ef72f4439002f Mon Sep 17 00:00:00 2001
+From 78a9ea981f0702087d4f7c3b0630294802e4c281 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 1 Nov 2019 17:55:06 +0800
 Subject: [PATCH 3/3] pixman_image_composite32: Support rockchip RGA 2D accel
@@ -7,9 +7,9 @@ Disabled by default, set env PIXMAN_USE_RGA=1 to enable.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- configure.ac       |  12 +++
+ configure.ac       |  12 ++
  pixman/Makefile.am |   2 +-
- pixman/pixman.c    | 274 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ pixman/pixman.c    | 274 +++++++++++++++++++++++++++++++++++++++++++++
  3 files changed, 287 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
@@ -49,7 +49,7 @@ index 581b6f6..5f0b475 100644
  
  libpixmanincludedir = $(includedir)/pixman-1
 diff --git a/pixman/pixman.c b/pixman/pixman.c
-index 99782f7..a5130d1 100644
+index 99782f7..756ce5f 100644
 --- a/pixman/pixman.c
 +++ b/pixman/pixman.c
 @@ -30,6 +30,15 @@
@@ -290,13 +290,13 @@ index 99782f7..a5130d1 100644
 +	    sw = sw & ~1;
 +	    sh = sh & ~1;
 +	    
-+	    /* RGA requires yuv image stride align to 8 */
-+	    if (src_stride % 8)
++	    /* RGA requires yuv image stride align to 2 */
++	    if (src_stride % 2)
 +		goto bail;
 +	}
 +
-+	/* Skip small box(300x300) */
-+	if (sw * sh <= 90000 || dw * dh <= 90000)
++	/* RGA requires w >= 2 and h >= 2 */
++	if (sw < 2 || sh < 2 || dw < 2 || dh < 2)
 +	    goto bail;
 +
 +	/* RGA has scale limits */
@@ -348,5 +348,5 @@ index 99782f7..a5130d1 100644
      {
  	info.src_x = pbox->x1 + src_x - dest_x;
 -- 
-2.11.0
+2.20.1
 

@@ -30,4 +30,10 @@ ifeq ($(BR2_PACKAGE_QT5WAYLAND_COMPOSITOR),y)
 QT5WAYLAND_CONF_OPTS += CONFIG+=wayland-compositor
 endif
 
+define QT5WAYLAND_FORCE_XDG_SHELL_V6
+	cd $(TARGET_DIR)/usr/lib/qt/plugins/wayland-shell-integration/ && \
+		ls | grep -v v6 | xargs rm -rf
+endef
+QT5WAYLAND_POST_INSTALL_TARGET_HOOKS += QT5WAYLAND_FORCE_XDG_SHELL_V6
+
 $(eval $(qmake-package))

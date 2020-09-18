@@ -1,7 +1,7 @@
-From 70d619282f13c1f8389a403cc9f2947e263c55f8 Mon Sep 17 00:00:00 2001
+From 7c38daf07cb882a0cedb1e6dca3e0a698b1e5260 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 3 Jan 2019 15:27:59 +0800
-Subject: [PATCH 2/9] qwayland-egl: Fix mali crash during exiting
+Subject: [PATCH 02/10] qwayland-egl: Fix mali crash during exiting
 
 Conflicts:
     src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
@@ -13,7 +13,7 @@ Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h b/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
-index f2c8a15..ac93756 100644
+index f2c8a154..ac937565 100644
 --- a/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
 +++ b/src/plugins/platforms/qwayland-egl/qwaylandeglplatformintegration.h
 @@ -57,6 +57,10 @@ public:

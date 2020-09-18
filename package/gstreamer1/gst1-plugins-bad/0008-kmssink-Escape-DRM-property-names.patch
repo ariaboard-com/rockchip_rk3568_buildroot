@@ -1,7 +1,7 @@
-From 50c4401626aa03add3663af116cf00cdd82cc934 Mon Sep 17 00:00:00 2001
+From d91bdc56f1d12f348c44715fd943fd9f7668364e Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Wed, 29 Aug 2018 11:53:13 -0400
-Subject: [PATCH 08/30] kmssink: Escape DRM property names
+Subject: [PATCH 08/48] kmssink: Escape DRM property names
 
 This allow setting properties that contains spaces. The spaces are
 replaced with '-'. As an example, one can set the connector proper
@@ -32,5 +32,5 @@ index 651a8eb77..bc85ffe0f 100644
        drmModeObjectSetProperty (fd, object, object_type,
            property->prop_id, value);
 -- 
-2.11.0
+2.20.1
 
