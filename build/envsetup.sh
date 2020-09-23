@@ -96,7 +96,12 @@ function main()
 			RK_BUILD_CONFIG=${RK_DEFCONFIG_ARRAY[0]}
 			;;
 		*)
-			choose_board
+			if [ "$1" = ${RK_DEFCONFIG_ARRAY[0]} ]; then
+				# Prefer exact-match
+				RK_BUILD_CONFIG=$1
+			else
+				choose_board
+			fi
 			;;
 	esac
 
