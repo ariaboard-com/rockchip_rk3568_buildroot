@@ -22,12 +22,7 @@ WESTON_CONF_OPTS = \
 	-Dcolor-management-colord=false \
 	-Dremoting=false
 
-# Uses VIDIOC_EXPBUF, only available from 3.8+
-ifeq ($(BR2_TOOLCHAIN_HEADERS_AT_LEAST_3_8),y)
-WESTON_CONF_OPTS += -Dsimple-clients=dmabuf-v4l
-else
-WESTON_CONF_OPTS += -Dsimple-clients=
-endif
+WESTON_CONF_OPTS += -Dsimple-clients=all
 
 ifeq ($(BR2_PACKAGE_DBUS)$(BR2_PACKAGE_SYSTEMD),yy)
 WESTON_CONF_OPTS += -Dlauncher-logind=true
@@ -149,5 +144,12 @@ define WESTON_INSTALL_TARGET_ENV
 endef
 
 WESTON_POST_INSTALL_TARGET_HOOKS += WESTON_INSTALL_TARGET_ENV
+
+define WESTON_INSTALL_TARGET_SCRIPTS
+        $(INSTALL) -D -m 0755 $(@D)/doc/scripts/calibration-helper.bash \
+                $(TARGET_DIR)/bin/weston-calibration-helper.sh
+endef
+
+WESTON_POST_INSTALL_TARGET_HOOKS += WESTON_INSTALL_TARGET_SCRIPTS
 
 $(eval $(meson-package))

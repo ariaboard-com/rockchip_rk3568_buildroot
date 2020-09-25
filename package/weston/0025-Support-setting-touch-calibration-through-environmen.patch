@@ -1,4 +1,4 @@
-From 733b0f9c34e839e2855884daea84ebf4a85e4610 Mon Sep 17 00:00:00 2001
+From 2d05fb6d0aa90b190969090c62a6bc43668bda9c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 4 Aug 2020 14:30:33 +0800
 Subject: [PATCH 25/28] Support setting touch calibration through environment
@@ -14,8 +14,9 @@ export WESTON_TOUCH_CALIBRATION="-0.846961 0.122487 0.864176 -0.110204 -0.685913
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  clients/calibrator.c        |  9 +++++++++
+ clients/touch-calibrator.c  | 12 ++++++++----
  libweston/libinput-device.c | 13 +++++++++++++
- 2 files changed, 22 insertions(+)
+ 3 files changed, 30 insertions(+), 4 deletions(-)
 
 diff --git a/clients/calibrator.c b/clients/calibrator.c
 index 21ca876..c8b4af6 100644
@@ -44,6 +45,34 @@ index 21ca876..c8b4af6 100644
  	exit(0);
  }
  
+diff --git a/clients/touch-calibrator.c b/clients/touch-calibrator.c
+index 66208d1..f1e0366 100644
+--- a/clients/touch-calibrator.c
++++ b/clients/touch-calibrator.c
+@@ -770,15 +770,19 @@ touch_device_handler(void *data, struct weston_touch_calibration *c,
+ 
+ 	if (!cal->match_name) {
+ 		printf("device \"%s\" - head \"%s\"\n", device, head);
+-		return;
+-	}
+ 
+-	if (cal->device_name)
++		if (!cal->device_name)
++			cal->device_name = strdup(device);
+ 		return;
++	}
+ 
+ 	if (strcmp(cal->match_name, device) == 0 ||
+-	    strcmp(cal->match_name, head) == 0)
++	    strcmp(cal->match_name, head) == 0) {
++		if (cal->device_name)
++			free(cal->device_name);
++
+ 		cal->device_name = strdup(device);
++	}
+ }
+ 
+ struct weston_touch_calibration_listener touch_calibration_listener = {
 diff --git a/libweston/libinput-device.c b/libweston/libinput-device.c
 index 9a084cb..c0bdf87 100644
 --- a/libweston/libinput-device.c
