@@ -58,7 +58,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_AISERVER_USE_ROCKX), y)
     AISERVER_DEPENDENCIES += rknpu rockx
-    AISERVER_CONF_OPTS +=  -DROCKX=ON \
+    AISERVER_CONF_OPTS +=  -DUSE_ROCKX=ON \
         -DROCKX_HEADER_DIR=$(STAGING_DIR)/usr/include/rockx
 endif
 
