@@ -54,9 +54,16 @@ config BR2_PACKAGE_AISERVER_EXIV2_FEATURE
           rockchip aiserver options
 
 config BR2_PACKAGE_AISERVER_USE_ROCKX
-    bool "rockx"
-    select BR2_PACKAGE_RKNPU
-    select BR2_PACKAGE_ROCKX
-    help
-      wrapped function of rockx
+        bool "rockx"
+        select BR2_PACKAGE_RKNPU
+        select BR2_PACKAGE_ROCKX
+        help
+          wrapped function of rockx
+
+config BR2_PACKAGE_AISERVER_USE_STASTERIA
+        bool "stasteria"
+        select BR2_PACKAGE_RKNPU
+        default n
+        help
+          rockchip aiserver options
 endif
