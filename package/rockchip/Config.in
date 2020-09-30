@@ -248,4 +248,5 @@ source "package/rockchip/eptz_demo/Config.in"
 source "package/rockchip/rksl/Config.in"
 source "package/rockchip/pcba_adb_test/Config.in"
 source "package/rockchip/camera_factory_test_server/Config.in"
+source "package/rockchip/thunderboot/Config.in"
 endif

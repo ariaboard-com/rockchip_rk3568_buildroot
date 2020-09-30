@@ -1,0 +1,4 @@
+config BR2_PACKAGE_THUNDERBOOT
+	bool "rockchip thunderboot"
+	help
+	  Rockchip tb(thunder boot) configuration.
