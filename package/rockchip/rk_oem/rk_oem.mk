@@ -34,7 +34,7 @@ define RK_OEM_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0644 $(RK_OEM_REDIRECT_DBUS4OEM_CONF) \
 		$(TARGET_DIR)/usr/share/dbus-1/system.d
 	mkdir -p $(RK_OEM_INSTALL_TARGET_DIR)
-	cp -rfp $(@D)/* $(RK_OEM_INSTALL_TARGET_DIR)
+	cp -rfp $(@D)/* $(RK_OEM_INSTALL_TARGET_DIR) | true
 	rm -fv $(RK_OEM_INSTALL_TARGET_DIR)/rk_oem.tar
 endef
 
