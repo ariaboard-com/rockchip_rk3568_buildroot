@@ -102,12 +102,9 @@ config BR2_PACKAGE_MEDIASERVE_TB
         bool "Enable thunder boot"
 
 config BR2_PACKAGE_MEDIASERVE_ZBAR
-        bool "Enable zbar to scan QR code"
-        select BR2_PACKAGE_JPEG
-        select BR2_PACKAGE_IMAGEMAGICK
-        select BR2_PACKAGE_ZBAR
+	bool "Enable zbar to scan QR code"
         default y if BR2_PACKAGE_MEDIASERVE_LINKAPI
-        help
+	help
           rockchip mediaserver options
 
 endif
