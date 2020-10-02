@@ -1,6 +1,7 @@
 #include "tinyrootfs.config"
 #include "arm_a7.config"
 #include "gcc8.config"
+BR2_CCACHE=y
 BR2_TARGET_GENERIC_HOSTNAME="RV1126_RV1109"
 BR2_TARGET_GENERIC_ISSUE="Welcome to Battery IPC"
 BR2_TARGET_GENERIC_ROOT_PASSWD="rockchip"
