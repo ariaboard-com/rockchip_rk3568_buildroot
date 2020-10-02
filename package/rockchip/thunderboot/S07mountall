@@ -13,6 +13,11 @@ do
 	part_name=`cat /sys/class/block/${EMMC_BLK}"p"${i}/uevent | grep PARTNAME | cut -d '=' -f 2`
 
 	if [ ${part_name}  == "oem" ]; then
-		mount /dev/${EMMC_BLK}"p"${i} /mnt
+		mount /dev/${EMMC_BLK}"p"${i} /oem
+	elif [[ ${part_name}  == "userdata" ]]; then
+		{
+			resize2fs /dev/${EMMC_BLK}"p"${i}
+			mount /dev/${EMMC_BLK}"p"${i} /userdata
+		}&
 	fi
 done
