@@ -52,6 +52,13 @@ define RKWIFIBT_TB_INSTALL
     $(INSTALL) -D -m 0755 $(@D)/tb_start_wifi.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
+
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/rkwifi/rk_wifi_config.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/rfkill/rfkill.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/rfkill/rfkill-rk.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/wireless/cfg80211.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/mac80211/mac80211.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    -$(TARGET_STRIP) $(STRIP_STRIP_DEBUG) $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/*.ko
 endef
 
 define RKWIFIBT_BROADCOM_INSTALL
