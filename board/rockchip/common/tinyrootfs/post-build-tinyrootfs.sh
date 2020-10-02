@@ -44,21 +44,4 @@ rm -rf $TARGET/lib/udev/cdrom_id
 rm -rf $TARGET/lib/udev/mtd_probe
 rm -rf $TARGET/etc/init.d
 
-make modules_install -C $KERNEL_DIR ARCH=$RK_ARCH INSTALL_MOD_PATH=$TARGET INSTALL_MOD_STRIP=1
-if [ $? -ne 0 ]; then
-	echo -e "ERROR: ====================== Please build kernel first!!! ====================="
-	exit 1
-fi
-KERNEL_VERSION=`make -C $KERNEL_DIR kernelversion |grep -v make`
-MODULES_TMP_TAR=$OUTPUT_DIR/modules.ko.tar
-( cd $TARGET && tar cf $MODULES_TMP_TAR ` find lib/modules/$KERNEL_VERSION -type f \
-	-name dw_mmc-rockchip.ko \
-	-o -name dw_mmc-pltfm.ko \
-	-o -name dw_mmc.ko       \
-	-o -name mmc_block.ko    \
-	-o -name mmc_core.ko     \
-	-o -name bcmdhd.ko \
-	-o -name modules.dep ` )
-( cd $TARGET && rm -rf $TARGET/lib/modules/$KERNEL_VERSION && tar xf $MODULES_TMP_TAR&& rm $MODULES_TMP_TAR )
-
 exit 0
