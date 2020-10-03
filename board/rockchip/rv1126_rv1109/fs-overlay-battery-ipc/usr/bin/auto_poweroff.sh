@@ -2,7 +2,7 @@
 #
 
 boot_limit_time=20
-no_client_time=10
+no_client_time=1
 # In the first 20 seconds, shut down if only one client
 client_num=`netstat -t | grep ESTABLISHED | wc -l`
 current_time=`cat /proc/uptime | cut -d '.' -f1`
@@ -19,7 +19,8 @@ done
 
 if [ $client_num -le 1 ]; then
     echo "$boot_limit_time seconds without client access"
-    poweroff
+    kill -15 `pidof mediaserver`
+    exit 0
 fi
 
 echo "after $boot_limit_time seconds, client_num is $client_num"
@@ -37,7 +38,8 @@ do
             client_num=`netstat -t | grep ESTABLISHED | wc -l`
             echo "interval_time is $interval_time, no_client_time is $no_client_time"
             if [ $interval_time -gt $no_client_time ]; then
-                poweroff
+                kill -15 `pidof mediaserver`
+                exit 0
             fi
             if [ $client_num -gt 1 ]; then
                 break

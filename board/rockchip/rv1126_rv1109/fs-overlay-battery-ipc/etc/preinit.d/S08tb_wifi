@@ -10,6 +10,8 @@ case "$1" in
 			insmod /vendor/lib/modules/cfg80211.ko
 			insmod /vendor/lib/modules/mac80211.ko
 			insmod /vendor/lib/modules/bcmdhd.ko
+
+			#tb_start_wifi.sh rockchip 12345678
 		}&
 		;;
 	stop)
