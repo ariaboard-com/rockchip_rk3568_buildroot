@@ -18,6 +18,7 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/modules/ $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 644 ${THUNDERBOOT_BUILDDIR}/lib/modules/${KERNEL_VERSION}/kernel/drivers/mmc/host/dw_mmc-rockchip.ko $(TARGET_DIR)/lib/modules/
 	$(INSTALL) -D -m 755 $(@D)/S07mountall $(TARGET_DIR)/etc/preinit.d/
+	$(INSTALL) -D -m 755 $(@D)/tb_poweroff $(TARGET_DIR)/usr/bin/
 endef
 
 $(eval $(generic-package))
