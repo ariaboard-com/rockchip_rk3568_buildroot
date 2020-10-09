@@ -7,6 +7,7 @@ lunch_start()
 	ispserver &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 
+	insmod /lib/modules/snd-soc-es8311.ko &
 	echo 297000000 > /proc/mpp_service/rkvenc/clk_core
 
 	export mediaserver_log_level=2
