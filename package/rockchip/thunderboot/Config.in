@@ -2,3 +2,9 @@ config BR2_PACKAGE_THUNDERBOOT
 	bool "rockchip thunderboot"
 	help
 	  Rockchip tb(thunder boot) configuration.
+
+config BR2_THUNDERBOOT_INSTALL_MODULES
+	string "dirver modules"
+	depends on BR2_PACKAGE_THUNDERBOOT
+	help
+	  Kernel driver modules to be installed.
