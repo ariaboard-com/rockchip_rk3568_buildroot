@@ -4,7 +4,7 @@
 lunch_start()
 {
 	export HDR_MODE=0
-	ispserver &
+	ispserver -f 25 &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 
 	insmod /lib/modules/snd-soc-es8311.ko &
