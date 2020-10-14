@@ -1,4 +1,4 @@
-From ac24025f1ab090a439bde7ac6763570e0586bfc3 Mon Sep 17 00:00:00 2001
+From a953289cd5cd6de001ed6bb81ae472d0d6abd9da Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:42:31 +0800
 Subject: [PATCH 13/28] backend-drm: Support mirror mode
@@ -21,14 +21,14 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  10 files changed, 316 insertions(+), 17 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
-index 0908763..f8cd2f2 100644
+index 0908763..27eb99f 100644
 --- a/desktop-shell/shell.c
 +++ b/desktop-shell/shell.c
 @@ -4319,6 +4319,9 @@ weston_view_set_initial_position(struct weston_view *view,
  	}
  
  	wl_list_for_each(output, &compositor->output_list, link) {
-+		if (!output->unavailable)
++		if (output->unavailable)
 +			continue;
 +
  		if (pixman_region32_contains_point(&output->region, ix, iy, NULL)) {
