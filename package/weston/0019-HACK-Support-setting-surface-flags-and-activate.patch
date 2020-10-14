@@ -1,7 +1,7 @@
-From 784aae2b134c7cd45721cbde4570057fdb348701 Mon Sep 17 00:00:00 2001
+From e50350b404a378678df53876c26ea57920cca5c4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
-Subject: [PATCH 19/28] HACK: Support setting surface flags and activate
+Subject: [PATCH 19/29] HACK: Support setting surface flags and activate
 
 Support setting surface flags through app_id, for example:
 app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
@@ -19,7 +19,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  5 files changed, 141 insertions(+)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
-index 329869b..20f8fc6 100644
+index 159871e..e715ede 100644
 --- a/desktop-shell/shell.c
 +++ b/desktop-shell/shell.c
 @@ -1943,6 +1943,11 @@ shell_surface_update_layer(struct shell_surface *shsurf)

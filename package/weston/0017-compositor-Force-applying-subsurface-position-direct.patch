@@ -1,7 +1,7 @@
-From 25b9c97b16f621c5d32920574b4dde87b4129a2d Mon Sep 17 00:00:00 2001
+From 532485c62ee802db0f8272978bf350389229307b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 18 Nov 2019 12:23:48 +0800
-Subject: [PATCH 17/28] compositor: Force applying subsurface position directly
+Subject: [PATCH 17/29] compositor: Force applying subsurface position directly
 
 Currently the subsurface's position would only be applied when
 committing it's parent, which might not always happen.

@@ -1,7 +1,7 @@
-From b7f6b3e504401ff6f49abd709d33b47293621221 Mon Sep 17 00:00:00 2001
+From 9a7864484232f9f8f4d76e55e3b53662d838120a Mon Sep 17 00:00:00 2001
 From: Eddie Cai <eddie.cai.linux@gmail.com>
 Date: Thu, 21 May 2020 09:19:12 +0800
-Subject: [PATCH 21/28] clients: desktop-shell: use second clock format by
+Subject: [PATCH 21/29] clients: desktop-shell: use second clock format by
  default
 
 Signed-off-by: Eddie Cai <eddie.cai.linux@gmail.com>

@@ -1,7 +1,7 @@
-From 2d05fb6d0aa90b190969090c62a6bc43668bda9c Mon Sep 17 00:00:00 2001
+From 84b3b4a18e25677bd73c46b36a68fe46fb6612ac Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 4 Aug 2020 14:30:33 +0800
-Subject: [PATCH 25/28] Support setting touch calibration through environment
+Subject: [PATCH 25/29] Support setting touch calibration through environment
 
 For example:
 1/ Use weston-calibrator tool to get calibration data
