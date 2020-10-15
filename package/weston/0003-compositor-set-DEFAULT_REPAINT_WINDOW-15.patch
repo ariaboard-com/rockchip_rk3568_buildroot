@@ -1,7 +1,7 @@
-From 4974013f2697f537c0ebc1e4acc9c5ac3dbe4a0d Mon Sep 17 00:00:00 2001
+From 599efeea3bbce41a4ae75a821208bd361dc7bcdc Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Wed, 15 Mar 2017 09:30:26 +0800
-Subject: [PATCH 03/29] compositor: set DEFAULT_REPAINT_WINDOW 15
+Subject: [PATCH 03/30] compositor: set DEFAULT_REPAINT_WINDOW 15
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---

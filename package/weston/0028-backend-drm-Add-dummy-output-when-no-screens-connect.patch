@@ -1,7 +1,7 @@
-From 0ec30aa19025da6241e60387827c9f8e48476248 Mon Sep 17 00:00:00 2001
+From 28688ec34f037e44e2c30e9f9b73e8875affa465 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 7 Sep 2020 18:03:38 +0800
-Subject: [PATCH 28/29] backend-drm: Add dummy output when no screens connected
+Subject: [PATCH 28/30] backend-drm: Add dummy output when no screens connected
 
 Some clients are not expecting no screens, add a dummy output for them.
 

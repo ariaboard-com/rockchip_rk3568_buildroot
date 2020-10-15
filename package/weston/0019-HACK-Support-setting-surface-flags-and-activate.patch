@@ -1,22 +1,26 @@
-From e50350b404a378678df53876c26ea57920cca5c4 Mon Sep 17 00:00:00 2001
+From 3493dc9063971c3073323ccf2bc5866d680f0df2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
-Subject: [PATCH 19/29] HACK: Support setting surface flags and activate
+Subject: [PATCH 19/30] HACK: Support setting surface flags and activate
 
-Support setting surface flags through app_id, for example:
-app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
+Support setting surface flags through app_id or title, for example:
+xdg_toplevel_set_app_id("flags=stay-on-top|stay-on-bottom|no-focus")
+Or
+xdg_toplevel_set_title("flags=stay-on-top|stay-on-bottom|no-focus")
 
-Support setting surface activate through app_id, for example:
-app_id = "requests=activate"
+Support setting surface activate through app_id or title, for example:
+xdg_toplevel_set_app_id("requests=activate")
+Or
+xdg_toplevel_set_title("requests=activate")
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  desktop-shell/shell.c         |  19 ++++++
  desktop-shell/shell.h         |   2 +
  include/libweston/libweston.h |   9 +++
- libweston-desktop/surface.c   | 108 ++++++++++++++++++++++++++++++++++
+ libweston-desktop/surface.c   | 120 ++++++++++++++++++++++++++++++++++
  libweston/input.c             |   3 +
- 5 files changed, 141 insertions(+)
+ 5 files changed, 153 insertions(+)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 159871e..e715ede 100644
@@ -124,11 +128,11 @@ index 7a73957..d5749e8 100644
  
  struct weston_subsurface {
 diff --git a/libweston-desktop/surface.c b/libweston-desktop/surface.c
-index 21ff080..691ec01 100644
+index 21ff080..a703666 100644
 --- a/libweston-desktop/surface.c
 +++ b/libweston-desktop/surface.c
-@@ -711,20 +711,128 @@ weston_desktop_surface_set_title(struct weston_desktop_surface *surface,
- 	free(old);
+@@ -695,20 +695,128 @@ weston_desktop_surface_set_position(struct weston_desktop_surface *surface,
+ 		weston_view_set_position(view->view, x, y);
  }
  
 +static bool
@@ -228,7 +232,35 @@ index 21ff080..691ec01 100644
 +}
 +
  void
- weston_desktop_surface_set_app_id(struct weston_desktop_surface *surface,
+ weston_desktop_surface_set_title(struct weston_desktop_surface *surface,
+ 				 const char *title)
+ {
+ 	char *tmp, *old;
++	bool handled = false;
+ 
+ 	tmp = strdup(title);
+ 	if (tmp == NULL)
+ 		return;
+ 
++	handled |= weston_desktop_surface_set_flags(surface, tmp);
++
++	strcpy(tmp, title);
++	handled |= weston_desktop_surface_set_requests(surface, tmp);
++
++	if (handled)
++		goto handled;
++
+ 	old = surface->title;
+ 	surface->title = tmp;
+ 	wl_signal_emit(&surface->metadata_signal, surface);
+ 	free(old);
++	return;
++handled:
++	free(tmp);
+ }
+ 
+ void
+@@ -716,15 +824,27 @@ weston_desktop_surface_set_app_id(struct weston_desktop_surface *surface,
  				  const char *app_id)
  {
  	char *tmp, *old;
