@@ -1,7 +1,7 @@
-From 8718cbe18b176e561f140a54515515f4c19f0cc9 Mon Sep 17 00:00:00 2001
+From 8f74311b86b494de12ea86e41c80d9a4dae92908 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 08/13] qwaylandxdgshellv6: Support switching between
+Subject: [PATCH 10/15] qwaylandxdgshellv6: Support switching between
  fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.
@@ -14,12 +14,12 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
-index 6fb3af1..431277b 100644
+index a8a16fa..7d40980 100644
 --- a/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
 +++ b/src/plugins/shellintegration/xdg-shell-v6/qwaylandxdgshellv6.cpp
-@@ -96,6 +96,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
- 
-     m_xdgSurface->setSizeHints();
+@@ -98,6 +98,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
+     // Set initial position
+     updatePosition();
  
 +    // Trigger a update to commit new state
 +    m_xdgSurface->m_window->window()->requestUpdate();
@@ -27,7 +27,7 @@ index 6fb3af1..431277b 100644
      m_applied = m_pending;
      qCDebug(lcQpaWayland) << "Applied pending zxdg_toplevel_v6 configure event:" << m_applied.size << m_applied.states;
  }
-@@ -138,6 +141,11 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
+@@ -160,6 +163,11 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
      // Re-send what's different from the applied state
      Qt::WindowStates changedStates = m_applied.states ^ states;
  
@@ -39,7 +39,7 @@ index 6fb3af1..431277b 100644
      if (changedStates & Qt::WindowMaximized) {
          if (states & Qt::WindowMaximized)
              set_maximized();
-@@ -148,8 +156,6 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
+@@ -170,8 +178,6 @@ void QWaylandXdgSurfaceV6::Toplevel::requestWindowStates(Qt::WindowStates states
      if (changedStates & Qt::WindowFullScreen) {
          if (states & Qt::WindowFullScreen)
              set_fullscreen(nullptr);

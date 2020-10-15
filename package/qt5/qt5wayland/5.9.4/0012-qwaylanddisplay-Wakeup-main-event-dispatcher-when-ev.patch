@@ -1,7 +1,7 @@
-From 6e3f78c30e1aba4fd5bde0e12691c6a17329bcf0 Mon Sep 17 00:00:00 2001
+From b01e042051936168339cfa092786c06764791add Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
-Subject: [PATCH 07/13] qwaylanddisplay: Wakeup main event dispatcher when
+Subject: [PATCH 12/17] qwaylanddisplay: Wakeup main event dispatcher when
  events pending
 
 The socket might not be able to generate poll events to wakeup the main
@@ -13,15 +13,15 @@ for pending events and wakeup the main event dispatcher.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylanddisplay.cpp | 50 +++++++++++++++++++++++++++++++++-
+ src/client/qwaylanddisplay.cpp | 51 +++++++++++++++++++++++++++++++++-
  src/client/qwaylanddisplay_p.h |  2 ++
- 2 files changed, 51 insertions(+), 1 deletion(-)
+ 2 files changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index 38ae52f..65e4436 100644
+index 437501f..5867573 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
-@@ -82,6 +82,8 @@
+@@ -73,6 +73,8 @@
  
  #include <QtCore/QDebug>
  
@@ -30,9 +30,9 @@ index 38ae52f..65e4436 100644
  #include <errno.h>
  #include <poll.h>
  
-@@ -91,6 +93,48 @@ namespace QtWaylandClient {
+@@ -80,6 +82,48 @@ QT_BEGIN_NAMESPACE
  
- Q_LOGGING_CATEGORY(lcQpaWayland, "qt.qpa.wayland"); // for general (uncategorized) Wayland platform logging
+ namespace QtWaylandClient {
  
 +class QWaylandDisplayThread : public QThread
 +{
@@ -79,47 +79,47 @@ index 38ae52f..65e4436 100644
  struct wl_surface *QWaylandDisplay::createSurface(void *handle)
  {
      struct wl_surface *surface = mCompositor.create_surface();
-@@ -159,6 +203,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
-         qCWarning(lcQpaWayland, "failed to create xkb context");
- #endif
+@@ -153,6 +197,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+ 
+     mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
  
 +    mThread = new QWaylandDisplayThread(mDisplay);
 +
      forceRoundTrip();
+ }
  
-     if (!mWaitingScreens.isEmpty()) {
-@@ -185,8 +231,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
- #if QT_CONFIG(cursor)
-     qDeleteAll(mCursorThemes);
+@@ -168,7 +214,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
+ #if QT_CONFIG(wayland_datadevice)
+     delete mDndSelectionHandler.take();
  #endif
--    if (mDisplay)
+-    wl_display_disconnect(mDisplay);
 +    if (mDisplay) {
 +        delete mThread;
-         wl_display_disconnect(mDisplay);
++        wl_display_disconnect(mDisplay);
 +    }
  }
  
  void QWaylandDisplay::checkError() const
 diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
-index 14bb771..18baa2c 100644
+index d81d5fa..2f4965c 100644
 --- a/src/client/qwaylanddisplay_p.h
 +++ b/src/client/qwaylanddisplay_p.h
-@@ -105,6 +105,7 @@ class QWaylandSurface;
- class QWaylandShellIntegration;
- class QWaylandCursor;
- class QWaylandCursorTheme;
+@@ -100,6 +100,7 @@ class QWaylandIntegration;
+ class QWaylandHardwareIntegration;
+ class QWaylandXdgShell;
+ class QWaylandShellSurface;
 +class QWaylandDisplayThread;
  
  typedef void (*RegistryListener)(void *data,
                                   struct wl_registry *registry,
-@@ -261,6 +262,7 @@ private:
+@@ -227,6 +228,7 @@ private:
      QVector<QWaylandWindow *> mActiveWindows;
-     struct wl_callback *mSyncCallback = nullptr;
+     struct wl_callback *mSyncCallback;
      static const wl_callback_listener syncCallbackListener;
 +    QWaylandDisplayThread *mThread = nullptr;
  
-     bool mClientSideInputContextRequested = !QPlatformInputContextFactory::requested().isNull();
-     bool mUsingInputContextFromCompositor = false;
+     void registry_global(uint32_t id, const QString &interface, uint32_t version) override;
+     void registry_global_remove(uint32_t id) override;
 -- 
 2.20.1
 
