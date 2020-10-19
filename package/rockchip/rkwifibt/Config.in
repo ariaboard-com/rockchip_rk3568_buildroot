@@ -136,7 +136,7 @@ config BR2_PACKAGE_RKWIFIBT_WIFI_KO
     default "bcmdhd.ko" if BR2_PACKAGE_RKWIFIBT_AP6354
     default "bcmdhd.ko" if BR2_PACKAGE_RKWIFIBT_AP6356
     default "bcmdhd.ko" if BR2_PACKAGE_RKWIFIBT_AP6398S
-    default "bcmdhd.ko" if BR2_PACKAGE_RKWIFIBT_AP6203BM
+    default "bcmdhd_indep_power.ko" if BR2_PACKAGE_RKWIFIBT_AP6203BM
     default "bcmdhd.ko" if BR2_PACKAGE_RKWIFIBT_AMPAKALL
     default "cywdhd.ko" if BR2_PACKAGE_RKWIFIBT_AWCM256
     default "cywdhd.ko" if BR2_PACKAGE_RKWIFIBT_AWNB197
