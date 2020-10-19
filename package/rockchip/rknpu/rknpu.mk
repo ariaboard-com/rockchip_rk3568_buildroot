@@ -3,7 +3,7 @@
 # rknpu
 #
 ################################################################################
-RKNPU_VERSION = 1.2.1
+RKNPU_VERSION = 1.5.0
 RKNPU_SITE_METHOD = local
 RKNPU_SITE = $(TOPDIR)/../external/rknpu
 NPU_TEST_FILE = $(@D)/test
@@ -46,9 +46,16 @@ ifeq ($(BR2_PACKAGE_PYTHON_RKNN), y)
 BUILD_PYTHON_RKNN=y
 endif
 
+ifeq ($(BR2_PACKAGE_RKNPU_USE_RKNN_API), y)
+BUILD_RKNN_API=y
+endif
+
 define RKNPU_INSTALL_STAGING_CMDS
     mkdir -p $(STAGING_DIR)/usr/include/rknn
     $(INSTALL) -D -m 0644 $(@D)/rknn/include/rknn_runtime.h $(STAGING_DIR)/usr/include/rknn/rknn_runtime.h
+    if [ ${BUILD_RKNN_API} = "y" ]; then \
+        $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/include/rknn_api.h $(STAGING_DIR)/usr/include/rknn/rknn_api.h; \
+    fi
 endef
 
 define RKNPU_INSTALL_TARGET_CMDS
@@ -75,6 +82,13 @@ define RKNPU_INSTALL_TARGET_CMDS
         cp -r $(@D)/rknn/python/rknn $(TARGET_DIR)/usr/lib/python3.6/site-packages/; \
     fi
 
+    if [ ${BUILD_RKNN_API} = "y" ]; then \
+        if [ ${NPU_PLATFORM_ARCH} = "linux-aarch64" ]; then \
+            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib64/librknn_api.so $(TARGET_DIR)/usr/lib/; \
+        else \
+            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib/librknn_api.so $(TARGET_DIR)/usr/lib/; \
+        fi \
+    fi
 endef
 
 $(eval $(generic-package))

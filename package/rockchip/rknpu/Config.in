@@ -33,3 +33,9 @@ config BR2_PACKAGE_PYTHON_RKNN
         help
           RKNN Python API for Rockchip NPU Hardware.
           Currently only support Rockchip RK1808.
+
+config BR2_PACKAGE_RKNPU_USE_RKNN_API
+	bool "use npu rknn api"
+        depends on BR2_PACKAGE_RKNPU
+	help
+	  "use rknn api"
