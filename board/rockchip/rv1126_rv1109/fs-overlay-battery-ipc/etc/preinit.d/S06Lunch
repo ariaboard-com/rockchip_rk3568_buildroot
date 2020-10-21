@@ -3,6 +3,8 @@
 
 lunch_start()
 {
+	echo none > /sys/class/leds/red/trigger
+	echo 255 > /sys/class/leds/red/brightness
 	export HDR_MODE=0
 	ispserver -f 25 &
 	echo "Now we are ready to start your first application" > /dev/kmsg
