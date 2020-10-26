@@ -1,7 +1,7 @@
-From 14d2f0ed01d114fb8d5e3062dcc66740f962b3e4 Mon Sep 17 00:00:00 2001
+From d48f704255e2a9c6775773aaebd240d90b150abb Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 16 Oct 2020 12:19:44 +0800
-Subject: [PATCH] touch-calibrator: Ignore verify errors
+Subject: [PATCH 31/38] touch-calibrator: Ignore verify errors
 
 Print warnings instead, this is useful when emulating a small screen.
 

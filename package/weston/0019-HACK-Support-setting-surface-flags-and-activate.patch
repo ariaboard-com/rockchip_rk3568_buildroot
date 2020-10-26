@@ -1,7 +1,7 @@
-From 3493dc9063971c3073323ccf2bc5866d680f0df2 Mon Sep 17 00:00:00 2001
+From c519201534df461310971204522745d7f4712c8f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 08:55:42 +0800
-Subject: [PATCH 19/30] HACK: Support setting surface flags and activate
+Subject: [PATCH 19/38] HACK: Support setting surface flags and activate
 
 Support setting surface flags through app_id or title, for example:
 xdg_toplevel_set_app_id("flags=stay-on-top|stay-on-bottom|no-focus")

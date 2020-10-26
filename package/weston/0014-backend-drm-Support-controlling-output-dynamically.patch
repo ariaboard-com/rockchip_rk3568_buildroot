@@ -1,7 +1,7 @@
-From e43f9a231c8c0b7f9fbbd38d37503e325a209cac Mon Sep 17 00:00:00 2001
+From f481122a60a3c4108d8d2828422d32a53e672d65 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:37:37 +0800
-Subject: [PATCH 14/30] backend-drm: Support controlling output dynamically
+Subject: [PATCH 14/38] backend-drm: Support controlling output dynamically
 
 Use config file to control output's rotation/mode/off/freeze/display
 rectangle.

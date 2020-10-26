@@ -1,7 +1,7 @@
-From 28688ec34f037e44e2c30e9f9b73e8875affa465 Mon Sep 17 00:00:00 2001
+From 01a3ae1c53fc001d5fd8768bc42db42d550c4785 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 7 Sep 2020 18:03:38 +0800
-Subject: [PATCH 28/30] backend-drm: Add dummy output when no screens connected
+Subject: [PATCH 28/38] backend-drm: Add dummy output when no screens connected
 
 Some clients are not expecting no screens, add a dummy output for them.
 
@@ -10,7 +10,8 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  desktop-shell/shell.c                |   4 -
  libweston/backend-drm/drm-internal.h |   6 +
  libweston/backend-drm/drm.c          | 210 ++++++++++++++++++++++++++-
- 3 files changed, 212 insertions(+), 8 deletions(-)
+ libweston/backend-drm/kms.c          |   2 +
+ 4 files changed, 214 insertions(+), 8 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index e715ede..190a303 100644
@@ -367,6 +368,19 @@ index 7aca953..ef214bf 100644
  	/* 'compute' faked zpos values in case HW doesn't expose any */
  	drm_backend_create_faked_zpos(b);
  
+diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
+index 4483a59..f17fb28 100644
+--- a/libweston/backend-drm/kms.c
++++ b/libweston/backend-drm/kms.c
+@@ -1188,6 +1188,8 @@ drm_pending_state_apply_atomic(struct drm_pending_state *pending_state,
+ 				continue;
+ 
+ 			head = to_drm_head(head_base);
++			if (head == b->dummy_head)
++				continue;
+ 
+ 			drm_debug(b, "\t\t[atomic] disabling inactive head %s\n",
+ 				  head_base->name);
 -- 
 2.20.1
 

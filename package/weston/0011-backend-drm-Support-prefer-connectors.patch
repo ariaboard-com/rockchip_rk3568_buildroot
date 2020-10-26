@@ -1,7 +1,7 @@
-From 238e8ae3423d2d2f3d79209f95a2ce0c08488b83 Mon Sep 17 00:00:00 2001
+From 508576adc3494fd1f07c01760ed92b4fd9acc1fd Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 23 Jun 2020 10:05:48 +0800
-Subject: [PATCH 11/30] backend-drm: Support prefer connectors
+Subject: [PATCH 11/38] backend-drm: Support prefer connectors
 
 Using internal connector as main output by default.
 
@@ -20,9 +20,9 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  desktop-shell/shell.c                |  25 ++-
  libweston/backend-drm/drm-internal.h |  18 ++
  libweston/backend-drm/drm.c          | 248 +++++++++++++++++++++++----
- libweston/backend-drm/kms.c          |  10 +-
+ libweston/backend-drm/kms.c          |  23 ++-
  libweston/compositor.c               |  40 ++++-
- 5 files changed, 299 insertions(+), 42 deletions(-)
+ 5 files changed, 309 insertions(+), 45 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 9a77479..0908763 100644
@@ -574,7 +574,7 @@ index 485604b..f72b90c 100644
  					    planes_binding, b);
  	weston_compositor_add_debug_binding(compositor, KEY_C,
 diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
-index 7c0e59a..975df91 100644
+index b88272f..5a08aa8 100644
 --- a/libweston/backend-drm/kms.c
 +++ b/libweston/backend-drm/kms.c
 @@ -699,6 +699,8 @@ drm_output_apply_state_legacy(struct drm_output_state *state)
@@ -604,7 +604,31 @@ index 7c0e59a..975df91 100644
  	}
  
  	pinfo = scanout_state->fb->format;
-@@ -1319,8 +1323,6 @@ drm_pending_state_apply(struct drm_pending_state *pending_state)
+@@ -1225,13 +1229,20 @@ drm_pending_state_apply_atomic(struct drm_pending_state *pending_state,
+ 	}
+ 
+ 	wl_list_for_each_safe(output_state, tmp, &pending_state->output_list,
+-			      link)
++			      link) {
++		struct drm_output *output = output_state->output;
++		struct drm_plane *scanout_plane = output->scanout_plane;
++		struct drm_plane_state *scanout_state =
++			drm_output_state_get_existing_plane(output_state,
++							    scanout_plane);
++		if (!scanout_state || !scanout_state->fb)
++			continue;
++
+ 		drm_output_assign_state(output_state, mode);
++	}
+ 
+ 	b->state_invalid = false;
+ 
+-	assert(wl_list_empty(&pending_state->output_list));
+-
+ out:
+ 	drmModeAtomicFree(req);
+ 	drm_pending_state_free(pending_state);
+@@ -1319,8 +1330,6 @@ drm_pending_state_apply(struct drm_pending_state *pending_state)
  
  	b->state_invalid = false;
  
@@ -613,7 +637,7 @@ index 7c0e59a..975df91 100644
  	drm_pending_state_free(pending_state);
  
  	return 0;
-@@ -1369,8 +1371,6 @@ drm_pending_state_apply_sync(struct drm_pending_state *pending_state)
+@@ -1369,8 +1378,6 @@ drm_pending_state_apply_sync(struct drm_pending_state *pending_state)
  
  	b->state_invalid = false;
  
