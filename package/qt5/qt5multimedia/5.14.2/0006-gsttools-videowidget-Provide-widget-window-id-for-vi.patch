@@ -1,7 +1,7 @@
-From 23ca188c38d8f4e141a5b120ef67470aa4853559 Mon Sep 17 00:00:00 2001
+From 26957f451a89c8edf32f3866e508dcc755c14f59 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 24 Dec 2018 15:40:56 +0800
-Subject: [PATCH 06/11] gsttools: videowidget: Provide widget window id for
+Subject: [PATCH 06/12] gsttools: videowidget: Provide widget window id for
  video window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>

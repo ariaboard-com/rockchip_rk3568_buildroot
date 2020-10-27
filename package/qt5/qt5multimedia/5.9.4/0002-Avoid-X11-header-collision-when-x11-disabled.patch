@@ -1,7 +1,7 @@
 From 4700c4389b0d5c4726a5b532d1458d2c26ac41c8 Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Mon, 28 Aug 2017 11:42:53 +0800
-Subject: [PATCH 02/12] Avoid X11 header collision when x11 disabled
+Subject: [PATCH 02/13] Avoid X11 header collision when x11 disabled
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---

@@ -1,8 +1,9 @@
-From 8f51a99aec82649ed878e51710834a8dffe9797f Mon Sep 17 00:00:00 2001
-From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Tue, 7 Jul 2020 17:35:18 +0800
-Subject: [PATCH 03/12] 0003-change-playbin-to-playbin3.patch
+From e9915bbf38a23c201a134e6fdede7fd5695d1372 Mon Sep 17 00:00:00 2001
+From: Ziyuan Xu <xzy.xu@rock-chips.com>
+Date: Fri, 12 Jul 2019 17:02:45 +0800
+Subject: [PATCH 03/13] GStreamer: change playbin to playbin3
 
+Signed-off-by: Ziyuan Xu <xzy.xu@rock-chips.com>
 ---
  src/multimedia/gsttools_headers/qgstutils_p.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

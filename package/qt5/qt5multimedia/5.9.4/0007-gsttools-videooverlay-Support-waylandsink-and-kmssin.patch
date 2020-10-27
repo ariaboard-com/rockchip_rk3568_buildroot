@@ -1,17 +1,16 @@
-From 808c4bbe3bdf49df1b888243b23cf9ab497ec4da Mon Sep 17 00:00:00 2001
+From 48153fd2a339ef5af54be23ce14ea7cc9e5f93aa Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
-Subject: [PATCH 07/12] gsttools: videooverlay: Support waylandsink in the
- right way
+Subject: [PATCH 07/13] gsttools: videooverlay: Support waylandsink and kmssink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp       | 159 ++++++++++++++----
+ src/gsttools/qgstreamervideooverlay.cpp       | 161 ++++++++++++++----
  .../qgstreamervideooverlay_p.h                |   2 +
- 2 files changed, 131 insertions(+), 30 deletions(-)
+ 2 files changed, 133 insertions(+), 30 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 6ad70fd..db1d36f 100644
+index 6ad70fd..75ae07b 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -40,7 +40,11 @@
@@ -37,7 +36,7 @@ index 6ad70fd..db1d36f 100644
  QT_BEGIN_NAMESPACE
  
  struct ElementMap
-@@ -190,31 +198,104 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
+@@ -190,31 +198,106 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
  {
      m_windowId = id;
  
@@ -77,6 +76,9 @@ index 6ad70fd..db1d36f 100644
 +    GstVideoOverlay *overlay;
 +    QPoint position;
 +
++    if (!id)
++        goto out;
++
 +#if !GST_CHECK_VERSION(1,0,0)
 +    qWarning("Only support gstreamer-1.0\n");
 +    goto out;
@@ -105,13 +107,12 @@ index 6ad70fd..db1d36f 100644
 +
 +    // It's wayland platform, using wl_surface as window handle.
 +    if (compositor) {
-+        if (isActive()) {
-+            gst_video_overlay_set_window_handle(overlay, (WId) surface);
++        if (!surface)
++            // There's no surface for overlay now.
++            goto out;
 +
-+            if (!surface)
-+                // There's no surface for overlay now.
-+                goto out;
-+        }
++        if (isActive())
++            gst_video_overlay_set_window_handle(overlay, (WId) surface);
 +
 +        if (!m_rect.width() || !m_rect.height())
 +            goto out;
@@ -160,7 +161,7 @@ index 6ad70fd..db1d36f 100644
  }
  
  void QGstreamerVideoOverlay::expose()
-@@ -246,24 +327,42 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
+@@ -246,24 +329,42 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
          h = rect.height();
      }
  
