@@ -1,4 +1,4 @@
-From 01a3ae1c53fc001d5fd8768bc42db42d550c4785 Mon Sep 17 00:00:00 2001
+From 7ca0c01eae020adc58871e236a4b8c65f62f0790 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 7 Sep 2020 18:03:38 +0800
 Subject: [PATCH 28/38] backend-drm: Add dummy output when no screens connected
@@ -369,10 +369,10 @@ index 7aca953..ef214bf 100644
  	drm_backend_create_faked_zpos(b);
  
 diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
-index 4483a59..f17fb28 100644
+index e674a9e..94cb2a3 100644
 --- a/libweston/backend-drm/kms.c
 +++ b/libweston/backend-drm/kms.c
-@@ -1188,6 +1188,8 @@ drm_pending_state_apply_atomic(struct drm_pending_state *pending_state,
+@@ -1194,6 +1194,8 @@ drm_pending_state_apply_atomic(struct drm_pending_state *pending_state,
  				continue;
  
  			head = to_drm_head(head_base);

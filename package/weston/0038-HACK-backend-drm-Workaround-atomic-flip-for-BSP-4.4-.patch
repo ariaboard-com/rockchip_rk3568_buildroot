@@ -1,4 +1,4 @@
-From d04e3f9a581b8209b19759043596316f504331c3 Mon Sep 17 00:00:00 2001
+From 4e993352c67840a24c7b99a34ca869f93035cef3 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 26 Oct 2020 17:50:06 +0800
 Subject: [PATCH 38/38] HACK: backend-drm: Workaround atomic flip for BSP 4.4
@@ -13,10 +13,10 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
-index f17fb28..e725e7c 100644
+index 94cb2a3..c2fce5a 100644
 --- a/libweston/backend-drm/kms.c
 +++ b/libweston/backend-drm/kms.c
-@@ -1506,7 +1506,11 @@ atomic_flip_handler(int fd, unsigned int frame, unsigned int sec,
+@@ -1525,7 +1525,11 @@ atomic_flip_handler(int fd, unsigned int frame, unsigned int sec,
  
  	drm_debug(b, "[atomic][CRTC:%u] flip processing started\n", crtc_id);
  	assert(b->atomic_modeset);
