@@ -29,5 +29,11 @@ else
     ISP2_IPC_CONF_OPTS += -DENABLE_MINILOGGER=OFF
 endif
 
+ifeq ($(BR2_PACKAGE_MEDIASERVER), y)
+    ISP2_IPC_CONF_OPTS += -DENABLE_MEDIASERVER=ON
+else
+    ISP2_IPC_CONF_OPTS += -DENABLE_MEDIASERVER=OFF
+endif
+
 endif
 $(eval $(cmake-package))
