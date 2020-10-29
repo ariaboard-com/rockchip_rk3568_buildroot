@@ -1,7 +1,7 @@
-From 4cd35e8f907febe022d7666ae856a7305f68be51 Mon Sep 17 00:00:00 2001
+From c08bb889029e7627b386058f297a4c8649d9e39f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 9 Jan 2019 11:23:14 +0800
-Subject: [PATCH 03/10] qwaylandwindow: Disable input when blocked
+Subject: [PATCH 03/13] qwaylandwindow: Disable input when blocked
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 39 insertions(+), 8 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 0df99d9f..f07d73b6 100644
+index 0df99d9..f07d73b 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -78,6 +78,7 @@ QWaylandWindow::QWaylandWindow(QWindow *window)
@@ -83,7 +83,7 @@ index 0df99d9f..f07d73b6 100644
  {
      QMutexLocker resizeLocker(&mResizeLock);
 diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
-index 5f15ca30..610ea201 100644
+index 5f15ca3..610ea20 100644
 --- a/src/client/qwaylandwindow_p.h
 +++ b/src/client/qwaylandwindow_p.h
 @@ -150,6 +150,8 @@ public:

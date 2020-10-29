@@ -29,7 +29,7 @@ RK_WIFI_CHIP_NAME1 = AP6256
 RK_WIFI_CHIP_NAME2 = AP6255
 endif
 
-ifeq (y,$(BR2_PACKAGE_RKWIFIBT_COMPATIBLE))
+ifeq (y,$(BR2_PACKAGE_RKWIFIBT_AMPAKALL))
 SXLOAD_WIFI = "S36load_ampakall_wifi_modules"
 endif
 
@@ -40,12 +40,28 @@ define RKWIFIBT_INSTALL_COMMON
     $(INSTALL) -D -m 0755 $(@D)/wifi_start.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/wifi_ap6xxx_rftest.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/src/rk_wifi_init $(TARGET_DIR)/usr/bin/
+    $(SED) 's/WIFI_KO/\/$(FIRMWARE_DIR)\/lib\/modules\/$(BR2_PACKAGE_RKWIFIBT_WIFI_KO)/g' $(@D)/$(SXLOAD_WIFI)
+    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/$(SXLOAD_WIFI)
+    -$(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
+endef
+
+define RKWIFIBT_TB_INSTALL
+	mkdir -p $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware
+    $(INSTALL) -D -m 0755 $(@D)/wpa_supplicant.conf $(TARGET_DIR)/etc/
+    $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
+    $(INSTALL) -D -m 0755 $(@D)/tb_start_wifi.sh $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
+
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/rkwifi/rk_wifi_config.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/rfkill/rfkill.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/rfkill/rfkill-rk.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/wireless/cfg80211.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/net/mac80211/mac80211.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
+    -$(TARGET_STRIP) $(STRIP_STRIP_DEBUG) $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/*.ko
 endef
 
 define RKWIFIBT_BROADCOM_INSTALL
-    $(SED) 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(@D)/$(SXLOAD_WIFI)
-    $(SED) 's/WIFI_KO/\/$(FIRMWARE_DIR)\/lib\/modules\/$(BR2_PACKAGE_RKWIFIBT_WIFI_KO)/g' $(@D)/$(SXLOAD_WIFI)
-    $(INSTALL) -D -m 0755 $(@D)/$(SXLOAD_WIFI) $(TARGET_DIR)/etc/init.d/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(RK_WIFI_CHIP_NAME1)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     -$(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(RK_WIFI_CHIP_NAME2)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
@@ -69,8 +85,8 @@ define RKWIFIBT_REALTEK_BT_INSTALL
     $(INSTALL) -D -m 0755 $(@D)/realtek/rtk_hciattach/rtk_hciattach $(TARGET_DIR)/usr/bin/rtk_hciattach
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/* $(TARGET_DIR)/lib/firmware/rtlbt/
-    $(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
-    $(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/mp_* $(TARGET_DIR)/lib/firmware/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/mp_* $(TARGET_DIR)/lib/firmware/rtlbt/
+    -$(INSTALL) -D -m 0644 $(@D)/realtek/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/mp_* $(TARGET_DIR)/lib/firmware/
     $(INSTALL) -D -m 0755 $(@D)/bt_realtek* $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0644 $(@D)/realtek/bluetooth_uart_driver/hci_uart.ko $(TARGET_DIR)/usr/lib/modules/hci_uart.ko
     $(INSTALL) -D -m 0755 $(@D)/bt_load_rtk_firmware $(TARGET_DIR)/usr/bin/
@@ -96,12 +112,24 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RK_ARCH)
 endef
 
+ifneq ($(BR2_PACKAGE_THUNDERBOOT), y)
+
 ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "BROADCOM")
 define RKWIFIBT_INSTALL_TARGET_CMDS
     $(RKWIFIBT_INSTALL_COMMON)
     $(RKWIFIBT_BROADCOM_INSTALL)
 endef
 endif
+
+else
+
+ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "BROADCOM")
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    $(RKWIFIBT_TB_INSTALL)
+endef
+endif
+
+endif #THUNDERBOOT
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "CYPRESS")
 define RKWIFIBT_INSTALL_TARGET_CMDS

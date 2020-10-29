@@ -34,7 +34,7 @@ module_choice()
     echo "ethernet test:        9"
     echo "auto reboot test:     10"
     echo "ddr freq scaling test 11"
-    echo "npu stress test       12"
+    echo "npu test       	12"
     echo "camera test           13 (use rkisp_demo)"
     echo "video test            14 (use gstreamer-wayland and app_demo)"
     echo "gpu test              15 (use glmark2)"
@@ -47,7 +47,7 @@ module_choice()
 
 npu_stress_test()
 {
-    sh /rockchip_test/npu/npu_stress_test.sh
+    sh /rockchip_test/npu/npu_test.sh
 }
 
 ddr_test()

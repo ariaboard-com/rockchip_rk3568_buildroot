@@ -67,5 +67,8 @@ config BR2_PACKAGE_ROCKX_POSE_HAND
     help
         Rockx pose hand support
 
+config BR2_PACKAGE_ROCKX_TB
+    bool "Enable thunder boot"
+
 endif # BR2_PACKAGE_ROCKX
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# setup configfs for adbd, usb mass storage and MTP....
+#etup configfs for adbd, usb mass storage and MTP....
 #
 
 UMS_EN=off
@@ -113,7 +113,7 @@ parameter_init()
 				parse_parameter ${line}
 				;;
 		esac
-	done < $DIR/.usb_config
+	done < $USB_CONFIG_FILE
 
 	case "$CONFIG_STRING" in
 		ums)
@@ -214,16 +214,16 @@ uvc_function_init()
 	ln -s ${USB_FUNCTIONS_DIR}/$UVC_GS/control/header/h ${USB_FUNCTIONS_DIR}/$UVC_GS/control/class/ss/h
 
 	mkdir ${USB_FUNCTIONS_DIR}/$UVC_GS/streaming/mjpeg/m
-	configure_uvc_mjpeg_resolution 480 640
-	configure_uvc_mjpeg_resolution 640 480
+	configure_uvc_mjpeg_resolution 400 640
+	configure_uvc_mjpeg_resolution 640 400
 	configure_uvc_mjpeg_resolution 1280 720
+	configure_uvc_mjpeg_resolution 1280 800
 	configure_uvc_mjpeg_resolution 1920 1080
 
 	mkdir ${USB_FUNCTIONS_DIR}/$UVC_GS/streaming/uncompressed/u
-	configure_uvc_uncompressed_resolution 480 640
-	configure_uvc_uncompressed_resolution 640 480
-	configure_uvc_uncompressed_resolution 1280 720
-
+	configure_uvc_uncompressed_resolution 400 640
+	configure_uvc_uncompressed_resolution 640 400
+	configure_uvc_uncompressed_resolution 1280 800
 
 	mkdir ${USB_FUNCTIONS_DIR}/$UVC_GS/streaming/header/h
 	ln -s ${USB_FUNCTIONS_DIR}/$UVC_GS/streaming/uncompressed/u ${USB_FUNCTIONS_DIR}/$UVC_GS/streaming/header/h/u
@@ -294,6 +294,21 @@ function_init()
 
 }
 
+program_kill()
+{
+	P_PID=`ps | grep $1 | grep -v grep | awk '{print $1}'`
+	test -z ${P_PID} || kill -9 ${P_PID}
+}
+
+usb_device_stop()
+{
+	echo "none" > ${USB_CONFIGFS_DIR}/UDC
+	program_kill adbd
+	program_kill mtp-server
+	ls ${USB_CONFIGS_DIR} | grep f[0-9] | xargs -I {} rm ${USB_CONFIGS_DIR}/{}
+	rm ${USB_CONFIGS_DIR}/uvc.*
+}
+
 case "$1" in
 start)
 	# DIR=/userdata
@@ -304,6 +319,13 @@ start)
 			echo "$0: Cannot find .usb_config"
 			exit 0
 		fi
+	fi
+
+	if [ -e /tmp/.usb_config ]; then
+		USB_CONFIG_FILE=/tmp/.usb_config
+	else
+		USB_CONFIG_FILE=$DIR/.usb_config
+		cp $DIR/.usb_config /tmp/.usb_config
 	fi
 
 	parameter_init
@@ -342,12 +364,21 @@ start)
 
 	sleep 1
 	UDC=`ls /sys/class/udc/| awk '{print $1}'`
+
 	echo $UDC > ${USB_CONFIGFS_DIR}/UDC
 	;;
 stop)
 	echo "none" > ${USB_CONFIGFS_DIR}/UDC
+	usb_device_stop
 	;;
 restart|reload)
+	# Do restart usb by udev
+	echo "USB_FORCE_CHANGED" >> /tmp/.usb_config
+	usb_device_stop
+	sleep 3
+	$0 start
+	# Don't forget to clear "USB_FORCE_CHANGED"
+	sed -i "/USB_FORCE_CHANGED/d" /tmp/.usb_config
 	;;
 *)
 	echo "Usage: $0 {start|stop|restart}"

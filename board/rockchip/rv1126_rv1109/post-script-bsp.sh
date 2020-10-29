@@ -34,6 +34,7 @@ cp $LIBDIR/libavutil.* ./lib/ -dv
 
 cp $LIBDIR/libRKAP* ./lib/ -dv
 cp $LIBDIR/libmd_share.so ./lib/ -dv
+cp $LIBDIR/libod_share.so ./lib/ -dv
 
 cp $LIBDIR/librkaiq.* ./lib/ -dv
 cp $LIBDIR/libeasymedia.* ./lib/ -dv
@@ -46,9 +47,11 @@ cp $HEADER_DIR/rkaiq ./include/ -rf
 cp $SDK_DIR/external/rkmedia/include/rkmedia ./include/ -vrf
 
 #copy examples
-cp $SDK_DIR/external/rkmedia/test/c_api/* ./example/ -vrf
+cp $SDK_DIR/external/rkmedia/examples/* ./example/ -vrf
 
 #copy iqfiles to examples
 cp $SDK_DIR/external/camera_engine_rkaiq/iqfiles ./example -vrf
+#copy vqefiles to examples
+cp $SDK_DIR/external/common_algorithm/audio/rkap_aec/para ./example/vqefiles -vrf
 
 cd -

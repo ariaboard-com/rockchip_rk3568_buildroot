@@ -5,3 +5,13 @@ config BR2_PACKAGE_IPCWEB_BACKEND
 	select BR2_PACKAGE_LIBIPCPROTOCOL
 	help
 		ipcweb backend for Linux
+
+if BR2_PACKAGE_IPCWEB_BACKEND
+
+config BR2_PACKAGE_IPCWEB_BACKEND_JWT
+        bool "jwt in ipcweb backend"
+        default y
+        help
+                enable jwt in ipcweb backend
+
+endif # BR2_PACKAGE_IPCWEB_BACKEND

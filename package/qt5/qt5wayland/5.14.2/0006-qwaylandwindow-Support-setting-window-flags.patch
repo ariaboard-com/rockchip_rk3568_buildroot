@@ -1,37 +1,21 @@
-From e873553348caf46e621a846c8adb5260e0a880b9 Mon Sep 17 00:00:00 2001
+From ecc23bc001cd7313db6717bfb952801d846dfa1c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 09:12:08 +0800
-Subject: [PATCH 06/10] qwaylandwindow: Support setting window flags
+Subject: [PATCH 06/13] qwaylandwindow: Support setting window flags
 
 Support setting window flags through app_id, for example:
 app_id = "flags=stay-on-top|stay-on-bottom|no-focus"
 
-Also stop freeing wl surface in reset(), since libmali doesn't like that.
-
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/client/qwaylandwindow.cpp | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ src/client/qwaylandwindow.cpp | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 202d01c7..98c8201e 100644
+index 202d01c..477bb86 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
-@@ -245,11 +245,13 @@ void QWaylandWindow::reset(bool sendDestroyEvent)
-     mShellSurface = nullptr;
-     delete mSubSurfaceWindow;
-     mSubSurfaceWindow = nullptr;
-+    /* HACK: The libmali might try to access free-ed wl surface.
-     if (mSurface) {
-         emit wlSurfaceDestroyed();
-         QWriteLocker lock(&mSurfaceLock);
-         mSurface.reset();
-     }
-+    */
- 
-     if (mFrameCallback) {
-         wl_callback_destroy(mFrameCallback);
-@@ -767,8 +769,21 @@ void QWaylandWindow::setWindowState(Qt::WindowStates states)
+@@ -767,8 +767,21 @@ void QWaylandWindow::setWindowState(Qt::WindowStates states)
  
  void QWaylandWindow::setWindowFlags(Qt::WindowFlags flags)
  {

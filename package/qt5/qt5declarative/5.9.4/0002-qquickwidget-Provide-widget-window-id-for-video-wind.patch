@@ -1,7 +1,7 @@
-From ee1871e87f753a502ba9dc0084c4ddb980047d44 Mon Sep 17 00:00:00 2001
+From 975dcbad645656bd000e0a24ea72ca02e5cde7d4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:45:33 +0800
-Subject: [PATCH] qquickwidget: Provide widget window id for video window
+Subject: [PATCH 2/5] qquickwidget: Provide widget window id for video window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/src/quickwidgets/qquickwidget.cpp b/src/quickwidgets/qquickwidget.cpp
-index b15df88..00c7492 100644
+index b15df88112..00c7492f3c 100644
 --- a/src/quickwidgets/qquickwidget.cpp
 +++ b/src/quickwidgets/qquickwidget.cpp
 @@ -89,12 +89,26 @@ private:
@@ -41,5 +41,5 @@ index b15df88..00c7492 100644
      // Do not call create() on offscreenWindow.
  
 -- 
-2.11.0
+2.20.1
 

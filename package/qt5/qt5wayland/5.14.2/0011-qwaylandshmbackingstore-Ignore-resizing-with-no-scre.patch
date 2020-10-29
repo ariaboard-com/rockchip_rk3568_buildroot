@@ -1,7 +1,7 @@
-From fa19e7198f9fe03db7a7d0cc5aa4382671999793 Mon Sep 17 00:00:00 2001
+From 7e4532f9d861d183dc9f7d8677db75dcf403e033 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 16 Jul 2020 17:18:42 +0800
-Subject: [PATCH] qwaylandshmbackingstore: Ignore resizing with no screen
+Subject: [PATCH 11/13] qwaylandshmbackingstore: Ignore resizing with no screen
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/src/client/qwaylandshmbackingstore.cpp b/src/client/qwaylandshmbackingstore.cpp
-index 9b5971a2..a32ec85a 100644
+index 9b5971a..a32ec85 100644
 --- a/src/client/qwaylandshmbackingstore.cpp
 +++ b/src/client/qwaylandshmbackingstore.cpp
 @@ -273,6 +273,9 @@ void QWaylandShmBackingStore::resize(const QSize &size)

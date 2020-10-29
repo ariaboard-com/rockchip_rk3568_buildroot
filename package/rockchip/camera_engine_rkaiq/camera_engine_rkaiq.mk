@@ -17,6 +17,8 @@ CAMERA_ENGINE_RKAIQ_DEPENDENCIES = host-camera_engine_rkaiq
 
 CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR = $(TARGET_DIR)
 
+CAMERA_ENGINE_RKAIQ_CONF_OPTS = -DBUILDROOT_BUILD_PROJECT=TRUE
+
 define HOST_CAMERA_ENGINE_RKAIQ_BUILD_CMDS
 	cd $(@D)/rkisp_parser_demo/build/linux && ./make-Makefiles.bash && $(MAKE)
 endef
@@ -27,7 +29,7 @@ endef
 
 RKISP_PARSER_HOST_BINARY = $(HOST_DIR)/bin/rkisp_parser
 
-ifeq ($(BR2_PACKAGE_RK_OEM), y)
+ifeq ($(BR2_PACKAGE_RK_OEM)$(BR2_PACKAGE_THUNDERBOOT), y)
 CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_OPTS = DESTDIR=$(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR) install/fast
 CAMERA_ENGINE_RKAIQ_DEPENDENCIES += rk_oem
 CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR = $(call qstrip,$(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR))
@@ -49,7 +51,9 @@ fi;
 endef
 
 define IQFILE_CONVER_CMD
-	$(call conver_iqfiles, $(@D)/iqfiles, $(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE))
+        $(foreach iqfile, $(call qstrip,$(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE)),
+		$(call conver_iqfiles, $(@D)/iqfiles, $(iqfile))
+        )
 endef
 
 define IQFILES_CONVER_CMD
@@ -71,6 +75,10 @@ else
 	endif
 endif
 
+ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_RKISP_DEMO), y)
+CAMERA_ENGINE_RKAIQ_CONF_OPTS += -DENABLE_RKISP_DEMO=ON
+endif
+
 define CAMERA_ENGINE_RKAIQ_INSTALL_STAGING_CMDS
 	$(TARGET_MAKE_ENV) DESTDIR=$(STAGING_DIR) $(MAKE) -C $($(PKG)_BUILDDIR) install
 	$(INSTALL) -D -m  644 $(@D)/rkisp_api/all_lib/Release/librkisp_api.so $(STAGING_DIR)/usr/lib/
@@ -82,7 +90,11 @@ define CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_CMDS
 	mkdir -p $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/
 	$(INSTALL) -D -m  644 $(@D)/all_lib/Release/librkaiq.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
 	$(INSTALL) -D -m  644 $(@D)/rkisp_api/all_lib/Release/librkisp_api.so $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/lib/
-	$(INSTALL) -D -m  644 $(@D)/iqfiles/$(CAMERA_ENGINE_RKAIQ_IQFILE) $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
+	$(foreach iqfile,$(CAMERA_ENGINE_RKAIQ_IQFILE),
+		$(INSTALL) -D -m  644 $(@D)/iqfiles/$(iqfile) \
+		$(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
+	)
+	$(INSTALL) -D -m  644 $(@D)/rkisp_demo/exe/Release/rkisp_demo $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/ || true
 endef
 
 $(eval $(cmake-package))

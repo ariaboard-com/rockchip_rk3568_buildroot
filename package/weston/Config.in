@@ -31,18 +31,6 @@ config BR2_PACKAGE_WESTON
 if BR2_PACKAGE_WESTON
 
 choice
-        prompt "Weston version"
-        default BR2_PACKAGE_WESTON_VERSION_8
-
-config BR2_PACKAGE_WESTON_VERSION_3
-        bool "weston 3.0.0"
-
-config BR2_PACKAGE_WESTON_VERSION_8
-        bool "weston 8.0.0"
-
-endchoice
-
-choice
 	prompt "default compositor"
 
 config BR2_PACKAGE_WESTON_DEFAULT_DRM

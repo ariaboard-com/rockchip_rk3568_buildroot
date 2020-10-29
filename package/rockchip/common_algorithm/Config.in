@@ -29,4 +29,9 @@ config BR2_PACKAGE_COMMON_ALGORITHM_MOVE_DETECT
 	help
 	  Move detection algorithm
 
+config BR2_PACKAGE_COMMON_ALGORITHM_OCCLUSION_DETECT
+	bool "occlusion detection"
+	default n
+	help
+	  Occlusion detection algorithm
 endif

@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+
+lunch_start()
+{
+	echo none > /sys/class/leds/red/trigger
+	echo 255 > /sys/class/leds/red/brightness
+	export HDR_MODE=0
+	ispserver -f 25 &
+	echo "Now we are ready to start your first application" > /dev/kmsg
+
+	insmod /lib/modules/snd-soc-es8311.ko &
+	echo 297000000 > /proc/mpp_service/rkvenc/clk_core
+
+	export mediaserver_log_level=2
+	mediaserver -a -d -c /usr/share/mediaserver/tb_rtsp-link.conf > /dev/kmsg 2>&1 &
+	auto_poweroff.sh &
+}
+
+lunch_stop()
+{
+	killall mediaserver
+	killall ispserver
+	echo "All applications have been stopped"
+}
+
+case "$1" in
+	start)
+		lunch_start
+		;;
+	stop)
+		lunch_stop
+		;;
+	*)
+		echo "Usage: $0 {start|stop}"
+		exit 1
+		;;
+esac
+
+exit 0

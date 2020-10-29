@@ -1,7 +1,7 @@
-From 9cc7f9c00946f0ff2d9930fb2c16628da832ef2d Mon Sep 17 00:00:00 2001
+From 722ae164670a1914888e8f508eb85206b2fdd30a Mon Sep 17 00:00:00 2001
 From: Giulio Camuffo <giulio.camuffo@kdab.com>
 Date: Sat, 1 Jul 2017 09:53:07 +0200
-Subject: [PATCH 01/15] Handle maximize/minimize/fullscreen in xdg_shell_v6
+Subject: [PATCH 01/17] Handle maximize/minimize/fullscreen in xdg_shell_v6
 
 Change-Id: I385eb3279d91f1c38d2f5d46bc63b324f0456ca4
 ---
@@ -11,7 +11,7 @@ Change-Id: I385eb3279d91f1c38d2f5d46bc63b324f0456ca4
  3 files changed, 69 insertions(+), 6 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index 6d7c0885..308f3864 100644
+index 6d7c088..308f386 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -971,7 +971,11 @@ bool QWaylandWindow::setWindowStateInternal(Qt::WindowState state)
@@ -28,7 +28,7 @@ index 6d7c0885..308f3864 100644
      if (mShellSurface) {
          createDecoration();
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index 7473174d..70da12cb 100644
+index 7473174..70da12c 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -56,6 +56,8 @@ QWaylandXdgSurfaceV6::Toplevel::Toplevel(QWaylandXdgSurfaceV6 *xdgSurface)
@@ -117,7 +117,7 @@ index 7473174d..70da12cb 100644
  
  QWaylandXdgShellV6::QWaylandXdgShellV6(struct ::wl_registry *registry, uint32_t id, uint32_t availableVersion)
 diff --git a/src/client/qwaylandxdgshellv6_p.h b/src/client/qwaylandxdgshellv6_p.h
-index 769f1983..1acd8e01 100644
+index 769f198..1acd8e0 100644
 --- a/src/client/qwaylandxdgshellv6_p.h
 +++ b/src/client/qwaylandxdgshellv6_p.h
 @@ -88,6 +88,10 @@ public:
