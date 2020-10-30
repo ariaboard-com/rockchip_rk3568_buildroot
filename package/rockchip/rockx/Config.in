@@ -70,5 +70,11 @@ config BR2_PACKAGE_ROCKX_POSE_HAND
 config BR2_PACKAGE_ROCKX_TB
     bool "Enable thunder boot"
 
+config BR2_PACKAGE_ROCKX_PERSON_DETECTION
+    bool "Rockx person detection support"
+    default n
+    help
+        Rockx person detection support
+
 endif # BR2_PACKAGE_ROCKX
 
