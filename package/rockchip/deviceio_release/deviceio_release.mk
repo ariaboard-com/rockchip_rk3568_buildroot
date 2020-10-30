@@ -17,18 +17,14 @@ else ifeq ($(call qstrip, $(BR2_ARCH)), aarch64)
 endif
 
 ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), REALTEK)
-	LIBDEVICEIOSO = libDeviceIo_bluez.so
-	DEVICEIO_BSA = fake
+	LIBDEVICEIOSO = bluez/libDeviceIo.so
 	DEVICEIO_RELEASE_DEPENDENCIES += readline bluez5_utils libglib2 bluez-alsa
 else ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), BROADCOM)
-	LIBDEVICEIOSO = libDeviceIo_broadcom.so
-	DEVICEIO_BSA = broadcom_bsa
+	LIBDEVICEIOSO = broadcom/libDeviceIo.so
 else ifeq ($(call qstrip,$(BR2_PACKAGE_RKWIFIBT_VENDOR)), CYPRESS)
-	LIBDEVICEIOSO = libDeviceIo_cypress.so
-	DEVICEIO_BSA = cypress_bsa
+	LIBDEVICEIOSO = cypress/libDeviceIo.so
 else
 	LIBDEVICEIOSO = libDeviceIo_fake.so
-	DEVICEIO_BSA = fake
 endif
 
 define DEVICEIO_RELEASE_INSTALL_COMMON
@@ -38,25 +34,9 @@ define DEVICEIO_RELEASE_INSTALL_COMMON
 	$(INSTALL) -D -m 0755 $(STAGING_DIR)/usr/bin/deviceio_test $(TARGET_DIR)/usr/bin/deviceio_test
 endef
 
-define DEVICEIO_RELEASE_INSTALL_BSA
-	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/libbsa.so $(TARGET_DIR)/usr/lib/libbsa.so
-	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/app_manager $(TARGET_DIR)/usr/bin/app_manager
-	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/bsa_server $(TARGET_DIR)/usr/bin/bsa_server
-	$(INSTALL) -D -m 0755 $(@D)/$(DEVICEIO_BSA)/$(BSAARCH)/libbsa.so $(STAGING_DIR)/usr/lib/libbsa.so
-endef
-
-ifneq ($(DEVICEIO_BSA), )
 define DEVICEIO_RELEASE_INSTALL_TARGET_CMDS
 	$(DEVICEIO_RELEASE_INSTALL_COMMON)
 endef
-define DEVICEIO_RELEASE_PRE_INSTALL_BSA
-	$(DEVICEIO_RELEASE_INSTALL_BSA)
-endef
-else
-define DEVICEIO_RELEASE_INSTALL_TARGET_CMDS
-	$(DEVICEIO_RELEASE_INSTALL_COMMON)
-endef
-endif
 
 define DEVICEIO_PRE_BUILD_HOOK
 	$(INSTALL) -D -m 0755 $(@D)/DeviceIO/$(DEVICEIOARCH)/$(LIBDEVICEIOSO) $(TARGET_DIR)/usr/lib/libDeviceIo.so
