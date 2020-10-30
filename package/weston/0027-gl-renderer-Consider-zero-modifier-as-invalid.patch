@@ -1,4 +1,4 @@
-From 46f9dce7a9448c5999e7bd6ac3c3258d9056d5ce Mon Sep 17 00:00:00 2001
+From 5333d2e031134c975096bfd3bcc3b8a4491ec5e9 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 1 Sep 2020 08:51:17 +0800
 Subject: [PATCH 27/38] gl-renderer: Consider zero modifier as invalid
@@ -8,9 +8,23 @@ modifier.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
+ libweston/pixman-renderer.c         | 2 +-
  libweston/renderer-gl/gl-renderer.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/libweston/pixman-renderer.c b/libweston/pixman-renderer.c
+index ee76278..7b7be74 100644
+--- a/libweston/pixman-renderer.c
++++ b/libweston/pixman-renderer.c
+@@ -1096,7 +1096,7 @@ pixman_renderer_import_dmabuf(struct weston_compositor *ec,
+ 	int i;
+ 
+ 	for (i = 0; i < attributes->n_planes; i++) {
+-		if (attributes->modifier[i] != DRM_FORMAT_MOD_INVALID)
++		if (attributes->modifier[i] && attributes->modifier[i] != DRM_FORMAT_MOD_INVALID)
+ 			return false;
+ 	}
+ 
 diff --git a/libweston/renderer-gl/gl-renderer.c b/libweston/renderer-gl/gl-renderer.c
 index 8106270..73b8e89 100644
 --- a/libweston/renderer-gl/gl-renderer.c
