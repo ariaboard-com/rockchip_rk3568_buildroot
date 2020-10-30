@@ -9,11 +9,28 @@ THUNDERBOOT_SITE_METHOD = local
 THUNDERBOOT_SITE = $(TOPDIR)/package/rockchip/thunderboot
 
 KERNEL_VERSION=`make -C $(TOPDIR)/../kernel kernelversion |grep -v make`
-INSTALL_MODULES = $(call qstrip,$(BR2_THUNDERBOOT_INSTALL_MODULES))
+THUNDERBOOT_INSTALL_MODULES = $(call qstrip,$(BR2_THUNDERBOOT_INSTALL_MODULES))
+THUNDERBOOT_ADB = $(call qstrip,$(BR2_THUNDERBOOT_USB_ADBD))
+THUNDERBOOT_RNDIS = $(call qstrip,$(BR2_THUNDERBOOT_USB_RNDIS))
+THUNDERBOOT_USB_CONFIG = $(TARGET_DIR)/etc/preinit.d/.usb_config
+THUNDERBOOT_USB_MODULES = dwc3.ko,dwc3-rockchip-inno.ko,phy-rockchip-naneng-usb2.ko,dwc3-of-simple.ko
+INSTALL_MODULES = $(THUNDERBOOT_INSTALL_MODULES)
 
 define THUNDERBOOT_BUILD_CMDS
 	make -C $(TOPDIR)/../kernel INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=${THUNDERBOOT_BUILDDIR} modules_install ARCH=${BR2_ARCH}
 endef
+
+ifeq ($(BR2_THUNDERBOOT_SIMPLIFY_USB),y)
+define THUNDERBOOT_USB
+	$(INSTALL) -D -m 755 $(@D)/S50tb_usbdevice $(TARGET_DIR)/etc/preinit.d/
+	if test -e $(THUNDERBOOT_USB_CONFIG) ; then \
+		rm $(THUNDERBOOT_USB_CONFIG) ; \
+	fi
+	touch $(THUNDERBOOT_USB_CONFIG)
+endef
+INSTALL_MODULES = $(THUNDERBOOT_INSTALL_MODULES),$(THUNDERBOOT_USB_MODULES)
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_USB
+endif
 
 define THUNDERBOOT_INSTALL_TARGET_CMDS
 	mkdir -p $(TARGET_DIR)/lib/modules/ $(TARGET_DIR)/etc/preinit.d/
@@ -25,5 +42,23 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/S07mountall $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 755 $(@D)/tb_poweroff $(TARGET_DIR)/usr/bin/
 endef
+
+ifeq ($(BR2_THUNDERBOOT_USB_ADBD),y)
+define THUNDERBOOT_USB_ADBD
+	if test ! `grep usb_adb_en $(THUNDERBOOT_USB_CONFIG)` ; then \
+		echo usb_adb_en >> $(THUNDERBOOT_USB_CONFIG) ; \
+	fi
+endef
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_USB_ADBD
+endif
+
+ifeq ($(BR2_THUNDERBOOT_USB_RNDIS),y)
+define THUNDERBOOT_USB_RNDIS
+	if test ! `grep usb_rndis_en $(THUNDERBOOT_USB_CONFIG)` ; then \
+		echo usb_rndis_en >> $(THUNDERBOOT_USB_CONFIG) ; \
+	fi
+endef
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_USB_RNDIS
+endif
 
 $(eval $(generic-package))
