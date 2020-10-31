@@ -33,6 +33,7 @@ THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_USB
 endif
 
 define THUNDERBOOT_INSTALL_TARGET_CMDS
+	rm -rf $(TARGET_DIR)/oem $(TARGET_DIR)/userdata && mkdir -p $(TARGET_DIR)/oem $(TARGET_DIR)/userdata
 	mkdir -p $(TARGET_DIR)/lib/modules/ $(TARGET_DIR)/etc/preinit.d/
 
 	for module in `echo ${INSTALL_MODULES} | tr ',' '\n'`; do \
