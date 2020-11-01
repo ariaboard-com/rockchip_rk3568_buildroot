@@ -40,6 +40,7 @@ config BR2_TARGET_ROOTFS_UBI_USE_CUSTOM_CONFIG
 config BR2_TARGET_ROOTFS_UBI_CUSTOM_CONFIG_FILE
 	string "Configuration file path"
 	depends on BR2_TARGET_ROOTFS_UBI_USE_CUSTOM_CONFIG
+	default "$(BASE_DIR)/ubinize.cfg"
 	help
 	  Path to the ubinize configuration file.
 
