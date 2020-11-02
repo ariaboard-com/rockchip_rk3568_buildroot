@@ -10,7 +10,8 @@ BR2_PACKAGE_IO=y
 BR2_PACKAGE_PROCPS_NG=y
 
 BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-uvc/"
-BR2_ROOTFS_POST_BUILD_SCRIPT="board/rockchip/common/uvcc/post-build-uvcc.sh"
+BR2_ROOTFS_POST_BUILD_SCRIPT="board/rockchip/rv1126_rv1109/pack-uvc-oem.sh"
+
 #BR2_PACKAGE_GDB=y
 #BR2_PACKAGE_GDB_DEBUGGER=y
 
