@@ -572,20 +572,24 @@ static void jpeg_get_displayinfo(char* path, int* width, int* height)
         fclose(infile);
 }
 
-static int jpeg_sf_decode(char* path, char* output)
+static int jpeg_sf_decode(char* path, /*char* output*/struct armsoc_bo* bo)
 {
     struct jpeg_decompress_struct cinfo;  
     struct jpeg_error_mgr jerr; 
     JSAMPARRAY lineBuf;
     int bytesPerPix;
+    char* output = NULL;
 #ifdef TIME_DEBUG
     struct timeval start,end;
     gettimeofday(&start, NULL);
 #endif
+    if (!bo)
+        return -1;
+    output = (char *)bo->ptr;
 
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
-    FILE* infile;
+    FILE* infile, *outfile;
     int outSize=0;
 
     if ((infile = fopen(path, "rb")) == NULL)
@@ -610,14 +614,40 @@ static int jpeg_sf_decode(char* path, char* output)
     {
         jpeg_finish_decompress(&cinfo);
         jpeg_destroy_decompress(&cinfo);
+        fclose(infile);
         return -2;
     }
+
+    if (bo->size < outSize || bo->width < cinfo.output_width || bo->height < cinfo.output_height) {
+        printf("%s: jpeg reslution(%dx%d) not match fb(%dx%d)\n",
+	       __func__,
+	       cinfo.output_width,
+	       cinfo.output_height,
+	       bo->width,
+	       bo->height);
+
+        jpeg_finish_decompress(&cinfo);
+        jpeg_destroy_decompress(&cinfo);
+        fclose(infile);
+        return -1;
+    }
+
     lineBuf = cinfo.mem->alloc_sarray ((j_common_ptr) &cinfo, JPOOL_IMAGE, (cinfo.output_width * bytesPerPix), 1);
     if (3 == bytesPerPix) {
-        int y;
+        int x, y;
+        char *line_fb = NULL;
         for (y = 0; y < cinfo.output_height; ++y) {
             jpeg_read_scanlines (&cinfo, lineBuf, 1);
-            memcpy ((output + y * cinfo.output_width * 3),lineBuf[0],3 * cinfo.output_width);
+#if !defined(MODESET_SWAP_RB)
+            memcpy ((output + y * /*cinfo.output_width * 3*/bo->pitch),lineBuf[0],3 * cinfo.output_width);
+#else
+            line_fb = output + y * bo->pitch;
+            for (x = 0; x < cinfo.output_width; ++x) {
+                line_fb[x * 3 + 2] = lineBuf[0][x * 3 + 0];
+                line_fb[x * 3 + 1] = lineBuf[0][x * 3 + 1];
+                line_fb[x * 3 + 0] = lineBuf[0][x * 3 + 2];
+            }
+#endif
         }
     } else if (1 == bytesPerPix) {
         unsigned int col;
@@ -698,7 +728,7 @@ void bootAnimation(int mDrmFd)
                 printf( "failed to bo_create fb: %s\n", strerror(errno));
                 return;
             }
-            jpeg_sf_decode(picPath, (char*)bo->ptr);
+            jpeg_sf_decode(picPath, /*(char*)bo->ptr*/bo);
             offsets[0] = 0;
             handles[0] = bo->handle;
             pitches[0] = bo->pitch;

@@ -6,6 +6,10 @@ PROJECT (modeset)
 include_directories(.)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
+if (DEFINED MODESET_SWAP_RB)
+    add_definitions(-DMODESET_SWAP_RB)
+endif()
+
 ADD_DEFINITIONS(-fpermissive)
 set(BOOT_SET_H
 	drm_common.h
