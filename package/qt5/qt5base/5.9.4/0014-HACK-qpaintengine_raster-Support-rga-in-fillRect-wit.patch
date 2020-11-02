@@ -1,4 +1,4 @@
-From 12b2ced57444d2a768a82b1812504253363e386b Mon Sep 17 00:00:00 2001
+From f118ca786e382d7231ad824f6d74c1b1203fecd1 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 12 Jun 2020 09:09:47 +0800
 Subject: [PATCH 14/14] HACK: qpaintengine_raster: Support rga in fillRect with
@@ -10,12 +10,12 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  src/gui/image/qimage_p.h                 |   4 +
  src/gui/painting/qpaintengine_raster.cpp |  46 +++++++++
- src/gui/painting/rga.c                   | 122 +++++++++++++++++++++++
- 3 files changed, 172 insertions(+)
+ src/gui/painting/rga.c                   | 115 +++++++++++++++++++++++
+ 3 files changed, 165 insertions(+)
  create mode 100644 src/gui/painting/rga.c
 
 diff --git a/src/gui/image/qimage_p.h b/src/gui/image/qimage_p.h
-index 775ab6d54..ff66dfe6b 100644
+index 775ab6d541..ff66dfe6bd 100644
 --- a/src/gui/image/qimage_p.h
 +++ b/src/gui/image/qimage_p.h
 @@ -176,7 +176,11 @@ inline QImage::Format qt_alphaVersion(QImage::Format format)
@@ -31,7 +31,7 @@ index 775ab6d54..ff66dfe6b 100644
          return QImage::Format_ARGB8555_Premultiplied;
      case QImage::Format_RGB666:
 diff --git a/src/gui/painting/qpaintengine_raster.cpp b/src/gui/painting/qpaintengine_raster.cpp
-index 92ab6e837..4b09d95e5 100644
+index 92ab6e8375..4b09d95e52 100644
 --- a/src/gui/painting/qpaintengine_raster.cpp
 +++ b/src/gui/painting/qpaintengine_raster.cpp
 @@ -1410,6 +1410,10 @@ void QRasterPaintEngine::fillPath(const QPainterPath &path, QSpanData *fillData)
@@ -96,10 +96,10 @@ index 92ab6e837..4b09d95e5 100644
  
 diff --git a/src/gui/painting/rga.c b/src/gui/painting/rga.c
 new file mode 100644
-index 000000000..4b82e0b78
+index 0000000000..9f356b7f2b
 --- /dev/null
 +++ b/src/gui/painting/rga.c
-@@ -0,0 +1,122 @@
+@@ -0,0 +1,115 @@
 +#include <rga/rga.h>
 +#include <rga/RgaApi.h>
 +
@@ -189,16 +189,9 @@ index 000000000..4b82e0b78
 +    else
 +        dst_stride /= 4;
 +
-+    if (alpha > 0xFF)
-+        alpha = 0xFF;
-+
-+    int blend = (alpha & 0xFF) << 16;
-+    if (mode == QPainter::CompositionMode_Source || alpha == 255)
++    int blend = ((alpha * 255) >> 8) << 16;
++    if (mode == QPainter::CompositionMode_Source)
 +        blend |= 0x0100;
-+    else if (src_format == QImage::Format_ARGB32_Premultiplied)
-+        // Somehow ignoring pre-alpha would get expected result
-+        // blend |= 0x0105;
-+        blend |= 0x0405;
 +    else
 +        blend |= 0x0405;
 +
