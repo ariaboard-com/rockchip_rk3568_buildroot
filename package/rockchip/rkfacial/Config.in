@@ -21,3 +21,8 @@ config BR2_PACKAGE_RKFACIAL_ENABLE_IR_TEST_DATA
     bool "enable ir test data"
     default n
     depends on BR2_PACKAGE_RKFACIAL
+
+config BR2_PACKAGE_RKFACIAL_ENABLE_FACE_MASK
+    bool "enable face mask"
+    default n
+    depends on BR2_PACKAGE_RKFACIAL
