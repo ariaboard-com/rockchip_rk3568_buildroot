@@ -64,4 +64,28 @@ config BR2_PACKAGE_ROCKFACE_OBJECT_DETECTION
     help
         Object detection support
 
+config BR2_PACKAGE_ROCKFACE_MASK_CLASSIFY
+    bool "Mask classify support"
+    default n
+    help
+        Mask classify support
+
+config BR2_PACKAGE_ROCKFACE_MASK_LANDMARKS
+    bool "Mask landmarks support"
+    default n
+    help
+        Mask landmarks support
+
+config BR2_PACKAGE_ROCKFACE_MASK_RECOGNITION
+    bool "Mask recognition support"
+    default n
+    help
+        Mask recognition support
+
+config BR2_PACKAGE_ROCKFACE_MASKS_DETECTION
+    bool "Masks detetion support"
+    default n
+    help
+        Masks detection support
+
 endif # BR2_PACKAGE_ROCKFACE
