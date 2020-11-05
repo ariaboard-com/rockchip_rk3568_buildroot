@@ -9,7 +9,7 @@ BR2_PACKAGE_IO=y
 # Provides things like kill, ps, uptime, free, top, etc for next generation
 BR2_PACKAGE_PROCPS_NG=y
 
-BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-uvc/"
+BR2_ROOTFS_OVERLAY="board/rockchip/rv1126_rv1109/fs-overlay-spi-nand-uvc/"
 BR2_ROOTFS_POST_BUILD_SCRIPT="board/rockchip/rv1126_rv1109/pack-uvc-oem.sh"
 
 #BR2_PACKAGE_GDB=y
