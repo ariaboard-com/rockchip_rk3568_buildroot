@@ -31,7 +31,7 @@ config BR2_PACKAGE_MEDIASERVE_LIB_EXAMPLE
         help
           rockchip mediaserver options
 
-config BR2_PACKAGE_MEDIASERVE_CONIFG
+config BR2_PACKAGE_MEDIASERVE_CONFIG
 	string "mediaserver config"
 	default "none"
 
