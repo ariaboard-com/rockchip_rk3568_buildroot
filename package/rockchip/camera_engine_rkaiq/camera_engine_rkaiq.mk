@@ -94,7 +94,7 @@ define CAMERA_ENGINE_RKAIQ_INSTALL_TARGET_CMDS
 		$(INSTALL) -D -m  644 $(@D)/iqfiles/$(iqfile) \
 		$(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/etc/iqfiles/
 	)
-	$(INSTALL) -D -m  644 $(@D)/rkisp_demo/exe/Release/rkisp_demo $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/ || true
+	$(INSTALL) -D -m  755 $(@D)/rkisp_demo/exe/Release/rkisp_demo $(CAMERA_ENGINE_RKAIQ_TARGET_INSTALL_DIR)/usr/bin/ || true
 endef
 
 $(eval $(cmake-package))
