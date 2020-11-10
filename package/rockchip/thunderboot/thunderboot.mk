@@ -45,6 +45,8 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(@D)/S06tb_launch $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 755 $(@D)/S07mountall $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 755 $(@D)/tb_poweroff $(TARGET_DIR)/usr/bin/
+
+	sed -i 's/CAMERA_FPS/$(BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS)/g' $(TARGET_DIR)/etc/preinit.d/S06tb_launch
 endef
 
 ifeq ($(BR2_THUNDERBOOT_USB_ADBD),y)

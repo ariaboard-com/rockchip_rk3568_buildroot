@@ -6,7 +6,7 @@ lunch_start()
 	echo none > /sys/class/leds/red/trigger
 	echo 255 > /sys/class/leds/red/brightness
 	export HDR_MODE=0
-	ispserver -f 25 &
+	ispserver -f CAMERA_FPS &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 
 	insmod /lib/modules/snd-soc-es8311.ko &
@@ -19,7 +19,7 @@ lunch_start()
 
 	export mediaserver_log_level=2
 	mediaserver -a -d -c /usr/share/mediaserver/tb.conf > /dev/kmsg 2>&1 &
-	#auto_poweroff.sh &
+	auto_poweroff.sh &
 }
 
 lunch_stop()

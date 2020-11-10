@@ -3,6 +3,12 @@ config BR2_PACKAGE_THUNDERBOOT
 	help
 	  Rockchip tb(thunder boot) configuration.
 
+config BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS
+	int "camera fps setting"
+	default 25
+	help
+	  Camera fps setting, default is 25fps.
+
 config BR2_THUNDERBOOT_INSTALL_MODULES
 	string "dirver modules"
 	depends on BR2_PACKAGE_THUNDERBOOT
