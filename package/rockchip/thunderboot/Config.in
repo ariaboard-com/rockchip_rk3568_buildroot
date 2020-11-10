@@ -1,8 +1,9 @@
-config BR2_PACKAGE_THUNDERBOOT
+menuconfig BR2_PACKAGE_THUNDERBOOT
 	bool "rockchip thunderboot"
 	help
 	  Rockchip tb(thunder boot) configuration.
 
+if BR2_PACKAGE_THUNDERBOOT
 config BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS
 	int "camera fps setting"
 	default 25
@@ -35,5 +36,5 @@ config BR2_THUNDERBOOT_USB_RNDIS
 	  Use simplify RNDIS configuration.
 	  Default net device is usb0.
 	  Default net address is 190.168.1.100
-
+endif
 endif
