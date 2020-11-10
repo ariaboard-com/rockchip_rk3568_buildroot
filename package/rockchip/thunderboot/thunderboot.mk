@@ -40,6 +40,9 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 		find ${THUNDERBOOT_BUILDDIR}/lib/modules/${KERNEL_VERSION}/kernel -name $$module | xargs -i cp {} $(TARGET_DIR)/lib/modules/; \
 	done
 
+	ln -rsf $(TARGET_DIR)/usr/share/mediaserver/$(call qstrip,$(BR2_PACKAGE_MEDIASERVE_CONFIG)) $(TARGET_DIR)/usr/share/mediaserver/tb.conf
+
+	$(INSTALL) -D -m 755 $(@D)/S06tb_launch $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 755 $(@D)/S07mountall $(TARGET_DIR)/etc/preinit.d/
 	$(INSTALL) -D -m 755 $(@D)/tb_poweroff $(TARGET_DIR)/usr/bin/
 endef

@@ -10,11 +10,16 @@ lunch_start()
 	echo "Now we are ready to start your first application" > /dev/kmsg
 
 	insmod /lib/modules/snd-soc-es8311.ko &
+	{
+		insmod /lib/modules/rk_sdmmc_ops.ko
+		insmod /lib/modules/sdmmc_vendor_storage.ko
+	}&
+
 	echo 297000000 > /proc/mpp_service/rkvenc/clk_core
 
 	export mediaserver_log_level=2
-	mediaserver -a -d -c /usr/share/mediaserver/tb_rtsp-link.conf > /dev/kmsg 2>&1 &
-	auto_poweroff.sh &
+	mediaserver -a -d -c /usr/share/mediaserver/tb.conf > /dev/kmsg 2>&1 &
+	#auto_poweroff.sh &
 }
 
 lunch_stop()
