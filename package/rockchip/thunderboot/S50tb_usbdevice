@@ -36,10 +36,13 @@ bind_functions()
 
 function_init()
 {
-	mkdir ${USB_FUNCTIONS_DIR}/rndis.gs0
-	mkdir ${USB_FUNCTIONS_DIR}/ffs.adb
-	mkdir /dev/usb-ffs/adb -m 0770
-	mount -o uid=2000,gid=2000 -t functionfs adb /dev/usb-ffs/adb
+	test $RNDIS_EN = on && mkdir ${USB_FUNCTIONS_DIR}/rndis.gs0
+
+	if [ $ADB_EN = on ];then
+		mkdir ${USB_FUNCTIONS_DIR}/ffs.adb
+		mkdir /dev/usb-ffs/adb -m 0770
+		mount -o uid=2000,gid=2000 -t functionfs adb /dev/usb-ffs/adb
+	fi
 }
 
 configfs_init()
@@ -144,33 +147,35 @@ usb_device_stop()
 
 case "$1" in
 start)
-	DIR=$(cd `dirname $0`; pwd)
-	if [ ! -e "$DIR/.usb_config" ]; then
-		echo "$0: Cannot find .usb_config"
-		exit 0
-	fi
+	{
+		DIR=$(cd `dirname $0`; pwd)
+		if [ ! -e "$DIR/.usb_config" ]; then
+			echo "$0: Cannot find .usb_config"
+			exit 0
+		fi
 
-	if [ -e /tmp/.usb_config ]; then
-		USB_CONFIG_FILE=/tmp/.usb_config
-	else
-		USB_CONFIG_FILE=$DIR/.usb_config
-		cp $DIR/.usb_config /tmp/.usb_config
-	fi
+		if [ -e /tmp/.usb_config ]; then
+			USB_CONFIG_FILE=/tmp/.usb_config
+		else
+			USB_CONFIG_FILE=$DIR/.usb_config
+			cp $DIR/.usb_config /tmp/.usb_config
+		fi
 
-	parameter_init
-	if [ -z $CONFIG_STRING ];then
-		echo "$0: no functions be selected"
-		exit 0
-	fi
+		parameter_init
+		if [ -z $CONFIG_STRING ];then
+			echo "$0: no functions be selected"
+			exit 0
+		fi
 
-	test -d ${USB_CONFIGFS_DIR} || configfs_init
-	echo $PID > ${USB_CONFIGFS_DIR}/idProduct
-	bind_functions
-	pre_run_binary
+		test -d ${USB_CONFIGFS_DIR} || configfs_init
+		echo $PID > ${USB_CONFIGFS_DIR}/idProduct
+		bind_functions
+		pre_run_binary
 
-	UDC=`ls /sys/class/udc/| awk '{print $1}'`
-	echo $UDC > ${USB_CONFIGFS_DIR}/UDC
-	run_binary
+		UDC=`ls /sys/class/udc/| awk '{print $1}'`
+		echo $UDC > ${USB_CONFIGFS_DIR}/UDC
+		run_binary
+	}&
 	;;
 stop)
 	usb_device_stop
