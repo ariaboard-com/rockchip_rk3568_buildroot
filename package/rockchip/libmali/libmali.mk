@@ -42,6 +42,8 @@ else ifneq ($(BR2_PACKAGE_RK3399)$(BR2_PACKAGE_RK3399PRO),)
 LIBMALI_CONF_OPTS += -Dgpu=midgard-t86x -Dversion=r18p0
 else ifeq ($(BR2_PACKAGE_RK3328),y)
 LIBMALI_CONF_OPTS += -Dgpu=utgard-450 -Dversion=r7p0
+else ifeq ($(BR2_PACKAGE_RK356X),y)
+LIBMALI_CONF_OPTS += -Dgpu=bifrost-g52 -Dversion=r25p0
 endif
 
 $(eval $(meson-package))
