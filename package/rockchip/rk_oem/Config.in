@@ -33,8 +33,14 @@ config BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE
 	string "Rockchip OEM Image filesystem type"
 	default "ext4"
 	help
-	  Make oem.img with filesystem type. Support ext2 ext4 squashfs.
+	  Make oem.img with filesystem type. Support ext2 ext4 squashfs and ubi.
 
 	  The default is "ext4"
+
+config BR2_PACKAGE_RK_OEM_IMAGE_PARTITION_SIZE
+	hex "Rockchip OEM Image Partition Size"
+	default 0x0
+	help
+	  Configure oem partition size. Must be configured if oem filesystem type is ubi.
 
 endif

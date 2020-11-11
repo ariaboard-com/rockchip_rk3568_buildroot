@@ -9,6 +9,9 @@ RK_OEM_SITE_METHOD = local
 RK_OEM_IMAGE_OUTPUT = $(TOPDIR)/../rockdev/oem.img
 RK_OEM_FAKEROOT_SCRIPT = oem_fakeroot.fs
 RK_OEM_FILESYSTEM_TYPE = $(BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE)
+RK_OEM_PARTITION_SIZE = $(BR2_PACKAGE_RK_OEM_IMAGE_PARTITION_SIZE)
+RK_OEM_UBI_PAGE_SIZE = $(BR2_TARGET_ROOTFS_UBI_SUBSIZE)
+RK_OEM_UBI_BLOCK_SIZE = $(BR2_TARGET_ROOTFS_UBI_PEBSIZE)
 
 ifeq ($(RK_OEM_FILESYSTEM_TYPE),"")
 RK_OEM_FILESYSTEM_TYPE = ext4
@@ -53,7 +56,11 @@ define RK_OEM_TARGET_POST_MKIMAGE_HOOK_CMDS
 	echo "[ -d $(RK_OEM_INSTALL_TARGET_DIR)/www ] && chown -R www-data:www-data $(RK_OEM_INSTALL_TARGET_DIR)/www" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
 	echo "[ -d $(RK_OEM_INSTALL_TARGET_DIR)/usr/www ] && chown -R www-data:www-data $(RK_OEM_INSTALL_TARGET_DIR)/usr/www" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
 	echo "mkdir -p $$(dirname $(RK_OEM_IMAGE_OUTPUT))" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
-	echo "$(TOPDIR)/../device/rockchip/common/mk-image.sh $(RK_OEM_INSTALL_TARGET_DIR) $(RK_OEM_IMAGE_OUTPUT) $(RK_OEM_FILESYSTEM_TYPE)" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
+	if [ $(RK_OEM_FILESYSTEM_TYPE) = "ubi" ];then \
+		echo "$(TOPDIR)/../device/rockchip/common/mk-image.sh $(RK_OEM_INSTALL_TARGET_DIR) $(RK_OEM_IMAGE_OUTPUT) $(RK_OEM_FILESYSTEM_TYPE) $(RK_OEM_PARTITION_SIZE) oem $(RK_OEM_UBI_PAGE_SIZE) $(RK_OEM_UBI_BLOCK_SIZE)" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT); \
+	else \
+		echo "$(TOPDIR)/../device/rockchip/common/mk-image.sh $(RK_OEM_INSTALL_TARGET_DIR) $(RK_OEM_IMAGE_OUTPUT) $(RK_OEM_FILESYSTEM_TYPE)" >> $(@D)/$(RK_OEM_FAKEROOT_SCRIPT); \
+	fi
 	chmod a+x $(@D)/$(RK_OEM_FAKEROOT_SCRIPT)
 endef
 
@@ -75,6 +82,13 @@ define RK_OEM_TARGET_FINALIZE_MKIMAGE_HOOK_CMDS
 	$(HOST_DIR)/bin/fakeroot -- $(BUILD_DIR)/rk_oem/$(RK_OEM_FAKEROOT_SCRIPT)
 endef
 RK_OEM_TARGET_FINALIZE_HOOKS += RK_OEM_TARGET_FINALIZE_MKIMAGE_HOOK_CMDS
+
+# reflash itself to make sure it will be built during every build
+define RK_OEM_POST_INSTALL_TARGET_HOOKS_CMDS
+    rm -f $(@D)/.stamp_built
+endef
+
+RK_OEM_POST_INSTALL_TARGET_HOOKS += RK_OEM_POST_INSTALL_TARGET_HOOKS_CMDS
 
 endif
 
