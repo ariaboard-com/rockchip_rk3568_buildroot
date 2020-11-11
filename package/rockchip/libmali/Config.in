@@ -7,7 +7,7 @@ config BR2_PACKAGE_LIBMALI
 	select BR2_PACKAGE_MESA3D_OPENGL_EGL
 	select BR2_PACKAGE_HAS_LIBEGL
 	select BR2_PACKAGE_HAS_LIBGLES
-  select BR2_PACKAGE_HOST_PATCHELF
+	select BR2_PACKAGE_HOST_PATCHELF
 	help
 	  Install the binary user-space library for the ARM Mali GPU.
 	  This package requires a kernel with the ARM Mali GPU Kernel
@@ -18,12 +18,17 @@ if BR2_PACKAGE_LIBMALI
 config BR2_PACKAGE_LIBMALI_WITHOUT_CL
 	bool "Libmali configuration without cl"
 	help
-	  Show packages in menuconfig that cl is not used by libmali.
+	  Select libmali without OpenCL.
 
 config BR2_PACKAGE_LIBMALI_ONLY_CL
 	bool "Libmali configuration only cl(disable display fetaure)"
 	help
-	  Show packages in menuconfig that cl is not used by libmali.
+	  Select libmali with OpenCL only.
+
+config BR2_PACKAGE_LIBMALI_DUMMY
+	bool "Libmali configuration dummy"
+	help
+	  Select libmali with dummy platform.
 endif
 
 
