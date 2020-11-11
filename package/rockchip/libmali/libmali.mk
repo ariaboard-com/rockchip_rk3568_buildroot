@@ -16,7 +16,7 @@ LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false
 
 ifeq ($(BR2_PACKAGE_LIBMALI_DUMMY),y)
 LIBMALI_CONF_OPTS += -Dplatform=dummy
-else ($(BR2_PACKAGE_LIBMALI_ONLY_CL),y)
+else ifeq ($(BR2_PACKAGE_LIBMALI_ONLY_CL),y)
 LIBMALI_CONF_OPTS += -Dplatform=only-cl
 else ifeq ($(BR2_PACKAGE_WAYLAND),y)
 LIBMALI_CONF_OPTS += -Dplatform=wayland
