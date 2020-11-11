@@ -6,7 +6,7 @@ RESULT_LOG=${RESULT_DIR}/stressapptest.log
 
 if [ ! -e "/data/cfg/rockchip_test" ]; then
 	echo "no /data/cfg/rockchip_test"
-	mkdir /data/cfg/rockchip_test
+	mkdir -p /data/cfg/rockchip_test
 fi
 
 #run stressapptest_test
