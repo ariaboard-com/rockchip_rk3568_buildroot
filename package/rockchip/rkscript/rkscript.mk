@@ -10,6 +10,13 @@ RKSCRIPT_LICENSE = Apache V2.0
 RKSCRIPT_LICENSE_FILES = NOTICE
 RKSCRIPT_USB_CONFIG_FILE = $(TARGET_DIR)/etc/init.d/.usb_config
 
+ifeq ($(RK_OEM_FS_TYPE),ubi)
+RK_OEM_FS_TYPE := ubifs
+endif
+ifeq ($(RK_USERDATA_FS_TYPE),ubi)
+RK_USERDATA_FS_TYPE := ubifs
+endif
+
 define RKSCRIPT_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0644 -D $(@D)/61-partition-init.rules $(TARGET_DIR)/lib/udev/rules.d/
 	$(INSTALL) -m 0644 -D $(@D)/61-sd-cards-auto-mount.rules $(TARGET_DIR)/lib/udev/rules.d/
