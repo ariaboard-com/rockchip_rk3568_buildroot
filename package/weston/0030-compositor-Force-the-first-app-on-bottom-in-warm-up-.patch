@@ -1,7 +1,7 @@
-From 2ded41d3490b33512930c067cb4bbf91efc2b7e1 Mon Sep 17 00:00:00 2001
+From 9715ad1253ad7fc98b7cafdb6aa9f27ac85a668c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 15 Oct 2020 12:43:00 +0800
-Subject: [PATCH 30/38] compositor: Force the first app on bottom in warm-up
+Subject: [PATCH 30/39] compositor: Force the first app on bottom in warm-up
  mode
 
 When warm-up enabled, assume the first app is a launcher and put it on

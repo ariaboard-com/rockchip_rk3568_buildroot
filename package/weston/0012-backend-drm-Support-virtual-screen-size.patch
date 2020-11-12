@@ -1,7 +1,7 @@
-From cf51855dd9cb50e16bb4118acfd6dcc90e5025c9 Mon Sep 17 00:00:00 2001
+From 51766395d1def87f39837cddabe05e7c063b3a29 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 24 Jun 2020 11:59:42 +0800
-Subject: [PATCH 12/38] backend-drm: Support virtual screen size
+Subject: [PATCH 12/39] backend-drm: Support virtual screen size
 
 Support setting virtual screen size, for example:
 export WESTON_DRM_VIRTUAL_SIZE=1024x768
@@ -144,7 +144,7 @@ index f72b90c..53b49de 100644
  	b->drm.fd = -1;
  	wl_array_init(&b->unused_crtcs);
 diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
-index 5a08aa8..4483a59 100644
+index 346394c..e674a9e 100644
 --- a/libweston/backend-drm/kms.c
 +++ b/libweston/backend-drm/kms.c
 @@ -58,6 +58,15 @@ struct drm_property_enum_info plane_type_enums[] = {

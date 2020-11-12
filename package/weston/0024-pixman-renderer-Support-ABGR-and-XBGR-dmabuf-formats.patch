@@ -1,7 +1,7 @@
-From b87374fe9b2a511c9e6b964a217802cfbe8dca86 Mon Sep 17 00:00:00 2001
+From 638f509862ebfbe7c625d8841bb9d37984aac06e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 14 Jul 2020 15:52:51 +0800
-Subject: [PATCH 24/38] pixman-renderer: Support ABGR and XBGR dmabuf formats
+Subject: [PATCH 24/39] pixman-renderer: Support ABGR and XBGR dmabuf formats
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

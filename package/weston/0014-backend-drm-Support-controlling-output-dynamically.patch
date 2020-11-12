@@ -1,7 +1,7 @@
-From f481122a60a3c4108d8d2828422d32a53e672d65 Mon Sep 17 00:00:00 2001
+From 392dfaff25d3f88f17998cad312a5ceb2dcae3d0 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 12:37:37 +0800
-Subject: [PATCH 14/38] backend-drm: Support controlling output dynamically
+Subject: [PATCH 14/39] backend-drm: Support controlling output dynamically
 
 Use config file to control output's rotation/mode/off/freeze/display
 rectangle.
@@ -111,7 +111,7 @@ index 972d23f..7a73957 100644
  
  enum weston_pointer_motion_mask {
 diff --git a/libweston/backend-drm/drm-internal.h b/libweston/backend-drm/drm-internal.h
-index efe6d09..4e2d2f8 100644
+index efe6d09..4cad948 100644
 --- a/libweston/backend-drm/drm-internal.h
 +++ b/libweston/backend-drm/drm-internal.h
 @@ -129,6 +129,10 @@
@@ -131,7 +131,7 @@ index efe6d09..4e2d2f8 100644
  	bool mirror_mode;
 +
 +	struct wl_event_source *config_timer;
-+	time_t config_mtime;
++	struct stat config_stat;
  };
  
  struct drm_mode {
@@ -160,7 +160,7 @@ index efe6d09..4e2d2f8 100644
  drm_output_set_mode(struct weston_output *base,
  		    enum weston_drm_backend_output_mode mode,
 diff --git a/libweston/backend-drm/drm.c b/libweston/backend-drm/drm.c
-index 0c2023c..8fcab84 100644
+index 0c2023c..3831b7f 100644
 --- a/libweston/backend-drm/drm.c
 +++ b/libweston/backend-drm/drm.c
 @@ -40,6 +40,7 @@
@@ -213,7 +213,7 @@ index 0c2023c..8fcab84 100644
  	output->state_invalid = true;
  
 +	/* Force reload config */
-+	b->config_mtime = 0;
++	memset(&b->config_stat, 0, sizeof(b->config_stat));
 +
  	weston_log("Output %s (crtc %d) video modes:\n",
  		   output->base.name, output->crtc_id);
@@ -253,7 +253,7 @@ index 0c2023c..8fcab84 100644
 +
 +	/* Unable to switch mode, let's retry later */
 +	if (output->page_flip_pending || output->atomic_complete_pending) {
-+		b->config_mtime = 0;
++		memset(&b->config_stat, 0, sizeof(b->config_stat));
 +		return;
 +	}
 +
@@ -354,10 +354,10 @@ index 0c2023c..8fcab84 100644
 +	if (stat(config_file, &st) < 0)
 +		return 0;
 +
-+	if (st.st_mtime && st.st_mtime == b->config_mtime)
++	if (st.st_mtime && !memcmp(&st, &b->config_stat, sizeof(st)))
 +		return 0;
 +
-+	b->config_mtime = st.st_mtime;
++	b->config_stat = st;
 +
 +	conf_fp = fopen(config_file, "r");
 +	if (!conf_fp)

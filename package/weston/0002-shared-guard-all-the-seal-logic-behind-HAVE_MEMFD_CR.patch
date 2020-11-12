@@ -1,7 +1,7 @@
-From 63d095afc4dba2a89ccf58f35c28b32b51bb3adf Mon Sep 17 00:00:00 2001
+From d580a975c967f6fa773d7901bad59fe436d07d63 Mon Sep 17 00:00:00 2001
 From: Sebastian Wick <sebastian@sebastianwick.net>
 Date: Wed, 5 Feb 2020 10:27:23 +0100
-Subject: [PATCH 02/38] shared: guard all the seal logic behind
+Subject: [PATCH 02/39] shared: guard all the seal logic behind
  HAVE_MEMFD_CREATE
 
 The initial version of os_ro_anonymous_file missed two guards around the

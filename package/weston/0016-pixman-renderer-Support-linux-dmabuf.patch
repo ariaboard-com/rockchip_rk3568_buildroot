@@ -1,7 +1,7 @@
-From 0f3130d76ef4991e818c3d39f812bf3821c6aee6 Mon Sep 17 00:00:00 2001
+From d29b8af888d609d1d02c6e5ab1fe3784e10b2949 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 3 Jul 2020 14:43:49 +0800
-Subject: [PATCH 16/38] pixman-renderer: Support linux dmabuf
+Subject: [PATCH 16/39] pixman-renderer: Support linux dmabuf
 
 NOTE: Only support contig dmabuf.
 
