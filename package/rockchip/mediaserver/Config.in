@@ -44,9 +44,24 @@ config BR2_PACKAGE_MEDIASERVE_DBUS
 	help
 	  rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_SCHEDULES_MANAGER
+	bool "Enable schedules manager"
+	depends on BR2_PACKAGE_MEDIASERVE_DBUS
+	default y if BR2_PACKAGE_MEDIASERVE_DBUS
+	help
+	  rockchip mediaserver options
+
 config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	bool "Enable link api features"
 	select BR2_PACKAGE_CJSON
+	default n
+	help
+	  rockchip mediaserver options
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI_VENDOR
+	bool "Enable link certificate to be read from vendor storage"
+	depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
+	select BR2_PACKAGE_VENDOR_STORAGE_LIBRARY
 	default n
 	help
 	  rockchip mediaserver options
@@ -88,13 +103,6 @@ config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         bool "Enable rockx"
         default y if BR2_PACKAGE_RKMEDIA_ROCKX
-        help
-          rockchip mediaserver options
-
-config BR2_PACKAGE_MEDIASERVE_SCHEDULES_MANAGER
-        bool "Enable schedules manager"
-        depends on BR2_PACKAGE_MEDIASERVE_DBUS
-        default y if BR2_PACKAGE_MEDIASERVE_DBUS
         help
           rockchip mediaserver options
 
