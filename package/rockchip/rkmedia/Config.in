@@ -73,8 +73,13 @@ config BR2_PACKAGE_RKMEDIA_FFMPEG
     help
       wrapped function of ffmpeg
 
-if BR2_PACKAGE_ALSA_LIB
+config BR2_PACKAGE_RKMEDIA_ALSA
+    bool "audio capture and palyback"
+    select BR2_PACKAGE_ALSA_LIB
+    help
+      wrapped function of alsa
 
+if BR2_PACKAGE_RKMEDIA_ALSA
 config BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK
     bool "alsa playback"
     help
@@ -85,18 +90,21 @@ config BR2_PACKAGE_RKMEDIA_ALSA_CAPTURE
     help
       wrapped function of alsa capture
 
-endif # BR2_PACKAGE_ALSA_LIB
+config BR2_PACKAGE_RKMEDIA_AUDIO_ALGORITHM
+    bool "audio algorithm"
+    depends on BR2_PACKAGE_RKMEDIA_ALSA_PLAYBACK || BR2_PACKAGE_RKMEDIA_ALSA_CAPTURE
+    select BR2_PACKAGE_COMMON_ALGORITHM
+    select BR2_PACKAGE_COMMON_ALGORITHM_ANR
+    select BR2_PACKAGE_COMMON_ALGORITHM_AEC_ANR_AGC
+    default n
+    help
+      audio algorithm(3A and ANR) switch
+endif # BR2_PACKAGE_RKMEDIA_ALSA
 
 config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
     bool "camera capture"
     help
       wrapped function of v4l2 capture
-
-config BR2_PACKAGE_RKMEDIA_RKGUARD
-    bool "rkguard"
-    default y
-    help
-      wrapped function of through guard
 
 config BR2_PACKAGE_RKMEDIA_RKRGA
     bool "rkrga"
@@ -149,14 +157,12 @@ config BR2_PACKAGE_RKMEDIA_LIVE555
       live555 is an rtsp server and client
 
 if BR2_PACKAGE_RKMEDIA_LIVE555
-
 config BR2_PACKAGE_RKMEDIA_RTSP_SERVER
     bool "rtsp server"
     help
       live555 rtsp server
 
 if BR2_PACKAGE_RKMEDIA_RTSP_SERVER
-
 config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H264
     bool "rtsp server h264 session"
     help
@@ -168,7 +174,6 @@ config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H265
       live555 rtsp server h265 session
 
 endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
-
 endif # BR2_PACKAGE_RKMEDIA_LIVE555
 
 config BR2_PACKAGE_RKMEDIA_MOVE_DETECTION
@@ -184,20 +189,6 @@ config BR2_PACKAGE_RKMEDIA_OCCLUSION_DETECTION
     select BR2_PACKAGE_COMMON_ALGORITHM_OCCLUSION_DETECT
     help
       wrapped function of rk occlusion detection algorithm
-
-config BR2_PACKAGE_RKMEDIA_ANR
-    bool "audio automatic noise reduction algorithm"
-    select BR2_PACKAGE_COMMON_ALGORITHM
-    select BR2_PACKAGE_COMMON_ALGORITHM_ANR
-    help
-      wrapped function of automatic noise reduction algorithm
-
-config BR2_PACKAGE_RKMEDIA_AEC
-    bool "audio echo cancellation algorithm"
-    select BR2_PACKAGE_COMMON_ALGORITHM
-    select BR2_PACKAGE_COMMON_ALGORITHM_AEC_ANR_AGC
-    help
-      wrapped function of echo cancellation algorithm
 
 config BR2_PACKAGE_RKMEDIA_MINILOGGER
     bool "Output log by minilogger"
