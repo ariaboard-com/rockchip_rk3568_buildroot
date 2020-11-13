@@ -1,5 +1,6 @@
 menuconfig BR2_PACKAGE_AISERVER
     bool "rockchip aiserver"
+    select BR2_PACKAGE_PROTOBUF
     select BR2_PACKAGE_ROCKIT
     select BR2_PACKAGE_DBUS
     select BR2_PACKAGE_DBUS_CPP
