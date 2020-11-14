@@ -5,8 +5,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 ROSBUILD_VERSION = 1.11.14
 endif
 
-ROSBUILD_SOURCE = $(ROSBUILD_VERSION).tar.gz
-ROSBUILD_SITE = https://github.com/ros/ros/archive
+ROSBUILD_SITE = $(call github,ros,ros,$(ROSBUILD_VERSION))
 ROSBUILD_SUBDIR = core/rosbuild
 
 ifeq ($(BR2_PACKAGE_ROS_KINETIC),y)

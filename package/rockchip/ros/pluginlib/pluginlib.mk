@@ -3,8 +3,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 PLUGINLIB_VERSION = 1.9.16
 endif
 
-PLUGINLIB_SOURCE = $(PLUGINLIB_VERSION).tar.gz
-PLUGINLIB_SITE = https://github.com/ros/pluginlib/archive
+PLUGINLIB_SITE = $(call github,ros,pluginlib,$(PLUGINLIB_VERSION))
 
 PLUGINLIB_DEPENDENCIES = boost class-loader rosconsole roslib
 

@@ -5,8 +5,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 ROSBAG_VERSION = 1.11.21
 endif
 
-ROSBAG_SOURCE = $(ROSBAG_VERSION).tar.gz
-ROSBAG_SITE = https://github.com/ros/ros_comm/archive
+ROSBAG_SITE = $(call github,ros,ros_comm,$(ROSBAG_VERSION))
 ROSBAG_SUBDIR = tools/rosbag
 
 ROSBAG_DEPENDENCIES = boost topic-tools rosbag-storage rosconsole

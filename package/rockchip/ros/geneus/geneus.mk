@@ -1,6 +1,5 @@
 GENEUS_VERSION = 2.2.6
-GENEUS_SITE = https://github.com/jsk-ros-pkg/geneus/archive
-GENEUS_SOURCE = $(GENEUS_VERSION).tar.gz
+GENEUS_SITE = $(call github,jsk-ros-pkg,geneus,$(GENEUS_VERSION))
 GENEUS_INSTALL_STAGING = YES
 
 GENEUS_DEPENDENCIES = genmsg

@@ -1,6 +1,5 @@
 CAMERA_INFO_MANAGER_VERSION = 1.11.11
-CAMERA_INFO_MANAGER_SITE = https://github.com/ros-perception/image_common/archive
-CAMERA_INFO_MANAGER_SOURCE = $(CAMERA_INFO_MANAGER_VERSION).tar.gz
+CAMERA_INFO_MANAGER_SITE = $(call github,ros-perception,image_common,$(CAMERA_INFO_MANAGER_VERSION))
 CAMERA_INFO_MANAGER_SUBDIR = camera_info_manager
 
 CAMERA_INFO_MANAGER_DEPENDENCIES = boost camera-calibration-parsers image-transport roscpp roslib sensor-msgs rostest

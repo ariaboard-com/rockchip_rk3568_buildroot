@@ -5,8 +5,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 ROSCPP_VERSION = 1.11.21
 endif
 
-ROSCPP_SOURCE = $(ROSCPP_VERSION).tar.gz
-ROSCPP_SITE = https://github.com/ros/ros_comm/archive
+ROSCPP_SITE = $(call github,ros,ros_comm,$(ROSCPP_VERSION))
 ROSCPP_SUBDIR = clients/roscpp
 
 ROSCPP_DEPENDENCIES = cpp_common message-generation \

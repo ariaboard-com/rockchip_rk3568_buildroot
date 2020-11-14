@@ -1,6 +1,5 @@
 LIBUVC_VERSION = v0.0.5
-LIBUVC_SITE = https://github.com/ktossell/libuvc/archive
-LIBUVC_SOURCE = $(LIBUVC_VERSION).tar.gz
+LIBUVC_SITE = $(call github,ktossell,libuvc,$(LIBUVC_VERSION))
 
 LIBUVC_DEPENDENCIES = boost jpeg cv-bridge libusb
 

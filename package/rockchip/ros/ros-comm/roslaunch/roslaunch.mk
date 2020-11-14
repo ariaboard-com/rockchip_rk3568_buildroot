@@ -7,8 +7,7 @@ ROSLAUNCH_VERSION = 1.11.21
 ROSLAUNCH_WORK_DIR = opt/ros/indigo
 endif
 
-ROSLAUNCH_SOURCE = $(ROSLAUNCH_VERSION).tar.gz
-ROSLAUNCH_SITE = https://github.com/ros/ros_comm/archive
+ROSLAUNCH_SITE = $(call github,ros,ros_comm,$(ROSLAUNCH_VERSION))
 ROSLAUNCH_SUBDIR = tools/roslaunch
 
 $(eval $(catkin-package))

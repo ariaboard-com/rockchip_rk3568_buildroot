@@ -1,6 +1,5 @@
 IMAGE_TRANSPORT_VERSION = 1.11.11
-IMAGE_TRANSPORT_SITE = https://github.com/ros-perception/image_common/archive
-IMAGE_TRANSPORT_SOURCE = $(IMAGE_TRANSPORT_VERSION).tar.gz
+IMAGE_TRANSPORT_SITE = $(call github,ros-perception,image_common,$(IMAGE_TRANSPORT_VERSION))
 IMAGE_TRANSPORT_SUBDIR = image_transport
 
 IMAGE_TRANSPORT_DEPENDENCIES = message-filters pluginlib rosconsole roscpp roslib sensor-msgs boost

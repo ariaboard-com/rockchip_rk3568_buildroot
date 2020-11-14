@@ -1,7 +1,6 @@
 TF_VERSION = 1.11.9
 
-TF_SOURCE = $(TF_VERSION).tar.gz
-TF_SITE = https://github.com/ros/geometry/archive
+TF_SITE = $(call github,ros,geometry,$(TF_VERSION))
 TF_SUBDIR = tf
 
 TF_DEPENDENCIES = angles geometry-msgs message-filters message-generation \

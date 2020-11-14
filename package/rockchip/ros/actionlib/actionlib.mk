@@ -1,6 +1,5 @@
 ACTIONLIB_VERSION = 1.11.12
-ACTIONLIB_SOURCE = $(ACTIONLIB_VERSION).tar.gz
-ACTIONLIB_SITE = https://github.com/ros/actionlib/archive
+ACTIONLIB_SITE = $(call github,ros,actionlib,$(ACTIONLIB_VERSION))
 
 ACTIONLIB_DEPENDENCIES = \
 	actionlib-msgs roscpp boost

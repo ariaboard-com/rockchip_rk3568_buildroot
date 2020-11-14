@@ -3,8 +3,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 MESSAGE_GENERATION_VERSION = 0.2.10	#groovy
 endif
 
-MESSAGE_GENERATION_SOURCE = $(MESSAGE_GENERATION_VERSION).tar.gz
-MESSAGE_GENERATION_SITE = https://github.com/ros/message_generation/archive
+MESSAGE_GENERATION_SITE = $(call github,ros,message_generation,$(MESSAGE_GENERATION_VERSION))
 
 MESSAGE_GENERATION_DEPENDENCIES = gencpp genlisp genpy
 

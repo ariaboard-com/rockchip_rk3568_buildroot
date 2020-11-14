@@ -5,8 +5,7 @@ ifeq ($(BR2_PACKAGE_ROS_INDIGO),y)
 ROSPARAM_VERSION = 1.11.21
 endif
 
-ROSPARAM_SOURCE = $(ROSPARAM_VERSION).tar.gz
-ROSPARAM_SITE = https://github.com/ros/ros_comm/archive
+ROSPARAM_SITE = $(call github,ros,ros_comm,$(ROSPARAM_VERSION))
 ROSPARAM_SUBDIR = tools/rosparam
 
 $(eval $(catkin-package))

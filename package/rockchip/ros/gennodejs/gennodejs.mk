@@ -1,6 +1,5 @@
 GENNODEJS_VERSION = 2.0.1
-GENNODEJS_SITE = https://github.com/RethinkRobotics-opensource/gennodejs/archive
-GENNODEJS_SOURCE = $(GENNODEJS_VERSION).tar.gz
+GENNODEJS_SITE = $(call github,RethinkRobotics-opensource,gennodejs,$(GENNODEJS_VERSION))
 GENNODEJS_INSTALL_STAGING = YES
 
 GENNODEJS_DEPENDENCIES = genmsg

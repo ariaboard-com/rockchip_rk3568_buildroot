@@ -1,7 +1,6 @@
 GEOMETRY_VERSION = 1.11.9
 
-GEOMETRY_SOURCE = $(GEOMETRY_VERSION).tar.gz
-GEOMETRY_SITE = https://github.com/ros/geometry/archive
+GEOMETRY_SITE = $(call github,ros,geometry,$(GEOMETRY_VERSION))
 GEOMETRY_SUBDIR = geometry
 
 $(eval $(catkin-package))

@@ -1,6 +1,5 @@
 GEOMETRY_MSGS_VERSION = 1.11.9
-GEOMETRY_MSGS_SOURCE = $(GEOMETRY_MSGS_VERSION).tar.gz
-GEOMETRY_MSGS_SITE = https://github.com/ros/common_msgs/archive
+GEOMETRY_MSGS_SITE = $(call github,ros,common_msgs,$(GEOMETRY_MSGS_VERSION))
 GEOMETRY_MSGS_SUBDIR = geometry_msgs
 
 GEOMETRY_MSGS_DEPENDENCIES = message-generation std-msgs gtest
