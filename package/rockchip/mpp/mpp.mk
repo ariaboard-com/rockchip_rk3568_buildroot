@@ -12,6 +12,10 @@ ifeq ($(BR2_PACKAGE_MPP_ALLOCATOR_DRM),y)
 MPP_CONF_OPTS += "-DHAVE_DRM=ON"
 endif
 
+ifeq ($(BR2_PACKAGE_MPP_TESTS),y)
+MPP_CONF_OPTS += "-DBUILD_TEST=ON"
+endif
+
 define MPP_LINK_GIT
 	rm -rf $(@D)/.git
 	ln -s $(SRCDIR)/.git $(@D)/
