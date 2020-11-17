@@ -1,4 +1,4 @@
-From 2208866a3a48f98ca08a447aa12ceaeb04c05ea5 Mon Sep 17 00:00:00 2001
+From 12e3f3a4b32ba356a9afad84d525f98763535cab Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 31 Oct 2019 18:45:19 +0800
 Subject: [PATCH 43/45] video-converter: Support rockchip RGA 2D accel
@@ -7,13 +7,13 @@ Disabled by default, set env GST_VIDEO_CONVERT_USE_RGA=1 to enable.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- configure.ac                         |  12 +++
+ configure.ac                         |  12 ++
  gst-libs/gst/video/Makefile.am       |   2 +-
- gst-libs/gst/video/video-converter.c | 174 +++++++++++++++++++++++++++++++++++
- 3 files changed, 187 insertions(+), 1 deletion(-)
+ gst-libs/gst/video/video-converter.c | 177 +++++++++++++++++++++++++++
+ 3 files changed, 190 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 1287583a62..3183b1e4d0 100644
+index 1287583..3183b1e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -310,6 +310,18 @@ PKG_CHECK_MODULES(G_UDEV, gudev-1.0 , [
@@ -36,7 +36,7 @@ index 1287583a62..3183b1e4d0 100644
  HAVE_GTK=no
  HAVE_GTK_X11=no
 diff --git a/gst-libs/gst/video/Makefile.am b/gst-libs/gst/video/Makefile.am
-index 9fc1ccfca3..500685408a 100644
+index 9fc1ccf..5006854 100644
 --- a/gst-libs/gst/video/Makefile.am
 +++ b/gst-libs/gst/video/Makefile.am
 @@ -94,7 +94,7 @@ noinst_HEADERS = gstvideoutilsprivate.h
@@ -49,7 +49,7 @@ index 9fc1ccfca3..500685408a 100644
  
  include $(top_srcdir)/common/gst-glib-gen.mak
 diff --git a/gst-libs/gst/video/video-converter.c b/gst-libs/gst/video/video-converter.c
-index e2cb3d51d8..ab3027288f 100644
+index e2cb3d5..1b0c473 100644
 --- a/gst-libs/gst/video/video-converter.c
 +++ b/gst-libs/gst/video/video-converter.c
 @@ -37,6 +37,11 @@
@@ -64,7 +64,7 @@ index e2cb3d51d8..ab3027288f 100644
  /**
   * SECTION:videoconverter
   * @title: GstVideoConverter
-@@ -3086,6 +3091,165 @@ convert_generic_task (ConvertTask * task)
+@@ -3086,6 +3091,168 @@ convert_generic_task (ConvertTask * task)
    }
  }
  
@@ -102,6 +102,8 @@ index e2cb3d51d8..ab3027288f 100644
 +      return RK_FORMAT_YCrCb_422_SP;
 +    case GST_VIDEO_FORMAT_Y42B:
 +      return RK_FORMAT_YCbCr_422_P;
++    case GST_VIDEO_FORMAT_P010_10LE:
++      return RK_FORMAT_YCbCr_420_SP_10B;
 +    default:
 +      return RK_FORMAT_UNKNOWN;
 +  }
@@ -156,6 +158,7 @@ index e2cb3d51d8..ab3027288f 100644
 +    case RK_FORMAT_RGB_565:
 +      hstride /= 2;
 +      break;
++    case RK_FORMAT_YCbCr_420_SP_10B:
 +    case RK_FORMAT_YCbCr_422_SP:
 +    case RK_FORMAT_YCrCb_422_SP:
 +    case RK_FORMAT_YCbCr_422_P:
@@ -230,7 +233,7 @@ index e2cb3d51d8..ab3027288f 100644
  static void
  video_converter_generic (GstVideoConverter * convert, const GstVideoFrame * src,
      GstVideoFrame * dest)
-@@ -3146,6 +3310,13 @@ video_converter_generic (GstVideoConverter * convert, const GstVideoFrame * src,
+@@ -3146,6 +3313,13 @@ video_converter_generic (GstVideoConverter * convert, const GstVideoFrame * src,
      for (i = 0; i < out_y; i++)
        PACK_FRAME (dest, convert->borderline, i, out_maxwidth);
    }
@@ -244,7 +247,7 @@ index e2cb3d51d8..ab3027288f 100644
  
    n_threads = convert->conversion_runner->n_threads;
    tasks = g_newa (ConvertTask, n_threads);
-@@ -3173,6 +3344,9 @@ video_converter_generic (GstVideoConverter * convert, const GstVideoFrame * src,
+@@ -3173,6 +3347,9 @@ video_converter_generic (GstVideoConverter * convert, const GstVideoFrame * src,
    gst_parallelized_task_runner_run (convert->conversion_runner,
        (GstParallelizedTaskFunc) convert_generic_task, (gpointer) tasks_p);
  
@@ -255,5 +258,5 @@ index e2cb3d51d8..ab3027288f 100644
      for (i = out_y + out_height; i < out_maxheight; i++)
        PACK_FRAME (dest, convert->borderline, i, out_maxwidth);
 -- 
-2.11.0
+2.20.1
 
