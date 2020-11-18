@@ -9,11 +9,12 @@ lunch_start()
 	ispserver -f CAMERA_FPS &
 	echo "Now we are ready to start your first application" > /dev/kmsg
 
-	insmod /lib/modules/snd-soc-es8311.ko &
 	{
+		insmod /lib/modules/dw_mmc-rockchip.ko
 		insmod /lib/modules/rk_sdmmc_ops.ko
 		insmod /lib/modules/sdmmc_vendor_storage.ko
 	}&
+	insmod /lib/modules/snd-soc-es8311.ko &
 
 	echo 297000000 > /proc/mpp_service/rkvenc/clk_core
 
