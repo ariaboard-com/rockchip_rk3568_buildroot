@@ -4,12 +4,6 @@ menuconfig BR2_PACKAGE_ROCKFACE
 
 if BR2_PACKAGE_ROCKFACE
 
-config BR2_PACKAGE_ROCKFACE_INSTATLL_PATH
-    string "The path of install rockface data and library"
-    default ""
-    help
-      Directory to install the rockface data and library.
-
 config BR2_PACKAGE_ROCKFACE_FACE_DETECTION
     bool "Face detection support"
     default n
