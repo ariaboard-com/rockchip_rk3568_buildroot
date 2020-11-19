@@ -11,8 +11,8 @@ case "$1" in
 		fi
 		;;
 	stop)
-		[ -f /oem/RkLunch-stop.sh ] && source /oem/RkLunch-stop.sh
-		printf "stop finished\n"
+		[ -f /oem/RkApps-stop.sh ] && source /oem/RkApps-stop.sh
+		printf "Apps stop finished\n"
 		;;
 	*)
 		echo "Usage: $0 {start|stop}"
