@@ -1,6 +1,14 @@
 #!/bin/sh
 #
 
+function usb_detect() {
+    cat /sys/class/extcon/usb2-phy/state | grep USB=1
+    if [ $? == 0 ]; then
+        echo "USB power supply detected, unable to enter sleep"
+        exit 0
+    fi
+}
+
 boot_limit_time=90
 no_client_time=5
 rtmp_file=/tmp/rtmp_live
@@ -18,6 +26,7 @@ done
 
 if [ ! -e "$rtmp_file" ]; then
     echo "$boot_limit_time seconds without client access"
+    usb_detect
     kill -15 `pidof mediaserver`
     exit 0
 fi
@@ -34,7 +43,8 @@ do
             interval_time=$((current_time-prev_time))
             echo "interval_time is $interval_time, no rtmp time is $no_client_time"
             if [ $interval_time -gt $no_client_time ]; then
-                kill -15 `pidof mediaserver`
+                usb_detect
+		kill -15 `pidof mediaserver`
                 exit 0
             fi
             if [ -e "$rtmp_file" ]; then
