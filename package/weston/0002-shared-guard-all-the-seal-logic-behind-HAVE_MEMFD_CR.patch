@@ -1,7 +1,7 @@
-From d580a975c967f6fa773d7901bad59fe436d07d63 Mon Sep 17 00:00:00 2001
+From 0073f2e76081d1281d6e0d8ba7dad86d4a6a25b8 Mon Sep 17 00:00:00 2001
 From: Sebastian Wick <sebastian@sebastianwick.net>
 Date: Wed, 5 Feb 2020 10:27:23 +0100
-Subject: [PATCH 02/39] shared: guard all the seal logic behind
+Subject: [PATCH 02/40] shared: guard all the seal logic behind
  HAVE_MEMFD_CREATE
 
 The initial version of os_ro_anonymous_file missed two guards around the
@@ -19,7 +19,7 @@ Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
  1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/shared/os-compatibility.c b/shared/os-compatibility.c
-index 041c929..2e12b7c 100644
+index 041c929f..2e12b7cc 100644
 --- a/shared/os-compatibility.c
 +++ b/shared/os-compatibility.c
 @@ -340,6 +340,7 @@ os_ro_anonymous_file_get_fd(struct ro_anonymous_file *file,
