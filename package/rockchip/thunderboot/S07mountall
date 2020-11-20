@@ -5,7 +5,20 @@
 
 mount_start()
 {
-	EMMC_BLK=`find /sys/block/ -name mmcblk*boot0 | cut -d '/' -f 4 | cut -c 1-7`
+	cnt=0
+	while [ 1 ]
+	do
+		EMMC_BLK=`find /sys/block/ -name mmcblk*boot0 | cut -d '/' -f 4 | cut -c 1-7`
+		if [ ! -z $EMMC_BLK ]; then
+			break
+		fi
+		if [ $cnt -gt 10 ]; then
+			break
+		fi
+		let cnt+=1
+		echo "EMMC_BLK is null, wait 100ms, cnt is $cnt"
+		sleep .1
+	done
 	EMMC_PARTITIONS=`find /sys/class/block/ -name ${EMMC_BLK}"p*" | wc -l`
 
 	for i in $(seq 1 $EMMC_PARTITIONS)
