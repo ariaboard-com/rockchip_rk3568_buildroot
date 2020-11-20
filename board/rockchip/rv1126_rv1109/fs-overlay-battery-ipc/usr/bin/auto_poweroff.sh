@@ -17,7 +17,7 @@ current_time=`cat /proc/uptime | cut -d '.' -f1`
 while [ $current_time -lt $boot_limit_time ]
 do
     current_time=`cat /proc/uptime | cut -d '.' -f1`
-    echo "current_time is $current_time, boot_limit_time is $boot_limit_time"
+    # echo "current_time is $current_time, boot_limit_time is $boot_limit_time"
     if [ -e "$rtmp_file" ]; then
         break
     fi
