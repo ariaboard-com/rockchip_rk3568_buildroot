@@ -20,6 +20,8 @@ lunch_start()
 
 	export mediaserver_log_level=2
 	mediaserver -a -d -c /usr/share/mediaserver/tb.conf > /dev/kmsg 2>&1 &
+
+	echo 20 > /proc/pir/sensibility
 	auto_poweroff.sh &
 }
 
