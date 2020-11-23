@@ -85,8 +85,10 @@ define RKNPU_INSTALL_TARGET_CMDS
     if [ ${BUILD_RKNN_API} = "y" ]; then \
         if [ ${NPU_PLATFORM_ARCH} = "linux-aarch64" ]; then \
             $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib64/librknn_api.so $(TARGET_DIR)/usr/lib/; \
+            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib64/librknn_api.so $(STAGING_DIR)/usr/lib; \
         else \
             $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib/librknn_api.so $(TARGET_DIR)/usr/lib/; \
+            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib/librknn_api.so $(STAGING_DIR)/usr/lib; \
         fi \
     fi
 endef
