@@ -2,7 +2,7 @@
 #
 
 function usb_detect() {
-    cat /sys/class/extcon/usb2-phy/state | grep USB=1
+    cat /sys/class/extcon/usb2-phy/state | grep P=1
     if [ $? == 0 ]; then
         echo "USB power supply detected, unable to enter sleep"
         exit 0
