@@ -4,7 +4,7 @@
 lunch_start()
 {
 	echo none > /sys/class/leds/red/trigger
-	echo 255 > /sys/class/leds/red/brightness
+	echo 5 > /sys/class/leds/red/brightness
 	export HDR_MODE=0
 	ispserver -f CAMERA_FPS &
 	echo "Now we are ready to start your first application" > /dev/kmsg
