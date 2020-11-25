@@ -38,7 +38,7 @@ mount_start()
 
 case "$1" in
 	start)
-		mount_start
+		mount_start &
 		;;
 	stop)
 		;;
