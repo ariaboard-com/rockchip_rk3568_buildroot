@@ -23,4 +23,7 @@ ROCKIT_DEPENDENCIES += camera_engine_rkaiq
 ROCKIT_CONF_OPTS += -DUSE_RKAIQ=ON
 endif
 
+ifeq ($(BR2_PACKAGE_AISERVER_USE_STASTERIA), y)
+ROCKIT_CONF_OPTS += -DUSE_STASTERIA=ON
+endif
 $(eval $(cmake-package))
