@@ -1,7 +1,7 @@
-From 67401f651807d088d9d44d32be9209e012453269 Mon Sep 17 00:00:00 2001
+From e7cfd1ca763a1db7a222a07ffb077cc0067cba05 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Tue, 14 Apr 2020 17:10:34 -0400
-Subject: [PATCH 34/48] kmssink: Save last metadata at the same time as the
+Subject: [PATCH 34/60] kmssink: Save last metadata at the same time as the
  last buffer
 
 The render width/height and the vinfo was only saved upon renegotiation. This

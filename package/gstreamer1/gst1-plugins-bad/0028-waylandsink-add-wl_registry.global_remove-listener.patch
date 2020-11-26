@@ -1,7 +1,7 @@
-From 2d5c21a44145e3db049baae931c603e853ed2798 Mon Sep 17 00:00:00 2001
+From d5ea2625beb6c1d21ed289090e865234bab3e0bf Mon Sep 17 00:00:00 2001
 From: Haihua Hu <jared.hu@nxp.com>
 Date: Tue, 9 Jun 2020 10:53:17 +0800
-Subject: [PATCH 28/48] waylandsink: add wl_registry.global_remove listener
+Subject: [PATCH 28/60] waylandsink: add wl_registry.global_remove listener
 
 when hotplug display, wayland client will call this listener
 to notify client do clean up. Temporarily set a dummy function

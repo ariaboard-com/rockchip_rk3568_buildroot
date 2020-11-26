@@ -1,7 +1,7 @@
-From 3205567d6b1e569220d0aae0125e025477b3a716 Mon Sep 17 00:00:00 2001
+From e1fccaeae50eb358da463e164ab32a40f6de2a33 Mon Sep 17 00:00:00 2001
 From: Matteo Valdina <matteo.valdina@gmail.com>
 Date: Mon, 9 Jul 2018 20:20:59 -0500
-Subject: [PATCH 03/48] waylandsink: relaxed wl_shell check and added
+Subject: [PATCH 03/60] waylandsink: relaxed wl_shell check and added
  zwp_fullscreen_shell.
 
 Relaxed the wl_shell interface constrains, so application that

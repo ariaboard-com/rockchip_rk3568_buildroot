@@ -1,7 +1,7 @@
-From 274b1c0a8d8782785869647214caecb556e852a9 Mon Sep 17 00:00:00 2001
+From 5172f4bd7cad1bb3642aa66c6b2d02382e343996 Mon Sep 17 00:00:00 2001
 From: Naveen Cherukuri <naveen.cherukuri@xilinx.com>
 Date: Tue, 4 Dec 2018 16:15:22 +0530
-Subject: [PATCH 10/48] kmssink: Avoiding get_property to take ownership of
+Subject: [PATCH 10/60] kmssink: Avoiding get_property to take ownership of
  object members
 
 Double free will happen if application frees string retuned by _get_property

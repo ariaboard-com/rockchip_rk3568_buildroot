@@ -1,7 +1,7 @@
-From ecdd6f18364f07fb8d6bf08e2af95aed94c34187 Mon Sep 17 00:00:00 2001
+From fe05a81e4d727406981be33b56297be11c87d9ed Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Fri, 31 Jan 2020 09:47:59 -0500
-Subject: [PATCH 33/48] kmssink: Fix crash with force-modesetting=1
+Subject: [PATCH 33/60] kmssink: Fix crash with force-modesetting=1
 
 This is a master regression, we would allocate a bo without having
 created the allocator yet. As of now, we lazily create the allocator.

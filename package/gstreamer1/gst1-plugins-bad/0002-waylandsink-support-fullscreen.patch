@@ -1,7 +1,7 @@
-From 0e382d2cb7aed999d10ce7542daa9ea3a703faa3 Mon Sep 17 00:00:00 2001
+From 63ead995ec3e50008f3aaa92c3e4fe5bb1bbf360 Mon Sep 17 00:00:00 2001
 From: Fabien Dessenne <fabien.dessenne@st.com>
 Date: Thu, 23 Feb 2017 11:48:13 +0100
-Subject: [PATCH 02/48] waylandsink: support fullscreen
+Subject: [PATCH 02/60] waylandsink: support fullscreen
 
 Add the fullscreen property that makes the sink displayed all across
 the output.

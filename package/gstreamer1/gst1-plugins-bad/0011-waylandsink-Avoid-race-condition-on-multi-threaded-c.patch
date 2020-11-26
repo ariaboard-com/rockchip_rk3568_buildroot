@@ -1,7 +1,7 @@
-From 0a7ada78d9499942fc6d87f44fea968d29c5d359 Mon Sep 17 00:00:00 2001
+From ee367b4a4c6a11eff8f71c96b502ace3c6fcee08 Mon Sep 17 00:00:00 2001
 From: Wonchul Lee <w.lee@lge.com>
 Date: Mon, 3 Dec 2018 16:18:32 +0900
-Subject: [PATCH 11/48] waylandsink: Avoid race condition on multi-threaded
+Subject: [PATCH 11/60] waylandsink: Avoid race condition on multi-threaded
  client
 
 When waylandsink is used on some other thread than the main wayland

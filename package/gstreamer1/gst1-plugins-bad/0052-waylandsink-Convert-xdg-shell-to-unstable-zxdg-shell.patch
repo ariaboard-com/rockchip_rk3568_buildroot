@@ -1,7 +1,7 @@
-From c2ddf7caeaf41ca8f92da84be629d12e8296efd8 Mon Sep 17 00:00:00 2001
+From bf639677d307a78428c085c9834a835b42eb78a8 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Mon, 27 May 2019 15:56:32 +0800
-Subject: [PATCH 46/48] waylandsink: Convert xdg shell to unstable zxdg shell
+Date: Thu, 26 Nov 2020 11:32:16 +0800
+Subject: [PATCH 52/60] waylandsink: Convert xdg shell to unstable zxdg shell
  v6
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -53,10 +53,10 @@ index 598536b29..db06f9d61 100644
      protocols_files = []
  
 diff --git a/ext/wayland/wldisplay.c b/ext/wayland/wldisplay.c
-index 744c97097..7458f5a91 100644
+index 6cbdc0cce..714bfe1cd 100644
 --- a/ext/wayland/wldisplay.c
 +++ b/ext/wayland/wldisplay.c
-@@ -90,8 +90,8 @@ gst_wl_display_finalize (GObject * gobject)
+@@ -96,8 +96,8 @@ gst_wl_display_finalize (GObject * gobject)
    if (self->wl_shell)
      wl_shell_destroy (self->wl_shell);
  
@@ -67,7 +67,7 @@ index 744c97097..7458f5a91 100644
  
    if (self->fullscreen_shell)
      zwp_fullscreen_shell_v1_release (self->fullscreen_shell);
-@@ -194,14 +194,14 @@ gst_wl_display_check_format_for_dmabuf (GstWlDisplay * display,
+@@ -200,14 +200,14 @@ gst_wl_display_check_format_for_dmabuf (GstWlDisplay * display,
  }
  
  static void
@@ -86,7 +86,7 @@ index 744c97097..7458f5a91 100644
  };
  
  static void
-@@ -218,10 +218,10 @@ registry_handle_global (void *data, struct wl_registry *registry,
+@@ -224,10 +224,10 @@ registry_handle_global (void *data, struct wl_registry *registry,
          wl_registry_bind (registry, id, &wl_subcompositor_interface, 1);
    } else if (g_strcmp0 (interface, "wl_shell") == 0) {
      self->wl_shell = wl_registry_bind (registry, id, &wl_shell_interface, 1);
@@ -101,7 +101,7 @@ index 744c97097..7458f5a91 100644
    } else if (g_strcmp0 (interface, "zwp_fullscreen_shell_v1") == 0) {
      self->fullscreen_shell = wl_registry_bind (registry, id,
          &zwp_fullscreen_shell_v1_interface, 1);
-@@ -361,12 +361,12 @@ gst_wl_display_new_existing (struct wl_display * display,
+@@ -367,12 +367,12 @@ gst_wl_display_new_existing (struct wl_display * display,
      g_warning ("Could not bind to zwp_linux_dmabuf_v1");
    }
  
@@ -117,7 +117,7 @@ index 744c97097..7458f5a91 100644
    }
  
 diff --git a/ext/wayland/wldisplay.h b/ext/wayland/wldisplay.h
-index 4ecc0d659..7d9881f53 100644
+index f2025a6a0..365031d78 100644
 --- a/ext/wayland/wldisplay.h
 +++ b/ext/wayland/wldisplay.h
 @@ -24,7 +24,7 @@
@@ -139,7 +139,7 @@ index 4ecc0d659..7d9881f53 100644
    struct wl_shm *shm;
    struct wp_viewporter *viewporter;
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index a3b9db0f7..dd8d37d1c 100644
+index b9f4be841..25f5896de 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -46,7 +46,7 @@ G_DEFINE_TYPE (GstWlWindow, gst_wl_window, G_TYPE_OBJECT);
@@ -208,7 +208,7 @@ index a3b9db0f7..dd8d37d1c 100644
    handle_xdg_surface_configure,
  };
  
-@@ -163,9 +164,9 @@ gst_wl_window_finalize (GObject * gobject)
+@@ -166,9 +167,9 @@ gst_wl_window_finalize (GObject * gobject)
      wl_shell_surface_destroy (self->wl_shell_surface);
  
    if (self->xdg_toplevel)
@@ -220,7 +220,7 @@ index a3b9db0f7..dd8d37d1c 100644
  
    if (self->video_viewport)
      wp_viewport_destroy (self->video_viewport);
-@@ -242,11 +243,11 @@ gst_wl_window_ensure_fullscreen (GstWlWindow * window, gboolean fullscreen)
+@@ -246,11 +247,11 @@ gst_wl_window_ensure_fullscreen (GstWlWindow * window, gboolean fullscreen)
    if (!window)
      return;
  
@@ -235,7 +235,7 @@ index a3b9db0f7..dd8d37d1c 100644
    } else {
      if (fullscreen)
        wl_shell_surface_set_fullscreen (window->wl_shell_surface,
-@@ -265,24 +266,24 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
+@@ -269,24 +270,24 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
    window = gst_wl_window_new_internal (display, render_lock);
  
    /* Check which protocol we will use (in order of preference) */
@@ -265,7 +265,7 @@ index a3b9db0f7..dd8d37d1c 100644
          &xdg_toplevel_listener, window);
  
      gst_wl_window_ensure_fullscreen (window, fullscreen);
-@@ -313,14 +314,14 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
+@@ -317,14 +318,14 @@ gst_wl_window_new_toplevel (GstWlDisplay * display, const GstVideoInfo * info,
          window->area_surface, ZWP_FULLSCREEN_SHELL_V1_PRESENT_METHOD_ZOOM,
          NULL);
    } else {
@@ -283,7 +283,7 @@ index a3b9db0f7..dd8d37d1c 100644
      /* set the initial size to be the same as the reported video size */
      gint width =
          gst_util_uint64_scale_int_round (info->width, info->par_n, info->par_d);
-@@ -378,7 +379,7 @@ gst_wl_window_is_toplevel (GstWlWindow * window)
+@@ -382,7 +383,7 @@ gst_wl_window_is_toplevel (GstWlWindow * window)
  {
    g_return_val_if_fail (window != NULL, FALSE);
  
@@ -293,7 +293,7 @@ index a3b9db0f7..dd8d37d1c 100644
    else
      return (window->wl_shell_surface != NULL);
 diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
-index c3f017216..7f31a549a 100644
+index cecbda664..47e86e7c4 100644
 --- a/ext/wayland/wlwindow.h
 +++ b/ext/wayland/wlwindow.h
 @@ -53,8 +53,8 @@ struct _GstWlWindow
@@ -304,9 +304,9 @@ index c3f017216..7f31a549a 100644
 -  struct xdg_toplevel *xdg_toplevel;
 +  struct zxdg_surface_v6 *xdg_surface;
 +  struct zxdg_toplevel_v6 *xdg_toplevel;
+   struct wl_callback *callback;
    gboolean configured;
    GCond configure_cond;
-   GMutex configure_mutex;
 -- 
 2.20.1
 

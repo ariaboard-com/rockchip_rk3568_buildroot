@@ -1,7 +1,7 @@
-From 89b53bb4a65f1151cbfda8be64d7f61555860f4d Mon Sep 17 00:00:00 2001
+From ab8006a60bb00f7d88b0af21e2efd6ab5c5ee33a Mon Sep 17 00:00:00 2001
 From: Wonchul Lee <chul0812@gmail.com>
 Date: Sat, 9 Nov 2019 19:37:10 +0900
-Subject: [PATCH 25/48] wlvideoformat: clean up video formats
+Subject: [PATCH 25/60] wlvideoformat: clean up video formats
 
 It cleans up videoFormat by combining the wl_shm_formats and
 drm_formats into a single table that represents the same format.

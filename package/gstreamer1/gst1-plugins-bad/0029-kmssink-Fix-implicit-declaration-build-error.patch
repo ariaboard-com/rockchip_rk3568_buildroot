@@ -1,7 +1,7 @@
-From 298d62d734f721413e9ef70ab2f07ab6e4fddbfc Mon Sep 17 00:00:00 2001
+From 89cd410d1b97d46ae1187f14a6314926b958dd7c Mon Sep 17 00:00:00 2001
 From: Seungha Yang <seungha.yang@navercorp.com>
 Date: Wed, 17 Jul 2019 01:05:32 +0900
-Subject: [PATCH 29/48] kmssink: Fix implicit declaration build error
+Subject: [PATCH 29/60] kmssink: Fix implicit declaration build error
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

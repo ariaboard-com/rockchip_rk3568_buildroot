@@ -1,7 +1,7 @@
-From 55ceec22b7d590ac2f0aea7c7fff50873a1130e0 Mon Sep 17 00:00:00 2001
+From ca7eefcb701277d08bcba4296a3d9099d02c27ea Mon Sep 17 00:00:00 2001
 From: Niels De Graef <niels.degraef@barco.com>
 Date: Fri, 1 Mar 2019 09:56:24 +0100
-Subject: [PATCH 16/48] waylandsink: Implement XDG-shell stable support
+Subject: [PATCH 16/60] waylandsink: Implement XDG-shell stable support
 
 [wl_shell] is officially [deprecated], so provide support for the
 XDG-shell protocol should be provided by all desktop-like compositors.

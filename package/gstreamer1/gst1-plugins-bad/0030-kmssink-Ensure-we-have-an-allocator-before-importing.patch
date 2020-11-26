@@ -1,7 +1,7 @@
-From 4e47692d9a57f9fa16971b268bae040bfe5807f8 Mon Sep 17 00:00:00 2001
+From f4e27fecc9592e66eda1e639b2c90efb2ae47fe1 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Fri, 8 Nov 2019 17:48:40 -0500
-Subject: [PATCH 30/48] kmssink: Ensure we have an allocator before importing
+Subject: [PATCH 30/60] kmssink: Ensure we have an allocator before importing
 
 This fixes cases where the kms allocator API was called with a null
 pointer.

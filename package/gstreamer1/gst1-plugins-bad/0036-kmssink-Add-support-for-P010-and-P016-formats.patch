@@ -1,7 +1,7 @@
-From 2b8e1f7e0212e638c50c09ee9dac73d601fe3ef1 Mon Sep 17 00:00:00 2001
+From e23728e30ca99fb8dad7bec28aecae255862b7c7 Mon Sep 17 00:00:00 2001
 From: Seungha Yang <seungha@centricular.com>
 Date: Sat, 11 Apr 2020 03:11:35 +0900
-Subject: [PATCH 36/48] kmssink: Add support for P010 and P016 formats
+Subject: [PATCH 36/60] kmssink: Add support for P010 and P016 formats
 
 Support high bit-depth YUV formats
 

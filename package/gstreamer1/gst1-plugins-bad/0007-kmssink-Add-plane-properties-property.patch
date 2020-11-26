@@ -1,7 +1,7 @@
-From ec363501949d57334493a04021d84c21709b871b Mon Sep 17 00:00:00 2001
+From b070ed18006ca8af12a63678af7908c57a5ee88a Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Mon, 27 Aug 2018 15:08:08 -0400
-Subject: [PATCH 07/48] kmssink: Add 'plane-properties' property
+Subject: [PATCH 07/60] kmssink: Add 'plane-properties' property
 
 This is similar to 'connector-properties' but will change
 selected plane properties instead.

@@ -1,7 +1,7 @@
-From 7bbf5124f502dd434309ca77f36427ee4569a717 Mon Sep 17 00:00:00 2001
+From a2d158fe8b9bab65908623b295c1c0d92352d4fe Mon Sep 17 00:00:00 2001
 From: Shinya Saito <ssaito@igel.co.jp>
 Date: Thu, 22 Aug 2019 16:04:37 +0900
-Subject: [PATCH 26/48] waylandsink: Fix xdg_shell fullscreen mode
+Subject: [PATCH 26/60] waylandsink: Fix xdg_shell fullscreen mode
 
 xdg_shell fullscreen mode doesn't work for committing
 xdg_surface without configure acknowledgement.

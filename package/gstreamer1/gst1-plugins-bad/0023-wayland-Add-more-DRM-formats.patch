@@ -1,7 +1,7 @@
-From 252779465ac09fe335b7010f80fe51761f3e060e Mon Sep 17 00:00:00 2001
-From: "olivier.crete@collabora.com" <Olivier Crête>
+From c179f4f231fbe396e504edac91b2f11ff333b35a Mon Sep 17 00:00:00 2001
+From: "olivier.crete@collabora.com" <olivier.crete@collabora.com>
 Date: Tue, 6 Aug 2019 21:08:12 +0100
-Subject: [PATCH 23/48] wayland: Add more DRM formats
+Subject: [PATCH 23/60] wayland: Add more DRM formats
 
 Add DRM format equivalents that we were missing compared
 to our caps.

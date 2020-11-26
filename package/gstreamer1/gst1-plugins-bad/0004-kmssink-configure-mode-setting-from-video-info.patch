@@ -1,7 +1,7 @@
-From 86a4091d6926da0cf8562a1a63fa3b2e38a54e6c Mon Sep 17 00:00:00 2001
+From 468f944d5fc05fd3c6180a215ac9cf5401cac282 Mon Sep 17 00:00:00 2001
 From: Philipp Zabel <p.zabel@pengutronix.de>
 Date: Fri, 17 Aug 2018 11:12:26 +0200
-Subject: [PATCH 04/48] kmssink: configure mode setting from video info
+Subject: [PATCH 04/60] kmssink: configure mode setting from video info
 
 drmModeGetFB returns -EINVAL for multi-planar framebuffers. Instead of
 depending on the framebuffer dimensions to select the mode, use width

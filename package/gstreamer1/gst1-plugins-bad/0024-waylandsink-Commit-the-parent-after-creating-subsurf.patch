@@ -1,7 +1,7 @@
-From 023d86af722103aaa9d4a33f8f885dc57eba8899 Mon Sep 17 00:00:00 2001
+From 3ab0d908ca6e806e75fe477ae6f0f35abc6ff128 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 25 Nov 2019 19:08:48 +0800
-Subject: [PATCH 24/48] waylandsink: Commit the parent after creating
+Subject: [PATCH 24/60] waylandsink: Commit the parent after creating
  subsurface
 
 We should commit the parent to activate new subsurface, this is

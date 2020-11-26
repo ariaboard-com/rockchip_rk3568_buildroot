@@ -1,7 +1,7 @@
-From c5e55e20c3f70edd71992206c45ba02ec5e339df Mon Sep 17 00:00:00 2001
+From ca2afe7f6f4cf043f4609c05961e28ea73cc6e5e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 18 Sep 2019 18:22:24 +0800
-Subject: [PATCH 48/48] Bump dtls/sctp/webrtc to upstream
+Subject: [PATCH 54/60] Bump dtls/sctp/webrtc to upstream
 
 Bump to:
 2af240288 vulkan: add device provider implementation

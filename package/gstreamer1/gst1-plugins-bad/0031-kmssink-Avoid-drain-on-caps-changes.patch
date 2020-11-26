@@ -1,7 +1,7 @@
-From 1a2d9426235aede14aa3334e3a75dd157ab9cda9 Mon Sep 17 00:00:00 2001
+From d9e7f1ff5b711079274f482d670b48afdbf1933c Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Fri, 8 Nov 2019 17:57:58 -0500
-Subject: [PATCH 31/48] kmssink: Avoid drain on caps changes
+Subject: [PATCH 31/60] kmssink: Avoid drain on caps changes
 
 Draining systematically on caps changes was a hack. Instead, properly
 save the render information used to render last_render, and use that

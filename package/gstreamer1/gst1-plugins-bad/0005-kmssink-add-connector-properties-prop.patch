@@ -1,7 +1,7 @@
-From 07cd9f0dee189f15179eea96d41b5e43dfeb0c2e Mon Sep 17 00:00:00 2001
+From d6c6b5eb1b7bc8aa160a9e61b30b013cb4bf5504 Mon Sep 17 00:00:00 2001
 From: Guillaume Desmottes <guillaume.desmottes@collabora.co.uk>
 Date: Thu, 23 Aug 2018 14:29:37 +0200
-Subject: [PATCH 05/48] kmssink: add 'connector-properties' prop
+Subject: [PATCH 05/60] kmssink: add 'connector-properties' prop
 
 Can be used to pass custom connector properties to DRM. Properties can
 be enumerated using modetest tool. These properties can then be applied

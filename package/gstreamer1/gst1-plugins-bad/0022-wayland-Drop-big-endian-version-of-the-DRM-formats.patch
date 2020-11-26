@@ -1,7 +1,7 @@
-From 2dd54a8bfc94b34f6d107ccb082fa9386d3a1827 Mon Sep 17 00:00:00 2001
-From: "olivier.crete@collabora.com" <Olivier Crête>
+From d0d5d3fb4bb0c57ee5266c5533b9bdbd780e8a83 Mon Sep 17 00:00:00 2001
+From: "olivier.crete@collabora.com" <olivier.crete@collabora.com>
 Date: Tue, 6 Aug 2019 19:09:54 +0100
-Subject: [PATCH 22/48] wayland: Drop big-endian version of the DRM formats
+Subject: [PATCH 22/60] wayland: Drop big-endian version of the DRM formats
 
 They were a big in some big-endian implementations
 

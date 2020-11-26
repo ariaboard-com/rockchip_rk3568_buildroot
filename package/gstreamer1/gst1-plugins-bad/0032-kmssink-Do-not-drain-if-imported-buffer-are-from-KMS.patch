@@ -1,7 +1,7 @@
-From dd0ff3758fa6f9259ce9930201962a46a930a1a4 Mon Sep 17 00:00:00 2001
+From 2a45b3e8fa0890f514dfd66873d4da91c17c7df0 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Fri, 8 Nov 2019 18:00:46 -0500
-Subject: [PATCH 32/48] kmssink: Do not drain if imported buffer are from KMS
+Subject: [PATCH 32/60] kmssink: Do not drain if imported buffer are from KMS
 
 This adds a check to avoid draining when the imported buffers are in
 fact own by kmssink. This happens since we export our kms buffer as

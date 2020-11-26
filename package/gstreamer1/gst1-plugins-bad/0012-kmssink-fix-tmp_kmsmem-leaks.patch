@@ -1,7 +1,7 @@
-From 67ecdf834c8f0fec523aab23fc268ed42256ed92 Mon Sep 17 00:00:00 2001
+From 5e9f7a0221d90886509ecff3397bd0204f4d4f5c Mon Sep 17 00:00:00 2001
 From: Guillaume Desmottes <guillaume.desmottes@collabora.com>
 Date: Tue, 18 Dec 2018 15:41:09 +0100
-Subject: [PATCH 12/48] kmssink: fix tmp_kmsmem leaks
+Subject: [PATCH 12/60] kmssink: fix tmp_kmsmem leaks
 
 configure_mode_setting() keeps a ref on tmp_kmsmem which is released in
 gst_kms_sink_show_frame().

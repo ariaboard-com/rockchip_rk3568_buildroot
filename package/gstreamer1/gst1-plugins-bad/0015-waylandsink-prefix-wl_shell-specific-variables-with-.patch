@@ -1,7 +1,7 @@
-From ace0d00f16251b82b9adb3235c5db28d77493207 Mon Sep 17 00:00:00 2001
+From 7cd505a2ad27c9cfe01d4b42c44907e9874ff897 Mon Sep 17 00:00:00 2001
 From: Niels De Graef <niels.degraef@barco.com>
 Date: Fri, 1 Mar 2019 10:17:23 +0100
-Subject: [PATCH 15/48] waylandsink: prefix wl_shell-specific variables with
+Subject: [PATCH 15/60] waylandsink: prefix wl_shell-specific variables with
  wl_
 
 ---

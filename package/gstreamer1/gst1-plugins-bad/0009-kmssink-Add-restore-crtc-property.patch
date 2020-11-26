@@ -1,7 +1,7 @@
-From 8435d7387fbc90af394cf60c2315ba2007ecd3d4 Mon Sep 17 00:00:00 2001
+From 1218c8d3bab1bd15df47c31f66669137a0ab6b8f Mon Sep 17 00:00:00 2001
 From: Devarsh Thakkar <devarsht@xilinx.com>
 Date: Sat, 25 Aug 2018 22:47:34 +0530
-Subject: [PATCH 09/48] kmssink: Add "restore-crtc" property
+Subject: [PATCH 09/60] kmssink: Add "restore-crtc" property
 
 This adds "restore-crtc" property using which one
 can restore previous crtc mode.

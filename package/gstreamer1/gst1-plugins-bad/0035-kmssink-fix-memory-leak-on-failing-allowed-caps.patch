@@ -1,7 +1,7 @@
-From 73be9ff3c81d79d6834daef4e58550f406a2cd34 Mon Sep 17 00:00:00 2001
+From 00e9621f1a8832b28075f1ebcc03e323107a2c6d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?St=C3=A9phane=20Cerveau?= <scerveau@collabora.com>
 Date: Thu, 16 Apr 2020 15:35:44 +0200
-Subject: [PATCH 35/48] kmssink: fix memory leak on failing allowed caps
+Subject: [PATCH 35/60] kmssink: fix memory leak on failing allowed caps
 
 When drm does not find any format, the allowed_caps is
 empty one and need to be unref by the caller.

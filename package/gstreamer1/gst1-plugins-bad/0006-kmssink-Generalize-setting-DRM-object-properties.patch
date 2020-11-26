@@ -1,7 +1,7 @@
-From 8a7e02cb8a957ea54460fc35d1f8532645521e52 Mon Sep 17 00:00:00 2001
+From 271cee7015ddb493288d27d734cc3cc8473d1bd7 Mon Sep 17 00:00:00 2001
 From: Nicolas Dufresne <nicolas.dufresne@collabora.com>
 Date: Mon, 27 Aug 2018 15:07:47 -0400
-Subject: [PATCH 06/48] kmssink: Generalize setting DRM object properties
+Subject: [PATCH 06/60] kmssink: Generalize setting DRM object properties
 
 https://bugzilla.gnome.org/show_bug.cgi?id=797027
 ---
