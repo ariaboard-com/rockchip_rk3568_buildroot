@@ -1,7 +1,7 @@
-From 13be28b439413351b2aacb7f72ba35e499959e05 Mon Sep 17 00:00:00 2001
+From 08229110a56f2aff24e4261341b519e884cf0023 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Oct 2020 15:00:46 +0800
-Subject: [PATCH 12/12] gsttools: videowidget: Avoid re-creating window during
+Subject: [PATCH 12/13] gsttools: videowidget: Avoid re-creating window during
  destroying
 
 There's a WinIdChange event when clearing window's winId.

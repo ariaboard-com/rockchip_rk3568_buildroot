@@ -1,7 +1,7 @@
-From e5806815fc0677382566dc401f1ce0ed5a8265e7 Mon Sep 17 00:00:00 2001
+From 58e350ec6903b18c2cf4c6e8885a37eb3445d6dd Mon Sep 17 00:00:00 2001
 From: Richard Oehlinger <richard.oehlinger@adbsafegate.com>
 Date: Mon, 18 Mar 2019 10:15:13 +0100
-Subject: [PATCH 01/15] Fix compile failure with gstreamer 0.10
+Subject: [PATCH 01/16] Fix compile failure with gstreamer 0.10
 
 This fixes an compile failure introduced in commit 67c4ec55.
 

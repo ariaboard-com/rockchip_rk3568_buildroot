@@ -1,0 +1,30 @@
+From f685e73c4d2f712f86cddf36e85844e6e2236710 Mon Sep 17 00:00:00 2001
+From: Jeffy Chen <jeffy.chen@rock-chips.com>
+Date: Thu, 26 Nov 2020 11:49:58 +0800
+Subject: [PATCH 13/13] gsttools: videowidget: Force updating geometry when
+ actived
+
+To avoid losing resize event randomly.
+
+Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
+---
+ src/gsttools/qgstreamervideowidget.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
+index 5f17aab..fa4aaf7 100644
+--- a/src/gsttools/qgstreamervideowidget.cpp
++++ b/src/gsttools/qgstreamervideowidget.cpp
+@@ -153,6 +153,9 @@ void QGstreamerVideoWidgetControl::setVideoSink(GstElement *sink)
+ 
+ void QGstreamerVideoWidgetControl::onOverlayActiveChanged()
+ {
++    // Force updating widget's geometry when actived
++    m_widget->updateGeometry();
++
+     WId newWId = m_widget->videoWinId();
+     if (newWId != m_windowId)
+         m_videoOverlay.setWindowHandle(m_windowId = newWId);
+-- 
+2.20.1
+

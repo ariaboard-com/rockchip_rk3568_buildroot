@@ -1,7 +1,7 @@
-From f2bbbdeebc61b23804aad7f0408e735bf314eb31 Mon Sep 17 00:00:00 2001
+From 54ebc322a89789a8046be932feb048a35d45c65e Mon Sep 17 00:00:00 2001
 From: Binyuan Lan <lby@rock-chips.com>
 Date: Wed, 19 Jul 2017 17:59:44 +0800
-Subject: [PATCH 02/15] qt5multimedia: qmlvideo support assigned videosink
+Subject: [PATCH 02/16] qt5multimedia: qmlvideo support assigned videosink
 
 Signed-off-by: Binyuan Lan <lby@rock-chips.com>
 ---

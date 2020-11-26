@@ -1,7 +1,7 @@
 From ce60553bfe12dd79df512bc3a55b30beb36c991b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Nov 2018 16:03:31 +0800
-Subject: [PATCH 06/13] gsttools: videowidget: Set overlay rectangle when
+Subject: [PATCH 06/14] gsttools: videowidget: Set overlay rectangle when
  resized
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
