@@ -14,8 +14,8 @@ info_view()
 info_view
 echo "***********************************************************"
 echo "video test:						1"
-echo "multivideo test:						2"
-echo "multivideo app demo test:					3"
+echo "multivideo with singlewindow test				2"
+echo "multivideo with multiwindow test				3"
 echo "***********************************************************"
 
 read -t 30 VIDEO_CHOICE
@@ -25,16 +25,16 @@ video_test()
 	sh ${DIR_VIDEO}/test_gst_video.sh
 }
 
-multivideo_app_demo_test()
+multivideo_singlewindow_test()
 {
 	cd ${DIR_VIDEO}
-	./test_app_demo_multivideo.sh test
+	./test_multivideo_singlewindow.sh test
 }
 
-multivideo_test()
+multivideo_multiwindow_test()
 {
 	cd ${DIR_VIDEO}
-	./test_gst_multivideo.sh test
+	./test_multivideo_multiwindow.sh test
 }
 
 case ${VIDEO_CHOICE} in
@@ -42,10 +42,10 @@ case ${VIDEO_CHOICE} in
 		video_test
 		;;
 	2)
-		multivideo_test
+		multivideo_singlewindow_test
 		;;
 	3)
-		multivideo_app_demo_test
+		multivideo_multiwindow_test
 		;;
 	*)
 		echo "not fount your input."
