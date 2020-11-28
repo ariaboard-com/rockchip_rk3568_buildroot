@@ -29,6 +29,10 @@ RK_WIFI_CHIP_NAME1 = AP6256
 RK_WIFI_CHIP_NAME2 = AP6255
 endif
 
+ifeq (y,$(BR2_KERNEL_HEADERS_4_19))
+FIRMWARE_DIR = vendor
+endif
+
 ifeq (y,$(BR2_PACKAGE_RKWIFIBT_AMPAKALL))
 SXLOAD_WIFI = "S36load_ampakall_wifi_modules"
 endif
