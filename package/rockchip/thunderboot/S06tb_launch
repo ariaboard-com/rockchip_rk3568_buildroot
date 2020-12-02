@@ -30,6 +30,8 @@ lunch_stop()
 	killall mediaserver
 	killall ispserver
 	echo "All applications have been stopped"
+
+	io -4 0xfe020104 0x00840084
 }
 
 case "$1" in
