@@ -25,6 +25,20 @@ else
 NPU_KO_FILE = galcore.ko
 endif
 
+ifeq ($(BR2_PACKAGE_RK356X),y)
+NPU_KO_FILE = rknpu.ko
+NPU_KO_PATH = rknnrt/lib/linux-aarch64/driver
+NPU_RKNN_API_LIB64 = rknnrt/lib/linux-aarch64/librknnrt.so
+NPU_TARGET_NAME = rknpu.ko
+NPU_COMMON_PATH = rknnrt/common
+else
+NPU_KO_PATH = drivers/npu_ko
+NPU_RKNN_API_LIB64 = rknn/rknn_api/librknn_api/lib64/librknn_api.so
+NPU_RKNN_API_LIB = rknn/rknn_api/librknn_api/lib/librknn_api.so
+NPU_TARGET_NAME = galcore.ko
+NPU_COMMON_PATH = drivers/common
+endif
+
 ifeq ($(BR2_arm),y)
 NPU_PLATFORM_ARCH = linux-armhf
 else
@@ -61,9 +75,9 @@ endef
 define RKNPU_INSTALL_TARGET_CMDS
     mkdir -p $(TARGET_DIR)/lib/modules/
     mkdir -p $(TARGET_DIR)/usr/share/npu/
-    $(INSTALL) -D -m 0644 $(@D)/drivers/npu_ko/$(NPU_KO_FILE) $(TARGET_DIR)/lib/modules/galcore.ko
-    cp -r $(@D)/drivers/common/* $(TARGET_DIR)/
-    cp -r $(@D)/drivers/common/* $(STAGING_DIR)/
+    $(INSTALL) -D -m 0644 $(@D)/$(NPU_KO_PATH)/$(NPU_KO_FILE) $(TARGET_DIR)/lib/modules/$(NPU_TARGET_NAME)
+    cp -r $(@D)/$(NPU_COMMON_PATH)/* $(TARGET_DIR)/
+    cp -r $(@D)/$(NPU_COMMON_PATH)/* $(STAGING_DIR)/
 
     if [ x${BUILD_NOT_START_RKNN_SCRIPT} != x ]; then \
         rm $(TARGET_DIR)/etc/init.d/S60NPU_init; \
@@ -84,11 +98,11 @@ define RKNPU_INSTALL_TARGET_CMDS
 
     if [ ${BUILD_RKNN_API} = "y" ]; then \
         if [ ${NPU_PLATFORM_ARCH} = "linux-aarch64" ]; then \
-            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib64/librknn_api.so $(TARGET_DIR)/usr/lib/; \
-            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib64/librknn_api.so $(STAGING_DIR)/usr/lib; \
+            $(INSTALL) -D -m 0644 $(@D)/$(NPU_RKNN_API_LIB64) $(TARGET_DIR)/usr/lib/; \
+            $(INSTALL) -D -m 0644 $(@D)/$(NPU_RKNN_API_LIB64) $(STAGING_DIR)/usr/lib; \
         else \
-            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib/librknn_api.so $(TARGET_DIR)/usr/lib/; \
-            $(INSTALL) -D -m 0644 $(@D)/rknn/rknn_api/librknn_api/lib/librknn_api.so $(STAGING_DIR)/usr/lib; \
+            $(INSTALL) -D -m 0644 $(@D)/$(NPU_RKNN_API_LIB) $(TARGET_DIR)/usr/lib/; \
+            $(INSTALL) -D -m 0644 $(@D)/$(NPU_RKNN_API_LIB) $(STAGING_DIR)/usr/lib; \
         fi \
     fi
 endef
