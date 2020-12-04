@@ -4,8 +4,15 @@ menuconfig BR2_PACKAGE_THUNDERBOOT
 	  Rockchip tb(thunder boot) configuration.
 
 if BR2_PACKAGE_THUNDERBOOT
+config BR2_PACKAGE_THUNDERBOOT_BATIPC_LAUNCH
+	bool "lunch for battery ipc"
+	help
+	  The default usage on battery ipc is special, that will power off
+	  automatically if the cloud connection was not establish.
+
 config BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS
 	int "camera fps setting"
+	depends on BR2_PACKAGE_THUNDERBOOT_BATIPC_LAUNCH
 	default 25
 	help
 	  Camera fps setting, default is 25fps.

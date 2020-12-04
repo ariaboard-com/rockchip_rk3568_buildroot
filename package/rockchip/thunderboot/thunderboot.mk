@@ -39,7 +39,11 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 	for module in `echo ${INSTALL_MODULES} | tr ',' '\n'`; do \
 		find ${THUNDERBOOT_BUILDDIR}/lib/modules/${KERNEL_VERSION}/kernel -name $$module | xargs -i cp {} $(TARGET_DIR)/lib/modules/; \
 	done
+endef
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_INSTALL_TARGET_CMDS
 
+ifeq ($(BR2_PACKAGE_THUNDERBOOT_BATIPC_LAUNCH),y)
+define THUNDERBOOT_INSTALL_BATIPC_CMDS
 	ln -rsf $(TARGET_DIR)/usr/share/mediaserver/$(call qstrip,$(BR2_PACKAGE_MEDIASERVE_CONFIG)) $(TARGET_DIR)/usr/share/mediaserver/tb.conf
 
 	$(INSTALL) -D -m 755 $(@D)/S06tb_launch $(TARGET_DIR)/etc/preinit.d/
@@ -48,6 +52,8 @@ define THUNDERBOOT_INSTALL_TARGET_CMDS
 
 	sed -i 's/CAMERA_FPS/$(BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS)/g' $(TARGET_DIR)/etc/preinit.d/S06tb_launch
 endef
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_INSTALL_BATIPC_CMDS
+endif
 
 ifeq ($(BR2_THUNDERBOOT_USB_ADBD),y)
 define THUNDERBOOT_USB_ADBD
