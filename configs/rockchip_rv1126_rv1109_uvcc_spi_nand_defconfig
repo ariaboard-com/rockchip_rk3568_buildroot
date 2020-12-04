@@ -3,6 +3,7 @@
 #include "video_mpp.config"
 #include "rv1126_rv1109_arm.config"
 #include "ubifs.config"
+#include "camera.config"
 
 #  - io tool used to read/write register and memory
 BR2_PACKAGE_IO=y
@@ -20,11 +21,8 @@ BR2_PACKAGE_SHM_TOOLS=y
 BR2_PACKAGE_LIBIPCPROTOCOL=y
 BR2_PACKAGE_RK_OEM=y
 BR2_PACKAGE_RK_OEM_RESOURCE_DIR="$(TOPDIR)/../device/rockchip/oem/oem_uvcc"
-BR2_PACKAGE_CAMERA_ENGINE_RKAIQ=y
 BR2_PACKAGE_CAMERA_ENGINE_RKAIQ_IQFILE="gc4c33_PCORW0009A_40IRC-4M.xml"
 BR2_PACKAGE_DBUS_GLIB=y
-BR2_PACKAGE_LIBV4L=y
-BR2_PACKAGE_LIBV4L_UTILS=y
 BR2_PACKAGE_UVC_APP=y
 BR2_PACKAGE_RKNPU_NOT_RUN_RKNN_SERVER=y
 BR2_PACKAGE_SMART_DISPLAY_SERVICE=y

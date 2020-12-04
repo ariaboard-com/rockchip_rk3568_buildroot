@@ -7,6 +7,7 @@
 #include "network.config"
 #include "video_mpp.config"
 #include "rk1806_webserver.config"
+#include "camera.config"
 BR2_TARGET_GENERIC_HOSTNAME="rk1806"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK1806 Buildroot"
 
