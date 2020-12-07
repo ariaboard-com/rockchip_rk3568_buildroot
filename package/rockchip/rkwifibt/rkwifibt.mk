@@ -50,11 +50,13 @@ define RKWIFIBT_INSTALL_COMMON
 endef
 
 define RKWIFIBT_TB_INSTALL
-	mkdir -p $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware
+    mkdir -p $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware
     $(INSTALL) -D -m 0755 $(@D)/wpa_supplicant.conf $(TARGET_DIR)/etc/
     $(INSTALL) -D -m 0644 $(@D)/firmware/broadcom/$(BR2_PACKAGE_RKWIFIBT_CHIPNAME)/wifi/* $(TARGET_DIR)/$(FIRMWARE_DIR)/etc/firmware/
     $(INSTALL) -D -m 0755 $(@D)/tb_start_wifi.sh $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(@D)/tb_start_cy_wifi.sh $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/brcm_tools/dhd_priv $(TARGET_DIR)/usr/bin/
+    $(INSTALL) -D -m 0755 $(@D)/src/CY_WL_API/keepalive $(TARGET_DIR)/usr/bin/
     $(INSTALL) -D -m 0755 $(@D)/bin/$(RKARCH)/* $(TARGET_DIR)/usr/bin/
 
     $(INSTALL) -D -m 0644 $(TOPDIR)/../kernel/drivers/net/wireless/rockchip_wlan/rkwifi/rk_wifi_config.ko $(TARGET_DIR)/$(FIRMWARE_DIR)/lib/modules/
@@ -113,6 +115,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/brcm_tools/dhd_priv $(@D)/brcm_tools/dhd_priv.c
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
     $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
+    $(MAKE) -C $(@D)/src/CY_WL_API/ CC=$(TARGET_CC)
     $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RKARCH)
 endef
 
@@ -125,22 +128,20 @@ define RKWIFIBT_INSTALL_TARGET_CMDS
 endef
 endif
 
-else
-
-ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "BROADCOM")
-define RKWIFIBT_INSTALL_TARGET_CMDS
-    $(RKWIFIBT_TB_INSTALL)
-endef
-endif
-
-endif #THUNDERBOOT
-
 ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "CYPRESS")
 define RKWIFIBT_INSTALL_TARGET_CMDS
     $(RKWIFIBT_INSTALL_COMMON)
     $(RKWIFIBT_BROADCOM_INSTALL)
 endef
 endif
+
+else
+
+define RKWIFIBT_INSTALL_TARGET_CMDS
+    $(RKWIFIBT_TB_INSTALL)
+endef
+
+endif #THUNDERBOOT
 
 ifeq ($(BR2_PACKAGE_RKWIFIBT_VENDOR), "REALTEK")
 
