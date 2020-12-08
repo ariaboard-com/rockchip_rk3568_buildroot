@@ -11,7 +11,7 @@ config BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
 if BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
 config BR2_PACKAGE_RKMEDIA_USE_AIQ
     bool "camera capture with rkaiq api"
-	select BR2_PACKAGE_CAMERA_ENGINE_RKAIQ
+    select BR2_PACKAGE_CAMERA_ENGINE
     help
       camera capture with rkaiq api
 endif #BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
