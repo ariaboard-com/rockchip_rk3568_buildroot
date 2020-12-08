@@ -1,16 +1,18 @@
 config BR2_PACKAGE_CAMERA_ENGINE_RKISP
-	bool "Rockchip Camera Engine for linux"
+	depends on BR2_PACKAGE_CAMERA_ENGINE
+	depends on BR2_ROCKCHIP_HAS_ISP1
+	bool "Rockchip Camera Engine for SoC with ISP1"
 	help
-	  Rockchip camera engine for linux.
+	  Rockchip camera engine for SoC with ISP1, e.g.
+	  RK3288, RK3399, RK3326, PX30, RK1808 etc.
 
+if BR2_PACKAGE_CAMERA_ENGINE_RKISP
 config BR2_PACKAGE_CAMERA_ENGINE_RKISP_3A_SERVICE
 	depends on BR2_PACKAGE_CAMERA_ENGINE_RKISP
 	bool "Rockchip Camera Engine 3A service run in booting"
 	default y
 	help
 	  Rockchip camera engine 3A service run in booting.
-
-if BR2_PACKAGE_CAMERA_ENGINE_RKISP_3A_SERVICE
 
 choice
 	bool "Specify a directory to store xml speed up bin"
@@ -28,11 +30,10 @@ config BR2_PACKAGE_CAMERA_ENGINE_RKISP_3A_SPEEDUP_DIR_USERDATA
 
 endchoice
 
-endif
-
 config BR2_PACKAGE_CAMERA_ENGINE_RKISP_IQFILE
 	depends on BR2_PACKAGE_CAMERA_ENGINE_RKISP
 	string "Rockchip Camera Engine IQ xml file"
 	default ""
 	help
 	  Rockchip camera engine for linux.
+endif
