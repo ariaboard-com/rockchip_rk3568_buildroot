@@ -36,7 +36,7 @@ else ifeq ($(BR2_PACKAGE_PX3SE),y)
 LIBMALI_CONF_OPTS += -Dgpu=utgard-400 -Dversion=r7p0 \
 		     -Dsubversion=r3p0
 else ifneq ($(BR2_PACKAGE_RK312X)$(BR2_PACKAGE_RK3128H)$(BR2_PACKAGE_RK3036)$(BR2_PACKAGE_RK3032),)
-LIBMALI_CONF_OPTS += -Dgpu=utgard-400 -Dversion=r7p0 -Dsubversion=r1p0
+LIBMALI_CONF_OPTS += -Dgpu=utgard-400 -Dversion=r7p0 -Dsubversion=r1p1
 else ifeq ($(BR2_PACKAGE_RK3288),y)
 LIBMALI_CONF_OPTS += -Dgpu=midgard-t76x -Dversion=r18p0 \
 		     -Dsubversion=all
