@@ -72,7 +72,7 @@ define BROADCOM_BSA_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/broadcom_bsa/bsa_bt_source.sh $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -D -m 755 $(TOPDIR)/../external/broadcom_bsa/$(BROADCOM_BSA_BLE_WIFI_CONFIG_FILE) $(TARGET_DIR)/usr/bin/bsa_ble_wifi_introducer.sh
 	sed -i 's/BTFIRMWARE_PATH/\/$(BT_FW_DIR)\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_hfp.sh
-	sed -i 's/BTFIRMWARE_PATH/\/$(BT_FW_DIR)\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
+	sed -i 's/BTFIRMWARE_PATH/\/$(BT_FW_DIR)\/etc\/firmware\//g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BT_TTY_DEV/\/dev\/$(BT_TTY_DEV)/g' $(TARGET_DIR)/usr/bin/bsa_server.sh
 	sed -i 's/BTFIRMWARE_PATH/\/$(BT_FW_DIR)\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_sink.sh
 	sed -i 's/BTFIRMWARE_PATH/\/$(BT_FW_DIR)\/etc\/firmware\/$(BTFIRMWARE)/g' $(TARGET_DIR)/usr/bin/bsa_bt_source.sh
