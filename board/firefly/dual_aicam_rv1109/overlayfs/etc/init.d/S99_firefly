@@ -1,10 +1,11 @@
 #!/bin/sh
-
+file="/userdata/firefly/firefly_start.sh"
 case "$1" in
   start)
-    ifconfig eth0 172.16.110.2
-    ifconfig eth0 down
-    ifconfig eth0 up
+    if [ -f "$file" ]; then
+        chmod 777 $file
+        $file
+    fi
     ;;
   stop)
     ;;
@@ -14,3 +15,4 @@ case "$1" in
     ;;
 esac
 exit 0
+
