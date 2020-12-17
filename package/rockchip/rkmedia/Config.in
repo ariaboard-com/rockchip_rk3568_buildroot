@@ -43,7 +43,7 @@ config BR2_PACKAGE_RKMEDIA_MPP_DECODER
 endif # BR2_PACKAGE_RKMEDIA_MPP
 
 config BR2_PACKAGE_RKMEDIA_ALSA
-    bool "audio capture and palyback"
+    bool "audio capture and playback"
     select BR2_PACKAGE_ALSA_LIB
     help
       wrapped function of alsa
