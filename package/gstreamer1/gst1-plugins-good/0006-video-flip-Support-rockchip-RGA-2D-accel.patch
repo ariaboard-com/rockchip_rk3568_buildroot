@@ -1,4 +1,4 @@
-From 8a4be0716d9e8b3a5878c0b138103334130e672d Mon Sep 17 00:00:00 2001
+From 92dccc15e60669fde64e0c8671f2134afb9d6f71 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 8 Nov 2019 17:36:20 +0800
 Subject: [PATCH] video-flip: Support rockchip RGA 2D accel
@@ -8,8 +8,8 @@ Disabled by default, set env GST_VIDEO_FLIP_USE_RGA=1 to enable.
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  configure.ac                   |  12 ++
- gst/videofilter/gstvideoflip.c | 200 +++++++++++++++++++++++++++++++++
- 2 files changed, 212 insertions(+)
+ gst/videofilter/gstvideoflip.c | 204 +++++++++++++++++++++++++++++++++
+ 2 files changed, 216 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
 index deb74f1..ba8f7f5 100644
@@ -35,7 +35,7 @@ index deb74f1..ba8f7f5 100644
  HAVE_GTK=no
  GTK_REQ=3.0.0
 diff --git a/gst/videofilter/gstvideoflip.c b/gst/videofilter/gstvideoflip.c
-index c6132f5..12f2336 100644
+index c6132f5..43ea033 100644
 --- a/gst/videofilter/gstvideoflip.c
 +++ b/gst/videofilter/gstvideoflip.c
 @@ -48,6 +48,11 @@
@@ -50,7 +50,7 @@ index c6132f5..12f2336 100644
  /* GstVideoFlip properties */
  enum
  {
-@@ -1118,6 +1123,192 @@ gst_video_flip_before_transform (GstBaseTransform * trans, GstBuffer * in)
+@@ -1118,6 +1123,196 @@ gst_video_flip_before_transform (GstBaseTransform * trans, GstBuffer * in)
      gst_object_sync_values (GST_OBJECT (videoflip), stream_time);
  }
  
@@ -159,10 +159,6 @@ index c6132f5..12f2336 100644
 +      w &= ~1;
 +      h &= ~1;
 +
-+      /* RGA requires yuv image stride align to 8 */
-+      if (hstride % 8)
-+        return FALSE;
-+
 +      if (vstride0 % 2)
 +        return FALSE;
 +      break;
@@ -207,11 +203,15 @@ index c6132f5..12f2336 100644
 +    rga_inited = 1;
 +  }
 +
-+  if (!get_rga_info (in_frame, &src_info, 0, 0, sw, sh))
++  if (!get_rga_info (in_frame, &src_info, 0, 0, sw, sh)) {
++    GST_DEBUG ("unsupported src info for RGA");
 +    return FALSE;
++  }
 +
-+  if (!get_rga_info (out_frame, &dst_info, 0, 0, dw, dh))
++  if (!get_rga_info (out_frame, &dst_info, 0, 0, dw, dh)) {
++    GST_DEBUG ("unsupported dst info for RGA");
 +    return FALSE;
++  }
 +
 +  switch (videoflip->active_method) {
 +    case GST_VIDEO_ORIENTATION_90R:
@@ -230,12 +230,16 @@ index c6132f5..12f2336 100644
 +      src_info.rotation = HAL_TRANSFORM_FLIP_V;
 +      break;
 +    default:
++      GST_DEBUG ("unsupported rotation for RGA");
 +      return FALSE;
 +  }
 +
-+  if (c_RkRgaBlit (&src_info, &dst_info, NULL) < 0)
++  if (c_RkRgaBlit (&src_info, &dst_info, NULL) < 0) {
++    GST_DEBUG ("failed to blit with RGA");
 +    return FALSE;
++  }
 +
++  GST_DEBUG ("flipped with RGA");
 +  return TRUE;
 +}
 +#endif
@@ -243,7 +247,7 @@ index c6132f5..12f2336 100644
  static GstFlowReturn
  gst_video_flip_transform_frame (GstVideoFilter * vfilter,
      GstVideoFrame * in_frame, GstVideoFrame * out_frame)
-@@ -1136,6 +1327,15 @@ gst_video_flip_transform_frame (GstVideoFilter * vfilter,
+@@ -1136,6 +1331,15 @@ gst_video_flip_transform_frame (GstVideoFilter * vfilter,
    g_type_class_unref (enum_class);
  
    GST_OBJECT_LOCK (videoflip);
