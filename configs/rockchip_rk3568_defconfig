@@ -6,7 +6,6 @@
 #include "bt.config"
 #include "camera.config"
 #include "camera_gst.config"
-#include "chromium.config"
 #include "debug.config"
 #include "debug2.config"
 #include "display.config"
