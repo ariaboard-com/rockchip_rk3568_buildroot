@@ -2,9 +2,16 @@ ifeq ($(BR2_PACKAGE_UVC_APP), y)
     UVC_APP_SITE = $(TOPDIR)/../external/uvc_app
     UVC_APP_SITE_METHOD = local
     UVC_APP_INSTALL_STAGING = YES
-    UVC_APP_DEPENDENCIES = libdrm mpp minilogger
+    UVC_APP_DEPENDENCIES = libdrm mpp
 ifeq ($(BR2_PACKAGE_CAMERA_ENGINE_RKISP),y)
     UVC_APP_DEPENDENCIES += camera_engine_rkisp
+endif
+
+ifeq ($(BR2_PACKAGE_UVC_APP_MINILOGGER), y)
+    UVC_APP_CONF_OPTS += -DENABLE_MINILOGGER=ON
+    UVC_APP_DEPENDENCIES += minilogger
+else
+    UVC_APP_CONF_OPTS += -DENABLE_MINILOGGER=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_AISERVER), y)
@@ -27,7 +34,7 @@ ifeq ($(BR2_PACKAGE_DBSERVER),y)
 endif
 
 ifeq ($(BR2_PACKAGE_RKMEDIA), y)
-    UVC_APP_CONF_OPTS = -DINSTALL_LIBRKUVC=y
+    UVC_APP_CONF_OPTS += -DINSTALL_LIBRKUVC=y
 endif
 
     $(eval $(cmake-package))
