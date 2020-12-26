@@ -1,4 +1,5 @@
 #!/bin/sh
+rndis_path=/sys/kernel/config/usb_gadget/rockchip/functions/rndis.gs0
 backup=/dev/block/by-name/backup
 file=/tmp/tmp_mac
 NETINTERFACE=eth0
@@ -9,16 +10,15 @@ GW="172.16.110.1"
 case "$1" in
   start)
     # rndis Mac 地址写入 backup 分区，开机校验分区是否存在 Mac 地址
-    dd if=$backup of=$file bs=100 count=1
-    MAC=$(cat $file  | cut -c1-50 | grep FFMAC | awk -F '=' '{print $2}')
-    if [ ! -n "$MAC" ];then
-	    MAC=$(ip link show $NETINTERFACE |  grep ether | awk -F ' ' '{print $2}')
-	    echo "FFMAC=$MAC" > $file
+    HOST_MAC=$(cat $file  | cut -c1-100 | grep HOST_MAC | awk -F '=' '{print $2}')
+    DEV_MAC=$(cat $file  | cut -c1-100 | grep DEV_MAC | awk -F '=' '{print $2}')
+    if [ ! -n "$HOST_MAC" ] || [ ! -n "$DEV_MAC" ];then
+	    HOST_MAC=$(cat $rndis_path/host_addr)
+	    DEV_MAC=$(cat $rndis_path/dev_addr)
+	    echo "HOST_MAC=$HOST_MAC" > $file
+	    echo "DEV_MAC=$DEV_MAC" >> $file
 	    dd if=$file of=$backup
     fi
-
-    ifconfig $NETINTERFACE down
-    ifconfig $NETINTERFACE hw ether $MAC
 
     ifconfig $NETINTERFACE $IP
     ifconfig $NETINTERFACE down
