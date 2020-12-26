@@ -2,6 +2,7 @@
 backup=/dev/block/by-name/backup
 file=/tmp/tmp_mac
 NETINTERFACE=eth0
+DNS="8.8.8.8"
 IP="172.16.110.2"
 GW="172.16.110.1"
 
@@ -23,6 +24,7 @@ case "$1" in
     ifconfig $NETINTERFACE down
     ifconfig $NETINTERFACE up
     route add default gw $GW
+    echo "nameserver $DNS" > /etc/resolv.conf
     ;;
   stop)
     ;;
