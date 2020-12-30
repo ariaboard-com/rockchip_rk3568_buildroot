@@ -1,4 +1,4 @@
-From 842f5808e599946bdb03634db3203f22e46b7451 Mon Sep 17 00:00:00 2001
+From 04e0078ae79c45133cd4323bffa97d0fbd965ef2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 19 Nov 2020 09:41:47 +0800
 Subject: [PATCH 14/40] backend-drm: Support mirror mode
@@ -14,11 +14,11 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  libweston/backend-drm/drm-internal.h  |   6 +
  libweston/backend-drm/drm.c           | 293 ++++++++++++++++++++++++--
  libweston/backend-drm/meson.build     |   3 +-
- libweston/backend-drm/state-propose.c |  14 +-
+ libweston/backend-drm/state-propose.c |  16 +-
  libweston/compositor.c                |   2 +-
  libweston/input.c                     |   7 +
  meson.build                           |   8 +
- 10 files changed, 325 insertions(+), 17 deletions(-)
+ 10 files changed, 326 insertions(+), 18 deletions(-)
 
 diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
 index 09087634..27eb99fa 100644
@@ -499,6 +499,15 @@ diff --git a/libweston/backend-drm/state-propose.c b/libweston/backend-drm/state
 index 767c34f4..63cf4dc8 100644
 --- a/libweston/backend-drm/state-propose.c
 +++ b/libweston/backend-drm/state-propose.c
+@@ -528,7 +528,7 @@ drm_output_try_view_on_plane(struct drm_plane *plane,
+ 
+ 	switch (plane->type) {
+ 	case WDRM_PLANE_TYPE_CURSOR:
+-		if (b->cursors_are_broken) {
++		if (b->cursors_are_broken || b->mirror_mode) {
+ 			availability = NO_PLANES_ACCEPTED;
+ 			goto out;
+ 		}
 @@ -1040,11 +1040,23 @@ drm_assign_planes(struct weston_output *output_base, void *repaint_data)
  	struct weston_view *ev;
  	struct weston_plane *primary = &output_base->compositor->primary_plane;
