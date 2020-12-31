@@ -94,20 +94,23 @@ config BR2_PACKAGE_MEDIASERVE_EXIV2_FEATURE
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_TB
+        bool "Enable thunder boot"
+
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
         bool "Enable rockface"
-        default y if BR2_PACKAGE_RKMEDIA_ROCKFACE
+        select BR2_PACKAGE_RKMEDIA_ROCKFACE
+        select BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
         help
           rockchip mediaserver options
 
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         bool "Enable rockx"
-        default y if BR2_PACKAGE_RKMEDIA_ROCKX
+        select BR2_PACKAGE_RKMEDIA_ROCKX
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
         help
           rockchip mediaserver options
-
-config BR2_PACKAGE_MEDIASERVE_TB
-        bool "Enable thunder boot"
 
 config BR2_PACKAGE_MEDIASERVE_ZBAR
 	bool "Enable zbar to scan QR code"
