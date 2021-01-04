@@ -29,7 +29,6 @@ FFMPEG_CONF_OPTS = \
 	--enable-network \
 	--disable-gray \
 	--enable-swscale-alpha \
-	--disable-small \
 	--enable-dct \
 	--enable-fft \
 	--enable-mdct \
@@ -68,6 +67,18 @@ ifeq ($(BR2_PACKAGE_FFMPEG_NONFREE),y)
 FFMPEG_CONF_OPTS += --enable-nonfree
 else
 FFMPEG_CONF_OPTS += --disable-nonfree
+endif
+
+ifeq ($(BR2_PACKAGE_FFMPEG_DEBUG),y)
+FFMPEG_CONF_OPTS += --enable-debug
+else
+FFMPEG_CONF_OPTS += --disable-debug
+endif
+
+ifeq ($(BR2_PACKAGE_FFMPEG_SMALL),y)
+FFMPEG_CONF_OPTS += --enable-small
+else
+FFMPEG_CONF_OPTS += --disable-small
 endif
 
 ifeq ($(BR2_PACKAGE_FFMPEG_FFMPEG),y)
