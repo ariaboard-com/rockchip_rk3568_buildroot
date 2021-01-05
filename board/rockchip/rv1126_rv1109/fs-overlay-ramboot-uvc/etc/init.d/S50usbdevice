@@ -391,7 +391,6 @@ start)
 	echo $PID > ${USB_CONFIGFS_DIR}/idProduct
 	bind_functions
 	pre_run_binary
-	#sleep 1
 	UDC=`ls /sys/class/udc/| awk '{print $1}'`
 	echo $UDC > ${USB_CONFIGFS_DIR}/UDC
 	run_binary
