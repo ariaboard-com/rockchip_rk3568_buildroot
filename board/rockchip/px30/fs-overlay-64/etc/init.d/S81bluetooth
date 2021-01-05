@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Start bluetooth
+#
+
+case "$1" in
+  start)
+	printf "Starting bluetooth: "
+	/usr/bin/bt_pcba_test
+	;;
+  stop)
+	printf "Stopping bluetooth: "
+	killall rtk_hciattach
+	;;
+  restart|reload)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+
