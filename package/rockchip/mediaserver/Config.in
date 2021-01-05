@@ -58,6 +58,21 @@ config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	help
 	  rockchip mediaserver options
 
+choice
+prompt "Link api type"
+  default BR2_PACKAGE_MEDIASERVE_LINKAPI_LINKKIT
+  help
+    Select a link api type.
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI_LINKKIT
+  bool "Enable linkkit api for aliyun"
+  depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI_TUYA
+  bool "Enable tuya api for tuya"
+  depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
+endchoice
+
 config BR2_PACKAGE_MEDIASERVE_LINKAPI_VENDOR
 	bool "Enable link certificate to be read from vendor storage"
 	depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
