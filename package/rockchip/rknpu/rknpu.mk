@@ -36,6 +36,7 @@ NPU_KO_PATH = drivers/npu_ko
 NPU_RKNN_API_LIB64 = rknn/rknn_api/librknn_api/lib64/librknn_api.so
 NPU_RKNN_API_LIB = rknn/rknn_api/librknn_api/lib/librknn_api.so
 NPU_TARGET_NAME = galcore.ko
+NPU_NN = y
 NPU_COMMON_PATH = drivers/common
 endif
 
@@ -85,8 +86,10 @@ define RKNPU_INSTALL_TARGET_CMDS
         rm $(TARGET_DIR)/etc/init.d/S05NPU_init; \
     fi
 
-    cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(TARGET_DIR)/
-    cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(STAGING_DIR)/
+    if [ x${NPU_NN} != x ]; then \
+        cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(TARGET_DIR)/; \
+        cp -r $(@D)/drivers/$(NPU_PLATFORM)/* $(STAGING_DIR)/; \
+    fi
 
     if [ -e "$(@D)/test" ]; then \
         cp -r $(@D)/test $(TARGET_DIR)/usr/share/npu; \
