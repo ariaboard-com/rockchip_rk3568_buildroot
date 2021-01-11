@@ -171,6 +171,13 @@ config BR2_PACKAGE_RKMEDIA_MINILOGGER
     select BR2_PACKAGE_MINILOGGER
     help
       Output log by minilogger interface
+
+config BR2_PACKAGE_RKMEDIA_MB_TS_DEBUG
+    bool "MediaBuffer TimeStamp Debug"
+    default n
+    help
+      Time-consuming statistics of each stage of MediaBuffer
+
 endif #BR2_PACKAGE_RKMEDIA_DEBUG_UTILS
 
 config BR2_PACKAGE_RKMEDIA_LIVE555
