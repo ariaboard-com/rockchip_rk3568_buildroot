@@ -100,10 +100,18 @@ config BR2_PACKAGE_MEDIASERVE_TB
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
         bool "Enable rockface"
         select BR2_PACKAGE_RKMEDIA_ROCKFACE
-        select BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
         default y if !BR2_PACKAGE_MEDIASERVE_TB
         help
           rockchip mediaserver options
+
+if BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
+config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE_RECOGNIZE
+        bool "Enable rockface recognize"
+        select BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
+        help
+          rockchip mediaserver recognize options
+endif
 
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         bool "Enable rockx"
