@@ -5,6 +5,21 @@ config BR2_PACKAGE_COMMON_ALGORITHM
 
 if BR2_PACKAGE_COMMON_ALGORITHM
 
+choice
+        prompt "target platform(32bit/64bit)"
+
+config BR2_PACKAGE_COMMON_ALGORITHM_32
+        bool "32bit"
+        default y if BR2_PACKAGE_COMMON_ALGORITHM
+        help
+          Use algorithm for 32bit system.
+
+config BR2_PACKAGE_COMMON_ALGORITHM_64
+        bool "64bit"
+        help
+          Use algorithm for 64bit system.
+endchoice
+
 config BR2_PACKAGE_COMMON_ALGORITHM_AEC_ANR_AGC
 	bool "audio 3a"
 	default n
