@@ -38,9 +38,20 @@ define RKSCRIPT_INSTALL_TARGET_CMDS
 	$(INSTALL) -m 0755 -D $(@D)/usbdevice $(TARGET_DIR)/usr/bin/
 	$(INSTALL) -m 0755 -D $(@D)/waylandtest.sh $(TARGET_DIR)/usr/bin/
 	echo -e "/dev/block/by-name/misc\t\t/misc\t\t\temmc\t\tdefaults\t\t0\t0" >> $(TARGET_DIR)/etc/fstab
-	echo -e "/dev/block/by-name/oem\t\t/oem\t\t\t$$RK_OEM_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab
-	echo -e "/dev/block/by-name/userdata\t/userdata\t\t$$RK_USERDATA_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab
-	cd $(TARGET_DIR) && rm -rf userdata data mnt udisk sdcard && mkdir -p userdata mnt/sdcard && ln -s userdata data && ln -s media/usb0 udisk && ln -s mnt/sdcard sdcard && cd -
+
+	if [ x${RK_OEM_NODE} != x ]; then \
+	    echo -e "$$RK_OEM_NODE\t\t/oem\t\t\t$$RK_OEM_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab; \
+	else \
+	    echo -e "/dev/block/by-name/oem\t\t/oem\t\t\t$$RK_OEM_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab; \
+	fi
+
+	if [ x${RK_USERDATA_NODE} != x ]; then \
+	    echo -e "$$RK_USERDATA_NODE\t/userdata\t\t$$RK_USERDATA_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab; \
+	else \
+	    echo -e "/dev/block/by-name/userdata\t/userdata\t\t$$RK_USERDATA_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab; \
+	fi
+
+	cd $(TARGET_DIR) && rm -rf oem userdata data mnt udisk sdcard && mkdir -p oem userdata mnt/sdcard && ln -s userdata data && ln -s media/usb0 udisk && ln -s mnt/sdcard sdcard && cd -
 	if echo $(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR) | grep $(TARGET_DIR); then echo "Found build oem into target...";else rm -rf $(TARGET_DIR)/oem && mkdir -p $(TARGET_DIR)/oem; fi
 	if test -e $(RKSCRIPT_USB_CONFIG_FILE) ; then \
 		rm $(RKSCRIPT_USB_CONFIG_FILE) ; \
