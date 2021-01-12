@@ -14,14 +14,15 @@
 # process   == program to run
 
 # Startup the system
-::sysinit:/etc/preinit.d/rcS
 ::sysinit:/bin/mount -t proc proc /proc
 ::sysinit:/bin/mount -o remount,rw /
 ::sysinit:/bin/mkdir -p /dev/pts
 ::sysinit:/bin/mkdir -p /dev/shm
 ::sysinit:/bin/mount -a 2>/dev/null
+::sysinit:/bin/hostname -F /etc/hostname
 # now run any rc scripts
 ::respawn:-/bin/sh
+::sysinit:/etc/preinit.d/rcS
 
 # Put a getty on the serial port
 #ttyFIQ0::respawn:/sbin/getty -L  ttyFIQ0 0 vt100 # GENERIC_SERIAL
