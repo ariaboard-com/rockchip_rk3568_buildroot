@@ -40,9 +40,9 @@ BR2_PACKAGE_RK_OEM_IMAGE_FILESYSTEM_TYPE="NONE"
 BR2_PACKAGE_CALLFUNIPC=y
 BR2_PACKAGE_ISP2_IPC=y
 BR2_PACKAGE_ISP2_IPC_DBUS=y
-BR2_PACKAGE_ISP2_IPC_DBSERVER=y
 BR2_PACKAGE_ISP2_IPC_MINILOGGER=y
 # BR2_PACKAGE_ALSA_UTILS_ALSAMIXER is not set
+# BR2_PACKAGE_FFMPEG_FFMPEG is not set
 BR2_PACKAGE_FFMPEG_ENCODERS="mp2 adpcm_g726 pcm_alaw pcm_mulaw rawvideo mjpeg mpeg2video"
 BR2_PACKAGE_FFMPEG_DECODERS="pcm_alaw pcm_mulaw rawvideo mjpeg mpeg2video"
 BR2_PACKAGE_FFMPEG_MUXERS="pcm_alaw pcm_mulaw g722 g726 adts rawvideo mjpeg mp4 mov rtp flv f4v mpegts matroska avi rtsp mpeg1system"
