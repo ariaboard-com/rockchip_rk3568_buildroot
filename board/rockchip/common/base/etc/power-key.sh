@@ -38,6 +38,7 @@ logger -t $(basename $0) "[$$]: Received power key event: $@..."
 
 case "$EVENT" in
 	press)
+		ifconfig wlan0 down&
 		# Lock it
 		exec 3<$0
 		flock -x 3
@@ -54,6 +55,7 @@ case "$EVENT" in
 		sleep .5
 
 		start-stop-daemon -K -q -p $PIDFILE && short_press
+		ifconfig wlan0 up&
 		;;
 	short-press)
 		short_press
