@@ -213,6 +213,17 @@ get_ubi_image_compression_tpye()
 	fi
 }
 
+stash_unused_files()
+{
+	# stash $ROOTFS_SRC_DIR/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM
+	mv $ROOTFS_SRC_DIR/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM $BUILDROOT_IMAGE_DIR/
+}
+
+pop_unused_files()
+{
+	mv $BUILDROOT_IMAGE_DIR/THIS_IS_NOT_YOUR_ROOT_FILESYSTEM $ROOTFS_SRC_DIR/
+}
+
 # Start
 
 if [ ! -d $IMAGE_OUTPUT_DIR ]; then
@@ -228,6 +239,8 @@ PARAMETER=$TOP_DIR/device/rockchip/.target_product/$RK_PARAMETER
 DEFAULT_UBI_PAGE_SIZE=${RK_UBI_PAGE_SIZE:-2048}
 # default block size 128KB
 DEFAULT_UBI_BLOCK_SIZE=${RK_UBI_BLOCK_SIZE:-0x20000}
+
+stash_unused_files
 
 echo "[$0:info] Start build ubi images..."
 
@@ -247,5 +260,8 @@ mk_ubi_image_fake_for_rootfs 0x20000 2048
 mk_ubi_image_fake_for_rootfs 0x40000 2048
 mk_ubi_image_fake_for_rootfs 0x40000 4096
 $FAKEROOT_TOOL -- $ROOTFS_IMAGE_FAKEROOT_UBI
+
+echo "[$0:info] End build ubi images..."
+pop_unused_files
 
 exit 0
