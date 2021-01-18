@@ -10,9 +10,16 @@ LIBMALI_SITE_METHOD = local
 
 LIBMALI_INSTALL_STAGING = YES
 
-LIBMALI_DEPENDENCIES = mesa3d
+ifeq ($(BR2_PACKAGE_LIBMALI_ONLY_CL),)
+LIBMALI_PROVIDES += libegl libgles
+endif
+
+ifeq ($(BR2_PACKAGE_LIBMALI_WITHOUT_CL),)
+LIBMALI_PROVIDES += libopencl
+endif
 
 LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false
+LIBMALI_DEPENDENCIES = libdrm
 
 ifeq ($(BR2_PACKAGE_LIBMALI_DUMMY),y)
 LIBMALI_CONF_OPTS += -Dplatform=dummy
@@ -20,8 +27,10 @@ else ifeq ($(BR2_PACKAGE_LIBMALI_ONLY_CL),y)
 LIBMALI_CONF_OPTS += -Dplatform=only-cl
 else ifeq ($(BR2_PACKAGE_WAYLAND),y)
 LIBMALI_CONF_OPTS += -Dplatform=wayland
+LIBMALI_DEPENDENCIES += wayland
 else ifeq ($(BR2_PACKAGE_XORG7)),y)
 LIBMALI_CONF_OPTS += -Dplatform=x11
+LIBMALI_DEPENDENCIES += libxcb xlib_libX11
 else
 LIBMALI_CONF_OPTS += -Dplatform=gbm
 endif
