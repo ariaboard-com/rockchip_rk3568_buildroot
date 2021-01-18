@@ -2,9 +2,7 @@
 
 case "$1" in
 	start)
-		sleep 5
-                echo ondemand > /sys/bus/cpu/devices/cpu0/cpufreq/scaling_governor
-                echo "set governor ondemand ok"
+		sleep 5 && echo ondemand > /sys/bus/cpu/devices/cpu0/cpufreq/scaling_governor && echo "set governor ondemand ok" &
 		;;
 	stop)
 		;;
