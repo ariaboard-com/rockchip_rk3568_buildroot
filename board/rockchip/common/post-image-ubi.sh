@@ -166,7 +166,7 @@ get_partition_size()
 		part_size_bytes=$[$part_size*512]
 
 		case $part_name in
-			rootfs)
+			rootfs | system_[ab])
 				ROOTFS_PART_SIZE=$part_size_bytes
 				;;
 			oem)
