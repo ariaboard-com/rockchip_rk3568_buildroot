@@ -1,6 +1,3 @@
-# hash from: https://download.qt.io/official_releases/qt/5.6/5.6.3/submodules/qtwayland-opensource-src-5.6.3.tar.xz.mirrorlist
-sha256 5a475278b2db73aa7fa7f3ba6d98d8d72774f5c77e172495007d79f91d09daa3 qtwayland-opensource-src-5.6.3.tar.xz
-
 # Hash from: https://download.qt.io/official_releases/qt/5.9/5.9.4/submodules/qtwayland-opensource-src-5.9.4.tar.xz.mirrorlist
 sha256 3f7496522013e6122bb8dc00d0c3cc7753a44dca94fa3b22096eaa21e6099874 qtwayland-opensource-src-5.9.4.tar.xz
 

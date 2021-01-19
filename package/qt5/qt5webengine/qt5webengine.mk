@@ -8,7 +8,7 @@ QT5WEBENGINE_VERSION = $(call qstrip,$(BR2_PACKAGE_QT5WEBENGINE_VERSION))
 QT5WEBENGINE_MAJOR_VERSION = $(call qstrip,$(basename $(QT5WEBENGINE_VERSION)))
 QT5WEBENGINE_SITE = https://download.qt.io/archive/qt/$(QT5WEBENGINE_MAJOR_VERSION)/$(QT5WEBENGINE_VERSION)/submodules
 QT5WEBENGINE_SOURCE = qtwebengine-$(QT5_SOURCE_TARBALL_PREFIX)-$(QT5WEBENGINE_VERSION).tar.xz
-QT5WEBENGINE_DEPENDENCIES = ffmpeg libglib2 libvpx opus webp \
+QT5WEBENGINE_DEPENDENCIES = ffmpeg libglib2 libvpx libxkbcommon opus webp \
 	qt5declarative qt5webchannel host-bison host-flex host-gperf \
 	host-pkgconf host-python
 QT5WEBENGINE_INSTALL_STAGING = YES
@@ -21,6 +21,10 @@ QT5WEBENGINE_LICENSE = GPL-2.0 or LGPL-3.0 or GPL-3.0 or GPL-3.0 with exception
 QT5WEBENGINE_LICENSE_FILES = LICENSE.GPL2 LICENSE.GPL3 LICENSE.GPL3-EXCEPT \
 	LICENSE.GPLv3 LICENSE.LGPL3 $(QT5WEBENGINE_CHROMIUM_LICENSE_FILES)
 
+ifeq ($(BR2_PACKAGE_QT5BASE_EXAMPLES),y)
+QT5WEBENGINE_DEPENDENCIES += qt5svg
+endif
+
 ifeq ($(BR2_PACKAGE_QT5BASE_XCB),y)
 QT5WEBENGINE_DEPENDENCIES += xlib_libXScrnSaver xlib_libXcomposite \
 	xlib_libXcursor xlib_libXi xlib_libXrandr xlib_libXtst
@@ -28,10 +32,10 @@ endif
 
 QT5WEBENGINE_DEPENDENCIES += host-libpng host-libnss libnss
 
-QT5WEBENGINE_CONFIG += -webengine-ffmpeg
+QT5WEBENGINE_CONFIG += -ffmpeg
 
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_WEBRTC),y)
-QT5WEBENGINE_CONFIG += -webengine-webrtc
+QT5WEBENGINE_CONFIG += -webrtc
 endif
 
 ifeq ($(BR2_PACKAGE_QT5WEBENGINE_PROPRIETARY_CODECS),y)
