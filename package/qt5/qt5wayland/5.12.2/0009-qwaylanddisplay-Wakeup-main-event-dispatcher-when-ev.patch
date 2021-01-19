@@ -1,7 +1,7 @@
-From 7341163e3472f580c9272b531af310e1499d087e Mon Sep 17 00:00:00 2001
+From 0d9ee6332bb8d161c928d5acc0fd129ef15a00df Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
-Subject: [PATCH 09/15] qwaylanddisplay: Wakeup main event dispatcher when
+Subject: [PATCH 09/16] qwaylanddisplay: Wakeup main event dispatcher when
  events pending
 
 The socket might not be able to generate poll events to wakeup the main
@@ -18,7 +18,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 51 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index dbebc52..a287278 100644
+index bee46a8..c884645 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -73,6 +73,8 @@
@@ -64,7 +64,7 @@ index dbebc52..a287278 100644
 +{
 +    while (!quit) {
 +        if (wl_display_prepare_read(mDisplay) != 0) {
-+            /* wakeup dispatcher for pending events */
++            // wakeup dispatcher for pending events
 +            if (auto *dispatcher = QCoreApplication::eventDispatcher())
 +                dispatcher->wakeUp();
 +        } else {
@@ -79,7 +79,7 @@ index dbebc52..a287278 100644
  struct wl_surface *QWaylandDisplay::createSurface(void *handle)
  {
      struct wl_surface *surface = mCompositor.create_surface();
-@@ -141,6 +185,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+@@ -145,6 +189,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
  
      mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
  
@@ -88,7 +88,7 @@ index dbebc52..a287278 100644
      forceRoundTrip();
  }
  
-@@ -163,8 +209,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
+@@ -167,8 +213,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
  #if QT_CONFIG(cursor)
      qDeleteAll(mCursorThemesBySize);
  #endif

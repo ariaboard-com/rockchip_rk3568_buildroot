@@ -1,7 +1,7 @@
-From 8f74311b86b494de12ea86e41c80d9a4dae92908 Mon Sep 17 00:00:00 2001
+From 16b4473c1c2538bc477ddefacdc4f9355fc18d79 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 10/15] qwaylandxdgshellv6: Support switching between
+Subject: [PATCH 10/16] qwaylandxdgshellv6: Support switching between
  fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.

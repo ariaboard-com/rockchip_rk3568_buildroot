@@ -1,15 +1,15 @@
-From b0cabc039f490c0497b873e8c49d472fd8232cba Mon Sep 17 00:00:00 2001
+From b4938c5eeb06a331948b0b0d96c89a0f3b6df11b Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:54:38 +0800
 Subject: [PATCH 04/13] gsttools: videooverlay: Support overriding video win id
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ src/gsttools/qgstreamervideooverlay.cpp | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index f1ab96f..41cb097 100644
+index b353eab..50f42fe 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -467,6 +467,15 @@ static QWindow *findWindow(WId id) {
@@ -36,7 +36,22 @@ index f1ab96f..41cb097 100644
 +    window = getVideoWindow(id);
      if (!window) {
          gst_video_overlay_set_window_handle(overlay, 0);
-         goto no_window;
+         goto set_rectangle;
+@@ -503,12 +512,8 @@ void QGstreamerVideoOverlay::setWindowHandle_helper(WId id)
+ 
+     // It's wayland platform, using wl_surface as window handle.
+     if (compositor) {
+-        if (!surface || !isActive()) {
+-            gst_video_overlay_set_window_handle(overlay, 0);
+-            goto out;
+-        }
+-
+-        gst_video_overlay_set_window_handle(overlay, (WId) surface);
++        gst_video_overlay_set_window_handle(overlay,
++                                            isActive() ? (WId) surface : 0);
+ 
+         if (m_rect.width() <= 0 || m_rect.height() <= 0)
+             goto out;
 -- 
 2.20.1
 

@@ -1,7 +1,7 @@
-From dfafb4fe4b775fb2ff5720307129bf241f6929e3 Mon Sep 17 00:00:00 2001
+From 5de871f12148ac61c8abee05e13640f1324bdea2 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
-Subject: [PATCH 13/17] qwaylandxdgshellv6: Support switching between
+Subject: [PATCH 13/18] qwaylandxdgshellv6: Support switching between
  fullscreen and maximized
 
 1/ The weston expected a commit to apply new window states.
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index 3a84b5d..6889d6c 100644
+index 3a84b5d7..6889d6c5 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -70,6 +70,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()

@@ -1,4 +1,4 @@
-From 21d2feb1612a09db6e767fb4a6991534bd5ce18a Mon Sep 17 00:00:00 2001
+From 6519e2a5c86be3ca262a2202bc0910cf6fed0619 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Nov 2018 16:03:31 +0800
 Subject: [PATCH 02/13] gsttools: videowidget: Set overlay rectangle when
