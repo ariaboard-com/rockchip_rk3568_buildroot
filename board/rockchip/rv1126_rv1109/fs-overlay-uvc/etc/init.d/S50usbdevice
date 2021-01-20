@@ -368,33 +368,32 @@ usb_device_stop()
 
 case "$1" in
 start)
-	DIR=$(cd `dirname $0`; pwd)
-	if [ ! -e "$DIR/.usb_config" ]; then
-		echo "$0: Cannot find .usb_config"
-		exit 0
-	fi
+#	DIR=$(cd `dirname $0`; pwd)
+#	if [ ! -e "$DIR/.usb_config" ]; then
+#		echo "$0: Cannot find .usb_config"
+#		exit 0
+#	fi
 
-	if [ -e /tmp/.usb_config ]; then
-		USB_CONFIG_FILE=/tmp/.usb_config
-	else
-		USB_CONFIG_FILE=$DIR/.usb_config
-		cp $DIR/.usb_config /tmp/.usb_config
-	fi
-
-	parameter_init
-	if [ -z $CONFIG_STRING ]; then
-		echo "$0: no function be selected"
-		exit 0
-	fi
-	test -d ${USB_CONFIGFS_DIR} || configfs_init
-	use_os_desc
-	echo $PID > ${USB_CONFIGFS_DIR}/idProduct
-	bind_functions
-	pre_run_binary
-	#sleep 1
-	UDC=`ls /sys/class/udc/| awk '{print $1}'`
-	echo $UDC > ${USB_CONFIGFS_DIR}/UDC
-	run_binary
+#	if [ -e /tmp/.usb_config ]; then
+#		USB_CONFIG_FILE=/tmp/.usb_config
+#	else
+#		USB_CONFIG_FILE=$DIR/.usb_config
+#		cp $DIR/.usb_config /tmp/.usb_config
+#	fi
+#
+#	parameter_init
+#	if [ -z $CONFIG_STRING ]; then
+#		echo "$0: no function be selected"
+#		exit 0
+#	fi
+#	test -d ${USB_CONFIGFS_DIR} || configfs_init
+#	use_os_desc
+#	echo $PID > ${USB_CONFIGFS_DIR}/idProduct
+#	bind_functions
+#	pre_run_binary
+#	UDC=`ls /sys/class/udc/| awk '{print $1}'`
+#	echo $UDC > ${USB_CONFIGFS_DIR}/UDC
+#	run_binary
 	;;
 stop)
 #	usb_device_stop
