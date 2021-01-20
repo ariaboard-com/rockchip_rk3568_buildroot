@@ -9,7 +9,6 @@
 #include "audio_gst.config"
 #include "camera.config"
 #include "camera_gst.config"
-#include "test.config"
 #include "debug.config"
 #include "benchmark.config"
 #include "wifi.config"
@@ -18,7 +17,7 @@
 #include "qt.config"
 #include "qt_app.config"
 #include "ntfs.config"
-BR2_ROOTFS_OVERLAY="board/rockchip/rk3288/fs-overlay/"
+BR2_ROOTFS_OVERLAY="board/rockchip/rk3288/fs-overlay/ board/rockchip/common/firefly"
 BR2_TARGET_GENERIC_HOSTNAME="rk3288"
 BR2_TARGET_GENERIC_ISSUE="Welcome to RK3288 Buildroot"
 BR2_PACKAGE_RKWIFIBT_AP6335=y

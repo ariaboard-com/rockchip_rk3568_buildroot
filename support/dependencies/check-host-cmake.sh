@@ -6,6 +6,8 @@
 major_min="${1%.*}"
 minor_min="${1#*.}"
 
+default_version="${1}"
+
 shift
 
 for candidate; do
@@ -31,6 +33,11 @@ for candidate; do
 
     major="${version%.*}"
     minor="${version#*.}"
+
+	if [ "${version}" != "${default_version}" ]; then
+		# echo nothing: no suitable cmake found
+		continue
+	fi
 
     if [ ${major} -gt ${major_min} ]; then
         echo "${cmake}"

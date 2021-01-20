@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ARCFACE
+    bool "Arc Face App"
+    help
+        Provided by ArcSoft
+
