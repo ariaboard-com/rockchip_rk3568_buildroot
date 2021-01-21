@@ -1,4 +1,4 @@
-From ee8bf0d36aebecf738b7de8e2f68653b3a7797e1 Mon Sep 17 00:00:00 2001
+From 1135335f26bcd59a68fe5adc4b82c1d4bb227b00 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 27 Feb 2019 16:52:15 +0800
 Subject: [PATCH 06/15] qwaylandxdgshellv6: Support setting window position

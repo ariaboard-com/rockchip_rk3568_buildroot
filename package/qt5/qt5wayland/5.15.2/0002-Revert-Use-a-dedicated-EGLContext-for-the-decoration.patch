@@ -1,13 +1,12 @@
-From 584d5dc9fdd8fb8a808b48205bbbfa3f9787a224 Mon Sep 17 00:00:00 2001
+From 41d1e3fa87d323980013b94b320e67683df3f710 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date: Wed, 20 Jan 2021 12:30:58 +0800
-Subject: [PATCH 02/15] Revert "Client: Don't send fake
- SurfaceCreated/Destroyed events"
+Date: Mon, 15 Jun 2020 16:48:42 +0800
+Subject: [PATCH 02/15] Revert "Use a dedicated EGLContext for the decorations
+ blitter"
 
-This reverts commit cd21404f99b486ff62225699e1a4bdc0d5b3d5c1.
+This reverts commit 7a69fc27a7cb5c5e9c70c1c56e534e6e59b46696.
 
-We need this SurfaceAboutToBeDestroyed event to done the current egl
-context before the reset.
+Somehow mali doesn't work well with this.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

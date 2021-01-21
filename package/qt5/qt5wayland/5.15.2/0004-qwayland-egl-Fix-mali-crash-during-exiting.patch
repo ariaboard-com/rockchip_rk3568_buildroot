@@ -1,4 +1,4 @@
-From 101506144f2c462b1d6b706a2da3050151780036 Mon Sep 17 00:00:00 2001
+From 4db1427ecb028cfd8d5c147c81836a501f68ce35 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 3 Jan 2019 15:27:59 +0800
 Subject: [PATCH 04/15] qwayland-egl: Fix mali crash during exiting
