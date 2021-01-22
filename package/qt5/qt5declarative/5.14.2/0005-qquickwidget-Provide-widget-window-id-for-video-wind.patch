@@ -1,7 +1,7 @@
-From 249acc8d7a53adb999fff752fbdff624e8219d54 Mon Sep 17 00:00:00 2001
+From 969d4e1b1069be737895d0dd84433ea862ec825a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:45:33 +0800
-Subject: [PATCH 4/4] qquickwidget: Provide widget window id for video window
+Subject: [PATCH 5/5] qquickwidget: Provide widget window id for video window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---

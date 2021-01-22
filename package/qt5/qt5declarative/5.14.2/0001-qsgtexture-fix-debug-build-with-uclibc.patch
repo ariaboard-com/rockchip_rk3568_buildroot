@@ -1,7 +1,7 @@
 From a4b7665c8deb73a44990435d5d674ea66e8d6af3 Mon Sep 17 00:00:00 2001
 From: Fabrice Fontaine <fontaine.fabrice@gmail.com>
 Date: Thu, 29 Nov 2018 23:33:10 +0100
-Subject: [PATCH 1/4] qsgtexture: fix debug build with uclibc
+Subject: [PATCH 1/5] qsgtexture: fix debug build with uclibc
 
 Debug build of gsgtexture fails on uclibc since version 5.11 and
 https://github.com/qt/qtdeclarative/commit/7c507eaac3f848f92f2ebdafe8ded4a064d68351:
