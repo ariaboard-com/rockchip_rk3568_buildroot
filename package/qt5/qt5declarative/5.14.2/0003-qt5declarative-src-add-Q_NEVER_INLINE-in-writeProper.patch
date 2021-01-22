@@ -1,7 +1,7 @@
-From fc691799bd3a049a4755272cab8ddcc63d7868a0 Mon Sep 17 00:00:00 2001
+From 17c1f93219c4a51e052a2b64954d5f8406ff247c Mon Sep 17 00:00:00 2001
 From: Nickey Yang <nickey.yang@rock-chips.com>
 Date: Thu, 2 Aug 2018 17:06:51 +0800
-Subject: [PATCH 2/3] qt5declarative: src: add Q_NEVER_INLINE in writeProperty
+Subject: [PATCH 3/4] qt5declarative: src: add Q_NEVER_INLINE in writeProperty
 
 gcc compiler optimizations will cause crash on cortex_a17 platform
 So fix it.
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/qml/qml/qqmlpropertydata_p.h b/src/qml/qml/qqmlpropertydata_p.h
-index dec69622..fe3e88a7 100644
+index dec696226e..fe3e88a784 100644
 --- a/src/qml/qml/qqmlpropertydata_p.h
 +++ b/src/qml/qml/qqmlpropertydata_p.h
 @@ -278,7 +278,7 @@ public:
