@@ -1,0 +1,15 @@
+#!/bin/sh
+case "$1" in
+  start)
+    hwclock -s
+    /usr/bin/ntp_sync.sh &
+    ;;
+  stop)
+    ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0
+

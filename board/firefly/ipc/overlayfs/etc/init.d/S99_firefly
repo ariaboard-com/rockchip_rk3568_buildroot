@@ -1,0 +1,18 @@
+#!/bin/sh
+file="/userdata/firefly/firefly_start.sh"
+case "$1" in
+  start)
+    if [ -f "$file" ]; then
+        chmod 777 $file
+        $file
+    fi
+    ;;
+  stop)
+    ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0
+
