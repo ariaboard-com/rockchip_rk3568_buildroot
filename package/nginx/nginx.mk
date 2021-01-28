@@ -255,6 +255,11 @@ NGINX_DEPENDENCIES += nginx-rtmp
 NGINX_CONF_OPTS += --add-module=$(NGINX_RTMP_DIR)
 endif
 
+ifeq ($(BR2_PACKAGE_NGINX_HTTP_FLV_LIVE),y)
+NGINX_DEPENDENCIES += nginx-http-flv-live
+NGINX_CONF_OPTS += --add-module=$(NGINX_HTTP_FLV_LIVE_DIR)
+endif
+
 # Debug logging
 NGINX_CONF_OPTS += $(if $(BR2_PACKAGE_NGINX_DEBUG),--with-debug)
 

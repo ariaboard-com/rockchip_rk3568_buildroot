@@ -1790,6 +1790,7 @@ menu "External nginx modules"
 	source "package/nginx-naxsi/Config.in"
 	source "package/nginx-upload/Config.in"
 	source "package/nginx-rtmp/Config.in"
+	source "package/nginx-http-flv-live/Config.in"
 endmenu
 endif
 	source "package/ngircd/Config.in"
