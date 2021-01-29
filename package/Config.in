@@ -1546,6 +1546,7 @@ menu "Other"
 	source "package/librws/Config.in"
 	source "package/lightning/Config.in"
 	source "package/linux-pam/Config.in"
+	source "package/mynt-eye-d-sdk/Config.in"
 	source "package/pcl/Config.in"
 if BR2_PACKAGE_LINUX_PAM
 comment "linux-pam plugins"
