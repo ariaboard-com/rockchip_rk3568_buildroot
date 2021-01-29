@@ -60,7 +60,7 @@ LIBMALI_GPU = bifrost-g52
 LIBMALI_VER = r25p0
 endif
 
-LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false \
+LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false -Dkhr-header=true \
 		    -Dplatform=$(LIBMALI_PLATFORM) -Dgpu=$(LIBMALI_GPU) \
 		    -Dversion=$(LIBMALI_VER)
 
