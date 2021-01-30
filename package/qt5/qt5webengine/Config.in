@@ -80,12 +80,11 @@ if BR2_PACKAGE_QT5WEBENGINE
 choice
 	prompt "Qt5WebEngine version"
 	default BR2_PACKAGE_QT5WEBENGINE_5_13 if BR2_PACKAGE_QT5_VERSION_5_12
-	default BR2_PACKAGE_QT5WEBENGINE_5_13 if BR2_PACKAGE_QT5_VERSION_5_13
 	default BR2_PACKAGE_QT5WEBENGINE_5_14 if BR2_PACKAGE_QT5_VERSION_5_14
-	default BR2_PACKAGE_QT5WEBENGINE_5_15 if BR2_PACKAGE_QT5_VERSION_5_15
 
 config BR2_PACKAGE_QT5WEBENGINE_5_12
 	bool "5.12"
+	depends on BR2_PACKAGE_QT5_VERSION_5_12
 	help
 	  This option builds QtWebEngine 5.12, which is licensed under
 	  (L)GPL-3.0+.
@@ -93,6 +92,8 @@ config BR2_PACKAGE_QT5WEBENGINE_5_12
 config BR2_PACKAGE_QT5WEBENGINE_5_13
 	bool "5.13"
 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_8
+	depends on BR2_PACKAGE_QT5_VERSION_5_12 || \
+		   BR2_PACKAGE_QT5_VERSION_5_13 || BR2_PACKAGE_QT5_VERSION_5_14
 	help
 	  This option builds QtWebEngine 5.13, which is licensed under
 	  (L)GPL-3.0+.
@@ -100,6 +101,7 @@ config BR2_PACKAGE_QT5WEBENGINE_5_13
 config BR2_PACKAGE_QT5WEBENGINE_5_14
 	bool "5.14"
 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_9
+	depends on BR2_PACKAGE_QT5_VERSION_5_14
 	help
 	  This option builds QtWebEngine 5.14, which is licensed under
 	  (L)GPL-3.0+.
@@ -107,6 +109,7 @@ config BR2_PACKAGE_QT5WEBENGINE_5_14
 config BR2_PACKAGE_QT5WEBENGINE_5_15
 	bool "5.15"
 	depends on BR2_TOOLCHAIN_GCC_AT_LEAST_9
+	depends on BR2_PACKAGE_QT5_VERSION_5_15
 	help
 	  This option builds QtWebEngine 5.15, which is licensed under
 	  (L)GPL-3.0+.
