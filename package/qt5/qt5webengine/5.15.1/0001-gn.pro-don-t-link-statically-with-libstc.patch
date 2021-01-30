@@ -1,4 +1,4 @@
-From ceedc0cc18c8ddaf10c162aa46beebe30bade80d Mon Sep 17 00:00:00 2001
+From 52dea831deebd6d8e8bafb6fa5f2852ab87cf462 Mon Sep 17 00:00:00 2001
 From: Romain Naour <romain.naour@gmail.com>
 Date: Sat, 23 May 2020 19:01:19 +0200
 Subject: [PATCH 01/12] gn.pro: don't link statically with libstc++

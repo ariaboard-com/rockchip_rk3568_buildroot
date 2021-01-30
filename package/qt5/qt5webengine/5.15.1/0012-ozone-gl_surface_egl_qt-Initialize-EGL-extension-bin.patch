@@ -1,4 +1,4 @@
-From d55519c74a111cd19c45d51b4310d2e110f7957e Mon Sep 17 00:00:00 2001
+From 596d58982f2153753b1058cb921d095849b58584 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 17 Apr 2020 22:48:12 +0800
 Subject: [PATCH 12/12] ozone: gl_surface_egl_qt: Initialize EGL extension

@@ -1,4 +1,4 @@
-From efdf7f6cb3d04793ec92262eeb2e0ed29a18ecd0 Mon Sep 17 00:00:00 2001
+From e04514b97b8c79fae8518c500da8a6948825ed6f Mon Sep 17 00:00:00 2001
 From: Maksim Sisov <msisov@igalia.com>
 Date: Wed, 31 Jul 2019 09:56:24 +0300
 Subject: [PATCH 04/12] Add support for V4L2VDA on Linux
@@ -30,13 +30,15 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  src/3rdparty/chromium/media/gpu/BUILD.gn      |  1 +
  src/3rdparty/chromium/media/gpu/args.gni      |  4 ++
  .../chromeos_video_decoder_factory.cc         |  6 +--
+ .../chromium/media/gpu/chromeos/fourcc.cc     |  4 ++
  .../gpu_video_decode_accelerator_factory.cc   |  8 ++++
  .../gpu_video_decode_accelerator_factory.h    |  2 +
  src/3rdparty/chromium/media/gpu/v4l2/BUILD.gn | 47 ++++++++++--------
  .../media/gpu/v4l2/generic_v4l2_device.cc     |  4 ++
  .../chromium/media/gpu/v4l2/v4l2_device.cc    | 48 +++++++++++++++++++
+ .../chromium/media/gpu/v4l2/v4l2_device.h     |  6 +++
  .../gpu/v4l2/v4l2_video_decode_accelerator.cc |  3 ++
- 10 files changed, 101 insertions(+), 25 deletions(-)
+ 12 files changed, 111 insertions(+), 25 deletions(-)
 
 diff --git a/src/3rdparty/chromium/components/chromeos_camera/gpu_mjpeg_decode_accelerator_factory.cc b/src/3rdparty/chromium/components/chromeos_camera/gpu_mjpeg_decode_accelerator_factory.cc
 index 016d6cd4c..ef9804013 100644
@@ -110,6 +112,21 @@ index b0c1595e6..cfa9299f5 100644
    configs = V4L2SliceVideoDecoder::GetSupportedConfigs();
    supported_configs.insert(supported_configs.end(), configs.begin(),
                             configs.end());
+diff --git a/src/3rdparty/chromium/media/gpu/chromeos/fourcc.cc b/src/3rdparty/chromium/media/gpu/chromeos/fourcc.cc
+index 5598bf9a1..f8b0de1ed 100644
+--- a/src/3rdparty/chromium/media/gpu/chromeos/fourcc.cc
++++ b/src/3rdparty/chromium/media/gpu/chromeos/fourcc.cc
+@@ -15,6 +15,10 @@
+ #include <va/va.h>
+ #endif  // BUILDFLAG(USE_VAAPI)
+ 
++#ifndef V4L2_PIX_FMT_MT21C
++#define V4L2_PIX_FMT_MT21C v4l2_fourcc('M', 'T', '2', '1')
++#endif
++
+ namespace media {
+ 
+ Fourcc::Fourcc() : value_(Fourcc::INVALID) {}
 diff --git a/src/3rdparty/chromium/media/gpu/gpu_video_decode_accelerator_factory.cc b/src/3rdparty/chromium/media/gpu/gpu_video_decode_accelerator_factory.cc
 index a5d4a3dfc..ee1e0ef0f 100644
 --- a/src/3rdparty/chromium/media/gpu/gpu_video_decode_accelerator_factory.cc
@@ -462,6 +479,23 @@ index 3753e745e..285262522 100644
  }
  
  bool V4L2RequestsQueue::AllocateRequests(size_t nb_requests) {
+diff --git a/src/3rdparty/chromium/media/gpu/v4l2/v4l2_device.h b/src/3rdparty/chromium/media/gpu/v4l2/v4l2_device.h
+index 25e90f4c4..9c49a44d0 100644
+--- a/src/3rdparty/chromium/media/gpu/v4l2/v4l2_device.h
++++ b/src/3rdparty/chromium/media/gpu/v4l2/v4l2_device.h
+@@ -38,6 +38,12 @@
+ #ifndef V4L2_PIX_FMT_JPEG_RAW
+ #define V4L2_PIX_FMT_JPEG_RAW v4l2_fourcc('J', 'P', 'G', 'R')
+ #endif
++#ifndef V4L2_PIX_FMT_VP9
++#define V4L2_PIX_FMT_VP9 v4l2_fourcc('V', 'P', '9', '0')
++#endif
++#ifndef V4L2_PIX_FMT_MT21C
++#define V4L2_PIX_FMT_MT21C v4l2_fourcc('M', 'T', '2', '1')
++#endif
+ #ifndef V4L2_CID_JPEG_LUMA_QUANTIZATION
+ #define V4L2_CID_JPEG_LUMA_QUANTIZATION (V4L2_CID_JPEG_CLASS_BASE + 5)
+ #endif
 diff --git a/src/3rdparty/chromium/media/gpu/v4l2/v4l2_video_decode_accelerator.cc b/src/3rdparty/chromium/media/gpu/v4l2/v4l2_video_decode_accelerator.cc
 index 10a401182..08e0ee4b1 100644
 --- a/src/3rdparty/chromium/media/gpu/v4l2/v4l2_video_decode_accelerator.cc
