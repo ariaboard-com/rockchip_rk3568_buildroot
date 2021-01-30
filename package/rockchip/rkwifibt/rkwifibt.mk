@@ -113,7 +113,7 @@ define RKWIFIBT_BUILD_CMDS
     $(TARGET_CC) -o $(@D)/brcm_tools/dhd_priv $(@D)/brcm_tools/dhd_priv.c
     $(TARGET_CC) -o $(@D)/src/rk_wifi_init $(@D)/src/rk_wifi_init.c
     $(MAKE) -C $(@D)/realtek/rtk_hciattach/ CC=$(TARGET_CC)
-    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RK_ARCH)
+    $(TARGET_CONFIGURE_OPTS) $(MAKE) -C $(TOPDIR)/../kernel/ M=$(@D)/realtek/bluetooth_uart_driver ARCH=$(RKARCH)
 endef
 
 ifneq ($(BR2_PACKAGE_THUNDERBOOT), y)
