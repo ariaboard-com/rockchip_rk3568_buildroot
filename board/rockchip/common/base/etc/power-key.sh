@@ -7,27 +7,24 @@ logger -t $(basename $0) "[$$]: Received power key event: $@..."
 TIMEOUT=3 # s
 PIDFILE="/tmp/$(basename $0).pid"
 
+power_key_led_blink()
+{
+    echo 0 > /sys/class/leds/firefly:blue:power/brightness
+    echo 0 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 1 > /sys/class/leds/firefly:blue:power/brightness
+    echo 1 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 0 > /sys/class/leds/firefly:blue:power/brightness
+    echo 0 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 1 > /sys/class/leds/firefly:blue:power/brightness
+    echo 1 > /sys/class/leds/firefly:yellow:user/brightness
+}
+
 short_press()
 {
-	logger -t $(basename $0) "[$$]: Power key short press..."
-
-	if type pm-suspend &>/dev/null; then
-		LOCK=/var/run/pm-utils/locks/pm-suspend.lock
-		SUSPEND_CMD="pm-suspend"
-	else
-		LOCK=/tmp/.power_key
-		PRE_SUSPEND="touch $LOCK"
-		SUSPEND_CMD="echo -n mem > /sys/power/state"
-		POST_SUSPEND="{ sleep 2 && rm $LOCK; }&"
-	fi
-
-	if [ ! -f $LOCK ]; then
-		logger -t $(basename $0) "[$$]: Prepare to suspend..."
-
-		sh -c "$PRE_SUSPEND"
-		sh -c "$SUSPEND_CMD"
-		sh -c "$POST_SUSPEND"
-	fi
+	power_key_led_blink
 }
 
 long_press()
