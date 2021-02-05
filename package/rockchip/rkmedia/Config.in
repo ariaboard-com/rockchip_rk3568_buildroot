@@ -147,6 +147,14 @@ config BR2_PACKAGE_RKMEDIA_EXAMPLES
     help
       provide examples to show the usage of rkmedia
 
+if BR2_PACKAGE_RKMEDIA_EXAMPLES
+config BR2_PACKAGE_RKMEDIA_UVC_EXAMPLE
+    bool "enable rkmedia uvc demo"
+    select BR2_PACKAGE_UVC_APP
+    help
+      Example of joint use of rkmedia and uvc_app interface
+endif #BR2_PACKAGE_RKMEDIA_EXAMPLES
+
 config BR2_PACKAGE_RKMEDIA_DEBUG_UTILS
     bool "utils for debug rkmedia"
 	default n
@@ -155,16 +163,16 @@ config BR2_PACKAGE_RKMEDIA_DEBUG_UTILS
 
 if BR2_PACKAGE_RKMEDIA_DEBUG_UTILS
 config BR2_PACKAGE_RKMEDIA_SANITIZER_DYNAMIC
-	bool "enable rkmedia sanitizer tools with dynamic linker"
-	select BR2_PACKAGE_ADDRESS_SANITIZER
-	help
-	  Enable rkmedia debug on sanitizer with dynamic linker.
+    bool "enable rkmedia sanitizer tools with dynamic linker"
+    select BR2_PACKAGE_ADDRESS_SANITIZER
+    help
+      Enable rkmedia debug on sanitizer with dynamic linker.
 
 config BR2_PACKAGE_RKMEDIA_SANITIZER_STATIC
-	bool "enable rkmedia sanitizer tools with static linker"
-	select BR2_PACKAGE_ADDRESS_SANITIZER
-	help
-	  Enable rkmedia debug on sanitizer with static linker.
+    bool "enable rkmedia sanitizer tools with static linker"
+    select BR2_PACKAGE_ADDRESS_SANITIZER
+    help
+      Enable rkmedia debug on sanitizer with static linker.
 
 config BR2_PACKAGE_RKMEDIA_MINILOGGER
     bool "Output log by minilogger"
