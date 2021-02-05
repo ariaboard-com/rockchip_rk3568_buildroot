@@ -51,7 +51,7 @@ define RKSCRIPT_INSTALL_TARGET_CMDS
 	    echo -e "/dev/block/by-name/userdata\t/userdata\t\t$$RK_USERDATA_FS_TYPE\t\tdefaults\t\t0\t2" >> $(TARGET_DIR)/etc/fstab; \
 	fi
 
-	cd $(TARGET_DIR) && rm -rf oem userdata data mnt udisk sdcard && mkdir -p oem userdata mnt/sdcard && ln -s userdata data && ln -s media/usb0 udisk && ln -s mnt/sdcard sdcard && cd -
+	cd $(TARGET_DIR) && rm -rf userdata data mnt udisk sdcard && mkdir -p userdata mnt/sdcard && ln -s userdata data && ln -s media/usb0 udisk && ln -s mnt/sdcard sdcard && cd -
 	if echo $(BR2_PACKAGE_RK_OEM_INSTALL_TARGET_DIR) | grep $(TARGET_DIR); then echo "Found build oem into target...";else rm -rf $(TARGET_DIR)/oem && mkdir -p $(TARGET_DIR)/oem; fi
 	if test -e $(RKSCRIPT_USB_CONFIG_FILE) ; then \
 		rm $(RKSCRIPT_USB_CONFIG_FILE) ; \
