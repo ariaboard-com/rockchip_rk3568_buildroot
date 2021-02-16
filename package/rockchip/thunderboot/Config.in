@@ -1,5 +1,6 @@
 menuconfig BR2_PACKAGE_THUNDERBOOT
 	bool "rockchip thunderboot"
+	depends on BR2_PACKAGE_RV1126_RV1109
 	help
 	  Rockchip tb(thunder boot) configuration.
 
@@ -19,7 +20,6 @@ config BR2_PACKAGE_THUNDERBOOT_CAMERA_FPS
 
 config BR2_THUNDERBOOT_INSTALL_MODULES
 	string "dirver modules"
-	depends on BR2_PACKAGE_THUNDERBOOT
 	help
 	  Kernel driver modules to be installed.
 
@@ -30,7 +30,6 @@ config BR2_THUNDERBOOT_ETH
 
 config BR2_THUNDERBOOT_SIMPLIFY_USB
 	bool "simplify usb configuration"
-	depends on BR2_PACKAGE_THUNDERBOOT
 	help
 	  Kernel driver modules to be installed.
 
