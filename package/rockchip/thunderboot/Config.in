@@ -23,6 +23,11 @@ config BR2_THUNDERBOOT_INSTALL_MODULES
 	help
 	  Kernel driver modules to be installed.
 
+config BR2_THUNDERBOOT_ETH
+	bool "ethernet configuration"
+	help
+	  Ethernet connection
+
 config BR2_THUNDERBOOT_SIMPLIFY_USB
 	bool "simplify usb configuration"
 	depends on BR2_PACKAGE_THUNDERBOOT
