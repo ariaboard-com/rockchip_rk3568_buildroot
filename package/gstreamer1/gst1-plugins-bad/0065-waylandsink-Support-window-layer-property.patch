@@ -1,4 +1,4 @@
-From fe1b3492f66dc21308d60689c03b2f2c08b3bcaf Mon Sep 17 00:00:00 2001
+From 6aaa338078af9a5806e026bc254802a3ccbd2845 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 5 Mar 2021 10:15:51 +0800
 Subject: [PATCH] waylandsink: Support window layer property
@@ -10,14 +10,14 @@ gst-launch-1.0 videotestsrc ! waylandsink layer=top
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- ext/wayland/gstwaylandsink.c | 53 ++++++++++++++++++++++++++++++++++--
+ ext/wayland/gstwaylandsink.c | 52 ++++++++++++++++++++++++++++++++++--
  ext/wayland/gstwaylandsink.h |  1 +
- ext/wayland/wlwindow.c       | 36 +++++++++++++++++++++++-
+ ext/wayland/wlwindow.c       | 36 ++++++++++++++++++++++++-
  ext/wayland/wlwindow.h       | 13 +++++++--
- 4 files changed, 98 insertions(+), 5 deletions(-)
+ 4 files changed, 97 insertions(+), 5 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 1c0846689..aa19e3558 100644
+index 0d11167..697c394 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -63,6 +63,7 @@ enum
@@ -66,16 +66,15 @@ index 1c0846689..aa19e3558 100644
    gst_video_overlay_install_properties (gobject_class, PROP_LAST);
  }
  
-@@ -218,6 +243,8 @@ gst_wayland_sink_init (GstWaylandSink * sink)
- {
-   g_mutex_init (&sink->display_lock);
+@@ -220,6 +245,7 @@ gst_wayland_sink_init (GstWaylandSink * sink)
    g_mutex_init (&sink->render_lock);
-+
+ 
+   sink->window_handle = 1;
 +  sink->layer = GST_WL_WINDOW_LAYER_NORMAL;
  }
  
  static void
-@@ -232,6 +259,18 @@ gst_wayland_sink_set_fullscreen (GstWaylandSink * sink, gboolean fullscreen)
+@@ -234,6 +260,18 @@ gst_wayland_sink_set_fullscreen (GstWaylandSink * sink, gboolean fullscreen)
    g_mutex_unlock (&sink->render_lock);
  }
  
@@ -94,7 +93,7 @@ index 1c0846689..aa19e3558 100644
  static void
  gst_wayland_sink_get_property (GObject * object,
      guint prop_id, GValue * value, GParamSpec * pspec)
-@@ -249,6 +288,11 @@ gst_wayland_sink_get_property (GObject * object,
+@@ -251,6 +289,11 @@ gst_wayland_sink_get_property (GObject * object,
        g_value_set_boolean (value, sink->fullscreen);
        GST_OBJECT_UNLOCK (sink);
        break;
@@ -106,7 +105,7 @@ index 1c0846689..aa19e3558 100644
      default:
        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
        break;
-@@ -272,6 +316,11 @@ gst_wayland_sink_set_property (GObject * object,
+@@ -274,6 +317,11 @@ gst_wayland_sink_set_property (GObject * object,
        gst_wayland_sink_set_fullscreen (sink, g_value_get_boolean (value));
        GST_OBJECT_UNLOCK (sink);
        break;
@@ -118,7 +117,7 @@ index 1c0846689..aa19e3558 100644
      default:
        if (!gst_video_overlay_set_property (object, PROP_LAST, prop_id, value))
          G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-@@ -716,8 +765,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
+@@ -717,8 +765,8 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
      if (!sink->window) {
        /* if we were not provided a window, create one ourselves */
        sink->window = gst_wl_window_new_toplevel (sink->display,
@@ -130,7 +129,7 @@ index 1c0846689..aa19e3558 100644
            G_CALLBACK (on_window_closed), sink, 0);
      }
 diff --git a/ext/wayland/gstwaylandsink.h b/ext/wayland/gstwaylandsink.h
-index bcaadafbc..8f4d2f134 100644
+index bcaadaf..8f4d2f1 100644
 --- a/ext/wayland/gstwaylandsink.h
 +++ b/ext/wayland/gstwaylandsink.h
 @@ -62,6 +62,7 @@ struct _GstWaylandSink
@@ -142,7 +141,7 @@ index bcaadafbc..8f4d2f134 100644
    gchar *display_name;
  
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index 8228f0109..a83881a0d 100644
+index 8228f01..a83881a 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -241,6 +241,39 @@ gst_wl_window_new_internal (GstWlDisplay * display, GMutex * render_lock)
@@ -203,7 +202,7 @@ index 8228f0109..a83881a0d 100644
      /* Finally, commit the xdg_surface state as toplevel */
      window->configured = FALSE;
 diff --git a/ext/wayland/wlwindow.h b/ext/wayland/wlwindow.h
-index 759a078f9..562633c88 100644
+index 759a078..562633c 100644
 --- a/ext/wayland/wlwindow.h
 +++ b/ext/wayland/wlwindow.h
 @@ -82,11 +82,20 @@ struct _GstWlWindowClass
