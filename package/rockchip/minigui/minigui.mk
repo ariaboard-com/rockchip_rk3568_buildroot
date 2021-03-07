@@ -86,7 +86,7 @@ MINIGUI_CONF_OPTS += \
 endif
 
 ifeq ($(BR2_PACKAGE_MINIGUI_ENABLE_PNG),y)
-MINIGUI_DEPENDENCIES += libpng12
+MINIGUI_DEPENDENCIES += libpng
 MINIGUI_CONF_OPTS += \
     --enable-pngsupport
 endif

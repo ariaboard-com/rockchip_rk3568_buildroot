@@ -7,7 +7,7 @@ LOCK_DEPENDENCIES = camerahal rkfb linux-rga face_service
 
 COMPILE_PROJECT_TYPE=$(call qstrip,$(BR2_PACKAGE_LOCK_PROJECT_TYPE))
 
-LOCK_DEPENDENCIES += libpng12 rv1108_minigui
+LOCK_DEPENDENCIES += libpng rv1108_minigui
 ifeq ($(BR2_PACKAGE_FREETYPE), y)
     LOCK_DEPENDENCIES += freetype
     LOCK_CONF_OPTS += -DCOMPILE_UI_TRUETYPE=$(COMPILE_UI_TRUETYPE)
