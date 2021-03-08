@@ -197,7 +197,7 @@ index e2cb3d5..e053754 100644
 +  static int rga_inited = 0;
 +  const char *buf;
 +
-+  buf = getenv ("GST_VIDEO_CONVERT_USE_RGA");
++  buf = g_getenv ("GST_VIDEO_CONVERT_USE_RGA");
 +  if (!buf || strcmp (buf, "1"))
 +    return FALSE;
 +

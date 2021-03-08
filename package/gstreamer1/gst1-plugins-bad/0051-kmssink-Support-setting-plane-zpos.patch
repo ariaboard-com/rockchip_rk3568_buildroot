@@ -79,12 +79,12 @@ index 1f3fbf34b..3fe1f56c6 100644
 +  } else {
 +    zpos = min + 1;
 +
-+    buf = getenv ("KMSSINK_PLANE_ZPOS");
++    buf = g_getenv ("KMSSINK_PLANE_ZPOS");
 +    if (buf)
 +      zpos = atoi (buf);
-+    else if (getenv ("KMSSINK_PLANE_ON_TOP"))
++    else if (g_getenv ("KMSSINK_PLANE_ON_TOP"))
 +      zpos = max;
-+    else if (getenv ("KMSSINK_PLANE_ON_BOTTOM"))
++    else if (g_getenv ("KMSSINK_PLANE_ON_BOTTOM"))
 +      zpos = min;
 +  }
 +

@@ -26,16 +26,16 @@ index 0e4a3c7..8fdb1f9 100644
    gint encbin_flags = 0;
 +  const char *env;
 +
-+  if ((env = getenv("CAMERABIN2_PREVIEW_FILTER")))
++  if ((env = g_getenv ("CAMERABIN2_PREVIEW_FILTER")))
 +    camera->preview_filter = gst_parse_launch (env, NULL);
 +
-+  if ((env = getenv("CAMERABIN2_IMAGE_FILTER")))
++  if ((env = g_getenv ("CAMERABIN2_IMAGE_FILTER")))
 +    camera->user_image_filter = gst_parse_launch (env, NULL);
 +
-+  if ((env = getenv("CAMERABIN2_VIDEO_FILTER")))
++  if ((env = g_getenv ("CAMERABIN2_VIDEO_FILTER")))
 +    camera->user_video_filter = gst_parse_launch (env, NULL);
 +
-+  if ((env = getenv("CAMERABIN2_VIEWFINDER_FILTER")))
++  if ((env = g_getenv ("CAMERABIN2_VIEWFINDER_FILTER")))
 +    camera->user_viewfinder_filter = gst_parse_launch (env, NULL);
  
    if (!camera->elements_created) {

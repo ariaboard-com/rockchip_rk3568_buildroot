@@ -27,7 +27,7 @@ index ff66166c1..b9f4be841 100644
        window->area_surface, parent);
    wl_subsurface_set_desync (window->area_subsurface);
  
-+  if (getenv("WAYLANDSINK_PLACE_ABOVE"))
++  if (g_getenv ("WAYLANDSINK_PLACE_ABOVE"))
 +    wl_subsurface_place_above (window->area_subsurface, parent);
 +  else
 +    wl_subsurface_place_below (window->area_subsurface, parent);
