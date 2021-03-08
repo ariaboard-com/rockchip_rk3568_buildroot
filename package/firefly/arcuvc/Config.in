@@ -1,0 +1,5 @@
+config BR2_PACKAGE_ARCUVC
+    bool "Arc UVC App"
+    help
+        Provided by ArcSoft
+

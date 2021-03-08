@@ -1,1 +1,2 @@
 source "package/firefly/arcface/Config.in"
+source "package/firefly/arcuvc/Config.in"
