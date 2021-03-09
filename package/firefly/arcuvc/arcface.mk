@@ -13,6 +13,7 @@ define ARCUVC_INSTALL_TARGET_CMDS
 
 	cp $(@D)/ArcAICamera $(TARGET_DIR)/usr/share/arcuvc/ArcAICamera -rf
         $(INSTALL) -D -m 0755 $(@D)/start_app.sh $(TARGET_DIR)/usr/share/arcuvc
+        $(INSTALL) -D -m 0755 $(@D)/S99_* $(TARGET_DIR)/etc/init.d/
 endef
 
 $(eval $(generic-package))
