@@ -28,5 +28,8 @@ endif
     ifeq ($(BR2_PACKAGE_RKFACIAL_ENABLE_IR_TEST_DATA), y)
         RKFACIAL_CONF_OPTS += "-DIR_TEST_DATA=y"
     endif
+    ifeq ($(BR2_PACKAGE_RKFACIAL_ENABLE_FACE_MASK), y)
+        RKFACIAL_CONF_OPTS += "-DFACE_MASK=y"
+    endif
     $(eval $(cmake-package))
 endif

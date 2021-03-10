@@ -1,7 +1,7 @@
-From b01e042051936168339cfa092786c06764791add Mon Sep 17 00:00:00 2001
+From 83649cdb094d5c8e5e046f6d7e44e2483523a867 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
-Subject: [PATCH 12/17] qwaylanddisplay: Wakeup main event dispatcher when
+Subject: [PATCH 12/18] qwaylanddisplay: Wakeup main event dispatcher when
  events pending
 
 The socket might not be able to generate poll events to wakeup the main
@@ -18,7 +18,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  2 files changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
-index 437501f..5867573 100644
+index 69c8fff6..272c7e0d 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -73,6 +73,8 @@
@@ -64,7 +64,7 @@ index 437501f..5867573 100644
 +{
 +    while (!quit) {
 +        if (wl_display_prepare_read(mDisplay) != 0) {
-+            /* wakeup dispatcher for pending events */
++            // wakeup dispatcher for pending events
 +            if (auto *dispatcher = QCoreApplication::eventDispatcher())
 +                dispatcher->wakeUp();
 +        } else {
@@ -79,7 +79,7 @@ index 437501f..5867573 100644
  struct wl_surface *QWaylandDisplay::createSurface(void *handle)
  {
      struct wl_surface *surface = mCompositor.create_surface();
-@@ -153,6 +197,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+@@ -157,6 +201,8 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
  
      mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
  
@@ -88,7 +88,7 @@ index 437501f..5867573 100644
      forceRoundTrip();
  }
  
-@@ -168,7 +214,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
+@@ -172,7 +218,10 @@ QWaylandDisplay::~QWaylandDisplay(void)
  #if QT_CONFIG(wayland_datadevice)
      delete mDndSelectionHandler.take();
  #endif
@@ -101,7 +101,7 @@ index 437501f..5867573 100644
  
  void QWaylandDisplay::checkError() const
 diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
-index d81d5fa..2f4965c 100644
+index d81d5fa4..2f4965cb 100644
 --- a/src/client/qwaylanddisplay_p.h
 +++ b/src/client/qwaylanddisplay_p.h
 @@ -100,6 +100,7 @@ class QWaylandIntegration;

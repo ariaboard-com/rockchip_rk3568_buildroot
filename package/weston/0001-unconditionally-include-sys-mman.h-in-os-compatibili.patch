@@ -1,7 +1,7 @@
-From b0f3fbe9255851b894aad6ebdddf1ccd195ce579 Mon Sep 17 00:00:00 2001
+From 4a045ca0f9b045dc3e3bb424421bbfdf59500a0f Mon Sep 17 00:00:00 2001
 From: James Hilliard <james.hilliard1@gmail.com>
 Date: Sat, 1 Feb 2020 20:02:29 -0700
-Subject: [PATCH 01/40] unconditionally include sys/mman.h in
+Subject: [PATCH 01/41] unconditionally include sys/mman.h in
  os-compatibility.c
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,7 +21,7 @@ Signed-off-by: James Hilliard <james.hilliard1@gmail.com>
  1 file changed, 3 deletions(-)
 
 diff --git a/shared/os-compatibility.c b/shared/os-compatibility.c
-index 5e1ce479..041c929f 100644
+index 5e1ce47..041c929 100644
 --- a/shared/os-compatibility.c
 +++ b/shared/os-compatibility.c
 @@ -34,10 +34,7 @@

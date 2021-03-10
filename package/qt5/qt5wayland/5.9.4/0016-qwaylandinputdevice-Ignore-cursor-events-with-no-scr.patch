@@ -1,7 +1,7 @@
-From 87bfa60635060b3614a8c2e6b3af5d165313924c Mon Sep 17 00:00:00 2001
+From 62f69cd83b2c0a3d334b6b4e53e19ab8b043cb2f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 8 Sep 2020 09:43:39 +0800
-Subject: [PATCH 16/17] qwaylandinputdevice: Ignore cursor events with no
+Subject: [PATCH 16/18] qwaylandinputdevice: Ignore cursor events with no
  screen
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
-index a84a10b..f8ffc39 100644
+index 4def0de8..6e54c9b0 100644
 --- a/src/client/qwaylandinputdevice.cpp
 +++ b/src/client/qwaylandinputdevice.cpp
 @@ -366,7 +366,12 @@ uint32_t QWaylandInputDevice::cursorSerial() const

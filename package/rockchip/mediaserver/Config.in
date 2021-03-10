@@ -58,6 +58,21 @@ config BR2_PACKAGE_MEDIASERVE_LINKAPI
 	help
 	  rockchip mediaserver options
 
+choice
+prompt "Link api type"
+  default BR2_PACKAGE_MEDIASERVE_LINKAPI_LINKKIT
+  help
+    Select a link api type.
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI_LINKKIT
+  bool "Enable linkkit api for aliyun"
+  depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
+
+config BR2_PACKAGE_MEDIASERVE_LINKAPI_TUYA
+  bool "Enable tuya api for tuya"
+  depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
+endchoice
+
 config BR2_PACKAGE_MEDIASERVE_LINKAPI_VENDOR
 	bool "Enable link certificate to be read from vendor storage"
 	depends on BR2_PACKAGE_MEDIASERVE_LINKAPI
@@ -94,20 +109,31 @@ config BR2_PACKAGE_MEDIASERVE_EXIV2_FEATURE
         help
           rockchip mediaserver options
 
+config BR2_PACKAGE_MEDIASERVE_TB
+        bool "Enable thunder boot"
+
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
         bool "Enable rockface"
-        default y if BR2_PACKAGE_RKMEDIA_ROCKFACE
+        select BR2_PACKAGE_RKMEDIA_ROCKFACE
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
         help
           rockchip mediaserver options
+
+if BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE
+config BR2_PACKAGE_MEDIASERVE_USE_ROCKFACE_RECOGNIZE
+        bool "Enable rockface recognize"
+        select BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
+        help
+          rockchip mediaserver recognize options
+endif
 
 config BR2_PACKAGE_MEDIASERVE_USE_ROCKX
         bool "Enable rockx"
-        default y if BR2_PACKAGE_RKMEDIA_ROCKX
+        select BR2_PACKAGE_RKMEDIA_ROCKX
+        default y if !BR2_PACKAGE_MEDIASERVE_TB
         help
           rockchip mediaserver options
-
-config BR2_PACKAGE_MEDIASERVE_TB
-        bool "Enable thunder boot"
 
 config BR2_PACKAGE_MEDIASERVE_ZBAR
 	bool "Enable zbar to scan QR code"

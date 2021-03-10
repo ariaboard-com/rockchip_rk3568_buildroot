@@ -32,4 +32,11 @@ GSTREAMER1_DEPENDENCIES = \
 	libglib2 \
 	$(if $(BR2_PACKAGE_LIBUNWIND),libunwind)
 
+define GSTREAMER1_INSTALL_TARGET_ENV
+	$(INSTALL) -D -m 0644 $(GSTREAMER1_PKGDIR)/gst.sh \
+		$(TARGET_DIR)/etc/profile.d/gst.sh
+endef
+
+GSTREAMER1_POST_INSTALL_TARGET_HOOKS += GSTREAMER1_INSTALL_TARGET_ENV
+
 $(eval $(autotools-package))

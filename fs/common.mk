@@ -110,6 +110,10 @@ endif
 	$$(foreach hook,$$(ROOTFS_POST_CMD_HOOKS),\
 		$$(call PRINTF,$$($$(hook))) >> $$(FAKEROOT_SCRIPT)$$(sep))
 	chmod a+x $$(FAKEROOT_SCRIPT)
+
+ifeq ($$(BR2_TARGET_ROOTFS_UBI), y)
+	cp -f $$(FAKEROOT_SCRIPT) $$(BINARIES_DIR)/fakeroot-ubi.fs
+endif
 	rm -f $$(TARGET_DIR_WARNING_FILE)
 	PATH=$$(BR_PATH) $$(HOST_DIR)/bin/fakeroot -- $$(FAKEROOT_SCRIPT)
 	$$(INSTALL) -m 0644 support/misc/target-dir-warning.txt $$(TARGET_DIR_WARNING_FILE)

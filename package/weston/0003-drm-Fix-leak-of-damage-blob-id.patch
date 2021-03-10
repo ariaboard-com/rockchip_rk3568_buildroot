@@ -1,7 +1,7 @@
-From d61381cbacf141579b279404870a3799089d1710 Mon Sep 17 00:00:00 2001
+From b896c5462a1a70d3567d1e77a4ef7fa71934c227 Mon Sep 17 00:00:00 2001
 From: Scott Anderson <scott.anderson@collabora.com>
 Date: Tue, 2 Jun 2020 17:39:43 +1200
-Subject: [PATCH 03/40] drm: Fix leak of damage blob id
+Subject: [PATCH 03/41] drm: Fix leak of damage blob id
 
 This moves the creation of the blob to be earlier, to when the damage is
 calculated. It replaces the damage tracked inside of the plane state
@@ -27,7 +27,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  4 files changed, 53 insertions(+), 51 deletions(-)
 
 diff --git a/libweston/backend-drm/drm-internal.h b/libweston/backend-drm/drm-internal.h
-index 2384a9ac..3de71728 100644
+index 2384a9a..3de7172 100644
 --- a/libweston/backend-drm/drm-internal.h
 +++ b/libweston/backend-drm/drm-internal.h
 @@ -409,7 +409,7 @@ struct drm_plane_state {
@@ -40,7 +40,7 @@ index 2384a9ac..3de71728 100644
  	struct wl_list link; /* drm_output_state::plane_list */
  };
 diff --git a/libweston/backend-drm/drm.c b/libweston/backend-drm/drm.c
-index e0b1cbd7..4a80e61d 100644
+index e0b1cbd..4a80e61 100644
 --- a/libweston/backend-drm/drm.c
 +++ b/libweston/backend-drm/drm.c
 @@ -354,8 +354,13 @@ drm_output_render(struct drm_output_state *state, pixman_region32_t *damage)
@@ -113,7 +113,7 @@ index e0b1cbd7..4a80e61d 100644
  
  static int
 diff --git a/libweston/backend-drm/kms.c b/libweston/backend-drm/kms.c
-index 192435c7..054077c0 100644
+index 192435c..054077c 100644
 --- a/libweston/backend-drm/kms.c
 +++ b/libweston/backend-drm/kms.c
 @@ -835,43 +835,6 @@ plane_add_prop(drmModeAtomicReq *req, struct drm_plane *plane,
@@ -172,7 +172,7 @@ index 192435c7..054077c0 100644
  		if (plane_state->fb && plane_state->fb->format)
  			pinfo = plane_state->fb->format;
 diff --git a/libweston/backend-drm/state-helpers.c b/libweston/backend-drm/state-helpers.c
-index 7b1d9241..d1054993 100644
+index 7b1d924..d105499 100644
 --- a/libweston/backend-drm/state-helpers.c
 +++ b/libweston/backend-drm/state-helpers.c
 @@ -49,7 +49,6 @@ drm_plane_state_alloc(struct drm_output_state *state_output,

@@ -3,9 +3,9 @@
 
 lunch_start()
 {
+	echo "Now we are ready to start your first application" > /dev/kmsg
 	export HDR_MODE=0
 	ispserver &
-	echo "Now we are ready to start your first application" > /dev/kmsg
 	export mediaserver_log_level=2
 	mediaserver -a -d -c /usr/share/mediaserver/evb_tb.conf > /dev/kmsg 2>&1 &
 }

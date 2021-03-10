@@ -22,8 +22,6 @@ WESTON_CONF_OPTS = \
 	-Dcolor-management-colord=false \
 	-Dremoting=false
 
-WESTON_CONF_OPTS += -Dsimple-clients=all
-
 ifeq ($(BR2_PACKAGE_DBUS)$(BR2_PACKAGE_SYSTEMD),yy)
 WESTON_CONF_OPTS += -Dlauncher-logind=true
 WESTON_DEPENDENCIES += dbus systemd
@@ -55,9 +53,11 @@ endif
 ifeq ($(BR2_PACKAGE_HAS_LIBEGL_WAYLAND)$(BR2_PACKAGE_HAS_LIBGLES),yy)
 WESTON_CONF_OPTS += -Drenderer-gl=true
 WESTON_DEPENDENCIES += libegl libgles
+WESTON_CONF_OPTS += -Dsimple-clients=all
 else
 WESTON_CONF_OPTS += \
 	-Drenderer-gl=false
+WESTON_CONF_OPTS += -Dsimple-clients=
 endif
 
 ifeq ($(BR2_PACKAGE_WESTON_RDP),y)
