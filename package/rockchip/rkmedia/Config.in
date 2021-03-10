@@ -214,4 +214,14 @@ config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H265
 endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
 endif # BR2_PACKAGE_RKMEDIA_LIVE555
 
+config BR2_PACKAGE_RKMEDIA_MINI
+    bool "rkmedia mini version"
+    depends on BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
+    depends on BR2_PACKAGE_RKMEDIA_USE_AIQ
+    depends on BR2_PACKAGE_DRM_DISPLAY_OUTPUT
+    depends on BR2_PACKAGE_RKMEDIA_RKRGA
+    default n
+    help
+      mini version only support vi/vo/rga
+
 endif # BR2_PACKAGE_RKMEDIA
