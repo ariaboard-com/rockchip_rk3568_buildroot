@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-SOURCE_HAN_SANS_HK_VERSION = 2.001
+SOURCE_HAN_SANS_HK_VERSION = $(SOURCE_HAN_SANS_VERSION)
 SOURCE_HAN_SANS_HK_SOURCE = SourceHanSansHK.zip
-SOURCE_HAN_SANS_HK_SITE = https://github.com/adobe-fonts/source-han-sans/raw/release/SubsetOTF
+SOURCE_HAN_SANS_HK_SITE = $(SOURCE_HAN_SANS_SITE)
 SOURCE_HAN_SANS_HK_LICENSE = LICENSE.txt
 SOURCE_HAN_SANS_HK_DEPENDENCIES = host-zip
 
