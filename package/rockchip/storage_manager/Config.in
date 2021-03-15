@@ -1,4 +1,4 @@
-config BR2_PACKAGE_STORAGE_MANAGER
+menuconfig BR2_PACKAGE_STORAGE_MANAGER
 	bool "rockchip storage_manager"
 	select BR2_PACKAGE_LIBGDBUS
 	select BR2_PACKAGE_LIBRKDB
@@ -28,4 +28,11 @@ config BR2_PACKAGE_STORAGE_MANAGER_MINILOGGER
 config BR2_PACKAGE_STORAGE_MANAGER_FILE_LOAD_DELAY
 	int "file load delay, us"
 	default 0
+
+config BR2_PACKAGE_STORAGE_MANAGER_WAIT_MEDIASTOP_WHEN_FORMAT
+	bool "enable storage manager wait mediastop cmd when format"
+	default y
+	help
+	  Enable storage manager wait mediastop cmd when format.
+
 endif
