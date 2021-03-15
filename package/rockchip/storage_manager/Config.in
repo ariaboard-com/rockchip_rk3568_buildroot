@@ -35,4 +35,9 @@ config BR2_PACKAGE_STORAGE_MANAGER_WAIT_MEDIASTOP_WHEN_FORMAT
 	help
 	  Enable storage manager wait mediastop cmd when format.
 
+config BR2_PACKAGE_STORAGE_MANAGER_AUTO_ADJUST_MEDIA_PATH
+	bool "enable auto adjust media path"
+	default y
+	help
+	  Enable use data as media path when default media path not exist.
 endif
