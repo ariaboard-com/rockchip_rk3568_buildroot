@@ -7,7 +7,6 @@
 #include "bt.config"
 #include "video_mpp.config"
 #include "rv1126_rv1109_arm.config"
-#include "ubifs.config"
 #include "camera.config"
 #include "updateEngine.config"
 #include "ipc_quick_display.config"
