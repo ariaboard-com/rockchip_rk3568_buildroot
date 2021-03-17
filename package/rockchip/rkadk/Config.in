@@ -1,0 +1,5 @@
+config BR2_PACKAGE_RKADK
+    bool "rkadk"
+    select BR2_PACKAGE_RKMEDIA
+    help
+      rkadk
