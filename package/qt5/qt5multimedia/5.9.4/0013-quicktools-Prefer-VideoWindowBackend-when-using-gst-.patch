@@ -1,4 +1,4 @@
-From ea46392c627a3bda10507a4151fc844bbee81650 Mon Sep 17 00:00:00 2001
+From 071c80beea05ac9155b39a9510cd6e1502744377 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 15 Jan 2021 16:27:59 +0800
 Subject: [PATCH 13/13] quicktools: Prefer VideoWindowBackend when using gst
@@ -8,11 +8,11 @@ Prefer VideoWindowBackend for video overlay.
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/qtmultimediaquicktools/qdeclarativevideooutput.cpp | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ .../qdeclarativevideooutput.cpp                       | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp b/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp
-index 4fc7684..0ba2811 100644
+index 4fc7684..9c959be 100644
 --- a/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp
 +++ b/src/qtmultimediaquicktools/qdeclarativevideooutput.cpp
 @@ -236,6 +236,7 @@ Q_GLOBAL_STATIC_WITH_ARGS(QMediaPluginLoader, videoBackendFactoryLoader,
@@ -33,7 +33,15 @@ index 4fc7684..0ba2811 100644
          m_backend.reset(new QDeclarativeVideoRendererBackend(this));
          if (m_backend->init(service))
              backendAvailable = true;
-@@ -263,6 +265,11 @@ bool QDeclarativeVideoOutput::createBackend(QMediaService *service)
+@@ -256,13 +258,18 @@ bool QDeclarativeVideoOutput::createBackend(QMediaService *service)
+ 
+     // QDeclarativeVideoWindowBackend only works when there is a service with a QVideoWindowControl.
+     // Without service, the QDeclarativeVideoRendererBackend should always work.
+-    if (!backendAvailable) {
++    if (!backendAvailable && service) {
+         Q_ASSERT(service);
+         m_backend.reset(new QDeclarativeVideoWindowBackend(this));
+         if (m_backend->init(service))
              backendAvailable = true;
      }
  
