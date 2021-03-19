@@ -1,4 +1,4 @@
-From e7f214c2f54c8667a1dfd93e04a42d89e04abd99 Mon Sep 17 00:00:00 2001
+From 58acd4e24797e96a5703c419d67ab148f2c39e24 Mon Sep 17 00:00:00 2001
 From: "james.lin" <james.lin@rock-chips.com>
 Date: Thu, 12 Apr 2018 16:20:36 +0800
 Subject: [PATCH 07/13] qgstreamerplayersession add seek direct to ensure seek

@@ -1,4 +1,4 @@
-From 5c8143f8bcbd0b0cc51dbcee6023bd3e3ae63418 Mon Sep 17 00:00:00 2001
+From 27c05059c876966e7e54f7e5752e397386754b19 Mon Sep 17 00:00:00 2001
 From: Francis Fan <francis.fan@rock-chips.com>
 Date: Thu, 5 Sep 2019 07:51:23 +0000
 Subject: [PATCH 10/13] qgstreamerplayersession: fix the method of judging the

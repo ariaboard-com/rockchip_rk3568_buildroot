@@ -1,4 +1,4 @@
-From 77dc436d187380d9dba7de9e0699c1c0a850bb2e Mon Sep 17 00:00:00 2001
+From d31f14a072d41e08a6eacf3a1f295a57834094d7 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 19 Jan 2021 10:06:04 +0800
 Subject: [PATCH 12/14] gsttools: videowidget: Avoid re-creating window during

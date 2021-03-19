@@ -1,4 +1,4 @@
-From b45a3b58d323464d4d3b651a71d73a2cb2b4b6ed Mon Sep 17 00:00:00 2001
+From 98ba5a08051c6e1f1f24bf5f42d470f2a7649c24 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 15 Jan 2021 16:27:59 +0800
 Subject: [PATCH 13/13] quicktools: Prefer VideoWindowBackend when using gst

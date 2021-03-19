@@ -1,4 +1,4 @@
-From f5c15eeb8f4f0268b521daaeac2465d197bc329a Mon Sep 17 00:00:00 2001
+From aecdde849de279322c3e76373ab0c96a52e1ab09 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 19 Jan 2021 10:09:24 +0800
 Subject: [PATCH 13/14] gsttools: videowidget: Force updating geometry when

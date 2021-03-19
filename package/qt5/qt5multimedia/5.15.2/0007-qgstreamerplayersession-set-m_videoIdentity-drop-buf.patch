@@ -1,4 +1,4 @@
-From 30cdc7e8ea2023961e073d66ff998b0d1889c95d Mon Sep 17 00:00:00 2001
+From 8f16e9a40b193be4c46e35976cfe7ab490d27e01 Mon Sep 17 00:00:00 2001
 From: "james.lin" <james.lin@rock-chips.com>
 Date: Wed, 17 Jan 2018 09:25:17 +0800
 Subject: [PATCH 07/14] qgstreamerplayersession: set m_videoIdentity

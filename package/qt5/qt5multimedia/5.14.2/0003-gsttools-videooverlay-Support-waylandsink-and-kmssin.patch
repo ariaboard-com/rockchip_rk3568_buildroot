@@ -1,16 +1,16 @@
-From d96b39959a3b306e9856d3b2e40ed2feca4b125e Mon Sep 17 00:00:00 2001
+From 1b25f9233cbec33aa2338f61998782d7fb8eae4d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
 Subject: [PATCH 03/13] gsttools: videooverlay: Support waylandsink and kmssink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- src/gsttools/qgstreamervideooverlay.cpp | 154 ++++++++++++++++++++----
+ src/gsttools/qgstreamervideooverlay.cpp | 155 ++++++++++++++++++++----
  src/gsttools/qgstreamervideooverlay_p.h |   2 +
- 2 files changed, 130 insertions(+), 26 deletions(-)
+ 2 files changed, 131 insertions(+), 26 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
-index 6b862e4..b353eab 100644
+index 6b862e4..72a03dc 100644
 --- a/src/gsttools/qgstreamervideooverlay.cpp
 +++ b/src/gsttools/qgstreamervideooverlay.cpp
 @@ -40,7 +40,11 @@
@@ -36,7 +36,7 @@ index 6b862e4..b353eab 100644
  #include <QtMultimedia/private/qtmultimediaglobal_p.h>
  
  QT_BEGIN_NAMESPACE
-@@ -447,27 +455,102 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
+@@ -447,27 +455,103 @@ void QGstreamerVideoOverlay::setWindowHandle(WId id)
  {
      m_windowId = id;
  
@@ -102,10 +102,8 @@ index 6b862e4..b353eab 100644
 +
 +    // It's wayland platform, using wl_surface as window handle.
 +    if (compositor) {
-+        if (!surface || !isActive()) {
-+            gst_video_overlay_set_window_handle(overlay, 0);
-+            goto out;
-+        }
++        if (!isActive())
++            surface = NULL;
 +
 +        gst_video_overlay_set_window_handle(overlay, (WId) surface);
 +
@@ -126,6 +124,9 @@ index 6b862e4..b353eab 100644
 +                                               position.x() + m_rect.x(),
 +                                               position.y() + m_rect.y(),
 +                                               m_rect.width(), m_rect.height());
++
++        if (!surface)
++            goto out;
 +
 +        // HACK: Tell wayland server about the video rectangle
 +        struct wl_region *region = wl_compositor_create_region(compositor);
@@ -153,7 +154,7 @@ index 6b862e4..b353eab 100644
  }
  
  void QGstreamerVideoOverlay::expose()
-@@ -499,24 +582,42 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
+@@ -499,24 +583,42 @@ void QGstreamerVideoOverlay::setRenderRectangle(const QRect &rect)
          h = rect.height();
      }
  
@@ -208,7 +209,7 @@ index 6b862e4..b353eab 100644
  #if !GST_CHECK_VERSION(1,0,0)
      if (gm && (GST_MESSAGE_TYPE(gm) == GST_MESSAGE_ELEMENT) &&
              gst_structure_has_name(gm->structure, "prepare-xwindow-id")) {
-@@ -574,6 +675,7 @@ void QGstreamerVideoOverlay::updateIsActive()
+@@ -574,6 +676,7 @@ void QGstreamerVideoOverlay::updateIsActive()
      if (newIsActive != m_isActive) {
          m_isActive = newIsActive;
          emit activeChanged();

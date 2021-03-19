@@ -1,4 +1,4 @@
-From c4884ccf25b35bff5797fc6f9e98c33cdb968229 Mon Sep 17 00:00:00 2001
+From 4c90d6c84ce3becf3545b24e09ade59b1b16689e Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 11 Mar 2019 11:51:00 +0800
 Subject: [PATCH 09/13] gstreamer: mediaplayer: Force redo setMedia after

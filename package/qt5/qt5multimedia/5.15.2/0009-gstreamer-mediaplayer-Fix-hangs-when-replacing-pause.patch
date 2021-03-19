@@ -1,4 +1,4 @@
-From 5699042040beeb7d509b7a7f6ea0b7d8a4819ec9 Mon Sep 17 00:00:00 2001
+From b401925d97b584ec93873f5e86b552895b58bf6a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 17:51:51 +0800
 Subject: [PATCH 09/14] gstreamer: mediaplayer: Fix hangs when replacing paused
