@@ -29,7 +29,7 @@ QT5BASE_CONFIGURE_OPTS += \
 	-no-pch \
 	-shared
 
-ifeq ($(BR2_PACKAGE_QT5_VERSION_5_9),)
+ifeq ($(BR2_PACKAGE_QT5_VERSION_5_9)$(BR2_PACKAGE_QT5_VERSION_5_12),)
 QT5BASE_CONFIGURE_OPTS += \
 	-no-feature-relocatable
 endif
