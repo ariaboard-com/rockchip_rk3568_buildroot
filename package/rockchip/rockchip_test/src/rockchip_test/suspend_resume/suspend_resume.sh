@@ -54,10 +54,12 @@ auto_suspend_resume_rtc()
     echo "sleep for $sus_time second"
     echo 0 > /sys/class/rtc/rtc0/wakealarm
     echo "+${sus_time}" > /sys/class/rtc/rtc0/wakealarm
+    ifconfig wlan0 down
     pm-suspend
     wake_time=$(( ( $(random) % $WKAE_INTERVAL ) + $WAKE_MIN ))
     echo "wake for $wake_time second"
     sleep $wake_time
+    ifconfig wlan0 up
     let "cnt=$cnt+1"
     done
 }
