@@ -1,4 +1,4 @@
-From 263e46ad6760965727b59cb77f2bb34713dbf365 Mon Sep 17 00:00:00 2001
+From fa2e4e6d18c7cf99b55b1e22cfe964add84dddcc Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 16 Jul 2020 17:18:42 +0800
 Subject: [PATCH 12/16] qwaylandshmbackingstore: Ignore resizing with no screen

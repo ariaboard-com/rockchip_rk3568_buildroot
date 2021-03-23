@@ -1,7 +1,7 @@
-From bf7b2de2b632d898cf69ddc9462e01d4424c94cc Mon Sep 17 00:00:00 2001
+From edc4264aea6c34f19bf3c3bff87090247a0eba78 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 15 Jan 2021 16:27:59 +0800
-Subject: [PATCH 14/14] quicktools: Prefer VideoWindowBackend when using gst
+Subject: [PATCH 13/13] quicktools: Prefer VideoWindowBackend when using gst
  sink
 
 Prefer VideoWindowBackend for video overlay.

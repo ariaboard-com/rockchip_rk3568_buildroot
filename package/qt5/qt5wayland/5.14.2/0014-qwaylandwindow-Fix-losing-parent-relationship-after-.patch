@@ -1,4 +1,4 @@
-From 034dcfb8ae3bfdffa56c6e247c85b1120839fe86 Mon Sep 17 00:00:00 2001
+From 158f0f4a9287ab5d6570bd6f41c7cb310e0094a4 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 4 Nov 2020 11:42:23 +0800
 Subject: [PATCH 14/15] qwaylandwindow: Fix losing parent relationship after

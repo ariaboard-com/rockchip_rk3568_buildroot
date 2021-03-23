@@ -1,4 +1,4 @@
-From a2a7b07098507e0abc91f84f133b5c517faa434d Mon Sep 17 00:00:00 2001
+From 96486d8783c03394c1e12d8f758c3d7ff216b90d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 4 Mar 2019 17:22:51 +0800
 Subject: [PATCH 07/16] qwaylandwindow: Don't try to move fullscreen/maximized

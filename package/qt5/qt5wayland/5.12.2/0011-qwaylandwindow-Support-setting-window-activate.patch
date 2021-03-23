@@ -1,4 +1,4 @@
-From 1b1adf2aafc57b42111be950e37a188d29396368 Mon Sep 17 00:00:00 2001
+From 9c739ae2ce7a703801622e310b69be16324ffd66 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:28:29 +0800
 Subject: [PATCH 11/16] qwaylandwindow: Support setting window activate

@@ -1,4 +1,4 @@
-From 63e712238f0bc0b104e53bdf1456c272928e7664 Mon Sep 17 00:00:00 2001
+From 4713c77a0d36c7f564df7c57b1c58401d1da4673 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 27 Feb 2019 16:52:15 +0800
 Subject: [PATCH 09/18] qwaylandxdgshellv6: Support setting window position
@@ -18,9 +18,9 @@ Change-Id: Ifb1433b3902d44c1b2e43036bc1805a6e00128fb
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  src/client/qwaylandwindow.cpp     |  4 +---
- src/client/qwaylandxdgshellv6.cpp | 28 ++++++++++++++++++++++++++++
+ src/client/qwaylandxdgshellv6.cpp | 25 +++++++++++++++++++++++++
  src/client/qwaylandxdgshellv6_p.h |  2 ++
- 3 files changed, 31 insertions(+), 3 deletions(-)
+ 3 files changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
 index aae1c678..398ba2ef 100644
@@ -45,10 +45,10 @@ index aae1c678..398ba2ef 100644
      int x = 0;
      int y = 0;
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index ac974536..3a84b5d7 100644
+index ac974536..4c0f2661 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
-@@ -72,6 +72,26 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
+@@ -72,6 +72,23 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
      m_xdgSurface->m_window->configure(0, m_configureState.width, m_configureState.height);
  }
  
@@ -63,9 +63,6 @@ index ac974536..3a84b5d7 100644
 +        return;
 +    m_position = position;
 +
-+    position += QPoint(window->frameMargins().top(),
-+                       window->frameMargins().left());
-+
 +    // HACK: Set window position through .set_window_geometry(x, y, 0, 0)
 +    m_xdgSurface->set_window_geometry(position.x() > 0 ? position.x() : 0,
 +                                      position.y() > 0 ? position.y() : 0,
@@ -75,7 +72,7 @@ index ac974536..3a84b5d7 100644
  void QWaylandXdgSurfaceV6::Toplevel::zxdg_toplevel_v6_configure(int32_t width, int32_t height, wl_array *states)
  {
      m_configureState.width = width;
-@@ -211,6 +231,10 @@ bool QWaylandXdgSurfaceV6::handleExpose(const QRegion &region)
+@@ -211,6 +228,10 @@ bool QWaylandXdgSurfaceV6::handleExpose(const QRegion &region)
          m_exposeRegion = region;
          return true;
      }
@@ -86,7 +83,7 @@ index ac974536..3a84b5d7 100644
      return false;
  }
  
-@@ -252,6 +276,10 @@ void QWaylandXdgSurfaceV6::zxdg_surface_v6_configure(uint32_t serial)
+@@ -252,6 +273,10 @@ void QWaylandXdgSurfaceV6::zxdg_surface_v6_configure(uint32_t serial)
      else if (m_popup)
          m_popup->applyConfigure();
  

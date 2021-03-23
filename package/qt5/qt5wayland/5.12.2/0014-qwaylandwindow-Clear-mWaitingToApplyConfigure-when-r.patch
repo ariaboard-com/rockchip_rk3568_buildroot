@@ -1,4 +1,4 @@
-From 33851e8e3780847e286bab3bf323b785b695ed90 Mon Sep 17 00:00:00 2001
+From 9a18b66c0800f5d4a623433fb1e6a75b5a523808 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 13 Oct 2020 17:01:39 +0800
 Subject: [PATCH 14/16] qwaylandwindow: Clear mWaitingToApplyConfigure when

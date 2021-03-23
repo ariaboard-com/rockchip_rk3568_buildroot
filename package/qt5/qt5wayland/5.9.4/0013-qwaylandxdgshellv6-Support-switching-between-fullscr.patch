@@ -1,4 +1,4 @@
-From 5de871f12148ac61c8abee05e13640f1324bdea2 Mon Sep 17 00:00:00 2001
+From 8510fd97bd7584ac29f34cfa5d1e63bf7a58b78a Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:23:59 +0800
 Subject: [PATCH 13/18] qwaylandxdgshellv6: Support switching between
@@ -14,7 +14,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/src/client/qwaylandxdgshellv6.cpp b/src/client/qwaylandxdgshellv6.cpp
-index 3a84b5d7..6889d6c5 100644
+index 4c0f2661..cfc3b817 100644
 --- a/src/client/qwaylandxdgshellv6.cpp
 +++ b/src/client/qwaylandxdgshellv6.cpp
 @@ -70,6 +70,9 @@ void QWaylandXdgSurfaceV6::Toplevel::applyConfigure()
@@ -27,7 +27,7 @@ index 3a84b5d7..6889d6c5 100644
  }
  
  void QWaylandXdgSurfaceV6::Toplevel::updatePosition()
-@@ -297,8 +300,13 @@ void QWaylandXdgSurfaceV6::setMaximized()
+@@ -294,8 +297,13 @@ void QWaylandXdgSurfaceV6::setMaximized()
  
  void QWaylandXdgSurfaceV6::setFullscreen()
  {
@@ -43,7 +43,7 @@ index 3a84b5d7..6889d6c5 100644
  }
  
  void QWaylandXdgSurfaceV6::setNormal()
-@@ -314,8 +322,13 @@ void QWaylandXdgSurfaceV6::setNormal()
+@@ -311,8 +319,13 @@ void QWaylandXdgSurfaceV6::setNormal()
  
  void QWaylandXdgSurfaceV6::setMinimized()
  {

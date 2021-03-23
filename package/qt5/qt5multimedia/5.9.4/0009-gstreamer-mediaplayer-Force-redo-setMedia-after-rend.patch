@@ -1,7 +1,7 @@
-From 34106a1abd2d74853f04c78cb48b2997ed4e2f43 Mon Sep 17 00:00:00 2001
+From 36a295be61c4d6e043f775b8ae15206c3d0afafb Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 11 Mar 2019 11:51:00 +0800
-Subject: [PATCH 09/13] gstreamer: mediaplayer: Force redo setMedia after
+Subject: [PATCH 09/12] gstreamer: mediaplayer: Force redo setMedia after
  renderer changed
 
 Somehow the playbin3 will screw up when setVideoRenderer been called

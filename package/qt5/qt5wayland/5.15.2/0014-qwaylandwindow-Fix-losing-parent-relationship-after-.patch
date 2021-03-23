@@ -1,4 +1,4 @@
-From 80f0c56cd3042eec1f9ee5f4d391e583062aa87d Mon Sep 17 00:00:00 2001
+From 4ce4e9dce2881dc0f5277e48a563d8b073f3f4e9 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 4 Nov 2020 11:42:23 +0800
 Subject: [PATCH 14/15] qwaylandwindow: Fix losing parent relationship after
@@ -12,7 +12,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 20 insertions(+)
 
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index c129de9f..67b35267 100644
+index c129de9..67b3526 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -217,6 +217,26 @@ void QWaylandWindow::initializeWlSurface()

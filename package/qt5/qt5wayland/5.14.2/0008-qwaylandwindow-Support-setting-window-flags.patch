@@ -1,4 +1,4 @@
-From f407493ed0413fbe425fb71370696d1d7885c390 Mon Sep 17 00:00:00 2001
+From aa39acf06a97e52c95a2beb419ec9e839aa1996d Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Thu, 7 May 2020 09:12:08 +0800
 Subject: [PATCH 08/15] qwaylandwindow: Support setting window flags

@@ -1,13 +1,14 @@
-From 1b25f9233cbec33aa2338f61998782d7fb8eae4d Mon Sep 17 00:00:00 2001
+From 42d5c8a77817cc987e3d9216efb09622fa07eee9 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 28 Nov 2018 21:31:49 +0800
-Subject: [PATCH 03/13] gsttools: videooverlay: Support waylandsink and kmssink
+Subject: [PATCH 03/12] gsttools: videooverlay: Support waylandsink and kmssink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  src/gsttools/qgstreamervideooverlay.cpp | 155 ++++++++++++++++++++----
  src/gsttools/qgstreamervideooverlay_p.h |   2 +
- 2 files changed, 131 insertions(+), 26 deletions(-)
+ src/gsttools/qgstreamervideowidget.cpp  |  15 ++-
+ 3 files changed, 143 insertions(+), 29 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideooverlay.cpp b/src/gsttools/qgstreamervideooverlay.cpp
 index 6b862e4..72a03dc 100644
@@ -237,6 +238,56 @@ index f2ca8a2..32b3d93 100644
  };
  
  QT_END_NAMESPACE
+diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
+index 55f9157..91a487e 100644
+--- a/src/gsttools/qgstreamervideowidget.cpp
++++ b/src/gsttools/qgstreamervideowidget.cpp
+@@ -43,10 +43,11 @@
+ #include <QtCore/qdebug.h>
+ #include <QtGui/qevent.h>
+ #include <QtGui/qpainter.h>
++#include <QtGui/qwindow.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-class QGstreamerVideoWidget : public QWidget
++class QGstreamerVideoWidget : public QWidget, public QVideoWindowAbstractInterface
+ {
+ public:
+     QGstreamerVideoWidget(QGstreamerVideoOverlay *overlay, QWidget *parent = 0)
+@@ -85,6 +86,14 @@ public:
+         painter.fillRect(rect(), palette().window());
+     }
+ 
++    WId videoWinId() const Q_DECL_OVERRIDE {
++        QWidget *parent = parentWidget();
++        if (parent)
++            return parent->winId() ?: parent->internalWinId();
++
++        return winId() ?: internalWinId();
++    }
++
+ protected:
+     void paintEvent(QPaintEvent *) override
+     {
+@@ -131,7 +140,7 @@ void QGstreamerVideoWidgetControl::createVideoWidget()
+     m_widget = new QGstreamerVideoWidget(&m_videoOverlay);
+ 
+     m_widget->installEventFilter(this);
+-    m_videoOverlay.setWindowHandle(m_windowId = m_widget->winId());
++    m_videoOverlay.setWindowHandle(m_windowId = m_widget->videoWinId());
+ }
+ 
+ GstElement *QGstreamerVideoWidgetControl::videoSink()
+@@ -171,7 +180,7 @@ bool QGstreamerVideoWidgetControl::eventFilter(QObject *object, QEvent *e)
+ {
+     if (m_widget && object == m_widget) {
+         if (e->type() == QEvent::ParentChange || e->type() == QEvent::Show || e->type() == QEvent::WinIdChange) {
+-            WId newWId = m_widget->winId();
++            WId newWId = m_widget->videoWinId();
+             if (newWId != m_windowId)
+                 m_videoOverlay.setWindowHandle(m_windowId = newWId);
+         }
 -- 
 2.20.1
 
