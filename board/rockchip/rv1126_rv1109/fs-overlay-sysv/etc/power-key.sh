@@ -6,23 +6,24 @@ TIMEOUT=3 # s
 PIDFILE="/tmp/$(basename $0).pid"
 LOCKFILE=/tmp/.power_key
 
+power_key_led_blink()
+{
+    echo 0 > /sys/class/leds/firefly:blue:power/brightness
+    echo 0 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 1 > /sys/class/leds/firefly:blue:power/brightness
+    echo 1 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 0 > /sys/class/leds/firefly:blue:power/brightness
+    echo 0 > /sys/class/leds/firefly:yellow:user/brightness
+    sleep 1
+    echo 1 > /sys/class/leds/firefly:blue:power/brightness
+    echo 1 > /sys/class/leds/firefly:yellow:user/brightness
+}
+
 short_press()
 {
-	logger -t $(basename $0) "[$$]: Power key short press..."
-
-	if type pm-suspend &>/dev/null; then
-		SUSPEND_CMD="pm-suspend"
-	else
-		SUSPEND_CMD="echo -n mem > /sys/power/state"
-	fi
-
-	if [ ! -f $LOCKFILE ]; then
-		logger -t $(basename $0) "[$$]: Prepare to suspend..."
-
-		touch $LOCKFILE
-		sh -c "$SUSPEND_CMD"
-		{ sleep 2 && rm $LOCKFILE; }&
-	fi
+	power_key_led_blink
 }
 
 long_press()
