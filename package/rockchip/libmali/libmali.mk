@@ -72,12 +72,14 @@ LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false -Dkhr-header=true \
 		    -Dplatform=$(LIBMALI_PLATFORM) -Dgpu=$(LIBMALI_GPU) \
 		    -Dversion=$(LIBMALI_VER)
 
-ifeq ($(BR2_PACKAGE_LIBMALI_WITHOUT_CL),)
-LIBMALI_CONF_OPTS += -Dsubversion=$(LIBMALI_SUBVER)
-else ifneq ($(LIBMALI_SUBVER),)
-LIBMALI_CONF_OPTS += -Dsubversion=$(LIBMALI_SUBVER)-without-cl
-else
-LIBMALI_CONF_OPTS += -Dsubversion=without-cl
+ifeq ($(BR2_PACKAGE_LIBMALI_WITHOUT_CL),y)
+LIBMALI_SUBVER += without-cl
 endif
+
+ifeq ($(BR2_PACKAGE_LIBMALI_WITH_DUMMY)|$(BR2_PACKAGE_LIBMALI_DUMMY),y|)
+LIBMALI_SUBVER += dummy
+endif
+
+LIBMALI_CONF_OPTS += -Dsubversion=$(subst $(eval) $(eval),-,$(LIBMALI_SUBVER))
 
 $(eval $(meson-package))
