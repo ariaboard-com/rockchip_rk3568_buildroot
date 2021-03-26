@@ -65,7 +65,7 @@ LIBMALI_GPU = bifrost-g31
 LIBMALI_VER = rxp0
 else ifeq ($(BR2_PACKAGE_RK356X),y)
 LIBMALI_GPU = bifrost-g52
-LIBMALI_VER = r25p0
+LIBMALI_VER = g2p0
 endif
 
 LIBMALI_CONF_OPTS = -Dwith-overlay=true -Dopencl-icd=false -Dkhr-header=true \
