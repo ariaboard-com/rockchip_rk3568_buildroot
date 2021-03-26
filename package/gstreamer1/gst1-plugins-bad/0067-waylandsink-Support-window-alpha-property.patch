@@ -1,4 +1,4 @@
-From cfda918db4c905e25883e6e69ba916694ece77a6 Mon Sep 17 00:00:00 2001
+From 8f5c2dfeefdaf8e0a4e0456cd6ec0ddfd32d55c0 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 26 Mar 2021 02:32:27 +0800
 Subject: [PATCH 67/67] waylandsink: Support window alpha property
@@ -8,11 +8,11 @@ gst-launch-1.0 videotestsrc ! waylandsink alpha=0.5
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
- ext/wayland/gstwaylandsink.c | 32 +++++++++++++++++++++++++++++
+ ext/wayland/gstwaylandsink.c | 32 +++++++++++++++++++++++++++
  ext/wayland/gstwaylandsink.h |  1 +
- ext/wayland/wlwindow.c       | 39 ++++++++++++++++++++++++------------
+ ext/wayland/wlwindow.c       | 43 +++++++++++++++++++++++-------------
  ext/wayland/wlwindow.h       |  1 +
- 4 files changed, 60 insertions(+), 13 deletions(-)
+ 4 files changed, 62 insertions(+), 15 deletions(-)
 
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
 index 697c394..a8ae51c 100644
@@ -119,7 +119,7 @@ index 8f4d2f1..966830d 100644
    gchar *display_name;
  
 diff --git a/ext/wayland/wlwindow.c b/ext/wayland/wlwindow.c
-index 202034f..e5d8c96 100644
+index 202034f..bb032b6 100644
 --- a/ext/wayland/wlwindow.c
 +++ b/ext/wayland/wlwindow.c
 @@ -24,6 +24,7 @@
@@ -145,11 +145,13 @@ index 202034f..e5d8c96 100644
    if (!window)
      return;
  
-   if (window->display->xdg_shell)
+-  if (window->display->xdg_shell)
 -    zxdg_toplevel_v6_set_title (window->xdg_toplevel, s);
-+    zxdg_toplevel_v6_set_title (window->xdg_toplevel, config);
-   else
+-  else
 -    wl_shell_surface_set_title (window->wl_shell_surface, s);
++  if (window->xdg_toplevel)
++    zxdg_toplevel_v6_set_title (window->xdg_toplevel, config);
++  else if (window->wl_shell_surface)
 +    wl_shell_surface_set_title (window->wl_shell_surface, config);
 +}
 +
