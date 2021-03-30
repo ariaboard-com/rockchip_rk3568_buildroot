@@ -58,6 +58,7 @@ function lunch_rockchip()
 
 	CONFIG=${TARGET_OUTPUT_DIR}/.config
 	cp ${CONFIG}{,.new}
+	[ -f ${CONFIG}.old ] || return 0
 	mv ${CONFIG}{.old,} &>/dev/null
 
 	make -C ${BUILDROOT_DIR} O="$TARGET_OUTPUT_DIR" olddefconfig &>/dev/null
