@@ -47,7 +47,7 @@ index d148b50..675e66b 100644
  
 +		/**
 +		 * HACK: Assuming Nth primary plane (or cursor) is the primary
-+		 * plane for the Nth crtc. 
++		 * plane for the Nth crtc.
 +		 * See:
 +		 * https://lore.kernel.org/dri-devel/20200807090706.GA2352366@phenom.ffwll.local/
 +		 */

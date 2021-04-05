@@ -146,7 +146,7 @@ endef
 WESTON_POST_INSTALL_TARGET_HOOKS += WESTON_INSTALL_TARGET_ENV
 
 define WESTON_INSTALL_TARGET_SCRIPTS
-        $(INSTALL) -D -m 0755 $(@D)/doc/scripts/calibration-helper.bash \
+        $(INSTALL) -D -m 0755 $(WESTON_PKGDIR)/weston-calibration-helper.sh \
                 $(TARGET_DIR)/bin/weston-calibration-helper.sh
 endef
 
