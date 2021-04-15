@@ -81,9 +81,8 @@ $$(BINARIES_DIR)/rootfs.$(1): target-finalize $$(ROOTFS_$(2)_DEPENDENCIES)
 	echo "set -e" >> $$(FAKEROOT_SCRIPT)
 	echo "chown -h -R 0:0 $$(TARGET_DIR)" >> $$(FAKEROOT_SCRIPT)
 ifeq ($$(BR2_PACKAGE_IPCWEB_BACKEND), y)
-ifneq ($$(BR2_PACKAGE_RK_OEM), y)
-	echo "chown -R www-data:www-data $$(TARGET_DIR)/usr/www" >>  $$(FAKEROOT_SCRIPT)
-endif
+	echo "[ -d $$(TARGET_DIR)/usr/www ] && chown -R www-data:www-data $$(TARGET_DIR)/usr/www" >>  $$(FAKEROOT_SCRIPT)
+	echo "[ -d $$(TARGET_DIR)/oem/www ] && chown -R www-data:www-data $$(TARGET_DIR)/oem/www" >>  $$(FAKEROOT_SCRIPT)
 endif
 ifneq ($$(ROOTFS_USERS_TABLES),)
 	cat $$(ROOTFS_USERS_TABLES) >> $$(USERS_TABLE)

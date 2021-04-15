@@ -1,4 +1,4 @@
-From 0d9ee6332bb8d161c928d5acc0fd129ef15a00df Mon Sep 17 00:00:00 2001
+From 6f63082a53621b220cbfee40130d40f5ae223149 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Sat, 9 May 2020 17:05:32 +0800
 Subject: [PATCH 09/16] qwaylanddisplay: Wakeup main event dispatcher when

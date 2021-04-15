@@ -205,7 +205,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_EFL_DRM),y)
 EFL_CONF_OPTS += --enable-drm
-EFL_DEPENDENCIES += libdrm libegl mesa3d
+EFL_DEPENDENCIES += libdrm libegl libgbm
 else
 EFL_CONF_OPTS += --disable-drm
 endif

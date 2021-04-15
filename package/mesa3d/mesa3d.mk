@@ -194,6 +194,7 @@ MESA3D_CONF_OPTS += \
 	-Dplatforms=$(subst $(space),$(comma),$(MESA3D_PLATFORMS))
 
 ifeq ($(BR2_PACKAGE_MESA3D_GBM),y)
+MESA3D_PROVIDES += libgbm
 MESA3D_CONF_OPTS += \
 	-Dgbm=enabled
 else

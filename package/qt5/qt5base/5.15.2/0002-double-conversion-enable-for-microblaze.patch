@@ -1,7 +1,7 @@
-From 2321f9ab2e5fc849e0d06f67ad81457a27beef8c Mon Sep 17 00:00:00 2001
+From f8139230ab1204af744e4e21b748be0164c2d29f Mon Sep 17 00:00:00 2001
 From: Peter Seiderer <ps.report@gmx.net>
 Date: Tue, 21 Aug 2018 21:11:40 +0200
-Subject: [PATCH 02/21] double-conversion: enable for microblaze
+Subject: [PATCH 02/20] double-conversion: enable for microblaze
 
 Signed-off-by: Peter Seiderer <ps.report@gmx.net>
 [Rebased for Qt5.12.0]

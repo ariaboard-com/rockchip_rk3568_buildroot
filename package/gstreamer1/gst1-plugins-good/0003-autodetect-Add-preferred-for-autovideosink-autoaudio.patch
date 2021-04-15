@@ -28,7 +28,7 @@ index 1edf6d8..e71c348 100644
  
    autodetect->media_klass = "Audio";
    autodetect->flag = GST_ELEMENT_FLAG_SINK;
-+  autodetect->preferred = getenv("AUTOAUDIOSINK_PREFERRED");
++  autodetect->preferred = g_getenv ("AUTOAUDIOSINK_PREFERRED");
  
    sink->ts_offset = DEFAULT_TS_OFFSET;
  }
@@ -86,7 +86,7 @@ index e4fd91e..fc4775d 100644
  
    autodetect->media_klass = "Video";
    autodetect->flag = GST_ELEMENT_FLAG_SINK;
-+  autodetect->preferred = getenv("AUTOVIDEOSINK_PREFERRED");
++  autodetect->preferred = g_getenv ("AUTOVIDEOSINK_PREFERRED");
  
    sink->ts_offset = DEFAULT_TS_OFFSET;
  }

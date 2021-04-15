@@ -1,7 +1,7 @@
-From 84f0b819e1cf21022d34e64f886e8a57e91d94c0 Mon Sep 17 00:00:00 2001
+From a3aa631cdfeb35f97e9cde4bc4ce2629aea6919c Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Fri, 30 Nov 2018 17:50:55 +0800
-Subject: [PATCH 10/18] qwindow: Add interface to override win id for video
+Subject: [PATCH 10/22] qwindow: Add interface to override win id for video
  window
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 7 insertions(+)
 
 diff --git a/src/gui/kernel/qwindow.h b/src/gui/kernel/qwindow.h
-index 5ee1d00f5..b2d652b9f 100644
+index 5ee1d00f..b2d652b9 100644
 --- a/src/gui/kernel/qwindow.h
 +++ b/src/gui/kernel/qwindow.h
 @@ -402,6 +402,13 @@ template <> inline const QWindow *qobject_cast<const QWindow*>(const QObject *o)

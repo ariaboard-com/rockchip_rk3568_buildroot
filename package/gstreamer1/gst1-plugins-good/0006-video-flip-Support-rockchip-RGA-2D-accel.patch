@@ -188,7 +188,7 @@ index c6132f5..43ea033 100644
 +  static int rga_inited = 0;
 +  const char *buf;
 +
-+  buf = getenv ("GST_VIDEO_FLIP_USE_RGA");
++  buf = g_getenv ("GST_VIDEO_FLIP_USE_RGA");
 +  if (!buf || strcmp (buf, "1"))
 +    return FALSE;
 +

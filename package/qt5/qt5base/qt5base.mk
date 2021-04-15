@@ -29,7 +29,7 @@ QT5BASE_CONFIGURE_OPTS += \
 	-no-pch \
 	-shared
 
-ifeq ($(BR2_PACKAGE_QT5_VERSION_5_9),)
+ifeq ($(BR2_PACKAGE_QT5_VERSION_5_9)$(BR2_PACKAGE_QT5_VERSION_5_12),)
 QT5BASE_CONFIGURE_OPTS += \
 	-no-feature-relocatable
 endif
@@ -77,10 +77,9 @@ else
 QT5BASE_CONFIGURE_OPTS += -no-kms
 endif
 
-# Uses libgbm from mesa3d
-ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
+ifeq ($(BR2_PACKAGE_HAS_LIBGBM),y)
 QT5BASE_CONFIGURE_OPTS += -gbm
-QT5BASE_DEPENDENCIES += mesa3d
+QT5BASE_DEPENDENCIES += libgbm
 else
 QT5BASE_CONFIGURE_OPTS += -no-gbm
 endif

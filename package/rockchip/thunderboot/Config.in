@@ -28,6 +28,16 @@ config BR2_THUNDERBOOT_ETH
 	help
 	  Ethernet connection
 
+config BR2_THUNDERBOOT_EMMC
+	bool "emmc configuration"
+	help
+	  EMMC enable
+
+config BR2_THUNDERBOOT_SOUND
+	bool "sound configuration"
+	help
+	  Sound enable
+
 config BR2_THUNDERBOOT_SIMPLIFY_USB
 	bool "simplify usb configuration"
 	help

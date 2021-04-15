@@ -38,8 +38,8 @@ index a2e9ed4453..5a95c9f129 100644
    playbin->multiview_mode = GST_VIDEO_MULTIVIEW_FRAME_PACKING_NONE;
    playbin->multiview_flags = GST_VIDEO_MULTIVIEW_FLAGS_NONE;
 +
-+  playbin->apreferred = getenv("PLAYBIN2_PREFERRED_AUDIOSINK");
-+  playbin->vpreferred = getenv("PLAYBIN2_PREFERRED_VIDEOSINK");
++  playbin->apreferred = g_getenv ("PLAYBIN2_PREFERRED_AUDIOSINK");
++  playbin->vpreferred = g_getenv ("PLAYBIN2_PREFERRED_VIDEOSINK");
  }
  
  static void

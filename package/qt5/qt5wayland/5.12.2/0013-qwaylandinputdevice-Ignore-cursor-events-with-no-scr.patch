@@ -1,4 +1,4 @@
-From 99891e3a133526ec857ee9d336663bb089388361 Mon Sep 17 00:00:00 2001
+From 3010e5eeb5cac20e98fea00c3500c949a0e5f08f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 8 Sep 2020 09:43:39 +0800
 Subject: [PATCH 13/16] qwaylandinputdevice: Ignore cursor events with no

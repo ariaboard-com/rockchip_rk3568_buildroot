@@ -1,7 +1,7 @@
-From 5699042040beeb7d509b7a7f6ea0b7d8a4819ec9 Mon Sep 17 00:00:00 2001
+From 0c404a0c6cec71191a5a9e22dffae8c1c26e198f Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 26 Dec 2018 17:51:51 +0800
-Subject: [PATCH 09/14] gstreamer: mediaplayer: Fix hangs when replacing paused
+Subject: [PATCH 09/13] gstreamer: mediaplayer: Fix hangs when replacing paused
  video sink
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>

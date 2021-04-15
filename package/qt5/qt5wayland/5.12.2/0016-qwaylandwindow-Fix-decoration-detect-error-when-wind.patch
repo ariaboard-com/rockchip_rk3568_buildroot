@@ -1,4 +1,4 @@
-From e3c62a7fd26cbf482c17a79c4eb07655f2ca6c1d Mon Sep 17 00:00:00 2001
+From e36646a0641925d1b4f45d3e114d8cbbcb2cf859 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 25 Nov 2020 15:46:03 +0800
 Subject: [PATCH 16/16] qwaylandwindow: Fix decoration detect error when window

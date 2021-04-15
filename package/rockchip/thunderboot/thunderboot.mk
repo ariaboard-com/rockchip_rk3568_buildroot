@@ -32,6 +32,16 @@ INSTALL_MODULES += $(THUNDERBOOT_USB_MODULES)
 THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_USB
 endif
 
+ifeq ($(BR2_THUNDERBOOT_EMMC),y)
+define THUNDERBOOT_EMMC
+	$(INSTALL) -D -m 755 $(@D)/S90tb_emmc $(TARGET_DIR)/etc/preinit.d/
+	$(INSTALL) -D -m 755 $(@D)/S07mountall $(TARGET_DIR)/etc/preinit.d/
+endef
+THUNDERBOOT_EMMC_MODULES = dw_mmc-rockchip.ko
+INSTALL_MODULES += $(THUNDERBOOT_EMMC_MODULES)
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_EMMC
+endif
+
 ifeq ($(BR2_THUNDERBOOT_ETH),y)
 define THUNDERBOOT_ETH
 	$(INSTALL) -D -m 755 $(@D)/S90tb_eth $(TARGET_DIR)/etc/preinit.d/
@@ -39,6 +49,21 @@ endef
 THUNDERBOOT_ETH_MODULES = stmmac.ko,stmmac-platform.ko,dwmac-rockchip.ko
 INSTALL_MODULES += $(THUNDERBOOT_ETH_MODULES)
 THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_ETH
+endif
+
+ifeq ($(BR2_THUNDERBOOT_SOUND),y)
+define THUNDERBOOT_SOUND
+	$(INSTALL) -D -m 755 $(@D)/S04tb_sound $(TARGET_DIR)/etc/preinit.d/
+endef
+THUNDERBOOT_SOUND_MODULES = snd-soc-dummy-codec.ko,snd-soc-rk817.ko,snd-soc-core.ko,\
+							snd-soc-simple-card-utils.ko,snd-soc-simple-card.ko,\
+							snd-soc-rockchip-i2s-tdm.ko,snd-soc-rockchip-pdm.ko,\
+							snd-soc-rockchip-i2s.ko,snd-soc-rockchip-pcm.ko,soundcore.ko,\
+							snd-aloop.ko,snd-hrtimer.ko,snd-pcm-dmaengine.ko,snd-pcm.ko,\
+							snd-timer.ko,snd.ko
+
+INSTALL_MODULES += $(THUNDERBOOT_SOUND_MODULES)
+THUNDERBOOT_POST_INSTALL_TARGET_HOOKS += THUNDERBOOT_SOUND
 endif
 
 define THUNDERBOOT_INSTALL_TARGET_CMDS

@@ -25,6 +25,7 @@ config BR2_PACKAGE_DRM_DISPLAY_OUTPUT
 config BR2_PACKAGE_RKMEDIA_MPP
     bool "rk mpp wrapper"
     select BR2_PACKAGE_MPP
+    select BR2_PACKAGE_MPP_ALLOCATOR_DRM
     help
       wrapped function of rk mpp
 
@@ -112,8 +113,12 @@ if BR2_PACKAGE_RKMEDIA_ROCKFACE
 
 config BR2_PACKAGE_RKMEDIA_ROCKFACE_RECOGNIZE
     bool "enable face recognize"
-    depends on BR2_PACKAGE_ROCKFACE_FACE_RECOGNITION
     depends on BR2_PACKAGE_SQLITE
+    select BR2_PACKAGE_ROCKFACE_FACE_DETECTION_V3_LARGE
+    select BR2_PACKAGE_ROCKFACE_FACE_RECOGNITION
+    select BR2_PACKAGE_ROCKFACE_FACE_LANDMARK
+    select BR2_PACKAGE_ROCKFACE_FACE_ATTRIBUTE
+    select BR2_PACKAGE_ROCKFACE_OBJECT_DETECTION
     default y
     help
         enable rockface recognize
@@ -213,5 +218,15 @@ config BR2_PACKAGE_RKMEDIA_RTSP_SERVER_H265
 
 endif # BR2_PACKAGE_RKMEDIA_RTSP_SERVER
 endif # BR2_PACKAGE_RKMEDIA_LIVE555
+
+config BR2_PACKAGE_RKMEDIA_MINI
+    bool "rkmedia mini version"
+    depends on BR2_PACKAGE_RKMEDIA_V4L2_CAPTURE
+    depends on BR2_PACKAGE_RKMEDIA_USE_AIQ
+    depends on BR2_PACKAGE_DRM_DISPLAY_OUTPUT
+    depends on BR2_PACKAGE_RKMEDIA_RKRGA
+    default n
+    help
+      mini version only support vi/vo/rga
 
 endif # BR2_PACKAGE_RKMEDIA

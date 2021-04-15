@@ -1,7 +1,7 @@
-From 71601253472809cac8c9cb167c22eb6b463c1ac5 Mon Sep 17 00:00:00 2001
+From a2be9f2d572116e350134138a8d2f80c6d35d056 Mon Sep 17 00:00:00 2001
 From: Yuqing Zhu <carol.zhu@nxp.com>
 Date: Mon, 27 Mar 2017 15:33:35 +0800
-Subject: [PATCH 01/14] qtbase: Fix build error when using EGL
+Subject: [PATCH 01/18] qtbase: Fix build error when using EGL
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

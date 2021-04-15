@@ -1,7 +1,7 @@
-From 0c5f206f2b97c6867abe5b78686049189296e523 Mon Sep 17 00:00:00 2001
+From 99b3e388507a0eba00826234511833db15c8e5e1 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Tue, 27 Nov 2018 16:03:31 +0800
-Subject: [PATCH 03/14] gsttools: videowidget: Set overlay rectangle when
+Subject: [PATCH 03/13] gsttools: videowidget: Set overlay rectangle when
  resized
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
@@ -10,7 +10,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/src/gsttools/qgstreamervideowidget.cpp b/src/gsttools/qgstreamervideowidget.cpp
-index 164e62f..dcaa556 100644
+index 164e62f..55f9157 100644
 --- a/src/gsttools/qgstreamervideowidget.cpp
 +++ b/src/gsttools/qgstreamervideowidget.cpp
 @@ -41,6 +41,7 @@
@@ -28,7 +28,7 @@ index 164e62f..dcaa556 100644
 -    QGstreamerVideoWidget(QWidget *parent = 0)
 +    QGstreamerVideoWidget(QGstreamerVideoOverlay *overlay, QWidget *parent = 0)
          :QWidget(parent)
-+	,m_videoOverlay(overlay)
++         ,m_videoOverlay(overlay)
      {
          setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
          QPalette palette;
@@ -37,7 +37,7 @@ index 164e62f..dcaa556 100644
      }
  
 +    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE {
-+	    m_videoOverlay->setRenderRectangle(QRect(QPoint(), event->size()));
++        m_videoOverlay->setRenderRectangle(QRect(QPoint(), event->size()));
 +    }
 +
      QSize m_nativeSize;

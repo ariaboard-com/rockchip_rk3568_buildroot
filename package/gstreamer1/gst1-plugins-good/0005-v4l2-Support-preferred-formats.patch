@@ -29,7 +29,7 @@ index 124c778..08706a7 100644
    }
  
 +  {
-+    char *buf = getenv ("GST_V4L2_PREFERRED_FOURCC");
++    char *buf = g_getenv ("GST_V4L2_PREFERRED_FOURCC");
 +    int max_rank = YUV_BASE_RANK * 2;
 +
 +    while (buf) {

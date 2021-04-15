@@ -1,7 +1,7 @@
-From 7f731ee65f7bca7c95ebe748f0345fd40bf1575e Mon Sep 17 00:00:00 2001
+From 8767ed78ab6d0bdae6a1e460d5b83b772c3d1029 Mon Sep 17 00:00:00 2001
 From: Peter Seiderer <ps.report@gmx.net>
 Date: Tue, 21 Aug 2018 21:11:40 +0200
-Subject: [PATCH 02/18] double-conversion: enable for microblaze
+Subject: [PATCH 02/22] double-conversion: enable for microblaze
 
 Signed-off-by: Peter Seiderer <ps.report@gmx.net>
 [Rebased for Qt5.12.0]
@@ -13,7 +13,7 @@ Signed-off-by: Peter Seiderer <ps.report@gmx.net>
  1 file changed, 1 insertion(+)
 
 diff --git a/src/3rdparty/double-conversion/include/double-conversion/utils.h b/src/3rdparty/double-conversion/include/double-conversion/utils.h
-index 70e697ca0..2bb8e389a 100644
+index 70e697ca..2bb8e389 100644
 --- a/src/3rdparty/double-conversion/include/double-conversion/utils.h
 +++ b/src/3rdparty/double-conversion/include/double-conversion/utils.h
 @@ -102,6 +102,7 @@ int main(int argc, char** argv) {

@@ -1,4 +1,4 @@
-From 0e1e60ba2e09ad6022f2c1811d33c3565b63c350 Mon Sep 17 00:00:00 2001
+From db9e59e5bfc48691b3e1f651cb62dca9830d9795 Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Wed, 20 Jan 2021 12:30:58 +0800
 Subject: [PATCH 01/15] Revert "Client: Don't send fake
@@ -17,7 +17,7 @@ Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
  3 files changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/examples/wayland/custom-extension/client-common/customextension.cpp b/examples/wayland/custom-extension/client-common/customextension.cpp
-index 8b77c061..aa0cb58a 100644
+index 8b77c06..aa0cb58 100644
 --- a/examples/wayland/custom-extension/client-common/customextension.cpp
 +++ b/examples/wayland/custom-extension/client-common/customextension.cpp
 @@ -81,11 +81,8 @@ QWindow *CustomExtension::windowForSurface(struct ::wl_surface *surface)
@@ -35,7 +35,7 @@ index 8b77c061..aa0cb58a 100644
          Q_ASSERT(window);
          window->removeEventFilter(this);
 diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
-index bc031ed5..53da83b9 100644
+index bc031ed..53da83b 100644
 --- a/src/client/qwaylandwindow.cpp
 +++ b/src/client/qwaylandwindow.cpp
 @@ -101,7 +101,7 @@ QWaylandWindow::~QWaylandWindow()
@@ -71,7 +71,7 @@ index bc031ed5..53da83b9 100644
      mShellSurface = nullptr;
      delete mSubSurfaceWindow;
 diff --git a/src/client/qwaylandwindow_p.h b/src/client/qwaylandwindow_p.h
-index 6cc1664b..9be9096f 100644
+index 6cc1664..9be9096 100644
 --- a/src/client/qwaylandwindow_p.h
 +++ b/src/client/qwaylandwindow_p.h
 @@ -267,7 +267,7 @@ private:

@@ -1,7 +1,7 @@
-From 3d62cfdd54c140dbb4f03b37ec0bcc083e69bf80 Mon Sep 17 00:00:00 2001
+From c589fff82b3bbd9736b05af9053912831e46068d Mon Sep 17 00:00:00 2001
 From: Peter Seiderer <ps.report@gmx.net>
 Date: Sun, 10 May 2020 22:26:43 +0200
-Subject: [PATCH 07/18] qimage_conversions: arm neon draw helper only available
+Subject: [PATCH 07/22] qimage_conversions: arm neon draw helper only available
  for little endian
 
 Fixes:
@@ -14,7 +14,7 @@ Signed-off-by: Peter Seiderer <ps.report@gmx.net>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/gui/image/qimage_conversions.cpp b/src/gui/image/qimage_conversions.cpp
-index 97a5f89e6..5fc5aba12 100644
+index 97a5f89e..5fc5aba1 100644
 --- a/src/gui/image/qimage_conversions.cpp
 +++ b/src/gui/image/qimage_conversions.cpp
 @@ -119,7 +119,7 @@ void qGamma_correct_back_to_linear_cs(QImage *image)

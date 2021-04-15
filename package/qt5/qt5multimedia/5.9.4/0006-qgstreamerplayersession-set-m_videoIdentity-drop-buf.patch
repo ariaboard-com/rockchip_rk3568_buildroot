@@ -1,7 +1,7 @@
-From 263d3bbca985f02cae765845c00a07bafa4ec6d8 Mon Sep 17 00:00:00 2001
+From 1e86a831695cdad14813be7e5d174375710b7b27 Mon Sep 17 00:00:00 2001
 From: "james.lin" <james.lin@rock-chips.com>
 Date: Wed, 17 Jan 2018 09:25:17 +0800
-Subject: [PATCH 06/13] qgstreamerplayersession: set m_videoIdentity
+Subject: [PATCH 06/12] qgstreamerplayersession: set m_videoIdentity
  drop-buffer-flags 0x0
 
 Identity pass buffer process may change buffer writable property cause

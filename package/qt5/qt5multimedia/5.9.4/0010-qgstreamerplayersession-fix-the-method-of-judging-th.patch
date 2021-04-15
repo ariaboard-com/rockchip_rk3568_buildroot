@@ -1,7 +1,7 @@
-From 3c51b8c480214570ba8439a93cc8a77ea4b8f931 Mon Sep 17 00:00:00 2001
+From f1fffe0f53f015bedffef1cdc26ce9328d28b2f9 Mon Sep 17 00:00:00 2001
 From: Francis Fan <francis.fan@rock-chips.com>
 Date: Thu, 5 Sep 2019 07:51:23 +0000
-Subject: [PATCH 10/13] qgstreamerplayersession: fix the method of judging the
+Subject: [PATCH 10/12] qgstreamerplayersession: fix the method of judging the
  video seekable attribute
 
 Signed-off-by: Francis Fan <francis.fan@rock-chips.com>
